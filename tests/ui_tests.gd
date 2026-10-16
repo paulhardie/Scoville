@@ -73,17 +73,56 @@ func run() -> void:
 	check(deck.visible, "the deck shows at £10 earned")
 	check(blank.size.x < big.x, "the Blank Button shrinks into the upper viewport: %s" % str(blank.size))
 	check(blank.get_global_rect().end.y <= deck.get_global_rect().position.y + 1.0, "it sits above the deck")
-	var plot_card: Control = screen.find_child("Card_plot", true, false)
-	var vat_card: Control = screen.find_child("Card_vat", true, false)
-	var line_card: Control = screen.find_child("Card_line", true, false)
-	check(plot_card.visible and vat_card.visible and not line_card.visible, "the plot and vat are offered, not the line")
-	var buy_plot: Button = screen.find_child("Buy_plot", true, false)
+	var plot_card: Control = screen.find_child("Card_plot_bell", true, false)
+	var buy_vat: Control = screen.find_child("BuySlot_vat", true, false)
+	var buy_line: Control = screen.find_child("BuySlot_line", true, false)
+	check(plot_card.visible and buy_vat.visible and not buy_line.visible, "the plot and vat are offered, not the line")
+	var buy_plot: Button = screen.find_child("Buy_plot_bell", true, false)
 	check(not buy_plot.disabled, "£10 buys the plot")
 	buy_plot.pressed.emit()
 	await process_frame
-	check(screen.game.stations.plot.owned and not buy_plot.visible, "the buy button buys it and goes")
-	var speed: Button = screen.find_child("Upgrade_plot_speed", true, false)
+	check(screen.game.plots.bell.owned and not buy_plot.visible, "the buy button buys it and goes")
+	var speed: Button = screen.find_child("Upgrade_plot_bell_speed", true, false)
 	check(speed.visible and speed.text.begins_with("Harvest Speed"), "its upgrades show: %s" % speed.text)
+
+	# Stage 3 (O8): the nav bar at £400 Operation Value.
+	var nav: Control = screen.find_child("Nav", true, false)
+	check(not nav.visible, "O8: no nav bar before £400")
+	screen.game.cash = 1000.0
+	(screen.find_child("BuySlot_vat", true, false) as Button).pressed.emit()
+	screen.game.account.best_ov = 400.0
+	await create_timer(0.6).timeout
+	check(nav.visible, "O8: the nav bar shows at £400")
+	var tabs := []
+	for tab in ["farms", "processing", "tech", "roster", "hq"]:
+		tabs.append((screen.find_child("Tab_" + tab, true, false) as Button).text)
+	check(tabs == ["Farms", "Processing", "[ ? ]", "[ ? ]", "[ ? ]"], "O8: Farms and Processing open, three [ ? ]: %s" % str(tabs))
+	check(deck.get_global_rect().end.y <= nav.get_global_rect().position.y + 1.0, "the deck ends above the nav bar")
+	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
+	await process_frame
+	var vat_card: Control = screen.find_child("Card_vat_0", true, false)
+	check((screen.find_child("Page_processing", true, false) as Control).visible and vat_card.is_visible_in_tree(), "Processing shows the vat")
+	check((screen.find_child("Recipe_vat_0", true, false) as OptionButton).item_count == 2, "its picker offers Off and Sweet Pepper Mash")
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	await process_frame
+	check(not (screen.find_child("Page_tech", true, false) as Control).visible, "O9: a locked tab doesn't open")
+
+	# O9: the Tech Tree at £750.
+	screen.game.account.best_ov = 750.0
+	await process_frame
+	check((screen.find_child("Tab_tech", true, false) as Button).text == "Tech Tree", "O9: the Tech Tree tab opens at £750")
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	await process_frame
+	check((screen.find_child("Page_tech", true, false) as Control).visible, "the Tech Tree page shows")
+	screen.game.stock.table_mild = 50
+	(screen.find_child("Tech_jalapeno_blueprint", true, false) as Button).pressed.emit()
+	await process_frame
+	var research: Button = screen.find_child("Research", true, false)
+	check(research.visible and not research.disabled, "the selected node can be researched")
+	research.pressed.emit()
+	await process_frame
+	check(screen.game.is_researched("jalapeno_blueprint"), "Research researches it")
+	check((screen.find_child("Card_plot_jalapeno", true, false) as Control).visible, "and the Jalapeño Plot appears on Farms")
 
 	screen.queue_free()
 	await process_frame

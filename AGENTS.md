@@ -26,7 +26,7 @@ Out of scope for v1.0 (brief): servers, accounts, cloud saves. Everything runs o
 
 - **Pure simulation, separate from UI.** `src/core/game.gd` (RefCounted, no nodes) owns all state and rules and advances by a fixed tick. Screens only present and report. A rule implemented twice is a bug.
 - **Deterministic.** A fixed tick (`Tuning.TICK_SECONDS`) and no wall clock inside the simulation; real time (offline progress, the Cook-Off) comes in from outside it. Nothing is random yet; the first chance-based rule brings one seeded RNG stream whose state is saved.
-- **Numbers in one place.** Tuning numbers live in `src/core/tuning.gd`, each citing its brief section or marked GUESS. Move them to data files under `data/` when there are enough of one kind (crops, recipes, managers, rooms), which the recipe table in v0.2–v0.3 will be.
+- **Numbers in one place.** Items, recipes, plots, slots and tech nodes live in `data/*.json`, loaded and checked only by `src/core/data_loader.gd`; bad data fails at load naming the file and row. Other tuning numbers live in `src/core/tuning.gd`. Each cites its brief section or decision, or is marked GUESS.
 - **Money is GBP** and shown as `£0.00`.
 - Colours and type sizes live only in `src/ui/style.gd`.
 - Scripts reference each other with `preload` constants, not `class_name`, so a stale `.godot` class cache can't break a headless run.
@@ -53,11 +53,12 @@ bash tools/serve_web.sh                              # export, then serve it on 
 
 | Path | What |
 | --- | --- |
-| `src/core/` | Simulation: `game.gd` (state, rules, time, saves), `tuning.gd` (every tuning number, with its source) |
+| `src/core/` | Simulation: `game.gd` (state, rules, time, saves; the run apart from the account), `data_loader.gd` (reads and checks `data/`), `tuning.gd` (every tuning number that isn't data, with its source) |
+| `data/` | Game data: `items`, `recipes`, `plots`, `slots`, `tech` (JSON). Only `data_loader.gd` reads it |
 | `src/sim/` | Scripted players for measuring: `engaged_player.gd` (the pacing player, [D003](docs/DECISIONS.md)) |
 | `src/ui/` | The screen (`main.gd`, built in code) and `style.gd` (palette and sizes) |
 | `scenes/` | `main.tscn`, the entry scene |
-| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`; `pacing_tests.gd` measures the first 15 minutes against FACTORY.md's criteria |
+| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 50 minutes against FACTORY.md's F and ECONOMY.md's N criteria |
 | `tools/` | `capture_ui.gd`, `export_web.sh`, `serve_web.sh`/`.py` (phone build), `install_godot_linux.sh` |
 | `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`, `ECONOMY.md`, `TECH_TREE.md`) |
 

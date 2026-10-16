@@ -1,0 +1,5 @@
+{
+	"_source": "Vat and line slot prices in buying order; the count is run 1's cap (G15, docs/FACTORY.md). GUESSES.",
+	"vat": {"prices": [25.0, 100.0, 120.0]},
+	"line": {"prices": [35.0, 120.0]}
+}

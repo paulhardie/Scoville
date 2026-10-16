@@ -1,0 +1,13 @@
+{
+	"_source": "The v0.3 slice of the Tech Tree (docs/TECH_TREE.md), with the North Wing's first node (brief §4). Costs are GUESSES. `pos` is the node's place in the web: x east, y south, in grid steps from the centre.",
+	"nodes": [
+		{"id": "kitchen_table", "label": "00", "name": "Kitchen Table", "wing": "centre", "needs": [], "cost": {}, "effects": [], "pos": [0, 0]},
+		{"id": "jalapeno_blueprint", "label": "E1", "name": "Crop Blueprint: Jalapeño", "wing": "east", "needs": ["kitchen_table"], "cost": {"table_mild": 3}, "effects": [{"unlock_plot": "jalapeno"}], "pos": [1, 0]},
+		{"id": "verde_blueprint", "label": "E2", "name": "Culinary Blueprint: Verde Mash", "wing": "east", "needs": ["jalapeno_blueprint"], "cost": {"table_mild": 10}, "effects": [{"unlock_recipe": "verde_mash"}], "pos": [2, -1]},
+		{"id": "vinegar_blueprint", "label": "E3", "name": "Crop Blueprint: White Vinegar", "wing": "east", "needs": ["jalapeno_blueprint"], "cost": {"table_mild": 10, "sweet_mash": 5}, "effects": [{"unlock_plot": "vinegar"}], "pos": [2, 1]},
+		{"id": "brine_blueprint", "label": "E4", "name": "Culinary Blueprint: Pickled Brine", "wing": "east", "needs": ["vinegar_blueprint"], "cost": {"table_mild": 10, "sweet_mash": 5}, "effects": [{"unlock_recipe": "pickled_brine"}], "pos": [3, 1]},
+		{"id": "bistro_blueprint", "label": "E5", "name": "Culinary Blueprint: Bistro Verde", "wing": "east", "needs": ["verde_blueprint", "brine_blueprint"], "cost": {"table_mild": 20}, "effects": [{"unlock_recipe": "bistro_verde"}], "pos": [3, -1]},
+		{"id": "calloused_thumbs", "label": "N1", "name": "Calloused Thumbs", "wing": "north", "needs": ["kitchen_table"], "cost": {"table_mild": 10}, "effects": [{"tap_yield": 2}], "pos": [0, -1]},
+		{"id": "delivery_van", "label": "W1", "name": "The Delivery Van", "wing": "west", "needs": ["kitchen_table"], "cost": {"table_mild": 15}, "effects": [{"delivery_van": true}], "pos": [-1, 0]}
+	]
+}

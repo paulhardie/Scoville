@@ -43,7 +43,7 @@ These values are what Operation Value counts and what the Raw Overflow Valve (v0
 | Operation Value | By | Carried by | Measured |
 | --- | --- | --- | --- |
 | £1,000 | 0:16 | Tier 1 | 0:16 (v0.2's pacing player passes £943 at 15:00 and £1,030 at 16:00) |
-| £10,000 | 0:50 | Tier 2 | v0.3 |
+| £10,000 | 0:50 | Tier 2 | 0:42 (v0.3) |
 | £100,000 | 1:50 | Tier 3 | v0.4 |
 | £1,000,000 | 3:00 | Tiers 4–5 | v0.6 |
 
@@ -55,9 +55,9 @@ All reveals happen in the first 15 minutes, as the brief's first pillar asks. Th
 
 | Unlock | Operation Value | v0.2 pacing player | Notes |
 | --- | --- | --- | --- |
-| Stage 3: the nav bar, plus the **Processing** tab | £400 | ~8:00 | The vats and lines move from Farms to Processing |
-| **Tech Tree** tab | £750 | ~13:00 | Opens on the free `[00] Kitchen Table` node |
-| **Shift Roster** tab | £10,000 (provisional) | ~0:50 target | Set by the 45–60 minute target. Re-measure once Tier 2 runs. The tab stays locked until v0.7 builds it, and opens with one free Recruitment Pack |
+| Stage 3: the nav bar, plus the **Processing** tab | £400 | 7:59 | The vats and lines move from Farms to Processing |
+| **Tech Tree** tab | £750 | 12:42 | Opens on the free `[00] Kitchen Table` node |
+| **Shift Roster** tab | £10,000 (provisional) | 42:18 | Set by the 45–60 minute target. v0.3 reaches £10,000 a little early; £14,000 would land at 50:00. Settle in v0.7, when the tab is built and opens with one free Recruitment Pack |
 | **HQ Facilities** tab | £1,000,000 | 3:00 target | Brief §2, §6 |
 
 A locked tab shows `[ ? ]`. Tapping it shows the Operation Value it unlocks at (assumed: the brief says only that the icons are locked).
@@ -71,7 +71,13 @@ Carolina Reaper is a Tier 6 that **unlocks only after the first Prestige**. Runs
 
 ## Criteria (v0.3)
 
-Measured by the pacing player (`tests/pacing_tests.gd`) over the first 50 minutes, extended for v0.3 to research, switch recipes and set the Delivery Van (to be specified with the build). v0.2's F1–F8 stay in force.
+Measured by the pacing player (`tests/pacing_tests.gd`, CI on every push) over the first 50 minutes. v0.2's F1–F8 stay in force.
+
+The pacing player for v0.3:
+- Taps 3 times a second.
+- Researches in a fixed order (Jalapeño, Calloused Thumbs, Verde, Vinegar, Brine, Bistro Verde, Van). While research needs bottles it keeps Table Mild back: by not selling it, or at a 50% Auto-Sell once it has the Van. When research needs mash, it switches the Table Mild line off until there's enough.
+- Buys Tier 2's stations in order as each is unlocked, saving for the next.
+- Otherwise buys the cheapest upgrade.
 
 | Id | Criterion |
 | --- | --- |
@@ -85,3 +91,24 @@ Measured by the pacing player (`tests/pacing_tests.gd`) over the first 50 minute
 | N8 | At 30:00, tapping still adds at least 10% to a minute's earnings. |
 
 N8 is lower than v0.2's F8 (25%) on purpose. Until the North Wing (v0.4) evolves the button, a tap is one Bell Pepper, and Tier 2's earnings dwarf it. v0.4's criteria raise the bar again.
+
+### Results (v0.3)
+
+All pass. "Waits" count purchases and research.
+
+| Id | Target | Measured |
+| --- | --- | --- |
+| N1 | Stage 3 by 9:00 | 7:59 |
+| N2 | Tech Tree by 14:00 | 12:42 |
+| N3 | Jalapeño blueprint by 20:00 | 12:53 |
+| N4 | First Bistro Verde by 30:00 | 21:39 |
+| N5 | £10,000 by 50:00 | 42:18 (£14,037 at 50:00; £1,000 at 16:15) |
+| N6 | No wait over 120 s, 15:00–50:00 | longest 104 s |
+| N7 | Table Mild line busy ≥ 50%, Brine made, 40:00–50:00 | 100%, 146 Pickled Brine |
+| N8 | Tapping adds ≥ 10% at 30:00 | +17% |
+
+v0.2's criteria at 15:00 still pass: F6's longest wait is 85 s (of 90), F7 £84.60 a minute, F8 +64%.
+
+Timeline: research starts at 12:53 and Tier 2 is fully built by 21:29, with the first Bistro Verde at 21:39. After that, an upgrade comes every 35–104 s.
+
+Close to the edge: F6 (85 s of 90) and N6 (104 s of 120).

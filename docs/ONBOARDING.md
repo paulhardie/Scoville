@@ -27,7 +27,7 @@ Assumed where the brief is open (the owner can overrule):
 | O6 | Reveals stay after selling and after a save and reload. | `core_tests.gd` |
 | O7 | An unreadable save is refused without changing the game, and kept as `save.json.bad`. | `core_tests.gd` (refusal); the `.bad` copy is not tested |
 
-## Stage 3 (v0.3, draft)
+## Stage 3 (v0.3)
 
 - **At £400 Operation Value**, a bottom navigation bar slides up with five tabs: **Farms** and **Processing** open, and **Tech Tree**, **Shift Roster** and **HQ Facilities** shown as `[ ? ]`. The vats and lines move from Farms to Processing.
 - Each locked tab opens at its Operation Value ([ECONOMY.md](ECONOMY.md#tab-thresholds-g5-d005)): Tech Tree at £750, Shift Roster at £10,000 (provisional, and not before v0.7 builds it), HQ at £1,000,000. Tapping a locked tab shows its threshold.
@@ -36,8 +36,10 @@ Assumed where the brief is open (the owner can overrule):
 
 ### Criteria (v0.3)
 
-| Id | Criterion |
-| --- | --- |
-| O8 | The nav bar appears at £400 Operation Value, not before, with Farms and Processing open and three `[ ? ]` tabs. |
-| O9 | The Tech Tree tab opens at £750 and not before. Shift Roster and HQ stay locked in v0.3. |
-| O10 | Opened tabs stay open after a save and reload, and are kept outside the run's state so a Prestige can't reset them. |
+| Id | Criterion | Result |
+| --- | --- | --- |
+| O8 | The nav bar appears at £400 Operation Value, not before, with Farms and Processing open and three `[ ? ]` tabs. | PASS (`tech_tests.gd`, `ui_tests.gd`) |
+| O9 | The Tech Tree tab opens at £750 and not before. Shift Roster and HQ stay locked in v0.3. | PASS |
+| O10 | Opened tabs stay open after a save and reload, and are kept outside the run's state so a Prestige can't reset them. | PASS: the save holds `account.best_ov` beside `run` |
+
+On screen, the stock line in the upper viewport switches to short names (`Bell 53 · Jalapeño 249 · …`) once more than three items are in play.

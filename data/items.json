@@ -1,0 +1,13 @@
+{
+	"_source": "docs/ECONOMY.md: bottle values are the brief's (§3); crop and mash values follow D004.",
+	"items": [
+		{"id": "bell", "name": "Bell Pepper", "plural": "Bell Peppers", "short": "Bell", "kind": "crop", "tier": 1, "value": 0.10},
+		{"id": "jalapeno", "name": "Jalapeño", "plural": "Jalapeños", "short": "Jalapeño", "kind": "crop", "tier": 2, "value": 0.20},
+		{"id": "vinegar", "name": "White Vinegar", "plural": "White Vinegar", "short": "Vinegar", "kind": "crop", "tier": 2, "value": 0.15},
+		{"id": "sweet_mash", "name": "Sweet Pepper Mash", "plural": "Sweet Pepper Mash", "short": "Sweet Mash", "kind": "mash", "tier": 1, "value": 2.00},
+		{"id": "pickled_brine", "name": "Pickled Brine", "plural": "Pickled Brine", "short": "Brine", "kind": "mash", "tier": 2, "value": 4.00},
+		{"id": "verde_mash", "name": "Verde Mash", "plural": "Verde Mash", "short": "Verde", "kind": "mash", "tier": 2, "value": 6.00},
+		{"id": "table_mild", "name": "Table Mild", "plural": "Table Mild", "short": "Table Mild", "kind": "bottle", "tier": 1, "value": 5.00},
+		{"id": "bistro_verde", "name": "Bistro Verde", "plural": "Bistro Verde", "short": "Bistro", "kind": "bottle", "tier": 2, "value": 25.00}
+	]
+}

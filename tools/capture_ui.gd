@@ -67,6 +67,22 @@ func run() -> void:
 	(screen.find_child("Tech_bistro_blueprint", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_tech.png"), 0.2)
 
+	# 1:40 of the pacing player: Tier 3, Heat, the valve and most of the tree.
+	var late := Game.new()
+	var late_player := Player.new()
+	for t in roundi(100 * 60 / T.TICK_SECONDS):
+		late_player.step(late)
+		late.tick()
+	g.load_state(late.to_state())
+	g.heat = 74.0
+	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("v04_farms.png"), 0.3)
+	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("v04_processing.png"), 0.2)
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_automated_piston", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("v04_tech.png"), 0.3)
+
 	# The Tech Tree just opened: nothing researched yet, the first node selected.
 	var fresh := Game.new()
 	var early := Player.new()

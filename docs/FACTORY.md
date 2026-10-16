@@ -136,20 +136,20 @@ All pass (`tests/factory_tests.gd`, `tests/tech_tests.gd`):
 | S5 | Operation Value = cash earned + stock at its values, after every action and tick | PASS |
 | S6 | Bad data fails at load naming the file and row | PASS (seven kinds of bad data) |
 
-## v0.4: Tier 3 and the factory upgrades (draft)
+## v0.4: Tier 3 and the factory upgrades
 
-Tier 3 arrives through the East Wing; the South Wing raises slot caps and adds packaging, Zero-Waste Piping and Overdrive ([TECH_TREE.md](TECH_TREE.md#v04-the-rest-of-the-tree-draft)). Values are [ECONOMY.md](ECONOMY.md)'s.
+Tier 3 arrives through the East Wing; the South Wing raises slot caps and adds packaging, Zero-Waste Piping and Overdrive ([TECH_TREE.md](TECH_TREE.md#v04-the-rest-of-the-tree)). Values are [ECONOMY.md](ECONOMY.md)'s.
 
-### Numbers (starting guesses, G4)
+### Numbers (tuned in the build)
 
-Recipes and the £140 bottle are the brief's. The rest is to be tuned in the build against [ECONOMY.md](ECONOMY.md#criteria-v04-draft)'s M1–M7.
+Recipes and the £140 bottle are the brief's. The rest is GUESSES tuned against [ECONOMY.md](ECONOMY.md#criteria-v04)'s M1–M7, with the drafts in brackets.
 
 | What | Price | Base |
 | --- | --- | --- |
-| Cayenne Plot | £600 | 5 Cayenne every 2.4 s |
-| Garlic Plot | £700 | 4 Garlic every 2.4 s |
-| Vat slots 4 / 5 (after S1 / S2) | £500 / £800 | — |
-| Line slots 3 / 4 (after S1 / S2) | £1,000 / £2,500 | — |
+| Cayenne Plot | £400 (was £600) | 5 Cayenne every 2.4 s |
+| Garlic Plot | £450 (was £700) | 4 Garlic every 2.4 s |
+| Vat slots 4 / 5 (after S1 / S2) | £300 / £500 (were £500 / £800) | — |
+| Line slots 3 / 4 (after S1 / S2) | £400 / £1,200 (were £1,000 / £2,500) | — |
 | Roasted Garlic Paste (20 Garlic) | — | 12 s |
 | Cayenne Mash (25 Cayenne + 1 Pickled Brine) | — | 12 s |
 | Classic Louisiana (1 Cayenne Mash + 1 Garlic Paste), £140 | — | 12 s |
@@ -157,7 +157,7 @@ Recipes and the £140 bottle are the brief's. The rest is to be tuned in the bui
 - The plots are sized to feed one Cayenne Mash vat and one Garlic Paste vat at base speed: 2.08 Cayenne and 1.67 Garlic a second, against 2.08 and 1.67 needed.
 - A Classic Louisiana line at base makes £700 a minute, against Bistro Verde's £150.
 - Cayenne Mash also needs Pickled Brine, so Brine is shared between Tier 2 and Tier 3. A second Brine vat, or speed on the first, is part of the build-out. That's the brief's "lower tiers stay relevant".
-- A full Tier 3 setup (two plots, vat slots 4 and 5, line slot 3) costs £3,600 in cash. At v0.3's £450–500 a minute that's about 7–8 minutes after the blueprints.
+- A full Tier 3 setup (two plots, vat slots 4 and 5, line slot 3) costs £2,050 in cash (the draft's was £3,600). At v0.3's £450–500 a minute that's about 4–5 minutes after the blueprints.
 
 ### Crop Quality (D016)
 
@@ -174,6 +174,8 @@ Version 4 adds:
 A v3 save migrates with Heat at 0, quality levels at 0, no pin, default keep amounts, and a stream seeded from the save's own figures, so the same save always migrates the same way.
 
 ### Criteria (v0.4 factory rules)
+
+All PASS (`tests/factory_tests.gd`, `tests/upgrades_tests.gd`). S9 uses a v0.3 save fixture, and S10 runs 30 minutes with every chance in play, saved and reloaded halfway.
 
 | Id | Criterion |
 | --- | --- |

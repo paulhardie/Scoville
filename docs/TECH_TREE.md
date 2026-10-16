@@ -45,9 +45,9 @@ The pacing criteria are in [ECONOMY.md](ECONOMY.md#criteria-v03) (N3–N6). Rule
 | R3 | Each blueprint opens exactly what it names: the plot can be bought, or the recipe can be assigned. | PASS |
 | R4 | At 100% Auto-Sell, a factory earns the same as one sold by hand with Sell Batch, to the penny. At 0% everything goes to stock. At 30%, 3 bottles in 10 are sold. | PASS (10-minute factory runs) |
 
-## v0.4: the rest of the tree (draft)
+## v0.4: the rest of the tree
 
-26 more nodes ([D010](DECISIONS.md)). Each costs about 2–4 minutes of whatever it's paid in, at the time the 3-hour curve ([ECONOMY.md](ECONOMY.md#the-first-run-g5-d005)) expects the player to reach it, rising to about 8 on the outer rim. The rates come from v0.3's pacing player at 45–55 minutes: about 14 Bistro Verde, 20 Table Mild, and 15 each of Verde Mash and Pickled Brine a minute. Tier 3's rates are estimates until it's built. Costs are starting GUESSES, tuned in the build against [ECONOMY.md](ECONOMY.md#criteria-v04-draft)'s M1–M7.
+26 more nodes ([D010](DECISIONS.md)). Each costs about 2–4 minutes of whatever it's paid in, at the time the 3-hour curve ([ECONOMY.md](ECONOMY.md#the-first-run-g5-d005)) expects the player to reach it, rising to about 8 on the outer rim. The rates come from v0.3's pacing player at 45–55 minutes: about 14 Bistro Verde, 20 Table Mild, and 15 each of Verde Mash and Pickled Brine a minute. Tier 3's rates are estimates until it's built. Costs are GUESSES, tuned in the build against [ECONOMY.md](ECONOMY.md#criteria-v04)'s M1–M7. Where the build changed a draft cost, the table shows the new one and the draft in brackets.
 
 "Pos" is the node's place in the web, in grid steps from the Kitchen Table (x east, y south). The web now spreads four ways, so on screen it pans in both directions and opens centred on the Kitchen Table.
 
@@ -56,7 +56,7 @@ The pacing criteria are in [ECONOMY.md](ECONOMY.md#criteria-v03) (N3–N6). Rule
 | Id | Node | Needs | Cost | Effect | Expected | Pos |
 | --- | --- | --- | --- | --- | --- | --- |
 | N1 | Calloused Thumbs (v0.3) | 00 | 10 Table Mild | +2 Bell Peppers a press | 0:14 | 0, −1 |
-| N2 | Double-Tap Mechanics | N1 | 20 Bistro Verde | 10% of presses register twice | 0:28 | 0, −2 |
+| N2 | Double-Tap Mechanics | N1 | 15 Bistro Verde (was 20) | 10% of presses register twice | 0:28 | 0, −2 |
 | N3 | Ergonomic Grip | N2 | 25 Bistro Verde | Holding the button presses it 2 times a second | 0:33 | 0, −3 |
 | N4 | Heat Meter (right path) | N3 | 30 Bistro Verde | Heat (below), up to +50% on sales | 0:38 | 1, −3 |
 | N5 | Slow Burn | N4 | 15 Classic Louisiana | Heat drains half as fast | 1:10 | 1, −4 |
@@ -84,11 +84,11 @@ A press from Double-Tap, Ergonomic Grip or the Piston counts as a press for ever
 
 | Id | Node | Needs | Cost | Effect | Expected | Pos |
 | --- | --- | --- | --- | --- | --- | --- |
-| E6 | Crop Blueprint: Cayenne | E5 | 20 Bistro Verde + 10 Verde Mash | Cayenne Plot can be bought | 0:45 | 4, −1 |
-| E7 | Crop Blueprint: Garlic | E5 | 20 Bistro Verde + 10 Pickled Brine | Garlic Plot can be bought | 0:46 | 4, 1 |
-| E8 | Culinary Blueprint: Roasted Garlic Paste | E7 | 25 Bistro Verde | Garlic Paste recipe (20 Garlic) | 0:49 | 5, 1 |
-| E9 | Culinary Blueprint: Cayenne Mash | E6 | 25 Bistro Verde + 10 Pickled Brine | Cayenne Mash recipe (25 Cayenne + 1 Pickled Brine) | 0:49 | 5, −1 |
-| E10 | Culinary Blueprint: Classic Louisiana | E8, E9 | 30 Bistro Verde | Classic Louisiana recipe (1 Cayenne Mash + 1 Garlic Paste, £140) | 0:51 | 6, 0 |
+| E6 | Crop Blueprint: Cayenne | E5 | 10 Bistro Verde + 5 Verde Mash (was 20 + 10) | Cayenne Plot can be bought | 0:45 | 4, −1 |
+| E7 | Crop Blueprint: Garlic | E5 | 10 Bistro Verde + 5 Pickled Brine (was 20 + 10) | Garlic Plot can be bought | 0:46 | 4, 1 |
+| E8 | Culinary Blueprint: Roasted Garlic Paste | E7 | 15 Bistro Verde (was 25) | Garlic Paste recipe (20 Garlic) | 0:49 | 5, 1 |
+| E9 | Culinary Blueprint: Cayenne Mash | E6 | 15 Bistro Verde + 5 Pickled Brine (was 25 + 10) | Cayenne Mash recipe (25 Cayenne + 1 Pickled Brine) | 0:49 | 5, −1 |
+| E10 | Culinary Blueprint: Classic Louisiana | E8, E9 | 20 Bistro Verde (was 30) | Classic Louisiana recipe (1 Cayenne Mash + 1 Garlic Paste, £140) | 0:51 | 6, 0 |
 | E11 | Hydroponic Bell Peppers (outer rim) | E10 | 40 Classic Louisiana | The Bell Pepper Plot runs 4× faster | 1:30 | 7, 0 |
 
 Tier 4–6 blueprints and the other GMO boosters come with v0.6.
@@ -98,7 +98,7 @@ Tier 4–6 blueprints and the other GMO boosters come with v0.6.
 | Id | Node | Needs | Cost | Effect | Expected | Pos |
 | --- | --- | --- | --- | --- | --- | --- |
 | S1 | Slot Expansion I | 00 | 40 Sweet Pepper Mash + 20 Verde Mash | +1 vat slot, +1 line slot (caps 4 and 3) | 0:40 | 0, 1 |
-| S2 | Slot Expansion II | S1 | 40 Verde Mash + 40 Pickled Brine | +1 vat slot, +1 line slot (caps 5 and 4) | 0:50 | 0, 2 |
+| S2 | Slot Expansion II | S1 | 25 Verde Mash + 25 Pickled Brine (was 40 + 40) | +1 vat slot, +1 line slot (caps 5 and 4) | 0:50 | 0, 2 |
 | S3 | Heavy Flint Glass | S1 | 40 Verde Mash + 40 Pickled Brine | Packaging 1.5× (D012) | 0:55 | −1, 2 |
 | S4 | Foil Neck Wraps | S3 | 30 Cayenne Mash + 30 Garlic Paste | Packaging 2.2× | 1:25 | −1, 3 |
 | S5 | Zero-Waste Piping I | S1 | 60 Sweet Pepper Mash + 30 Pickled Brine | Vats need 10% fewer raw crops | 1:00 | 1, 2 |
@@ -134,7 +134,17 @@ Standard Operating Procedures (needs Prestige) and Night Shift Protocols (needs 
 - **Byproduct Recycling (D013):** the "lowest-level plot" is the owned plot with the fewest levels across its three upgrades (ties go in data order). The free level goes on whichever of its upgrades is cheapest.
 - Executive Perks (North–West, the Head Chef slot) waits for the Shift Roster (v0.7).
 
+On screen:
+- The Heat Meter is a thin bar under the button, with the bonus (`HEAT +36%`) to its left, opposite Sell Batch.
+- Holding the button presses it (Ergonomic Grip).
+- Processing gets a Factory Overdrive card and a valve card with −/+, Off and Default per item.
+- A Tech Tree node has Pin beside Research, and the pinned node is outlined red.
+- A Market Ticker spike shows under Operation Value.
+- The web pans both ways and opens centred on the Kitchen Table.
+
 ### Criteria (v0.4 rules)
+
+All PASS: `tests/button_tests.gd` (R5–R8, H1–H3) and `tests/upgrades_tests.gd` (R9–R18).
 
 | Id | Criterion |
 | --- | --- |

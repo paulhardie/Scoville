@@ -25,7 +25,7 @@ Out of scope for v1.0 (brief): servers, accounts, cloud saves. Everything runs o
 ## Architecture rules
 
 - **Pure simulation, separate from UI.** `src/core/game.gd` (RefCounted, no nodes) owns all state and rules and advances by a fixed tick. Screens only present and report. A rule implemented twice is a bug.
-- **Deterministic.** A fixed tick (`Tuning.TICK_SECONDS`) and no wall clock inside the simulation; real time (offline progress, the Cook-Off) comes in from outside it. Nothing is random yet; the first chance-based rule brings one seeded RNG stream whose state is saved.
+- **Deterministic.** A fixed tick (`Tuning.TICK_SECONDS`) and no wall clock inside the simulation; real time (offline progress, the Cook-Off) comes in from outside it. Every chance draws from the game's one seeded stream (`Game.rng`), whose state is saved (D017). Tests pass a seed to `Game.new(data, seed)`.
 - **Numbers in one place.** Items, recipes, plots, slots and tech nodes live in `data/*.json`, loaded and checked only by `src/core/data_loader.gd`; bad data fails at load naming the file and row. Other tuning numbers live in `src/core/tuning.gd`. Each cites its brief section or decision, or is marked GUESS.
 - **Money is GBP** and shown as `£0.00`.
 - Colours and type sizes live only in `src/ui/style.gd`.
@@ -58,7 +58,7 @@ bash tools/serve_web.sh                              # export, then serve it on 
 | `src/sim/` | Scripted players for measuring: `engaged_player.gd` (the pacing player, [D003](docs/DECISIONS.md)) |
 | `src/ui/` | The screen (`main.gd`, built in code) and `style.gd` (palette and sizes) |
 | `scenes/` | `main.tscn`, the entry scene |
-| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 50 minutes against FACTORY.md's F and ECONOMY.md's N criteria |
+| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 110 minutes against FACTORY.md's F and ECONOMY.md's N and M criteria. `button_tests.gd` (whose `with()` builds a game with chosen research) and `upgrades_tests.gd` cover v0.4's nodes |
 | `tools/` | `capture_ui.gd`, `export_web.sh`, `serve_web.sh`/`.py` (phone build), `install_godot_linux.sh` |
 | `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`, `ECONOMY.md`, `TECH_TREE.md`) |
 

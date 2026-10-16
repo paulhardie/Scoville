@@ -124,6 +124,50 @@ func run() -> void:
 	check(screen.game.is_researched("jalapeno_blueprint"), "Research researches it")
 	check((screen.find_child("Card_plot_jalapeno", true, false) as Control).visible, "and the Jalapeño Plot appears on Farms")
 
+	# v0.4: Heat, holding, Overdrive, the valve, pins (TECH_TREE.md).
+	var Helpers = load("res://tests/button_tests.gd")
+	var heat_bar: Control = screen.find_child("HeatBar", true, false)
+	check(not heat_bar.visible, "no Heat bar before the Heat Meter")
+	var g = screen.game
+	for item in g.stock:
+		g.stock[item] = 100000
+	for node in ["heat_meter", "smart_stockpiling", "overdrive_turbines"]:
+		Helpers.research_with_parents(g, node)
+	await process_frame
+	check(heat_bar.visible, "the Heat bar appears with the Heat Meter")
+	g.heat = 0.0
+	blank.pressed.emit()
+	await process_frame
+	check((screen.find_child("HeatLabel", true, false) as Label).text.contains("+2"), "a press shows its Heat bonus: %s" % (screen.find_child("HeatLabel", true, false) as Label).text)
+	var presses: int = g.stats.presses
+	blank.button_down.emit()
+	await create_timer(1.1).timeout
+	blank.button_up.emit()
+	check(g.stats.presses - presses >= 2, "holding the button presses it (Ergonomic Grip): %d" % (g.stats.presses - presses))
+	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
+	await process_frame
+	var od: Button = screen.find_child("Overdrive", true, false)
+	check(od.is_visible_in_tree() and not od.disabled, "the Overdrive button is ready")
+	od.pressed.emit()
+	await process_frame
+	check(g.overdrive_active() and od.disabled, "it runs Overdrive, then waits")
+	check((screen.find_child("ValveCard", true, false) as Control).is_visible_in_tree(), "the valve card shows")
+	var toggle: Button = screen.find_child("ValveToggle_bell", true, false)
+	toggle.pressed.emit()
+	await process_frame
+	check(g.keep_amount("bell") == -1 and toggle.text == "On", "a valve row can be switched off")
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_automated_piston", true, false) as Button).pressed.emit()
+	await process_frame
+	var pin_button: Button = screen.find_child("Pin", true, false)
+	check(pin_button.visible, "Pin shows for a node not yet researched")
+	pin_button.pressed.emit()
+	await process_frame
+	check(g.pin == "automated_piston" and pin_button.text == "Unpin", "Pin pins it")
+	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
+	await process_frame
+	check((screen.find_child("Upgrade_plot_bell_quality", true, false) as Button).text.begins_with("Crop Quality"), "plots offer Crop Quality")
+
 	screen.queue_free()
 	await process_frame
 	for failure in failures:

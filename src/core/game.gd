@@ -2,7 +2,8 @@ extends RefCounted
 ## The whole simulation: state and rules, no nodes. Screens call the actions and
 ## tick(), then read the state; they never change it themselves
 ## (docs/ONBOARDING.md, FACTORY.md, ECONOMY.md, TECH_TREE.md). Deterministic:
-## time only moves through tick(), and nothing is random yet.
+## time only moves through tick(), and every chance draws from one seeded stream
+## whose state is saved (D017).
 ##
 ## The run (everything a Prestige will reset) is kept apart from the account
 ## (what survives it): `account` holds only the best Operation Value so far,
@@ -13,13 +14,14 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 3
+const SAVE_VERSION := 4
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
 const EPSILON := 1e-6
 
 const TABS := ["farms", "processing", "tech", "roster", "hq"]
+const PLOT_UPGRADES := ["speed", "yield", "quality"]
 
 var data: Dictionary
 
@@ -27,52 +29,127 @@ var data: Dictionary
 var cash := 0.0
 var stock := {}                 # item id → count
 var revealed := {"counter": false, "status_bar": false, "deck": false}
-var plots := {}                 # crop → {owned, speed, yield, progress}
-var vats: Array = []            # slots in buying order: {recipe, speed, progress, running}
+var plots := {}                 # crop → {owned, speed, yield, quality, progress}
+var vats: Array = []            # slots in buying order: {recipe, speed, progress, running, taken}
 var lines: Array = []           # the same, plus crate: Starter Crate bottles left
 var research := {}              # node id → true
 var autosell := {}              # bottle id → percent sold at once (Delivery Van)
 var autosell_acc := {}          # bottle id → percent carried towards the next sale
+var heat := 0.0                 # 0–100 (D011)
+var holding := false            # the button held down (Ergonomic Grip); input, not saved
+var press_acc := {"grip": 0.0, "piston": 0.0}
+var overdrive := {"until": 0, "ready": 0}       # ticks
+var keep := {}                  # item → keep amount set by the player; -1 = valve off for it
+var pin := ""                   # the node Smart Stockpiling saves for
+var ticker := {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}   # ticks
+var byproduct_ready := 0        # tick from which Byproduct Recycling may give a level
 var stats := {}
+var rng := RandomNumberGenerator.new()
 
 # --- The account ---
 var account := {"best_ov": 0.0}
 
+## What research adds up to, worked out when research changes (_refresh_fx).
+var fx := {}
 
-func _init(game_data: Dictionary = {}) -> void:
+
+func _init(game_data: Dictionary = {}, seed_value: int = 0) -> void:
 	data = game_data if not game_data.is_empty() else DataLoader.default_data()
+	rng.seed = seed_value
 	for item in data.items:
 		stock[item] = 0
 	for crop in data.plots:
-		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "progress": 0.0}
+		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "quality": 0, "progress": 0.0}
 	for item in data.items:
 		if data.items[item].kind == "bottle":
 			autosell[item] = 100
 			autosell_acc[item] = 0
 	research = {"kitchen_table": true}
 	stats = _new_stats()
+	_refresh_fx()
 
 
 func _new_stats() -> Dictionary:
-	var s := {"presses": 0, "bell_picked": 0, "cash_earned": 0.0, "ticks": 0,
-		"harvested": {}, "made": {}, "sold": {}, "consumed": {}, "researched": 0}
+	var s := {"presses": 0, "doubles": 0, "bell_picked": 0, "cash_earned": 0.0, "ticks": 0, "researched": 0,
+		"free_levels": 0, "spikes": 0, "harvested": {}, "made": {}, "sold": {}, "consumed": {}}
 	for item in data.items:
 		for k in ["harvested", "made", "sold", "consumed"]:
 			s[k][item] = 0
 	return s
 
 
+## Sums every researched node's effects (D010). Called whenever research changes.
+func _refresh_fx() -> void:
+	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
+		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
+		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
+		"byproduct": 0.0, "stock_bonus": 0.0, "plots": {}, "recipes": {}}
+	for node in research:
+		for e in data.tech[node].effects:
+			var kind: String = e.keys()[0]
+			var v: Variant = e[kind]
+			match kind:
+				"unlock_plot": fx.plots[v] = true
+				"unlock_recipe": fx.recipes[v] = true
+				"delivery_van": fx.van = true
+				"tap_yield": fx.tap_bonus += int(v)
+				"double_tap": fx.double = maxf(fx.double, v)
+				"grip": fx.grip = maxf(fx.grip, v)
+				"heat_meter": fx.heat = true
+				"heat_drain": fx.heat_drain = minf(fx.heat_drain, v)
+				"overclock": fx.overclock = maxf(fx.overclock, v)
+				"piston": fx.piston = maxf(fx.piston, v)
+				"plot_speed": fx.plot_speed[v.crop] = fx.plot_speed.get(v.crop, 1.0) * v.mult
+				"slot_cap":
+					for st in v:
+						fx.slot_cap[st] += int(v[st])
+				"packaging": fx.packaging = maxf(fx.packaging, v)
+				"input_reduction": fx.reduction = maxf(fx.reduction, v)
+				"overdrive": fx.overdrive = true
+				"overflow_valve": fx.valve = true
+				"smart_stockpiling": fx.stockpile = true
+				"market_ticker": fx.ticker = true
+				"byproduct_recycling": fx.byproduct = maxf(fx.byproduct, v)
+				"stock_value_bonus": fx.stock_bonus += v
+
+
 # --- Reading: value and reveals ------------------------------------------------
 
+## An item's base value (ECONOMY.md, D004).
 func value(item: String) -> float:
 	return data.items[item].value
 
 
-## Cash earned this run plus everything in stock at its value (ECONOMY.md).
+## What an item counts for in Operation Value: bottles with packaging, and stock
+## with Franchise Auditors.
+func appraisal(item: String) -> float:
+	var v := value(item)
+	if data.items[item].kind == "bottle":
+		v *= fx.packaging
+	return v * (1.0 + fx.stock_bonus)
+
+
+## What an item sells for before Heat: bottles with packaging and any spike.
+func sale_price(item: String) -> float:
+	var v := value(item)
+	if data.items[item].kind == "bottle":
+		v *= fx.packaging
+		if ticker.sauce == item:
+			v *= ticker.mult
+	return v
+
+
+## Heat's multiplier on all sale cash (D011).
+func heat_mult() -> float:
+	return 1.0 + T.HEAT_BONUS * heat / T.HEAT_MAX
+
+
+## Cash earned this run plus everything in stock at its appraisal (ECONOMY.md).
 func operation_value() -> float:
 	var v: float = stats.cash_earned
 	for item in stock:
-		v += stock[item] * value(item)
+		if stock[item] > 0:
+			v += stock[item] * appraisal(item)
 	return v
 
 
@@ -90,17 +167,28 @@ func tab_open(tab: String) -> bool:
 
 
 func has_van() -> bool:
-	for node in research:
-		for e in data.tech[node].effects:
-			if e.has("delivery_van"):
-				return true
-	return false
+	return fx.van
+
+
+func now_seconds() -> float:
+	return stats.ticks * T.TICK_SECONDS
+
+
+func _ticks(seconds: float) -> int:
+	return roundi(seconds / T.TICK_SECONDS)
+
+
+# --- Reading: the button -------------------------------------------------------
+
+## Bell Peppers a press picks: the base plus the North Wing's bonuses.
+func tap_yield() -> int:
+	return T.BUTTON_BASE_YIELD + fx.tap_bonus
 
 
 # --- Reading: plots ------------------------------------------------------------
 
 func plot_unlocked(crop: String) -> bool:
-	return data.plots[crop].unlocked or _unlocked_by_research("unlock_plot", crop)
+	return data.plots[crop].unlocked or fx.plots.has(crop)
 
 
 func plot_offered(crop: String) -> bool:
@@ -112,20 +200,30 @@ func plot_price(crop: String) -> float:
 
 
 func plot_cycle(crop: String) -> float:
-	return data.plots[crop].seconds / (1.0 + T.PLOT_SPEED_STEP * plots[crop].speed)
+	return data.plots[crop].seconds / (1.0 + T.PLOT_SPEED_STEP * plots[crop].speed) / fx.plot_speed.get(crop, 1.0)
 
 
 func plot_yield(crop: String) -> int:
 	return data.plots[crop]["yield"] + plots[crop]["yield"]
 
 
-## "speed" or "yield".
+## The chance a harvest gives double (Crop Quality, D016).
+func quality_chance(crop: String) -> float:
+	return T.CROP_QUALITY_STEP * plots[crop].quality
+
+
+## "speed", "yield" or "quality".
 func plot_upgrade_cost(crop: String, upgrade: String) -> float:
 	var scale := sqrt(plot_price(crop) / data.plots.bell.price)
 	var lv: int = plots[crop][upgrade]
-	if upgrade == "speed":
-		return T.PLOT_SPEED_COST * scale * pow(T.PLOT_SPEED_GROWTH, lv)
-	return T.PLOT_YIELD_COST * scale * pow(T.PLOT_YIELD_GROWTH, lv)
+	match upgrade:
+		"speed":
+			return T.PLOT_SPEED_COST * scale * pow(T.PLOT_SPEED_GROWTH, lv)
+		"yield":
+			return T.PLOT_YIELD_COST * scale * pow(T.PLOT_YIELD_GROWTH, lv)
+		"quality":
+			return T.CROP_QUALITY_COST * scale * pow(T.CROP_QUALITY_GROWTH, lv) if lv < T.CROP_QUALITY_MAX else INF
+	return INF
 
 
 func can_buy_plot(crop: String) -> bool:
@@ -133,7 +231,7 @@ func can_buy_plot(crop: String) -> bool:
 
 
 func can_upgrade_plot(crop: String, upgrade: String) -> bool:
-	return plots.has(crop) and plots[crop].owned and upgrade in ["speed", "yield"] and cash >= plot_upgrade_cost(crop, upgrade)
+	return plots.has(crop) and plots[crop].owned and upgrade in PLOT_UPGRADES and cash >= plot_upgrade_cost(crop, upgrade)
 
 
 # --- Reading: slots and recipes ------------------------------------------------
@@ -142,8 +240,9 @@ func slots(station: String) -> Array:
 	return vats if station == "vat" else lines
 
 
+## Run 1's base cap plus Slot Expansion.
 func slot_cap(station: String) -> int:
-	return data.slots[station].prices.size()
+	return mini(data.slots[station].base_cap + fx.slot_cap[station], data.slots[station].prices.size())
 
 
 ## The next slot is offered: the first vat with the deck, the first line once a
@@ -180,7 +279,7 @@ func can_upgrade_slot(station: String, index: int) -> bool:
 
 
 func recipe_unlocked(recipe: String) -> bool:
-	return data.recipes.has(recipe) and (data.recipes[recipe].unlocked or _unlocked_by_research("unlock_recipe", recipe))
+	return data.recipes.has(recipe) and (data.recipes[recipe].unlocked or fx.recipes.has(recipe))
 
 
 ## Recipes a slot of this station can run now, in data order.
@@ -192,17 +291,51 @@ func recipes_for(station: String) -> Array:
 	return out
 
 
-## Seconds a slot's cycle takes now, Starter Crate included. INF when it's off.
+## A recipe's inputs now: a vat's raw crops cut by Zero-Waste Piping, rounded
+## down, at least 1 (brief §6's Cooperage rule).
+func recipe_inputs(recipe: String) -> Dictionary:
+	var r: Dictionary = data.recipes[recipe]
+	if r.station != "vat" or fx.reduction <= 0.0:
+		return r.inputs
+	var out := {}
+	for item in r.inputs:
+		var n: int = r.inputs[item]
+		if data.items[item].kind == "crop":
+			n = maxi(1, floori(n * (1.0 - fx.reduction) + 1e-9))
+		out[item] = n
+	return out
+
+
+## Vat and line speed from Overdrive: Turbines always, the button while it runs.
+func factory_speed() -> float:
+	var m := 1.0
+	if fx.overdrive:
+		m *= 1.0 + T.TURBINE_SPEED
+	if overdrive_active():
+		m *= T.OVERDRIVE_BOOST
+	return m
+
+
+## Seconds a slot's cycle takes now, Starter Crate and Overdrive included. INF
+## when it's off.
 func slot_cycle(station: String, index: int) -> float:
 	var s: Dictionary = slots(station)[index]
 	if s.recipe == "":
 		return INF
 	var step := T.VAT_SPEED_STEP if station == "vat" else T.LINE_SPEED_STEP
 	var crate := T.STARTER_CRATE_SPEED if station == "line" and s.crate > 0 else 1.0
-	return data.recipes[s.recipe].seconds / (1.0 + step * s.speed) / crate
+	return data.recipes[s.recipe].seconds / (1.0 + step * s.speed) / crate / factory_speed()
 
 
-# --- Reading: research ---------------------------------------------------------
+func overdrive_active() -> bool:
+	return stats.ticks < overdrive.until
+
+
+func can_overdrive() -> bool:
+	return fx.overdrive and stats.ticks >= overdrive.ready
+
+
+# --- Reading: research, the valve and the market --------------------------------
 
 func is_researched(node: String) -> bool:
 	return research.has(node)
@@ -229,6 +362,37 @@ func has_items(cost: Dictionary) -> bool:
 	return true
 
 
+## How many of an item the pinned node still needs held back (Smart Stockpiling).
+func pinned_need(item: String) -> int:
+	if pin == "" or is_researched(pin):
+		return 0
+	return data.tech[pin].cost.get(item, 0)
+
+
+## The valve's keep amount for a crop or mash (D014): the player's, or 5 cycles
+## of the researched recipes that use it. -1 means the valve leaves it alone.
+func keep_amount(item: String) -> int:
+	if keep.has(item):
+		return keep[item]
+	return default_keep(item)
+
+
+func default_keep(item: String) -> int:
+	var n := 0
+	for id in data.recipes:
+		if recipe_unlocked(id):
+			n += recipe_inputs(id).get(item, 0) * T.OVERFLOW_KEEP_CYCLES
+	return n
+
+
+## Sauces that can be made now, for the Market Ticker.
+func unlocked_bottles() -> Array:
+	var out := []
+	for r in recipes_for("line"):
+		out.append(data.recipes[r].output)
+	return out
+
+
 func can_sell_raw() -> bool:
 	return revealed.status_bar and stock.bell > 0
 
@@ -241,36 +405,25 @@ func bottles_held() -> int:
 	return n
 
 
+## What Sell Batch would bring in now, Heat included.
 func bottles_value() -> float:
 	var v := 0.0
 	for item in stock:
 		if data.items[item].kind == "bottle":
-			v += stock[item] * value(item)
-	return v
+			v += stock[item] * sale_price(item)
+	return v * heat_mult()
 
 
 # --- Actions -------------------------------------------------------------------
 
-## Bell Peppers a press picks: the base plus the North Wing's bonuses.
-func tap_yield() -> int:
-	var n := T.BUTTON_BASE_YIELD
-	for node in research:
-		for e in data.tech[node].effects:
-			n += int(e.get("tap_yield", 0))
-	return n
-
-
 ## One press of the Blank Button. Returns the Bell Peppers it picked.
 func press() -> int:
-	var picked := tap_yield()
-	stats.presses += 1
-	stock.bell += picked
-	stats.bell_picked += picked
-	revealed.counter = true
-	if stats.bell_picked >= T.STAGE_1_PEPPERS:
-		revealed.status_bar = true
-	_note_value()
-	return picked
+	return _press()
+
+
+## Holding the button down (Ergonomic Grip presses it while held).
+func set_holding(on: bool) -> void:
+	holding = on
 
 
 ## Sells every Bell Pepper held at its value. Returns false with none.
@@ -313,7 +466,7 @@ func buy_slot(station: String) -> bool:
 	if not can_buy_slot(station):
 		return false
 	cash -= slot_price(station)
-	var s := {"recipe": recipes_for(station)[0], "speed": 0, "progress": 0.0, "running": false}
+	var s := {"recipe": recipes_for(station)[0], "speed": 0, "progress": 0.0, "running": false, "taken": {}}
 	if station == "line":
 		s.crate = T.STARTER_CRATE_BOTTLES if lines.is_empty() else 0
 	slots(station).append(s)
@@ -340,12 +493,13 @@ func assign(station: String, index: int, recipe: String) -> bool:
 	if s.recipe == recipe:
 		return true
 	if s.running:
-		for item in data.recipes[s.recipe].inputs:
-			stock[item] += data.recipes[s.recipe].inputs[item]
-			stats.consumed[item] -= data.recipes[s.recipe].inputs[item]
+		for item in s.taken:
+			stock[item] += s.taken[item]
+			stats.consumed[item] -= s.taken[item]
 	s.recipe = recipe
 	s.running = false
 	s.progress = 0.0
+	s.taken = {}
 	_start_cycles()
 	return true
 
@@ -360,6 +514,12 @@ func research_node(node: String) -> bool:
 		stats.consumed[item] += cost[item]
 	research[node] = true
 	stats.researched += 1
+	if pin == node:
+		pin = ""
+	var had_ticker: bool = fx.ticker
+	_refresh_fx()
+	if fx.ticker and not had_ticker:
+		ticker.next = stats.ticks + _ticks(rng.randi_range(T.TICKER_FIRST[0], T.TICKER_FIRST[1]))
 	_start_cycles()
 	return true
 
@@ -372,12 +532,60 @@ func set_autosell(bottle: String, percent: int) -> bool:
 	return true
 
 
+## Sets a crop's or mash's keep amount for the Overflow Valve; -1 leaves it
+## alone, and default_keep() is what it starts at (D014).
+func set_keep(item: String, amount: int) -> bool:
+	if not fx.valve or not data.items.has(item) or data.items[item].kind == "bottle" or amount < -1:
+		return false
+	keep[item] = amount
+	return true
+
+
+## Puts a crop's or mash's keep amount back to its default.
+func clear_keep(item: String) -> void:
+	keep.erase(item)
+
+
+## Pins a node for Smart Stockpiling, or "" to unpin.
+func set_pin(node: String) -> bool:
+	if not fx.stockpile:
+		return false
+	if node != "" and (not data.tech.has(node) or is_researched(node)):
+		return false
+	pin = node
+	return true
+
+
+## Factory Overdrive: doubles vat and line speed for 60 s, then 15 minutes'
+## cooldown from the press (brief §4).
+func activate_overdrive() -> bool:
+	if not can_overdrive():
+		return false
+	overdrive.until = stats.ticks + _ticks(T.OVERDRIVE_SECONDS)
+	overdrive.ready = stats.ticks + _ticks(T.OVERDRIVE_COOLDOWN)
+	return true
+
+
 # --- Time ----------------------------------------------------------------------
 
-## Advances one fixed tick. Plots first, then vats, then lines, so an item made
-## this tick can start the next station this tick.
+## Advances one fixed tick: automatic presses, Heat, plots, then vats, then
+## lines (so an item made this tick can start the next station this tick), then
+## the valve and the market.
 func tick() -> void:
 	stats.ticks += 1
+	if holding and fx.grip > 0.0:
+		press_acc.grip += fx.grip * T.TICK_SECONDS
+		while press_acc.grip >= 1.0 - EPSILON:
+			press_acc.grip -= 1.0
+			_press()
+	if fx.piston > 0.0:
+		press_acc.piston += fx.piston * T.TICK_SECONDS
+		while press_acc.piston >= 1.0 - EPSILON:
+			press_acc.piston -= 1.0
+			_press()
+	if heat > 0.0:
+		heat = maxf(0.0, heat - T.HEAT_DRAIN * fx.heat_drain * T.TICK_SECONDS)
+
 	for crop in plots:
 		var p: Dictionary = plots[crop]
 		if not p.owned:
@@ -385,19 +593,54 @@ func tick() -> void:
 		p.progress += T.TICK_SECONDS
 		while p.progress >= plot_cycle(crop) - EPSILON:
 			p.progress -= plot_cycle(crop)
-			stock[crop] += plot_yield(crop)
-			stats.harvested[crop] += plot_yield(crop)
+			var n := plot_yield(crop)
+			if p.quality > 0 and rng.randf() < quality_chance(crop):
+				n *= 2
+			stock[crop] += n
+			stats.harvested[crop] += n
 	_start_cycles()
 	for i in vats.size():
 		_run("vat", i)
 	for i in lines.size():
 		_run("line", i)
+
+	if fx.valve and stats.ticks % _ticks(T.OVERFLOW_EVERY_SECONDS) == 0:
+		_overflow()
+	_market()
 	_note_value()
 
 
 func advance(ticks: int) -> void:
 	for i in ticks:
 		tick()
+
+
+## A press, from a finger, Ergonomic Grip or the Piston: Double-Tap may make it
+## two, and each counts for peppers, Heat and Overclock.
+func _press() -> int:
+	var n := 1
+	if fx.double > 0.0 and rng.randf() < fx.double:
+		n = 2
+		stats.doubles += 1
+	var picked := 0
+	for i in n:
+		picked += tap_yield()
+		stats.presses += 1
+		if fx.heat:
+			heat = minf(T.HEAT_MAX, heat + T.HEAT_PER_PRESS)
+		if fx.overclock > 0.0:
+			for station in ["vat", "line"]:
+				for j in slots(station).size():
+					var s: Dictionary = slots(station)[j]
+					if s.running:
+						s.progress = minf(s.progress + fx.overclock, slot_cycle(station, j))
+	stock.bell += picked
+	stats.bell_picked += picked
+	revealed.counter = true
+	if stats.bell_picked >= T.STAGE_1_PEPPERS:
+		revealed.status_bar = true
+	_note_value()
+	return picked
 
 
 func _run(station: String, index: int) -> void:
@@ -408,6 +651,7 @@ func _run(station: String, index: int) -> void:
 	while s.running and s.progress >= slot_cycle(station, index) - EPSILON:
 		s.progress -= slot_cycle(station, index)
 		s.running = false
+		s.taken = {}
 		var out: String = data.recipes[s.recipe].output
 		stats.made[out] += 1
 		if station == "line":
@@ -416,22 +660,77 @@ func _run(station: String, index: int) -> void:
 			_bottle_made(out)
 		else:
 			stock[out] += 1
+			_byproduct()
 		_start_cycles()
 	if not s.running:
 		s.progress = 0.0
 
 
 ## A finished bottle: with the Delivery Van, its Auto-Sell share is sold at once
-## (3 in 10 at 30%), the rest goes to stock.
+## (3 in 10 at 30%), the rest goes to stock. A pinned node's bottles are kept.
 func _bottle_made(bottle: String) -> void:
-	if has_van():
+	if has_van() and stock[bottle] >= pinned_need(bottle):
 		autosell_acc[bottle] += autosell[bottle]
 		if autosell_acc[bottle] >= 100:
 			autosell_acc[bottle] -= 100
 			stats.sold[bottle] += 1
-			_earn(value(bottle))
+			_earn(sale_price(bottle) * heat_mult())
 			return
 	stock[bottle] += 1
+
+
+## Byproduct Recycling (D013): a chance per vat cycle of a free level for the
+## lowest-level plot, at most one a minute.
+func _byproduct() -> void:
+	if fx.byproduct <= 0.0 or stats.ticks < byproduct_ready:
+		return
+	if rng.randf() >= fx.byproduct:
+		return
+	var lowest := ""
+	var lowest_levels := 1 << 30
+	for crop in plots:
+		var p: Dictionary = plots[crop]
+		if p.owned and p.speed + p["yield"] + p.quality < lowest_levels:
+			lowest = crop
+			lowest_levels = p.speed + p["yield"] + p.quality
+	if lowest == "":
+		return
+	var best := ""
+	for upgrade in PLOT_UPGRADES:
+		if best == "" or plot_upgrade_cost(lowest, upgrade) < plot_upgrade_cost(lowest, best):
+			best = upgrade
+	plots[lowest][best] += 1
+	stats.free_levels += 1
+	byproduct_ready = stats.ticks + _ticks(T.BYPRODUCT_COOLDOWN)
+
+
+## The Raw Overflow Valve (D014): sells crops and mash above their keep amount,
+## holding back what a pinned node needs.
+func _overflow() -> void:
+	for item in stock:
+		if data.items[item].kind == "bottle":
+			continue
+		var k := keep_amount(item)
+		if k < 0:
+			continue
+		var extra: int = stock[item] - maxi(k, pinned_need(item))
+		if extra > 0:
+			_sell(item, extra)
+
+
+## The Market Ticker (D015): one spike at a time on an unlocked sauce.
+func _market() -> void:
+	if ticker.sauce != "" and stats.ticks >= ticker.ends:
+		ticker.sauce = ""
+		ticker.mult = 1.0
+	if ticker.next < 0 or stats.ticks < ticker.next:
+		return
+	var sauces := unlocked_bottles()
+	ticker.sauce = sauces[rng.randi_range(0, sauces.size() - 1)]
+	ticker.mult = T.TICKER_MULTS[rng.randi_range(0, T.TICKER_MULTS.size() - 1)]
+	ticker.ends = stats.ticks + _ticks(T.TICKER_SECONDS)
+	ticker.next = stats.ticks + _ticks(rng.randi_range(T.TICKER_GAP[0], T.TICKER_GAP[1]))
+	stats.spikes += 1
 
 
 ## Idle slots with a recipe take their inputs if the stock has them, vats before
@@ -441,18 +740,19 @@ func _start_cycles() -> void:
 		for s in slots(station):
 			if s.running or s.recipe == "":
 				continue
-			var inputs: Dictionary = data.recipes[s.recipe].inputs
+			var inputs := recipe_inputs(s.recipe)
 			if has_items(inputs):
 				for item in inputs:
 					stock[item] -= inputs[item]
 					stats.consumed[item] += inputs[item]
 				s.running = true
+				s.taken = inputs.duplicate()
 
 
 func _sell(item: String, count: int) -> void:
 	stock[item] -= count
 	stats.sold[item] += count
-	_earn(count * value(item))
+	_earn(count * sale_price(item) * heat_mult())
 
 
 func _earn(amount: float) -> void:
@@ -466,14 +766,6 @@ func _earn(amount: float) -> void:
 ## Keeps the account's best Operation Value, which opens tabs.
 func _note_value() -> void:
 	account.best_ov = maxf(account.best_ov, operation_value())
-
-
-func _unlocked_by_research(kind: String, target: String) -> bool:
-	for node in research:
-		for e in data.tech[node].effects:
-			if e.get(kind) == target:
-				return true
-	return false
 
 
 # --- Saving --------------------------------------------------------------------
@@ -491,6 +783,15 @@ func to_state() -> Dictionary:
 			"research": research.keys(),
 			"autosell": autosell.duplicate(),
 			"autosell_acc": autosell_acc.duplicate(),
+			"heat": heat,
+			"press_acc": press_acc.duplicate(),
+			"overdrive": overdrive.duplicate(),
+			"keep": keep.duplicate(),
+			"pin": pin,
+			"ticker": ticker.duplicate(),
+			"byproduct_ready": byproduct_ready,
+			# Strings: JSON numbers are doubles and would round a 64-bit state.
+			"rng": {"seed": str(rng.seed), "state": str(rng.state)},
 			"stats": stats.duplicate(true),
 		},
 		"account": account.duplicate(),
@@ -520,23 +821,44 @@ func load_state(s: Variant) -> String:
 		if problem != "":
 			return problem
 		s = _migrate_2_to_3(s)
+		version = 3
 	problem = _check(s, {"run": TYPE_DICTIONARY, "account": TYPE_DICTIONARY})
 	if problem != "":
 		return problem
+	if version == 3:
+		s = _migrate_3_to_4(s)
 	var run: Dictionary = s.run
 	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "revealed": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
-		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY, "stats": TYPE_DICTIONARY})
+		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,
+		"heat": TYPE_FLOAT, "press_acc": TYPE_DICTIONARY, "overdrive": TYPE_DICTIONARY, "keep": TYPE_DICTIONARY, "pin": TYPE_STRING,
+		"ticker": TYPE_DICTIONARY, "byproduct_ready": TYPE_FLOAT, "rng": TYPE_DICTIONARY, "stats": TYPE_DICTIONARY})
 	if problem != "":
 		return problem
 	for item in run.stock:
 		if not data.items.has(item):
 			return "save holds unknown item " + str(item)
+	for item in run.keep:
+		if not data.items.has(item):
+			return "save keeps unknown item " + str(item)
 	for crop in run.plots:
 		if not data.plots.has(crop) or typeof(run.plots[crop]) != TYPE_DICTIONARY:
 			return "save has a bad plot " + str(crop)
+	for node in run.research:
+		if not data.tech.has(node):
+			return "save has unknown research " + str(node)
+	if run.pin != "" and not data.tech.has(run.pin):
+		return "save pins unknown node " + run.pin
+	var t_sauce := str(run.ticker.get("sauce", ""))
+	if t_sauce != "" and (not data.items.has(t_sauce) or data.items[t_sauce].kind != "bottle"):
+		return "save's market spike is on unknown sauce " + t_sauce
+	# Slot caps depend on research, so work that out first.
+	var fresh = get_script().new(data)
+	for node in run.research:
+		fresh.research[node] = true
+	fresh._refresh_fx()
 	for station in ["vat", "line"]:
 		var saved: Array = run.vats if station == "vat" else run.lines
-		if saved.size() > slot_cap(station):
+		if saved.size() > fresh.slot_cap(station):
 			return "save has more %s slots than the cap" % station
 		for slot in saved:
 			if typeof(slot) != TYPE_DICTIONARY:
@@ -544,12 +866,13 @@ func load_state(s: Variant) -> String:
 			var r: String = str(slot.get("recipe", ""))
 			if r != "" and (not data.recipes.has(r) or data.recipes[r].station != station):
 				return "save's %s runs unknown recipe %s" % [station, r]
-	for node in run.research:
-		if not data.tech.has(node):
-			return "save has unknown research " + str(node)
+			if typeof(slot.get("taken", {})) != TYPE_DICTIONARY:
+				return "save has a bad %s slot" % station
+			for item in slot.get("taken", {}):
+				if not data.items.has(item):
+					return "save's %s slot took unknown item %s" % [station, item]
 
 	# Everything checked: now load.
-	var fresh = get_script().new(data)
 	cash = float(run.cash)
 	stock = fresh.stock
 	for item in run.stock:
@@ -560,23 +883,41 @@ func load_state(s: Variant) -> String:
 	plots = fresh.plots
 	for crop in run.plots:
 		var p: Dictionary = run.plots[crop]
-		plots[crop] = {"owned": bool(p.get("owned", false)), "speed": int(p.get("speed", 0)), "yield": int(p.get("yield", 0)), "progress": float(p.get("progress", 0.0))}
+		plots[crop] = {"owned": bool(p.get("owned", false)), "speed": int(p.get("speed", 0)), "yield": int(p.get("yield", 0)),
+			"quality": int(p.get("quality", 0)), "progress": float(p.get("progress", 0.0))}
 	vats = []
-	for slot in run.vats:
-		vats.append({"recipe": str(slot.get("recipe", "")), "speed": int(slot.get("speed", 0)), "progress": float(slot.get("progress", 0.0)), "running": bool(slot.get("running", false))})
 	lines = []
-	for slot in run.lines:
-		lines.append({"recipe": str(slot.get("recipe", "")), "speed": int(slot.get("speed", 0)), "progress": float(slot.get("progress", 0.0)), "running": bool(slot.get("running", false)), "crate": int(slot.get("crate", 0))})
-	research = {"kitchen_table": true}
-	for node in run.research:
-		research[node] = true
+	for station in ["vat", "line"]:
+		for slot in (run.vats if station == "vat" else run.lines):
+			var taken := {}
+			for item in slot.get("taken", {}):
+				taken[item] = int(slot.taken[item])
+			var loaded := {"recipe": str(slot.get("recipe", "")), "speed": int(slot.get("speed", 0)), "progress": float(slot.get("progress", 0.0)),
+				"running": bool(slot.get("running", false)), "taken": taken}
+			if station == "line":
+				loaded.crate = int(slot.get("crate", 0))
+			slots(station).append(loaded)
+	research = fresh.research
 	autosell = fresh.autosell
 	autosell_acc = fresh.autosell_acc
 	for b in autosell:
 		autosell[b] = int(run.autosell.get(b, 100))
 		autosell_acc[b] = int(run.autosell_acc.get(b, 0))
+	heat = clampf(float(run.heat), 0.0, T.HEAT_MAX)
+	holding = false
+	press_acc = {"grip": float(run.press_acc.get("grip", 0.0)), "piston": float(run.press_acc.get("piston", 0.0))}
+	overdrive = {"until": int(run.overdrive.get("until", 0)), "ready": int(run.overdrive.get("ready", 0))}
+	keep = {}
+	for item in run.keep:
+		keep[item] = int(run.keep[item])
+	pin = run.pin
+	ticker = {"sauce": t_sauce, "mult": float(run.ticker.get("mult", 1.0)), "ends": int(run.ticker.get("ends", 0)), "next": int(run.ticker.get("next", -1))}
+	byproduct_ready = int(run.byproduct_ready)
+	rng = RandomNumberGenerator.new()
+	rng.seed = String(run.rng.get("seed", "0")).to_int()
+	rng.state = String(run.rng.get("state", str(rng.state))).to_int()
 	stats = fresh.stats
-	for k in ["presses", "bell_picked", "ticks", "researched"]:
+	for k in ["presses", "doubles", "bell_picked", "ticks", "researched", "free_levels", "spikes"]:
 		stats[k] = int(run.stats.get(k, 0))
 	stats.cash_earned = float(run.stats.get("cash_earned", 0.0))
 	for k in ["harvested", "made", "sold", "consumed"]:
@@ -586,6 +927,7 @@ func load_state(s: Variant) -> String:
 				if stats[k].has(item):
 					stats[k][item] = int(saved[item])
 	account = {"best_ov": float(s.account.get("best_ov", 0.0))}
+	_refresh_fx()
 	_note_value()
 	return ""
 
@@ -652,6 +994,37 @@ func _migrate_2_to_3(s: Dictionary) -> Dictionary:
 		},
 		"account": {"best_ov": ov},
 	}
+
+
+## v3 (v0.3) had no Heat, Crop Quality, valve, pin, Overdrive, market or random
+## stream. A running slot's taken inputs were its recipe's, since v0.3 had no
+## Zero-Waste Piping. The stream is seeded from the save's own figures, so the
+## same save always migrates the same way (FACTORY.md, S9).
+func _migrate_3_to_4(s: Dictionary) -> Dictionary:
+	var out: Dictionary = s.duplicate(true)
+	var run: Dictionary = out.run
+	for station in ["vats", "lines"]:
+		if typeof(run.get(station)) != TYPE_ARRAY:
+			continue
+		for slot in run[station]:
+			if typeof(slot) == TYPE_DICTIONARY and bool(slot.get("running", false)) and data.recipes.has(str(slot.get("recipe", ""))):
+				slot.taken = data.recipes[slot.recipe].inputs.duplicate()
+	var st: Variant = run.get("stats", {})
+	var seed_value := 0
+	if typeof(st) == TYPE_DICTIONARY:
+		seed_value = absi(hash([int(st.get("ticks", 0)), int(st.get("presses", 0)), float(st.get("cash_earned", 0.0))]))
+	run.heat = 0.0
+	run.press_acc = {"grip": 0.0, "piston": 0.0}
+	run.overdrive = {"until": 0, "ready": 0}
+	run.keep = {}
+	run.pin = ""
+	run.ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
+	run.byproduct_ready = 0.0
+	var r := RandomNumberGenerator.new()
+	r.seed = seed_value
+	run.rng = {"seed": str(r.seed), "state": str(r.state)}
+	out.version = 4
+	return out
 
 
 func _check(s: Dictionary, want: Dictionary) -> String:

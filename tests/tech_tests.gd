@@ -106,8 +106,9 @@ func test_research_costs_and_permanence() -> void:
 	check(g.stats.researched == 7, "seven researched")
 	var c := Game.new()
 	c.load_state(JSON.parse_string(JSON.stringify(g.to_state())))
-	for node in g.data.tech:
+	for node in g.research:
 		check(c.is_researched(node), "R2: %s survives a reload" % node)
+	check(c.research.size() == g.research.size(), "R2: and nothing else is researched")
 
 
 func test_blueprints_open_what_they_name() -> void:

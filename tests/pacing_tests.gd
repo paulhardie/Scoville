@@ -1,13 +1,14 @@
 extends SceneTree
-## The first 50 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
-## docs/ECONOMY.md's N1–N8 (to 50:00), played by the pacing player (D003).
+## The first 110 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
+## docs/ECONOMY.md's N1–N8 (to 50:00) and M1–M7 (to 1:50), played by the
+## pacing player (D003).
 ## Prints a timeline and each criterion's measurement.
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
 const Player = preload("res://src/sim/engaged_player.gd")
 
-const MINUTES := 50
+const MINUTES := 110
 
 var failures: Array[String] = []
 var checks := 0
@@ -27,6 +28,8 @@ func criterion(id: String, ok: bool, measured: String) -> void:
 func clock(seconds: float) -> String:
 	if seconds == INF:
 		return "never"
+	if seconds >= 3600.0:
+		return "%d:%02d:%02d" % [int(seconds) / 3600, (int(seconds) / 60) % 60, int(seconds) % 60]
 	return "%d:%04.1f" % [int(seconds) / 60, fmod(seconds, 60.0)]
 
 
@@ -46,10 +49,14 @@ func run() -> void:
 		"bistro": func(): return g.stats.made.bistro_verde > 0,
 		"ov_1k": func(): return g.operation_value() >= 1000.0,
 		"ov_10k": func(): return g.operation_value() >= 10000.0,
+		"ov_100k": func(): return g.operation_value() >= 100000.0,
+		"louisiana": func(): return g.stats.made.classic_louisiana > 0,
 	}
 	var at_15: Dictionary = {}
 	var at_30: Dictionary = {}
-	var window := {"line_busy": 0, "ticks": 0, "brine_start": 0}
+	var at_90: Dictionary = {}
+	var window := {"line_busy": 0, "ticks": 0, "brine_start": 0, "brine_end": 0}
+	var late := {"table_mild": 0, "bistro_verde": 0, "ticks": 0}
 	for i in minute(MINUTES):
 		p.step(g)
 		g.tick()
@@ -61,9 +68,20 @@ func run() -> void:
 			at_15 = g.to_state()
 		if g.stats.ticks == minute(30):
 			at_30 = g.to_state()
+		if g.stats.ticks == minute(90):
+			at_90 = g.to_state()
+		if g.stats.ticks > minute(90) and g.stats.ticks <= minute(100):
+			late.ticks += 1
+			for sauce in ["table_mild", "bistro_verde"]:
+				for s in g.lines:
+					if s.recipe == sauce and s.running:
+						late[sauce] += 1
+						break
 		if g.stats.ticks == minute(40):
 			window.brine_start = g.stats.made.pickled_brine
-		if g.stats.ticks > minute(40):
+		if g.stats.ticks == minute(50):
+			window.brine_end = g.stats.made.pickled_brine
+		if g.stats.ticks > minute(40) and g.stats.ticks <= minute(50):
 			window.ticks += 1
 			for s in g.lines:
 				if s.recipe == "table_mild" and s.running:
@@ -82,8 +100,8 @@ func run() -> void:
 	# v0.2's criteria, to 15:00 (FACTORY.md).
 	criterion("F1", reached.get("status_bar", INF) <= 15.0, "status bar at %s (by 0:15)" % clock(reached.get("status_bar", INF)))
 	criterion("F2", reached.get("deck", INF) <= 90.0, "deck at %s (by 1:30)" % clock(reached.get("deck", INF)))
-	criterion("F3", p.first("buy vat 1") <= 180.0, "vat at %s (by 3:00)" % clock(p.first("buy vat 1")))
-	var line_at := p.first("buy line 1")
+	criterion("F3", p.first("buy vat 1 (sweet_mash)") <= 180.0, "vat at %s (by 3:00)" % clock(p.first("buy vat 1 (sweet_mash)")))
+	var line_at := p.first("buy line 1 (table_mild)")
 	criterion("F4", line_at <= 300.0, "line at %s (by 5:00)" % clock(line_at))
 	criterion("F5", p.first("sell_batch") <= 330.0, "first Sell Batch at %s (by 5:30)" % clock(p.first("sell_batch")))
 	criterion("F6", longest_wait(p, line_at, 15 * 60.0) <= 90.0, "longest wait between purchases or research, line to 15:00: %.0f s (at most 90)" % longest_wait(p, line_at, 15 * 60.0))
@@ -103,12 +121,29 @@ func run() -> void:
 	var wait := longest_wait(p, 15 * 60.0, 50 * 60.0)
 	criterion("N6", wait <= 120.0, "longest wait between purchases or research, 15:00–50:00: %.0f s (at most 120)" % wait)
 	var busy: float = window.line_busy / float(maxi(window.ticks, 1))
-	var brine: int = g.stats.made.pickled_brine - window.brine_start
+	var brine: int = window.brine_end - window.brine_start
 	criterion("N7", busy >= 0.5 and brine > 0, "40:00–50:00: Table Mild line busy %.0f%% (at least 50%%), %d Pickled Brine made from Bell Peppers" % [busy * 100.0, brine])
 	var idle_30 := minute_from(at_30, 0.0)
 	var tap_30 := minute_from(at_30, p.taps_per_second)
 	var lift_30 := (tap_30 - idle_30) / idle_30 if idle_30 > 0.0 else INF
 	criterion("N8", lift_30 >= 0.10, "tapping adds %.0f%% at 30:00 (at least 10%%): £%.2f vs £%.2f a minute" % [lift_30 * 100.0, tap_30, idle_30])
+
+	# v0.4's criteria, to 1:50 (ECONOMY.md).
+	var tier_3 := minf(p.first("research cayenne_blueprint"), p.first("research garlic_blueprint"))
+	criterion("M1", tier_3 <= 48 * 60.0, "first Tier 3 blueprint at %s (by 48:00)" % clock(tier_3))
+	criterion("M2", reached.get("louisiana", INF) <= 55 * 60.0, "first Classic Louisiana at %s (by 55:00)" % clock(reached.get("louisiana", INF)))
+	criterion("M3", reached.get("ov_100k", INF) <= 110 * 60.0, "Operation Value £100,000 at %s (by 1:50:00); at 1:50 £%.0f" % [clock(reached.get("ov_100k", INF)), g.operation_value()])
+	var wait_m := longest_wait(p, 50 * 60.0, 110 * 60.0)
+	criterion("M4", wait_m <= 150.0, "longest wait between purchases or research, 50:00–1:50:00: %.0f s (at most 150)" % wait_m)
+	var idle_90 := minute_from(at_90, 0.0)
+	var tap_90 := minute_from(at_90, p.taps_per_second)
+	var lift_90 := (tap_90 - idle_90) / idle_90 if idle_90 > 0.0 else INF
+	criterion("M5", lift_90 >= 0.30, "tapping adds %.0f%% at 1:30:00 (at least 30%%): £%.0f vs £%.0f a minute" % [lift_90 * 100.0, tap_90, idle_90])
+	var tm: float = late.table_mild / float(maxi(late.ticks, 1))
+	var bv: float = late.bistro_verde / float(maxi(late.ticks, 1))
+	criterion("M6", tm >= 0.5 and bv >= 0.5, "1:30–1:40: Table Mild line busy %.0f%%, Bistro Verde line busy %.0f%% (each at least 50%%)" % [tm * 100.0, bv * 100.0])
+	var piston := p.first("research automated_piston")
+	criterion("M7", piston <= 110 * 60.0, "Automated Piston at %s (by 1:50:00)" % clock(piston))
 
 	for failure in failures:
 		printerr("FAIL: ", failure)

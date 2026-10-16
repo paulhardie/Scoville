@@ -62,6 +62,29 @@ func run() -> void:
 	check("Cash: £2.00" in visible_text(screen) and counter.text == "Bell Peppers: 0", "selling updates cash and the counter")
 	check(sell.disabled, "the sell button is disabled with no peppers")
 
+	# Stage 2 (docs/FACTORY.md): the deck opens at £10 earned.
+	var deck: Control = screen.find_child("Deck", true, false)
+	check(not deck.visible, "no deck at £2 earned")
+	var big := blank.size
+	for i in 80:
+		blank.pressed.emit()
+	sell.pressed.emit()
+	await create_timer(1.2).timeout
+	check(deck.visible, "the deck shows at £10 earned")
+	check(blank.size.x < big.x, "the Blank Button shrinks into the upper viewport: %s" % str(blank.size))
+	check(blank.get_global_rect().end.y <= deck.get_global_rect().position.y + 1.0, "it sits above the deck")
+	var plot_card: Control = screen.find_child("Card_plot", true, false)
+	var vat_card: Control = screen.find_child("Card_vat", true, false)
+	var line_card: Control = screen.find_child("Card_line", true, false)
+	check(plot_card.visible and vat_card.visible and not line_card.visible, "the plot and vat are offered, not the line")
+	var buy_plot: Button = screen.find_child("Buy_plot", true, false)
+	check(not buy_plot.disabled, "£10 buys the plot")
+	buy_plot.pressed.emit()
+	await process_frame
+	check(screen.game.stations.plot.owned and not buy_plot.visible, "the buy button buys it and goes")
+	var speed: Button = screen.find_child("Upgrade_plot_speed", true, false)
+	check(speed.visible and speed.text.begins_with("Harvest Speed"), "its upgrades show: %s" % speed.text)
+
 	screen.queue_free()
 	await process_frame
 	for failure in failures:

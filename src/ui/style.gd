@@ -27,9 +27,21 @@ const GUTTER := 20
 const RADIUS := 12
 ## Side of the Blank Button at the start (brief §2: "large").
 const BLANK_BUTTON_SIZE := 280.0
+## Its side once compressed into the upper viewport (Stage 2).
+const BLANK_BUTTON_COMPACT := 150.0
 const STATUS_BAR_HEIGHT := 84.0
+## Sell Batch, beside the compact button.
+const SELL_BATCH_WIDTH := 140.0
+const SELL_BATCH_HEIGHT := 72.0
+## The upper viewport's share of the screen height (brief §2: 35%).
+const UPPER_FRACTION := 0.35
+## Cycle progress bars.
+const PROGRESS_HEIGHT := 8.0
+const PROGRESS_FILL := Color("#f97316")
+const PROGRESS_TRACK := Color("#0c0e14")
 
 ## Motion, in seconds.
 const PRESS_SQUASH := 0.12
 const FADE_IN := 0.6
 const SLIDE_IN := 0.45
+const COMPRESS := 0.5

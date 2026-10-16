@@ -25,7 +25,7 @@ Out of scope for v1.0 (brief): servers, accounts, cloud saves. Everything runs o
 ## Architecture rules
 
 - **Pure simulation, separate from UI.** `src/core/game.gd` (RefCounted, no nodes) owns all state and rules and advances by a fixed tick. Screens only present and report. A rule implemented twice is a bug.
-- **Deterministic.** Once anything is timed or random (v0.2's farms): a fixed tick, one seeded RNG stream whose state is saved, and no wall clock inside the simulation. Real time (offline progress, the Cook-Off) comes in from outside it.
+- **Deterministic.** A fixed tick (`Tuning.TICK_SECONDS`) and no wall clock inside the simulation; real time (offline progress, the Cook-Off) comes in from outside it. Nothing is random yet; the first chance-based rule brings one seeded RNG stream whose state is saved.
 - **Numbers in one place.** Tuning numbers live in `src/core/tuning.gd`, each citing its brief section or marked GUESS. Move them to data files under `data/` when there are enough of one kind (crops, recipes, managers, rooms), which the recipe table in v0.2–v0.3 will be.
 - **Money is GBP** and shown as `£0.00`.
 - Colours and type sizes live only in `src/ui/style.gd`.
@@ -36,7 +36,7 @@ Out of scope for v1.0 (brief): servers, accounts, cloud saves. Everything runs o
 All Godot runs go through `run_godot.sh`, which points `HOME` at a scratch folder so nothing touches a real save.
 
 ```bash
-bash run_tests.sh                                    # GDScript suites; any error line fails
+bash run_tests.sh                                    # GDScript suites, pacing included; any error line fails
 bash run_godot.sh --headless --path . --quit         # headless boot check
 bash run_godot.sh --path .                           # play it in a window
 bash run_godot.sh --path . --quit-after 1200 -s res://tools/capture_ui.gd -- --out /abs/dir   # render each stage to PNGs, then look at them
@@ -53,14 +53,15 @@ bash tools/serve_web.sh                              # export, then serve it on 
 
 | Path | What |
 | --- | --- |
-| `src/core/` | Simulation: `game.gd` (state, rules, saves), `tuning.gd` (every tuning number, with its source) |
+| `src/core/` | Simulation: `game.gd` (state, rules, time, saves), `tuning.gd` (every tuning number, with its source) |
+| `src/sim/` | Scripted players for measuring: `engaged_player.gd` (the pacing player, [D003](docs/DECISIONS.md)) |
 | `src/ui/` | The screen (`main.gd`, built in code) and `style.gd` (palette and sizes) |
 | `scenes/` | `main.tscn`, the entry scene |
-| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:` |
+| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`; `pacing_tests.gd` measures the first 15 minutes against FACTORY.md's criteria |
 | `tools/` | `capture_ui.gd`, `export_web.sh`, `serve_web.sh`/`.py` (phone build), `install_godot_linux.sh` |
-| `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md` so far) |
+| `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`) |
 
 ## Sources of truth
 
-- What the game should do: my explicit instructions, then decisions in `docs/DECISIONS.md`, then the brief (`docs/BRIEF.md`), then each system's design doc (`docs/ONBOARDING.md`), which owns that system's criteria and assumptions.
+- What the game should do: my explicit instructions, then decisions in `docs/DECISIONS.md`, then the brief (`docs/BRIEF.md`), then each system's design doc (`docs/ONBOARDING.md`, `docs/FACTORY.md`), which owns that system's criteria and assumptions.
 - What comes next: `docs/ROADMAP.md` (versions) and `docs/BACKLOG.md` (gaps and work). Where we are: `docs/HANDOVER.md`.

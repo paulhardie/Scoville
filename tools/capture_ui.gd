@@ -1,7 +1,7 @@
 extends SceneTree
-## Renders each onboarding stage to PNGs, for looking at after a UI change
-## (tests don't catch layout faults). Needs a window, so not headless:
-##   bash run_godot.sh --path . -s res://tools/capture_ui.gd -- --out /abs/dir
+## Renders each onboarding stage and the factory to PNGs, for looking at after a
+## UI change (tests don't catch layout faults). Needs a window, so not headless:
+##   bash run_godot.sh --path . --quit-after 1200 -s res://tools/capture_ui.gd -- --out /abs/dir
 
 const Main = preload("res://scenes/main.tscn")
 const T = preload("res://src/core/tuning.gd")
@@ -30,6 +30,25 @@ func run() -> void:
 	for p in T.STAGE_1_PEPPERS:
 		blank.pressed.emit()
 	await _shot(out.path_join("status_bar.png"), 1.0)
+
+	for p in 80:
+		blank.pressed.emit()
+	(screen.find_child("SellRaw", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("deck.png"), 1.2)
+
+	# Mid-factory: everything bought, the crate half used, some upgrades.
+	var g = screen.game
+	g.cash = 1234.5
+	for station in ["plot", "vat", "line"]:
+		g.buy(station)
+	g.stations.plot.speed = 3
+	g.stations.plot.yield = 1
+	g.stations.vat.speed = 2
+	g.stations.line.crate = 23
+	g.stock.bell = 48
+	g.stock.sweet_mash = 3
+	g.stock.table_mild = 17
+	await _shot(out.path_join("factory.png"), 0.6)
 
 	print("PASS: captured to ", out)
 	quit()

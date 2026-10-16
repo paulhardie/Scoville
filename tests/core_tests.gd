@@ -42,14 +42,14 @@ func pressed(times: int) -> Game:
 func test_fresh_game_reveals_nothing() -> void:
 	var g := Game.new()
 	check(not g.revealed.counter and not g.revealed.status_bar, "O1: nothing revealed at the start")
-	check(g.bell == 0 and g.cash == 0.0, "starts empty")
+	check(g.stock.bell == 0 and g.cash == 0.0, "starts empty")
 
 
 func test_each_press_picks_one() -> void:
 	var g := Game.new()
 	for i in 50:
 		check(g.press() == 1, "O2: a press reports 1 pepper")
-	check(g.bell == 50 and g.stats.bell_picked == 50 and g.stats.presses == 50, "O2: 50 presses, 50 peppers")
+	check(g.stock.bell == 50 and g.stats.bell_picked == 50 and g.stats.presses == 50, "O2: 50 presses, 50 peppers")
 
 
 func test_counter_appears_on_first_press() -> void:
@@ -66,10 +66,10 @@ func test_status_bar_at_twenty() -> void:
 
 func test_sell_raw() -> void:
 	var early := pressed(5)
-	check(not early.sell_raw() and early.bell == 5, "can't sell before the status bar appears")
+	check(not early.sell_raw() and early.stock.bell == 5, "can't sell before the status bar appears")
 	var g := pressed(37)
 	check(g.sell_raw(), "O5: selling works with peppers held")
-	check(close(g.cash, 3.70) and g.bell == 0, "O5: 37 peppers sell for £3.70: £%.2f" % g.cash)
+	check(close(g.cash, 3.70) and g.stock.bell == 0, "O5: 37 peppers sell for £3.70: £%.2f" % g.cash)
 	check(not g.sell_raw() and close(g.cash, 3.70), "O5: selling with none does nothing")
 	check(close(g.stats.cash_earned, 3.70), "earned cash is counted")
 

@@ -1,13 +1,29 @@
 # Backlog
 
-Everything adopted and not done, one row each. Update the status when it moves; delete a row when it's done and the handover says so.
+Everything adopted and not done, one row each. Gaps (G) are things the brief leaves open that a version needs settled; work rows (W) are things to build or check. Update the status when a row moves; delete it when it's done and the handover says so.
+
+## Gaps in the brief
+
+| Id | Gap | Needed by | Status |
+| --- | --- | --- | --- |
+| G1 | Platform: native iOS and Android builds, or the Web build (as a phone PWA) until v1.0? Native needs Xcode, the Android SDK and signing. | v1.0 (testing now) | Open: recommend Web for testing, native from v1.0 |
+| G2 | Title: the brief says Hot Sauce Empire, the repository is Scoville. | — | Assumed: the game is Hot Sauce Empire, the project is Scoville |
+| G3 | Stage 2 trigger "£10 Cash": cash held, or earned in total? | v0.2 | Open |
+| G4 | Farm, vat and line numbers: cycle times, yields, purchase prices, upgrade cost curves, and what Crop Quality Chance does. Starter Crate: how fast "rapidly" is. | v0.2 | Open |
+| G5 | Operation Value thresholds that unlock tabs 2–4 (only HQ's £1,000,000 is given). | v0.3 | Open |
+| G6 | Value of raw crops and mashes, for Operation Value's "stockpiled inventory" (only bottle values are given; raw Bell Pepper sells at £0.10). | v0.3 | Open |
+| G7 | Carolina Reaper is in the crop list but has no recipe; are there tiers past 5? | v0.3 | Open |
+| G8 | Franchise Credits formula ("scaled logarithmically"), HQ room level costs, and when a room draft is offered. | v0.6 | Open |
+| G9 | Tech Tree: the full node list per wing, each node's item cost, and which nodes connect. | v0.4 | Open |
+| G10 | Heat meter: build and decay rates, and how "+50% while maintained" scales between 0 and 100%. | v0.4 | Open |
+| G11 | Base offline cap and offline speed before upgrades. | v0.5 | Open |
+| G12 | Golden Seeds: amounts per source, pack price, rarity drop rates, slot prices, duplicates per star, Mastery costs. | v0.7 | Open |
+| G13 | Manager art: who makes it and in what style. | v0.7 | Open |
+| G14 | Cook-Off reward table: Golden Seeds and Ribbons per threshold. | v0.8 | Open |
+
+## Work
 
 | Id | What | Status | Needs |
 | --- | --- | --- | --- |
-| B1 | Heat multiplier: the prototype showed 1.0–1.8× by heat but never applied it | Open decision | Owner: apply it to taps, or drop it |
-| B2 | Time away: nothing happens while the game is closed (pickers and the capper stop) | Not started | A clock outside the simulation, a cap and a rate |
-| B3 | Sound: the prototype synthesised pick, bottle, cash and boil sounds | Not started | Nothing |
-| B4 | Pick feedback: floating "+N" at the tap, crit and boil highlights | Not started | Nothing |
-| B5 | Reset progress, with a confirm | Not started | Nothing |
-| B6 | Try the Web build on a phone (exports cleanly; not yet opened on a device) | Not started | `bash tools/serve_web.sh` and a phone on the same Wi-Fi |
-| B7 | First-session pacing criteria and a bot to measure them | Not started | Owner's targets for time to kitchen, first upgrade, jalapeño patch |
+| W1 | Open the Web build on a phone (it exports cleanly; not yet tried on a device) | Not started | `bash tools/serve_web.sh` and a phone on the same Wi-Fi |
+| W2 | Sound and haptics for the button press | Not started | Nothing |

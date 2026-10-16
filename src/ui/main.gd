@@ -1,62 +1,37 @@
 extends Control
-## The one screen. Presents the game and reports taps to it; every rule lives in
-## src/core/game.gd. Builds its nodes in code so the layout is all in one place.
+## The one screen. Presents the game and reports presses to it; every rule lives
+## in src/core/game.gd. Builds its nodes in code so the layout is all in one place.
+## Reveals animate when they happen and appear at once when loaded from a save.
 
 const Game = preload("res://src/core/game.gd")
-const G = preload("res://src/core/guesses.gd")
+const T = preload("res://src/core/tuning.gd")
 const S = preload("res://src/ui/style.gd")
-
-const UPGRADE_INFO := {
-	"shears": ["Sharp Shears", "+1 pepper a tap"],
-	"picker": ["Field Picker", "+2 peppers a second"],
-	"capper": ["Hand Capper", "bottles Table Sauce by itself"],
-	"jalapeno": ["Jalapeño Patch", "taps can pick jalapeños; unlocks Smoky Sauce"],
-}
 
 ## Where the game saves. Tests clear it so nothing is read or written.
 var save_path := "user://save.json"
 var game: Game
 
-var _acc := 0.0
 var _since_save := 0.0
+var _shown := {}
 
-var _tier: Label
+var _blank: Button
+var _counter: Label
+var _status_bar: PanelContainer
 var _cash: Label
-var _heat_label: Label
-var _heat_bar: ProgressBar
-var _heat_fill: StyleBoxFlat
-var _pick: Button
-var _bell: Label
-var _sell_bell: Button
-var _jalapeno_row: Control
-var _jalapeno: Label
-var _sell_jalapeno: Button
-var _kitchen: Control
-var _bottle_table: Button
-var _bottle_smoky: Button
-var _bottles: Label
-var _upgrades: Control
-var _upgrade_buttons := {}
-var _stats: Label
+var _sell: Button
 
 
 func _ready() -> void:
-	game = Game.new(int(Time.get_unix_time_from_system()))
+	game = Game.new()
 	_load()
-	theme = _make_theme()
 	_build()
-	_refresh()
+	_refresh(false)
 
 
 func _process(delta: float) -> void:
-	_acc += delta
-	while _acc >= G.TICK_SECONDS:
-		_acc -= G.TICK_SECONDS
-		game.tick()
 	_since_save += delta
-	if _since_save >= G.AUTOSAVE_SECONDS:
+	if _since_save >= T.AUTOSAVE_SECONDS:
 		_save()
-	_refresh()
 
 
 func _notification(what: int) -> void:
@@ -92,177 +67,110 @@ func _save() -> void:
 # --- Building --------------------------------------------------------------
 
 func _build() -> void:
-	var margin := MarginContainer.new()
-	margin.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	for side in ["left", "right", "top", "bottom"]:
-		margin.add_theme_constant_override("margin_" + side, S.GUTTER)
-	add_child(margin)
-	var scroll := ScrollContainer.new()
-	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
-	margin.add_child(scroll)
-	var col := VBoxContainer.new()
-	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col.add_theme_constant_override("separation", S.GAP)
-	scroll.add_child(col)
+	var bg := ColorRect.new()
+	bg.color = S.BG
+	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	add_child(bg)
 
-	# Header: brand on the left, cash on the right.
-	var header := HBoxContainer.new()
-	col.add_child(header)
-	var brand := VBoxContainer.new()
-	brand.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	header.add_child(brand)
-	brand.add_child(_label("SCOVILLE", S.SIZE_TITLE, S.GOLD))
-	_tier = _label("", S.SIZE_SMALL, S.DIM)
-	brand.add_child(_tier)
-	_cash = _label("", S.SIZE_BIG, S.GREEN)
+	# Stage 0: the Blank Button, centred, with no label at all.
+	_blank = Button.new()
+	_blank.name = "BlankButton"
+	_blank.focus_mode = Control.FOCUS_NONE
+	_blank.custom_minimum_size = Vector2.ONE * S.BLANK_BUTTON_SIZE
+	var half := S.BLANK_BUTTON_SIZE / 2.0
+	_blank.set_anchors_preset(Control.PRESET_CENTER)
+	_blank.offset_left = -half
+	_blank.offset_right = half
+	_blank.offset_top = -half
+	_blank.offset_bottom = half
+	_blank.pivot_offset = Vector2.ONE * half
+	var round := int(half)
+	var looks := {"normal": S.BUTTON, "hover": S.BUTTON_HOVER, "pressed": S.BUTTON_PRESSED}
+	for state in looks:
+		var box := _box(looks[state], round)
+		box.border_color = S.BUTTON_EDGE
+		box.set_border_width_all(4)
+		box.shadow_color = Color(0, 0, 0, 0.45)
+		box.shadow_size = 18
+		_blank.add_theme_stylebox_override(state, box)
+	_blank.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	_blank.pressed.connect(_on_blank_pressed)
+	add_child(_blank)
+
+	# Stage 0, after the first press: the counter at the top.
+	_counter = Label.new()
+	_counter.name = "Counter"
+	_counter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_counter.add_theme_font_size_override("font_size", S.SIZE_BODY)
+	_counter.add_theme_color_override("font_color", S.TEXT)
+	_counter.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_counter.offset_top = S.STATUS_BAR_HEIGHT + 24
+	_counter.offset_bottom = _counter.offset_top + 40
+	add_child(_counter)
+
+	# Stage 1: the status bar, which slides down from above the screen.
+	_status_bar = PanelContainer.new()
+	_status_bar.name = "StatusBar"
+	var bar := _box(S.PANEL, 0)
+	bar.content_margin_left = S.GUTTER
+	bar.content_margin_right = S.GUTTER
+	bar.border_color = S.LINE
+	bar.border_width_bottom = 1
+	_status_bar.add_theme_stylebox_override("panel", bar)
+	_status_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_status_bar.offset_bottom = S.STATUS_BAR_HEIGHT
+	add_child(_status_bar)
+	var row := HBoxContainer.new()
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_status_bar.add_child(row)
+	_cash = Label.new()
+	_cash.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	_cash.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	header.add_child(_cash)
-
-	# Heat.
-	var heat_head := HBoxContainer.new()
-	col.add_child(heat_head)
-	var heat_title := _label("HEAT", S.SIZE_SMALL, S.ORANGE)
-	heat_title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	heat_head.add_child(heat_title)
-	_heat_label = _label("", S.SIZE_SMALL, S.ORANGE)
-	heat_head.add_child(_heat_label)
-	_heat_bar = ProgressBar.new()
-	_heat_bar.max_value = G.HEAT_MAX
-	_heat_bar.show_percentage = false
-	_heat_bar.custom_minimum_size.y = 14
-	_heat_bar.add_theme_stylebox_override("background", _box(S.CARD, 7))
-	_heat_fill = _box(S.ORANGE, 7)
-	_heat_bar.add_theme_stylebox_override("fill", _heat_fill)
-	col.add_child(_heat_bar)
-
-	# The field: the big button.
-	_pick = _button("", game.tap)
-	_pick.name = "Pick"
-	_pick.custom_minimum_size.y = 200
-	_pick.add_theme_font_size_override("font_size", S.SIZE_BIG)
-	col.add_child(_pick)
-
-	# Stock.
-	var stock := _card(col)
-	var bell_row := HBoxContainer.new()
-	stock.add_child(bell_row)
-	_bell = _label("", S.SIZE_BODY, S.TEXT)
-	_bell.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	bell_row.add_child(_bell)
-	_sell_bell = _button("", game.sell_loose_bell)
-	bell_row.add_child(_sell_bell)
-	var jal_row := HBoxContainer.new()
-	_jalapeno_row = jal_row
-	stock.add_child(jal_row)
-	_jalapeno = _label("", S.SIZE_BODY, S.TEXT)
-	_jalapeno.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	jal_row.add_child(_jalapeno)
-	_sell_jalapeno = _button("", game.sell_loose_jalapeno)
-	jal_row.add_child(_sell_jalapeno)
-
-	# Kitchen.
-	var kitchen := _card(col)
-	_kitchen = kitchen.get_parent()
-	kitchen.add_child(_label("KITCHEN", S.SIZE_SMALL, S.DIM))
-	_bottle_table = _button("Bottle Table Sauce   %d bell → %s" % [G.TABLE_SAUCE_PEPPERS, _money(G.TABLE_SAUCE_PRICE)], game.bottle_table)
-	kitchen.add_child(_bottle_table)
-	_bottle_smoky = _button("Bottle Smoky Sauce   %d jalapeño → %s" % [G.SMOKY_SAUCE_PEPPERS, _money(G.SMOKY_SAUCE_PRICE)], game.bottle_smoky)
-	kitchen.add_child(_bottle_smoky)
-	_bottles = _label("", S.SIZE_SMALL, S.DIM)
-	kitchen.add_child(_bottles)
-
-	# Upgrades.
-	var ups := _card(col)
-	_upgrades = ups.get_parent()
-	ups.add_child(_label("UPGRADES", S.SIZE_SMALL, S.DIM))
-	for key in UPGRADE_INFO:
-		var b := _button("", game.buy.bind(key))
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		_upgrade_buttons[key] = b
-		ups.add_child(b)
-
-	_stats = _label("", S.SIZE_SMALL, S.MUTED)
-	_stats.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_stats)
+	_cash.add_theme_font_size_override("font_size", S.SIZE_BODY)
+	_cash.add_theme_color_override("font_color", S.GREEN)
+	row.add_child(_cash)
+	_sell = Button.new()
+	_sell.name = "SellRaw"
+	_sell.text = "Sell Raw Peppers (%s/ea)" % _money(T.BELL_RAW_PRICE)
+	_sell.focus_mode = Control.FOCUS_NONE
+	_sell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	_style_control(_sell)
+	_sell.pressed.connect(func() -> void:
+		game.sell_raw()
+		_refresh(true))
+	row.add_child(_sell)
 
 
-func _refresh() -> void:
-	var boiling := game.is_boiling()
-	_tier.text = "Backyard Jalapeño Batch #2" if game.unlocked.jalapeno else "Kitchen Table Batch #1"
-	_cash.text = _money(game.cash)
+func _on_blank_pressed() -> void:
+	game.press()
+	var squash := create_tween()
+	squash.tween_property(_blank, "scale", Vector2.ONE * 0.92, S.PRESS_SQUASH * 0.4)
+	squash.tween_property(_blank, "scale", Vector2.ONE, S.PRESS_SQUASH * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+	_refresh(true)
 
-	_heat_bar.value = G.HEAT_MAX if boiling else game.heat
-	_heat_fill.bg_color = S.CRIMSON if boiling else S.ORANGE
-	if boiling:
-		_heat_label.text = "FLASH BOIL  %.0fs" % ceilf(game.boil_ticks * G.TICK_SECONDS)
-	else:
-		_heat_label.text = "%d%%" % int(game.heat)
-	var per_tap := roundi(game.tap_yield() * (G.BOIL_MULT if boiling else 1.0))
-	_pick.text = "%s\n+%d bell pepper%s" % ["FLASH BOIL!" if boiling else "PICK PEPPER", per_tap, "" if per_tap == 1 else "s"]
-	_pick.add_theme_color_override("font_color", S.CRIMSON if boiling else S.TEXT)
 
-	_bell.text = "Bell peppers   %s" % _count(game.bell)
-	_sell_bell.text = "Sell loose  " + _money(game.bell * G.BELL_LOOSE_PRICE)
-	_sell_bell.disabled = game.bell <= 0.0
-	_jalapeno_row.visible = game.unlocked.jalapeno
-	_jalapeno.text = "Jalapeños   %s" % _count(game.jalapeno)
-	_sell_jalapeno.text = "Sell loose  " + _money(game.jalapeno * G.JALAPENO_LOOSE_PRICE)
-	_sell_jalapeno.disabled = game.jalapeno <= 0
+## Shows the state. `animate` plays a reveal's entrance the moment it happens.
+func _refresh(animate: bool) -> void:
+	_counter.text = "Bell Peppers: %d" % game.bell
+	_cash.text = "Cash: " + _money(game.cash)
+	_sell.disabled = not game.can_sell_raw()
+	_reveal("counter", _counter, animate, func() -> void:
+		_counter.modulate.a = 0.0
+		create_tween().tween_property(_counter, "modulate:a", 1.0, S.FADE_IN))
+	_reveal("status_bar", _status_bar, animate, func() -> void:
+		_status_bar.position.y = -S.STATUS_BAR_HEIGHT
+		create_tween().tween_property(_status_bar, "position:y", 0.0, S.SLIDE_IN).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT))
 
-	_kitchen.visible = game.unlocked.bottling
-	_bottle_table.disabled = not game.can_bottle_table()
-	_bottle_smoky.visible = game.unlocked.jalapeno
-	_bottle_smoky.disabled = not game.can_bottle_smoky()
-	_bottles.text = "Bottles sold: %s" % _count(game.stats.bottles)
 
-	_upgrades.visible = game.unlocked.upgrades
-	for key in _upgrade_buttons:
-		var b: Button = _upgrade_buttons[key]
-		var info: Array = UPGRADE_INFO[key]
-		if key == "jalapeno":
-			b.visible = not game.unlocked.jalapeno
-			b.text = "%s   %s\n%s" % [info[0], _money(game.cost(key)), info[1]]
-		else:
-			b.text = "%s  Lv %d   %s\n%s" % [info[0], game.levels[key], _money(game.cost(key)), info[1]]
-		b.disabled = not game.can_buy(key)
-
-	_stats.text = "Picked %s  ·  Bottled %s  ·  Earned %s  ·  Boils %s" % [
-		_count(game.stats.peppers), _count(game.stats.bottles), _money(game.stats.revenue), _count(game.stats.boils)]
+func _reveal(key: String, node: Control, animate: bool, entrance: Callable) -> void:
+	var on: bool = game.revealed[key]
+	node.visible = on
+	if on and not _shown.get(key, false) and animate:
+		entrance.call()
+	_shown[key] = on
 
 
 # --- Pieces ----------------------------------------------------------------
-
-func _label(text: String, size: int, color: Color) -> Label:
-	var l := Label.new()
-	l.text = text
-	l.add_theme_font_size_override("font_size", size)
-	l.add_theme_color_override("font_color", color)
-	return l
-
-
-## Every action returns whether it did anything; the screen just redraws.
-func _button(text: String, action: Callable) -> Button:
-	var b := Button.new()
-	b.text = text
-	b.focus_mode = Control.FOCUS_NONE
-	b.pressed.connect(func() -> void:
-		action.call()
-		_refresh())
-	return b
-
-
-## A card: a panel with a column inside. Returns the column; its parent is the panel.
-func _card(parent: Container) -> VBoxContainer:
-	var panel := PanelContainer.new()
-	var box := _box(S.CARD, S.RADIUS)
-	box.set_content_margin_all(S.GAP)
-	panel.add_theme_stylebox_override("panel", box)
-	parent.add_child(panel)
-	var inner := VBoxContainer.new()
-	inner.add_theme_constant_override("separation", 10)
-	panel.add_child(inner)
-	return inner
-
 
 func _box(color: Color, radius: int) -> StyleBoxFlat:
 	var b := StyleBoxFlat.new()
@@ -271,34 +179,21 @@ func _box(color: Color, radius: int) -> StyleBoxFlat:
 	return b
 
 
-func _make_theme() -> Theme:
-	var t := Theme.new()
-	t.default_font_size = S.SIZE_BODY
-	t.set_color("font_color", "Label", S.TEXT)
-	var states := {"normal": Color("#232a3a"), "hover": Color("#2b3346"), "pressed": Color("#343e55"), "disabled": Color("#181c26")}
-	for state in states:
-		var b := _box(states[state], S.RADIUS - 4)
-		b.set_content_margin_all(12)
-		b.border_color = S.LINE
-		b.set_border_width_all(1)
-		t.set_stylebox(state, "Button", b)
-	t.set_stylebox("focus", "Button", StyleBoxEmpty.new())
-	t.set_color("font_color", "Button", S.TEXT)
-	t.set_color("font_hover_color", "Button", S.TEXT)
-	t.set_color("font_pressed_color", "Button", S.TEXT)
-	t.set_color("font_disabled_color", "Button", S.MUTED)
-	return t
+func _style_control(b: Button) -> void:
+	var looks := {"normal": S.CONTROL, "hover": S.CONTROL, "pressed": S.CONTROL_PRESSED, "disabled": S.CONTROL_DISABLED}
+	for state in looks:
+		var box := _box(looks[state], S.RADIUS)
+		box.set_content_margin_all(12)
+		box.border_color = S.LINE
+		box.set_border_width_all(1)
+		b.add_theme_stylebox_override(state, box)
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	b.add_theme_font_size_override("font_size", S.SIZE_SMALL)
+	b.add_theme_color_override("font_color", S.TEXT)
+	b.add_theme_color_override("font_hover_color", S.TEXT)
+	b.add_theme_color_override("font_pressed_color", S.TEXT)
+	b.add_theme_color_override("font_disabled_color", S.MUTED)
 
 
 static func _money(amount: float) -> String:
-	for step in [[1e9, "B"], [1e6, "M"], [1e3, "k"]]:
-		if amount >= step[0]:
-			return "$%.2f%s" % [amount / step[0], step[1]]
-	return "$%.2f" % amount
-
-
-static func _count(n: float) -> String:
-	for step in [[1e9, "B"], [1e6, "M"], [1e3, "k"]]:
-		if n >= step[0]:
-			return "%.1f%s" % [n / step[0], step[1]]
-	return str(int(floorf(n)))
+	return "£%.2f" % amount

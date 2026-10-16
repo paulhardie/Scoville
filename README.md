@@ -1,12 +1,13 @@
 # Scoville
 
-A hot sauce incremental game: pick peppers, build heat into a Flash Boil, bottle sauce, and automate the kitchen. Built in Godot 4.7.2 for phones (Web export), from the HTML prototype kept in [`reference/web-prototype/`](reference/web-prototype/).
+**Hot Sauce Empire**: a mobile idle incremental game where a single unlabelled button grows into a multi-million-pound hot sauce franchise. Built in Godot 4.7.2.
 
+- The design: [docs/BRIEF.md](docs/BRIEF.md)
 - How to work on it: [AGENTS.md](AGENTS.md)
 - Where it's at: [docs/HANDOVER.md](docs/HANDOVER.md)
+- What's coming, version by version: [docs/ROADMAP.md](docs/ROADMAP.md)
+- Gaps in the brief and work waiting: [docs/BACKLOG.md](docs/BACKLOG.md)
 - Why things are the way they are: [docs/DECISIONS.md](docs/DECISIONS.md)
-- What's waiting: [docs/BACKLOG.md](docs/BACKLOG.md)
-- The core loop's design and criteria: [docs/CORE.md](docs/CORE.md)
 
 Run the tests and check the game boots:
 

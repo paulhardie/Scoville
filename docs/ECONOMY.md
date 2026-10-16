@@ -34,7 +34,7 @@ These values are what Operation Value counts and what the Raw Overflow Valve (v0
 
 ## Operation Value (brief §6)
 
-**Operation Value = cash earned this run + every item in stock at the values above.** Cash spent still counts, because it was earned. Items in stations mid-cycle don't count until they're out. It shows under Cash in the status bar from Stage 3.
+**Operation Value = cash earned this run + every item in stock at the values above.** From v0.4, bottles are valued with the packaging tier (D012), and Franchise Auditors add 20% to stock (not to cash). Cash spent still counts, because it was earned. Items in stations mid-cycle don't count until they're out. It shows under Cash in the status bar from Stage 3.
 
 ## The first run (G5, D005)
 
@@ -112,3 +112,24 @@ v0.2's criteria at 15:00 still pass: F6's longest wait is 85 s (of 90), F7 £84.
 Timeline: research starts at 12:53 and Tier 2 is fully built by 21:29, with the first Bistro Verde at 21:39. After that, an upgrade comes every 35–104 s.
 
 Close to the edge: F6 (85 s of 90) and N6 (104 s of 120).
+
+## Criteria (v0.4, draft)
+
+Measured by the pacing player over the first 110 minutes. v0.2's F1–F8 and v0.3's N1–N8 stay in force.
+
+| Id | Criterion |
+| --- | --- |
+| M1 | The first Tier 3 blueprint by 0:48. |
+| M2 | The first Classic Louisiana by 0:55. |
+| M3 | Operation Value £100,000 by 1:50 (the 3-hour curve's checkpoint). |
+| M4 | From 0:50 to 1:50, never more than 150 s without a purchase or a research. |
+| M5 | At 1:30, tapping (with Heat) adds at least 30% to a minute's earnings. |
+| M6 | Tiers 1 and 2 stay in use (brief pillar 3): from 1:30 to 1:40 the Table Mild and Bistro Verde lines are each busy at least half the time. |
+| M7 | The button evolves within the run: the Automated Piston is researched by 1:50. |
+
+For v0.4 the pacing player also:
+- researches the new nodes, in an order to be written down with the build;
+- uses Heat by tapping;
+- presses Factory Overdrive whenever it's ready;
+- leaves the Overflow Valve's keep amounts at their defaults;
+- pins the next node it's saving for.

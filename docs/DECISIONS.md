@@ -46,7 +46,7 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 
 ## D008: Calloused Thumbs comes with the v0.3 slice
 
-**Decision:** The North Wing's first node, Calloused Thumbs (+2 Bell Peppers a press, 10 Table Mild), is part of the v0.3 Tech Tree. It was added during the build, outside the drafted slice. The owner should confirm it.
+**Decision:** The North Wing's first node, Calloused Thumbs (+2 Bell Peppers a press, 10 Table Mild), is part of the v0.3 Tech Tree. It was added during the build, outside the drafted slice. **Confirmed by the owner.**
 
 **Why:** Without it, Tier 2's income dwarfed a one-pepper tap. Tapping added 6% at 30:00 (N8 wanted 10%) and 22% at 15:00 (F8 wanted 25%), so the build missed the brief's "the button never becomes obsolete". The brief names this node as the button's first step, and with it N8 measures +17% and F8 +64%. The other choices were lowering the criteria, or leaving the build failing until v0.4.
 
@@ -55,3 +55,51 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 **Decision:** A plot's or slot's upgrades cost v0.2's curve × √(its price ÷ the first of its kind). The draft used the full ratio.
 
 **Why:** At the full ratio, Tier 2's upgrades cost 10–20× Tier 1's for a similar gain, so they were never worth buying, and waits ran past N6's 120 s. Tier 1 is unchanged (its ratio is 1).
+
+## D010: The v0.4 Tech Tree (G9)
+
+**Decision:** v0.4 adds 26 nodes ([TECH_TREE.md](TECH_TREE.md#v04-the-rest-of-the-tree-draft)): the North Wing up to the Automated Piston, Tier 3's East Wing blueprints and Hydroponic Bell Peppers, the South Wing up to Overdrive Turbines (without Artisan Decanters), the West Wing's Raw Overflow Valve, Smart Stockpiling and Market Ticker, and two bridges (Byproduct Recycling, Franchise Auditors). Nodes that need later systems wait for them: Golden Seed Extractor and Executive Perks for v0.7, Night Shift Protocols for v0.5, Standard Operating Procedures, Artisan Decanters and the Tier 4–6 blueprints for v0.6. A node costs about 2–4 minutes of whatever it's paid in, at the time the 3-hour curve expects the player to reach it, rising to about 8 on the outer rim. North and West are paid in the current top bottle, East in the previous tier's bottles and mash, and South mostly in mash.
+
+**Why:** It's what the brief describes, minus what can't work yet. The costing rule makes every node a few minutes' choice between selling and researching, whatever the tier.
+
+## D011: Heat (G10)
+
+**Decision:** Each press adds 5 Heat and Heat drains 12 a second (6 with Slow Burn), between 0 and 100. Cash from every sale is multiplied by 1 + 0.5 × Heat/100, so up to +50%. It applies to sales by hand and Auto-Sell alike, raw included. Stock is valued as normal.
+
+**Why:** About 2.5 presses a second hold it, so an engaged player keeps the full bonus and the Automated Piston (1 a second) can't. That is the brief's "while maintained". Ergonomic Grip (2 a second) can hold it only with Slow Burn, so holding the button is a real, chosen way to play.
+
+## D012: Packaging is one global tier
+
+**Decision:** Packaging tiers (Heavy Flint Glass 1.5×, Foil Neck Wraps 2.2×, later Artisan Decanters 3.5×) are set by the South Wing for every line. There is no per-line packaging upgrade. The tier multiplies every bottle's sale value and its value in Operation Value.
+
+**Why:** The brief lists packaging both as a line's cash knob and as a tree upgrade "across all lines". With per-line tiers, identical bottles in stock would be worth different amounts.
+
+## D013: Byproduct Recycling hands out at most one level a minute
+
+**Decision:** Keep the brief's 25% chance per vat cycle, but give at most one free plot level a minute. It goes to the owned plot with the fewest levels, on whichever of its upgrades is cheapest.
+
+**Why:** At Tier 3 cycle speeds, 25% per cycle uncapped would be about 15 free levels a minute, which would break the economy.
+
+## D014: The Raw Overflow Valve keeps an amount of each item
+
+**Decision:** Each crop and mash has a "keep" amount, defaulting to 5 cycles' worth of the researched recipes that use it. The player can raise it, lower it or switch it off. Anything above it sells at its value (with Heat), except what a pinned node needs (Smart Stockpiling).
+
+**Why:** The brief says "excess" without defining it. A keep amount makes excess concrete, and the default never starves a running recipe.
+
+## D015: One Market Ticker spike at a time
+
+**Decision:** Once researched, a spike starts 1–5 minutes later on a random unlocked sauce: ×2 or ×3 its sale price for 30 minutes. Each later spike starts 45–75 minutes after the last one started. The value in Operation Value is unchanged.
+
+**Why:** "Periodic" with a 30-minute spike, kept simple: about one an hour, always visible, never stacking.
+
+## D016: Crop Quality Chance doubles a harvest (rest of G4)
+
+**Decision:** Crop Quality is a third plot upgrade. Each level adds a 3% chance that a harvest gives double, capped at 30% (10 levels). Its price curve is £30 × 2^level, scaled by √(price ratio) like the others.
+
+**Why:** The brief names the knob without defining it. Doubling a harvest is the simplest reading, and it leaves Barnaby's Mutant Crops (v0.7) as a different, bigger effect.
+
+## D017: One seeded random stream
+
+**Decision:** Every chance (Double-Tap, Byproduct Recycling, the Market Ticker, Crop Quality) draws from one random stream seeded when a game starts. Its state is saved, as a string so JSON can't round it, so a loaded game carries on exactly as it would have.
+
+**Why:** Randomness arrives with v0.4. Determinism keeps tests and the pacing player exact.

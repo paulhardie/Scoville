@@ -103,3 +103,36 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 **Decision:** Every chance (Double-Tap, Byproduct Recycling, the Market Ticker, Crop Quality) draws from one random stream seeded when a game starts. Its state is saved, as a string so JSON can't round it, so a loaded game carries on exactly as it would have.
 
 **Why:** Randomness arrives with v0.4. Determinism keeps tests and the pacing player exact.
+
+## D018: Offline cap and speed (G11)
+
+**Decision:** Time away counts for up to **4 hours** to start, and production runs at **50%** of the idle online rate. The West Wing's Night Shift Protocols I and II (v0.5) each add +2 hours and +10 points, so with both: 8 hours at 70%. Night Watchman's Desk (HQ, v0.6) and Gus (v0.7) build on these.
+
+**Why:** 4 hours rewards checking in a few times a day, and 8 hours after the Night Shift nodes covers a night's sleep. 50% leaves room for the brief's later boosts (Gus +25% to +60%), so his Mastery's "150% of active online speed" is still a real step up.
+
+## D019: What happens while away
+
+**Decision:** While away:
+- Production runs at the offline speed. Nobody taps, so Heat falls to 0, but the Automated Piston keeps pressing.
+- Nothing is bought, researched, assigned or pressed for the player, including Factory Overdrive.
+- Timers keep wall-clock time: Overdrive's cooldown, Byproduct Recycling's minute and the Market Ticker's schedule. Spikes that would have started and ended while away are missed.
+- Time beyond the cap is lost.
+
+**Why:** "Offline-first" means the factory works while the player sleeps, but choices stay the player's. Missing spikes keeps the Ticker a reason to check in.
+
+## D020: Offline progress is measured, then scaled
+
+**Decision:** The offline time is (time away, up to the cap) × the offline speed.
+- **Up to 5 minutes of it:** the real simulation runs, with no input.
+- **Longer:** the simulation runs 5 minutes for real, measures what changed, and scales that to the rest.
+  - When scaling would empty a pile of stock, it stops at that point, measures again from there, and carries on, up to 4 times. Whatever time is left after the fourth measurement is credited at the last measured rate, holding every pile at zero.
+  - No stock ever goes negative.
+  - Chances come from the game's own random stream, so the same save and the same time away always give the same result.
+
+**Why:** Simulating 8 hours tick by tick is 288,000 ticks: seconds on a desktop, far too long on a phone. Measuring the real factory keeps every rule and bottleneck right, without a second, simplified model of the game to keep in step. Re-measuring when a pile empties stops a draining pile from being counted as if it lasted for ever.
+
+## D021: When the player counts as away
+
+**Decision:** The player counts as away when the app was closed, or when the screen hasn't run for more than 10 seconds (a phone pauses a web game in the background). The save records the device time it was written, and each run of the screen records the time of its last frame. A gap counts from those. A clock that has gone backwards counts as no time; one moved forwards is only limited by the cap.
+
+**Why:** The brief has no server, so the device clock is all there is (as for the Cook-Off). The cap bounds what moving the clock forwards can gain.

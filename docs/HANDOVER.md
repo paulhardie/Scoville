@@ -2,34 +2,24 @@
 
 ## Where it's at
 
-v0.4 Tech Tree is built, on top of v0.1–v0.3 (PRs #1–#5, still to merge). The tree has 34 nodes.
-- **North Wing:** Double-Tap, Ergonomic Grip (hold the button), Heat (a bar under the button, up to +50% on every sale), Slow Burn, Overclock I–III, and the Automated Piston.
-- **East Wing:** Tier 3 (Cayenne, Garlic, Roasted Garlic Paste, Cayenne Mash, Classic Louisiana at £140) and Hydroponic Bell Peppers.
-- **South Wing:** Slot Expansion I–II (caps 5 and 4), Heavy Flint Glass and Foil Neck Wraps, Zero-Waste Piping I–II, and Overdrive Turbines with the Factory Overdrive button.
-- **West Wing:** the Raw Overflow Valve with keep amounts, Smart Stockpiling (pins), and the Market Ticker.
-- **Bridges:** Byproduct Recycling and Franchise Auditors.
-- **Also:** Crop Quality on every plot, one seeded random stream, and saves at v4 (migrating v1–v3).
+Built: v0.1–v0.4 (PRs #1–#6, waiting to merge); v0.4 details in [ECONOMY.md](ECONOMY.md#results-v04). W7 (the run is ahead of the 3-hour curve) is left for v0.6, as agreed.
 
-Checks:
-- All criteria pass: R5–R18, H1–H3, S7–S10, pacing M1–M7, and v0.2–v0.3's F1–F8 and N1–N8.
-- 535 rule and screen checks.
-- The headless boot is clean and the web export works.
-- Every new screen was captured and looked at.
-
-What moved from the draft:
-- Cheaper Tier 3 research and stations.
-- The pacing player's research order and saving rules.
-
-The details are in [TECH_TREE.md](TECH_TREE.md#v04-the-rest-of-the-tree), [FACTORY.md](FACTORY.md#v04-tier-3-and-the-factory-upgrades) and [ECONOMY.md](ECONOMY.md#results-v04).
+This branch is design only: G11 is settled and v0.5 Offline is drafted ([OFFLINE.md](OFFLINE.md)).
+- **D018, cap and speed:** 4 hours at 50% to start. Night Shift Protocols I–II add +2 h and +10 points each, giving 8 h at 70%.
+- **D019, while away:** production only. Heat falls to 0, the Piston keeps pressing, nothing is bought or pressed for the player, timers keep wall-clock time, and missed spikes are missed.
+- **D020, the catch-up:** run 5 real minutes, measure, scale to the rest. When a pile would run dry it re-measures, up to 4 times. Stock is never negative, and the result is deterministic.
+- **D021, counting as away:** the app was closed, or the screen didn't run for over 10 s. The device clock is used; a clock that went backwards counts as no time.
+- **Also drafted:** the "While you were away" card, save v5 (`saved_at`), two Night Shift nodes (W5, W6), and criteria X1–X8, P1–P2.
+- **New gap G16:** the brief's Night Watchman's Desk can't be both "+1 hour a level, hard cap Lv 15" and "+8 hours max". It's for v0.6.
 
 ## Open decisions
 
-- **W7: the run is ahead of the 3-hour curve.** £100k arrives at 1:29 (target 1:50), and it's £379k by 1:50, because Heat, packaging, Overclock and a second Louisiana line stack from about 1:20. Recommendation: wait for v0.6. When Tiers 4–5 and Prestige exist, set the whole curve against D005 with "not before" bounds as well as deadlines. Retuning now would have to be redone once Tiers 4–5 land.
-- **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0.
+- **Review the v0.5 draft.** X3's 2% accuracy bar and P1/P2's targets are mine; the Night Shift costs are starting guesses.
+- **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0. v0.5 is where it matters most, since a phone really does pause the game in the background (W1).
 
 ## Next
 
-1. Settle G11 (offline cap and speed) for v0.5 Offline.
-2. W1: open the Web build on a phone.
+1. Build v0.5 against X1–X8 and P1–P2, with F, N and M kept.
+2. W1: open the Web build on a phone, ideally with v0.5's offline catch-up.
 
-Touches: data (Tier 3, 26 nodes, slot caps), the simulation (Heat, presses, effects, valve, pins, market, Overdrive, Crop Quality, random stream, save v4), the pacing player, the screen, and docs. Stubbed or open: W1–W7. Next: G11, because v0.5 can't be built without it.
+Touches: docs only (D018–D021, OFFLINE.md, the tree, roadmap, backlog). Stubbed: none new; G16 added. Next: build v0.5, since every gap it needs is settled.

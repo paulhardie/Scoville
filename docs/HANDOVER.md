@@ -21,7 +21,7 @@ Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
 - P2's measurement, fixed;
 - the run now gets ahead of the 3-hour curve a little sooner (W7).
 
-**Also in design: the pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional up to 16 billion SHU, each with a value. The brief's six peppers keep their values, so nothing built changes. Not in `data/` yet (W10).
+**Also in design: the pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional up to 16 billion SHU, each with a value. The brief's six peppers keep their values, so nothing built changes. Not in `data/` yet (W10). Since then: ingredients come from their own stations unlocked by blueprints (D024, accepted), the button tops them up through a new node, Forager's Luck (D025, designed, W11), and making ingredients the deliberate bottleneck is proposed as G18.
 
 ## Open decisions
 
@@ -29,10 +29,11 @@ Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
 - **W7, the whole curve:** for v0.6, as agreed.
 - **E6 was narrowed** to the casual player after measuring, because the pacing player leaves only 3 mash for the Starter Crate. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
 - **The pepper ladder (D023):** accept the list and values, or rename and swap peppers.
+- **G18, ingredients as the bottleneck:** recommend one Pantry branch in the East Wing rather than a tree per ingredient; say whether you want either/or forks.
 - **G17, how the new peppers are used:** recommend one mash and one sauce per new pepper (Idle Planet Miner's ore→bar), built with v0.6. The cheaper option, any pepper of a tier filling that tier's mash, adds no recipes but makes them interchangeable.
 
 ## Next
 
 1. W8, once you've sent references; otherwise G8, G16 and G17 for v0.6 Prestige, with the pepper ladder (W10).
 
-Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W10, G16, G17. Next: W8 or G8/G16/G17, your call.
+Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W11, G16–G18. Next: W8 or G8/G16/G17, your call.

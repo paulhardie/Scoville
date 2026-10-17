@@ -174,3 +174,26 @@ Two West Wing nodes for offline play. The rules and criteria are in [OFFLINE.md]
 | --- | --- | --- | --- | --- | --- | --- |
 | W5 | Night Shift Protocols I | W1 | 15 Classic Louisiana | Offline cap +2 hours, offline speed +10 points | 0:55 | −2, −1 |
 | W6 | Night Shift Protocols II | W5 | 25 Classic Louisiana | Offline cap +2 hours, offline speed +10 points | 1:20 | −3, −1 |
+
+## N10: Forager's Luck (D025)
+
+Designed, not built (W11). Asked for by the owner, beyond the brief.
+
+| Id | Node | Needs | Cost | Effect | Expected | Pos |
+| --- | --- | --- | --- | --- | --- | --- |
+| N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.5% chance to drop one harvest of the shortest ingredient | 0:35 | 1, −2 |
+
+- **Shortest ingredient:** among owned non-pepper stations (D024), the one whose stock covers the fewest cycles of the researched recipes that use it (stock ÷ the most any one of those recipes takes a cycle). Ties go in data order. With no ingredient station owned, nothing drops.
+- **One harvest:** what that station's next harvest would give, yield upgrades included, without Crop Quality's double.
+- Every press counts, as for the other button perks: Double-Tap, Grip and the Piston, offline included (D019). The chance draws from `Game.rng` (D017).
+- Size (GUESS, the target to measure): 3 presses a second is about 4.5 drops a minute. Against a Vinegar Cask harvesting every 2 s (30 a minute) that's about +15%; the Piston alone about +5%. It shrinks as speed upgrades make the station harvest more often, which is right for a top-up.
+
+### Criteria (N10)
+
+| Id | Criterion |
+| --- | --- |
+| T1 | Over 10,000 presses, 2–3% drop. |
+| T2 | A drop always goes to the shortest ingredient as defined above, and is exactly one harvest of it. |
+| T3 | No drop, and no draw from the random stream, with no ingredient station owned. |
+| T4 | For the pacing player at 0:45, the shortest ingredient's supply over a minute is 10–20% higher than without the node. |
+| T5 | Every existing pacing and offline criterion still passes. |

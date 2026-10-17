@@ -161,3 +161,15 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision:** The game's crops become a ladder of 13 real peppers ordered by Scoville, Bell Pepper (0) to Pepper X (2.69M), then 6 fictional ones up to 16 billion ([INGREDIENTS.md](INGREDIENTS.md)). The brief's six peppers keep their D004 values as anchors; each new real pepper sits on the geometric line between its neighbours; past the Carolina Reaper each rung is ×2.15, Idle Planet Miner's ore step. How the new peppers are used in recipes is G17.
 
 **Why:** The owner asked for real hot sauce peppers from Bell to Pepper X and fictional ones beyond, valued with Idle Planet Miner as the reference. Keeping the brief's values as anchors means the brief's bottles and the built, tuned Tiers 1–3 don't move.
+
+## D024: Hot sauce ingredients are stations, unlocked by blueprints
+
+**Decision:** Non-pepper ingredients come from their own stations, bought with cash once their East Wing Crop Blueprint is researched, and run on the same rules as a pepper plot (cycle, yield, upgrades, offline). It's how White Vinegar already works. Grown ingredients (Garlic, Cane Sugar) are shown as plots; made ones get a station of their own on screen (White Vinegar → Vinegar Cask, Smoked Oak → Oak Smokehouse). Only the name and art differ, not the rules. The button is not a source, and cash never buys ingredients (brief §3). **Accepted by the owner.**
+
+**Why:** Idle Planet Miner gets every raw input from the same mining loop. A button source can't feed a factory, stops while away (D019), and would make tapping a chore rather than the bonus the brief wants.
+
+## D025: Forager's Luck, the button's ingredient top-up
+
+**Decision:** A North Wing node, N10 Forager's Luck ([TECH_TREE.md](TECH_TREE.md#n10-foragers-luck-d025)): each press has a 2.5% chance to drop one harvest of whichever ingredient the factory is shortest of. Every press counts (Double-Tap, Grip, the Piston), so it keeps working while away through the Piston. **Asked for by the owner;** the numbers are GUESSES until measured.
+
+**Why:** It rewards active play where the factory actually hurts, without the factory depending on it. At 3 presses a second it adds about 15% to an early ingredient station; the Piston alone adds about 5%.

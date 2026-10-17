@@ -14,6 +14,7 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | G12 | Golden Seeds: amounts per source, pack price, rarity drop rates, slot prices, duplicates per star, Mastery costs. | v0.7 | Open |
 | G13 | Manager art: who makes it and in what style. | v0.7 | Open |
 | G14 | Cook-Off reward table: Golden Seeds and Ribbons per threshold. | v0.8 | Open |
+| G18 | Ingredients as the bottleneck: how much Pickled Brine hotter recipes take, the Pantry branch's nodes, and whether its tracks end in either/or forks (new to the tree) ([INGREDIENTS.md](INGREDIENTS.md#ingredients-as-the-bottleneck-g18-proposed)) | v0.6 | Open: recommend one Pantry branch, forks only if you want either/or choices |
 | G17 | The pepper ladder's new peppers (D023) have no recipes: Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina, Moruga Scorpion, Pepper X and the fictional six. Also the fictional tiers' supporting ingredients. | v0.6 | Open: recommend one mash and one sauce per new pepper ([INGREDIENTS.md](INGREDIENTS.md#open-g17)) |
 
 ## Work
@@ -28,4 +29,5 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | W7 | The run is ahead of the 3-hour curve: £100k at 1:24 (target 1:50), £454k at 1:50. One night away from 1:40 adds £3.6M, past the £1M Prestige line. The criteria are only deadlines, so nothing fails | Open, for v0.6 | Set the whole curve against D005 with "not before" bounds, offline included |
 | W8 | Visual pass: on a phone it "looks like a 2010 web game rather than a mobile app in 2026" (owner, after W1). Today's look is placeholder panels, flat colours and the default font | Open | Owner: reference games and a mood, and whether art will come later |
 | W10 | Build the pepper ladder (D023) into `data/`: plots, items, blueprints, and re-measure the curve with the extra crops | Not started | D023 accepted, G17 settled; with v0.6 (W7) |
+| W11 | Build N10 Forager's Luck (D025) against T1–T5, and the Vinegar Cask and Oak Smokehouse names (D024) | Not started | Nothing; can ship on its own |
 | W9 | The pacing player never sets Bistro Verde's Auto-Sell back to 100% after Smart Stockpiling, so Bistro piles up in late runs. A measuring quirk, not a game fault | Open | Fix with W4's smarter player |

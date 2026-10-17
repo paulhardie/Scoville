@@ -69,3 +69,39 @@ The brief's non-pepper crops are unchanged. Each fictional tier will need its ow
 ## Open (G17)
 
 Each new pepper needs a use, or its plot is dead weight: nothing in the brief's recipes takes a Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina, Moruga Scorpion or Pepper X. The recommendation is Idle Planet Miner's ore→bar rule: **every pepper gets its own single-pepper mash, and each new pepper adds one sauce in its tier**, priced by D004. That's 7 more mashes, 7 more sauces and about 14 more blueprints on the East Wing for the real peppers alone, which adds to the first run (13 crops instead of 9 through Tier 5), so it belongs with v0.6's re-pacing of the whole curve (W7). The cheaper alternative, any pepper of a tier filling that tier's mash, adds no recipes but makes the new peppers interchangeable.
+
+## Reference: Idle Planet Miner's ores and planets
+
+From the community wiki's planet table ([Planets](https://idle-planet-miner.fandom.com/wiki/Planets), CC-BY-SA; read from a mirror on 2026-10-17, so it may predate later updates). **25 ores across 70 planets.** 20 planets mine one ore at 100%, 36 mine two and 14 mine three.
+
+| # | Ore | First on | Planets | 100% planet |
+| --- | --- | --- | --- | --- |
+| 1 | Copper | P1 Balor | 7 | Balor |
+| 2 | Iron | P2 Drasta | 6 | none |
+| 3 | Lead | P4 Dholen | 6 | Newton |
+| 4 | Silica | P7 Widow | 6 | none |
+| 5 | Aluminium | P9 Yangtze | 6 | Imir |
+| 6 | Silver | P12 Relic | 4 | none |
+| 7 | Gold | P14 Batalla | 5 | Pranas |
+| 8 | Diamond | P17 Castellus | 6 | none |
+| 9 | Platinum | P19 Parnitha | 5 | Theseus |
+| 10 | Titanium | P22 Zelene | 5 | none |
+| 11 | Iridium | P25 Osun | 5 | Elysta |
+| 12 | Palladium | P28 Tikkun | 5 | none |
+| 13 | Osmium | P31 Vular | 6 | Xena |
+| 14 | Rhodium | P34 Rupert | 5 | Ivyra |
+| 15 | Inerton | P37 Utrits | 5 | Zulu |
+| 16 | Quadium | P40 Unicae | 6 | Naraka |
+| 17 | Scrith | P43 Daedalus | 6 | Zero |
+| 18 | Uru | P46 Sotomi | 5 | Muse |
+| 19 | Vibranium | P49 Arabis | 6 | Chandra |
+| 20 | Aether | P52 Vega | 5 | Singhana |
+| 21 | Viterium | P55 Zumbia | 4 | Nyota, Doral |
+| 22 | Xynium | P59 Nikara | 5 | Limbo |
+| 23 | Quolium | P61 Bob | 6 | Antigone |
+| 24 | Luterium | P64 Hecate | 5 | Lavinia |
+| 25 | Wraith | P67 Ren | 4 | Leto |
+
+The pattern: a new ore arrives as the minority share of a mixed planet (Iron is 20% of Drasta), grows to the majority on the next one or two, usually gets a pure planet, then lingers as a 10–40% share on later planets. A new ore every 2.8 planets on average. Planets mostly cost ×2–2.5 the last. Six ores (Iron, Silica, Silver, Diamond, Titanium, Palladium) never get a pure planet.
+
+The table has three rows that don't add up (Utrits 130/10, Arabis 110/20, Sterop gives three shares for two ores), so treat those three as unreliable.

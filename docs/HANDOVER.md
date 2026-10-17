@@ -16,7 +16,7 @@ Built: v0.1–v0.5 (PRs #1–#8, waiting to merge), and now **v0.5.1, the early-
 
 All criteria pass: E1–E6, F, N, M, X, P (31 pacing and offline criteria, 553 rule and screen checks).
 
-Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved-1):
+Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
 - two catch-up faults that a bigger factory exposed, fixed;
 - P2's measurement, fixed;
 - the run now gets ahead of the 3-hour curve a little sooner (W7).

@@ -42,9 +42,9 @@ These values are what Operation Value counts and what the Raw Overflow Valve (v0
 
 | Operation Value | By | Carried by | Measured |
 | --- | --- | --- | --- |
-| £1,000 | 0:16 | Tier 1 | 0:16 (v0.2's pacing player passes £943 at 15:00 and £1,030 at 16:00) |
-| £10,000 | 0:50 | Tier 2 | 0:42 (v0.3) |
-| £100,000 | 1:50 | Tier 3 | 1:29 (v0.4; £379k by 1:50, well ahead: see below) |
+| £1,000 | 0:16 | Tier 1 | 0:14 (v0.5.1; v0.2 had 0:16) |
+| £10,000 | 0:50 | Tier 2 | 0:43 (v0.5.1) |
+| £100,000 | 1:50 | Tier 3 | 1:24 (v0.5.1; £454k by 1:50, well ahead: W7) |
 | £1,000,000 | 3:00 | Tiers 4–5 | v0.6 |
 
 Without a new tier, Operation Value grows in a straight line: Tier 1 alone adds about £100 a minute and reaches only £2,400 at 30:00. Each tier has to arrive in time to bend the curve.

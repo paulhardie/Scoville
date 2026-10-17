@@ -143,3 +143,13 @@ Stepping runs the real rules, so all three take care of themselves. It measures 
 **Decision:** The player counts as away when the app was closed, or when the screen hasn't run for more than 10 seconds (a phone pauses a web game in the background). The save records the device time it was written, and each run of the screen records the time of its last frame. A gap counts from those. A clock that has gone backwards counts as no time; one moved forwards is only limited by the cap.
 
 **Why:** The brief has no server, so the device clock is all there is (as for the Cook-Off). The cap bounds what moving the clock forwards can gain.
+
+## D022: The early game is measured with a casual player too
+
+**Decision:** The first 20 minutes are measured twice:
+- with the pacing player (3 taps a second, always);
+- with a casual phone player (2 a second in 45-second bursts with 15-second rests, looking every 2 seconds).
+
+Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without something new") as well as deadlines.
+
+**Why:** On a phone the start felt "incredibly slow" while every deadline passed. A tireless player and deadline-only criteria can't see a dead stretch.

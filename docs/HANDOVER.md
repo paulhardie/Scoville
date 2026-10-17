@@ -2,34 +2,33 @@
 
 ## Where it's at
 
-v0.5 Offline is built, on top of v0.1–v0.4 (PRs #1–#7, still to merge).
-- **Time away:** closing the app, or the screen not running for over 10 s (a phone backgrounding the tab), counts as away. It counts for up to 4 hours at 50% speed; Night Shift Protocols I–II (West Wing) take that to 8 hours at 70%.
-- **The catch-up** runs the real rules in up to 4,000 longer steps (D020, revised: see below). Timers keep wall-clock time, and missed Market spikes are skipped.
-- **The return card** shows the time away, the cap note, the cash, the rise in Operation Value and the top three items.
-- **Saves** are v5 and carry `saved_at`.
+Built: v0.1–v0.5 (PRs #1–#8, waiting to merge), and now **v0.5.1, the early-game pass** ([FACTORY.md](FACTORY.md#v051-the-early-game-pass)).
 
-Checks:
-- All criteria pass: X1–X8, P1–P2, and F1–F8, N1–N8, M1–M7.
-- 552 rule and screen checks.
-- The headless boot is clean and the web export works.
-- The card was captured and looked at.
+**The phone test (W1, done).** The Web build plays fine on the owner's phone, and the "While you were away" card works. Two findings:
+- **The start felt "incredibly slow".** That's fixed here.
+- **It "looks like a 2010 web game rather than a mobile app in 2026".** That's W8, the visual pass.
 
-**What moved from the draft:** the catch-up method. Measuring 5 minutes and scaling them missed the 2% accuracy target three ways (pins, buffers, a growing factory), up to 14% off. Running the real rules in longer steps measures within 0.74%. Speeding that up to 0.38 s for 8 hours took three changes:
-- caching what research decides;
-- batching harvests and cycles within a step;
-- noting Operation Value once per step instead of after every sale, which also speeds up normal play.
+**What v0.5.1 changes:**
+- **A casual phone player for the first 20 minutes (D022),** beside the tireless pacing player.
+- **New early-game criteria, E1–E6,** with "never longer than … without something new" gaps as well as deadlines.
+- **Cheaper, stronger first stations:** a £5 plot giving a pepper a second, a £15 vat and a £10 line. Upgrade prices are unchanged.
+- **Results for the casual player:** the line at 3:16 (was 10:40), the longest wait 96 s (was 450 s), and the Tech Tree at 13:10.
 
-Details: [D020](DECISIONS.md), [OFFLINE.md](OFFLINE.md#results-v05).
+All criteria pass: E1–E6, F, N, M, X, P (31 pacing and offline criteria, 553 rule and screen checks).
+
+Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
+- two catch-up faults that a bigger factory exposed, fixed;
+- P2's measurement, fixed;
+- the run now gets ahead of the 3-hour curve a little sooner (W7).
 
 ## Open decisions
 
-- **W7, now with offline in it:** one night away from 1:40 adds £3.2M, past the £1M Prestige line. Agreed for v0.6: set the whole curve with "not before" bounds, offline included.
-- **W1, the phone:** v0.5 is the version most worth trying on a phone. The catch-up's speed there, and how the browser pauses the tab, are both unmeasured.
-- **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0.
+- **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
+- **W7, the whole curve:** for v0.6, as agreed.
+- **E6 was narrowed** to the casual player after measuring, because the pacing player leaves only 3 mash for the Starter Crate. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
 
 ## Next
 
-1. W1: open the Web build on a phone (`bash tools/serve_web.sh`).
-2. Settle G8 and G16 (Franchise Credits, HQ room costs, Night Watchman's Desk) for v0.6 Prestige, with W7's whole-curve work.
+1. W8, once you've sent references; otherwise G8 and G16 for v0.6 Prestige.
 
-Touches: simulation (stepped `_step`, the catch-up, Night Shift, save v5), the screen (clock, return card), tests, docs. Stubbed or open: W1–W7, G16. Next: W1, then G8/G16, because v0.6 needs them.
+Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W9, G16. Next: W8 or G8/G16, your call.

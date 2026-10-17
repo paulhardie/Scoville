@@ -26,6 +26,8 @@ With **away** = min(time away, cap), the **offline time** is away × speed.
 2. **Longer:** the same rules run in longer steps, at most 4,000 of them (`Game._step`). In one step:
    - A plot harvests every whole cycle, with one draw for how many come up double.
    - A vat or line finishes every cycle its time and inputs allow, then restarts if it can.
+   - A vat's output goes straight to any slot waiting for it, as in a tick, so a shared input (Pickled Brine) is split as in play.
+   - The Piston's presses come in one batch.
    - The valve, pins and keep amounts, Auto-Sell and Byproduct Recycling work as in play.
    - Plots run first, then vats, then lines, as in a tick, so what one makes feeds the next in the same step.
 3. **Afterwards:** the clock moves on by the whole time away (not just the offline time), so every timer has really passed. The Market Ticker's schedule is replayed on that clock: missed spikes are skipped, and one still running carries on.
@@ -81,14 +83,14 @@ All pass: `tests/offline_tests.gd` (X1–X7, 48 checks), `tests/ui_tests.gd` (X8
 | Id | Target | Measured |
 | --- | --- | --- |
 | X1–X2 | 4 h at 50%, +2 h and +10 points a node | 4 h 50%, 6 h 60%, 8 h 70%; 10 h away counts 4; a backwards clock counts 0 |
-| X3 | Within 2% of tick by tick | 0:30 0.14%, 1:00 0.02%, 1:40 0.74% (2 hours away); 10 minutes away exact |
+| X3 | Within 2% of tick by tick | 0:30 0.03%, 1:00 0.00%, 1:40 1.82% (2 hours away; v0.5.1, a bigger factory at 1:40); 10 minutes away exact |
 | X4 | No negative stock; nothing bought or pressed | holds at 0:30, 1:00 and 1:40 over 8 hours; the Piston keeps pressing |
 | X5 | Timers keep wall-clock time | Overdrive's cooldown, and the Ticker's schedule and running spike, match a tick-by-tick run |
 | X6 | Deterministic | the same save and time away give identical results |
-| X7 | 8 hours in under 0.5 s | 0.38 s (3,953 steps of 5.1 s) on the development Mac |
+| X7 | 8 hours in under 0.5 s | 0.46 s since v0.5.1 (3,953 steps of 5.1 s) on the development Mac |
 | X8 | The card | shows after 3 h, not after 30 s; notes the cap at 10 h; shows after reopening a save 2 h later |
-| P1 | 30 min, 8 h away, 30 min ≥ 2× a straight hour | £101,944 against £25,643 (4×) |
-| P2 | A night beats 2 hours' tapping (from 1:40) | +£3,159,375 against £1,206,245 |
+| P1 | 30 min, 8 h away, 30 min ≥ 2× a straight hour | £127,126 against £35,310 (v0.5.1) |
+| P2 | A night beats 2 hours' tapping (from 1:40) | +£3,605,984 against £1,600,288 (v0.5.1; the tapping minute is measured without a running Market spike) |
 
 Researching the Night Shift nodes moved v0.4's M7 (the Piston) from 1:37 to 1:41 (by 1:50). Everything else held.
 

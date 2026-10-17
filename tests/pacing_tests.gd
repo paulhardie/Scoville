@@ -1,7 +1,8 @@
 extends SceneTree
 ## The first 110 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
 ## docs/ECONOMY.md's N1–N8 (to 50:00) and M1–M7 (to 1:50), played by the
-## pacing player (D003).
+## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E6,
+## played by both the eager pacing player and a casual one.
 ## Prints a timeline and each criterion's measurement.
 
 const Game = preload("res://src/core/game.gd")
@@ -151,6 +152,18 @@ func run() -> void:
 	var piston := p.first("research automated_piston")
 	criterion("M7", piston <= 110 * 60.0, "Automated Piston at %s (by 1:50:00)" % clock(piston))
 
+	# v0.5.1's early-game criteria (FACTORY.md), for both players.
+	var eager := early(Player.new())
+	var casual := early(Player.casual())
+	criterion("E1", casual.deck <= 90.0, "casual player: the deck at %s (by 1:30)" % clock(casual.deck))
+	criterion("E2", eager.line <= 150.0 and casual.line <= 240.0, "the first line at %s eager (by 2:30), %s casual (by 4:00)" % [clock(eager.line), clock(casual.line)])
+	criterion("E3", eager.gap <= 75.0 and casual.gap <= 100.0, "longest stretch with nothing new, deck to 15:00: %.0f s eager (at most 75), %.0f s casual (at most 100)" % [eager.gap, casual.gap])
+	criterion("E4", casual.plot_share >= 1.0 / 3.0, "the plot picks %.0f%% of the casual player's peppers in the first 5 minutes (at least a third)" % (casual.plot_share * 100.0))
+	criterion("E5", casual.tech <= 15 * 60.0, "casual player: the Tech Tree at %s (by 15:00)" % clock(casual.tech))
+	# Narrowed to the casual player after measuring: the eager one buys the line
+	# 36 s after the vat, so little mash waits (FACTORY.md says so).
+	criterion("E6", casual.crate_mash >= 10, "Sweet Pepper Mash waiting for the Starter Crate: %d casual (at least 10); %d eager (not judged)" % [casual.crate_mash, eager.crate_mash])
+
 	# v0.5's criteria (OFFLINE.md).
 	var checker := Game.new()
 	checker.load_state(JSON.parse_string(JSON.stringify(at_30, "", false, true)))
@@ -164,7 +177,7 @@ func run() -> void:
 	var night := Game.new()
 	night.load_state(JSON.parse_string(JSON.stringify(at_100, "", false, true)))
 	var slept := night.catch_up(8 * 3600.0)
-	var tapping_rate := minute_from(at_100, p.taps_per_second)
+	var tapping_rate := minute_from(at_100, p.taps_per_second, true)
 	criterion("P2", slept.ov >= tapping_rate * 120.0, "from 1:40, 8 h away (counted %s at %d%%) raise Operation Value £%.0f; 2 h of tapping would £%.0f" % [
 		clock(slept.counted), roundi(night.offline_speed() * 100.0), slept.ov, tapping_rate * 120.0])
 
@@ -172,6 +185,47 @@ func run() -> void:
 		printerr("FAIL: ", failure)
 	print("%s: pacing tests (%d criteria)" % ["PASS" if failures.is_empty() else "FAIL", checks])
 	quit(0 if failures.is_empty() else 1)
+
+
+## Plays the first 20 minutes with a player and returns what the early-game
+## criteria need: when the deck, the first line and the Tech Tree came, the
+## longest stretch with nothing new (a purchase, research or reveal) from the
+## deck to 15:00, the plot's share of peppers in the first 5 minutes, and the
+## mash waiting when the line was bought.
+func early(p: Player) -> Dictionary:
+	var g := Game.new()
+	var out := {"deck": INF, "line": INF, "tech": INF, "gap": 0.0, "plot_share": 0.0, "crate_mash": 0}
+	var reveals := []
+	for i in minute(20):
+		p.step(g)
+		g.tick()
+		var now: float = g.now_seconds()
+		if g.revealed.deck and out.deck == INF:
+			out.deck = now
+			reveals.append(now)
+		if g.lines.size() == 1 and out.line == INF:
+			out.line = now
+			out.crate_mash = g.stock.sweet_mash + g.stats.made.table_mild + (1 if g.lines[0].running else 0)
+		for tab in ["processing", "tech"]:
+			if g.tab_open(tab) and not out.has("seen_" + tab):
+				out["seen_" + tab] = true
+				reveals.append(now)
+				if tab == "tech":
+					out.tech = now
+		if g.stats.ticks == minute(5):
+			out.plot_share = g.stats.harvested.bell / float(maxi(1, g.stats.harvested.bell + g.stats.bell_picked))
+	var times: Array = reveals.duplicate()
+	for e in p.events:
+		if not String(e[1]).begins_with("sell"):
+			times.append(e[0])
+	times.sort()
+	var last: float = out.deck
+	for t in times:
+		if t > out.deck and t <= 15 * 60.0:
+			out.gap = maxf(out.gap, t - last)
+			last = t
+	out.gap = maxf(out.gap, 15 * 60.0 - last)
+	return out
 
 
 ## The longest stretch between the player's purchases and research in a window,
@@ -191,9 +245,12 @@ func longest_wait(p: Player, from: float, to: float) -> float:
 ## What the next minute earns from a saved state, by a player tapping at the
 ## given rate who buys and researches nothing more: the rise in Operation Value,
 ## so bottles saved up earlier and sold now don't count as new earnings.
-func minute_from(state: Dictionary, taps_per_second: float) -> float:
+func minute_from(state: Dictionary, taps_per_second: float, no_spike: bool = false) -> float:
 	var c := Game.new()
 	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	if no_spike:
+		# A spike lasts 30 minutes; a minute scaled to hours mustn't carry it.
+		c.ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
 	var p := Player.new()
 	p.taps_per_second = taps_per_second
 	p.buys = false

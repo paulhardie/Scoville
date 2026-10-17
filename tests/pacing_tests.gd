@@ -55,6 +55,8 @@ func run() -> void:
 	var at_15: Dictionary = {}
 	var at_30: Dictionary = {}
 	var at_90: Dictionary = {}
+	var at_100: Dictionary = {}
+	var ov_60 := 0.0
 	var window := {"line_busy": 0, "ticks": 0, "brine_start": 0, "brine_end": 0}
 	var late := {"table_mild": 0, "bistro_verde": 0, "ticks": 0}
 	for i in minute(MINUTES):
@@ -70,6 +72,10 @@ func run() -> void:
 			at_30 = g.to_state()
 		if g.stats.ticks == minute(90):
 			at_90 = g.to_state()
+		if g.stats.ticks == minute(60):
+			ov_60 = g.operation_value()
+		if g.stats.ticks == minute(100):
+			at_100 = g.to_state()
 		if g.stats.ticks > minute(90) and g.stats.ticks <= minute(100):
 			late.ticks += 1
 			for sauce in ["table_mild", "bistro_verde"]:
@@ -144,6 +150,23 @@ func run() -> void:
 	criterion("M6", tm >= 0.5 and bv >= 0.5, "1:30–1:40: Table Mild line busy %.0f%%, Bistro Verde line busy %.0f%% (each at least 50%%)" % [tm * 100.0, bv * 100.0])
 	var piston := p.first("research automated_piston")
 	criterion("M7", piston <= 110 * 60.0, "Automated Piston at %s (by 1:50:00)" % clock(piston))
+
+	# v0.5's criteria (OFFLINE.md).
+	var checker := Game.new()
+	checker.load_state(JSON.parse_string(JSON.stringify(at_30, "", false, true)))
+	var away := checker.catch_up(8 * 3600.0)
+	var back := Player.new()
+	for i in minute(30):
+		back.step(checker)
+		checker.tick()
+	criterion("P1", checker.operation_value() >= 2.0 * ov_60, "30 min, 8 h away (counted %s at %d%%), 30 min: £%.0f against a straight hour's £%.0f (at least twice)" % [
+		clock(away.counted), roundi(away.offline / maxf(away.counted, 1.0) * 100.0), checker.operation_value(), ov_60])
+	var night := Game.new()
+	night.load_state(JSON.parse_string(JSON.stringify(at_100, "", false, true)))
+	var slept := night.catch_up(8 * 3600.0)
+	var tapping_rate := minute_from(at_100, p.taps_per_second)
+	criterion("P2", slept.ov >= tapping_rate * 120.0, "from 1:40, 8 h away (counted %s at %d%%) raise Operation Value £%.0f; 2 h of tapping would £%.0f" % [
+		clock(slept.counted), roundi(night.offline_speed() * 100.0), slept.ov, tapping_rate * 120.0])
 
 	for failure in failures:
 		printerr("FAIL: ", failure)

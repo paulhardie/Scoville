@@ -14,7 +14,7 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 4
+const SAVE_VERSION := 5
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
@@ -83,7 +83,7 @@ func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
 		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
 		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
-		"byproduct": 0.0, "stock_bonus": 0.0, "plots": {}, "recipes": {}}
+		"byproduct": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
 	for node in research:
 		for e in data.tech[node].effects:
 			var kind: String = e.keys()[0]
@@ -111,6 +111,21 @@ func _refresh_fx() -> void:
 				"market_ticker": fx.ticker = true
 				"byproduct_recycling": fx.byproduct = maxf(fx.byproduct, v)
 				"stock_value_bonus": fx.stock_bonus += v
+				"offline":
+					fx.offline_hours += v.hours
+					fx.offline_speed += v.speed
+	# Worked out once per research change: recipe inputs after Zero-Waste
+	# Piping, and the valve's default keep amounts.
+	fx.inputs = {}
+	for id in data.recipes:
+		fx.inputs[id] = _inputs_after_reduction(id)
+	fx.default_keep = {}
+	for item in data.items:
+		var n := 0
+		for id in data.recipes:
+			if recipe_unlocked(id):
+				n += fx.inputs[id].get(item, 0) * T.OVERFLOW_KEEP_CYCLES
+		fx.default_keep[item] = n
 
 
 # --- Reading: value and reveals ------------------------------------------------
@@ -292,8 +307,12 @@ func recipes_for(station: String) -> Array:
 
 
 ## A recipe's inputs now: a vat's raw crops cut by Zero-Waste Piping, rounded
-## down, at least 1 (brief §6's Cooperage rule).
+## down, at least 1 (brief §6's Cooperage rule). Cached in fx.
 func recipe_inputs(recipe: String) -> Dictionary:
+	return fx.inputs[recipe]
+
+
+func _inputs_after_reduction(recipe: String) -> Dictionary:
 	var r: Dictionary = data.recipes[recipe]
 	if r.station != "vat" or fx.reduction <= 0.0:
 		return r.inputs
@@ -378,11 +397,7 @@ func keep_amount(item: String) -> int:
 
 
 func default_keep(item: String) -> int:
-	var n := 0
-	for id in data.recipes:
-		if recipe_unlocked(id):
-			n += recipe_inputs(id).get(item, 0) * T.OVERFLOW_KEEP_CYCLES
-	return n
+	return fx.default_keep[item]
 
 
 ## Sauces that can be made now, for the Market Ticker.
@@ -431,6 +446,7 @@ func sell_raw() -> bool:
 	if not can_sell_raw():
 		return false
 	_sell("bell", stock.bell)
+	_note_value()
 	return true
 
 
@@ -441,6 +457,7 @@ func sell_batch(item: String = "") -> bool:
 		if data.items[b].kind == "bottle" and (item == "" or item == b) and stock[b] > 0:
 			_sell(b, stock[b])
 			sold = true
+	_note_value()
 	return sold
 
 
@@ -541,6 +558,15 @@ func set_keep(item: String, amount: int) -> bool:
 	return true
 
 
+## How much time away counts, in seconds, and the speed it runs at (D018).
+func offline_cap() -> float:
+	return (T.OFFLINE_HOURS + fx.offline_hours) * 3600.0
+
+
+func offline_speed() -> float:
+	return T.OFFLINE_SPEED + fx.offline_speed
+
+
 ## Puts a crop's or mash's keep amount back to its default.
 func clear_keep(item: String) -> void:
 	keep.erase(item)
@@ -572,39 +598,60 @@ func activate_overdrive() -> bool:
 ## lines (so an item made this tick can start the next station this tick), then
 ## the valve and the market.
 func tick() -> void:
-	stats.ticks += 1
+	_step(1)
+
+
+## Advances `k` ticks as one step. With k = 1 this is the game's tick; the
+## offline catch-up uses longer steps (D020), where a plot can harvest and a
+## slot can finish several times in one step, in the same order.
+func _step(k: int) -> void:
+	var dt := k * T.TICK_SECONDS
+	var ticks_before: int = stats.ticks
+	stats.ticks += k
 	if holding and fx.grip > 0.0:
-		press_acc.grip += fx.grip * T.TICK_SECONDS
+		press_acc.grip += fx.grip * dt
 		while press_acc.grip >= 1.0 - EPSILON:
 			press_acc.grip -= 1.0
 			_press()
 	if fx.piston > 0.0:
-		press_acc.piston += fx.piston * T.TICK_SECONDS
+		press_acc.piston += fx.piston * dt
 		while press_acc.piston >= 1.0 - EPSILON:
 			press_acc.piston -= 1.0
 			_press()
 	if heat > 0.0:
-		heat = maxf(0.0, heat - T.HEAT_DRAIN * fx.heat_drain * T.TICK_SECONDS)
+		heat = maxf(0.0, heat - T.HEAT_DRAIN * fx.heat_drain * dt)
 
 	for crop in plots:
 		var p: Dictionary = plots[crop]
 		if not p.owned:
 			continue
-		p.progress += T.TICK_SECONDS
-		while p.progress >= plot_cycle(crop) - EPSILON:
-			p.progress -= plot_cycle(crop)
-			var n := plot_yield(crop)
-			if p.quality > 0 and rng.randf() < quality_chance(crop):
-				n *= 2
-			stock[crop] += n
-			stats.harvested[crop] += n
+		p.progress += dt
+		if k == 1:
+			while p.progress >= plot_cycle(crop) - EPSILON:
+				p.progress -= plot_cycle(crop)
+				var n := plot_yield(crop)
+				if p.quality > 0 and rng.randf() < quality_chance(crop):
+					n *= 2
+				stock[crop] += n
+				stats.harvested[crop] += n
+		else:
+			_harvest_batch(crop)
 	_start_cycles()
 	for i in vats.size():
-		_run("vat", i)
+		if k == 1:
+			_run("vat", i, dt)
+		else:
+			_run_batch("vat", i, dt)
+	if k > 1:
+		_start_cycles()
 	for i in lines.size():
-		_run("line", i)
+		if k == 1:
+			_run("line", i, dt)
+		else:
+			_run_batch("line", i, dt)
 
-	if fx.valve and stats.ticks % _ticks(T.OVERFLOW_EVERY_SECONDS) == 0:
+	var every := _ticks(T.OVERFLOW_EVERY_SECONDS)
+	if fx.valve and ticks_before / every != stats.ticks / every:
 		_overflow()
 	_market()
 	_note_value()
@@ -643,11 +690,79 @@ func _press() -> int:
 	return picked
 
 
-func _run(station: String, index: int) -> void:
+## A long step's harvests at once (the catch-up, D020): every whole cycle in the
+## step, with one draw for how many come up double (a binomial, by its normal
+## approximation once there are enough).
+func _harvest_batch(crop: String) -> void:
+	var p: Dictionary = plots[crop]
+	var cycle := plot_cycle(crop)
+	var n := floori((p.progress + EPSILON) / cycle)
+	if n <= 0:
+		return
+	p.progress -= n * cycle
+	var doubled := 0
+	var chance := quality_chance(crop)
+	if chance > 0.0:
+		if n < 12:
+			for i in n:
+				if rng.randf() < chance:
+					doubled += 1
+		else:
+			doubled = clampi(roundi(rng.randfn(n * chance, sqrt(n * chance * (1.0 - chance)))), 0, n)
+	var got := (n + doubled) * plot_yield(crop)
+	stock[crop] += got
+	stats.harvested[crop] += got
+
+
+## A long step for a vat or line (the catch-up, D020): as many cycles as the
+## time and the inputs allow, then a restart if it can.
+func _run_batch(station: String, index: int, dt: float) -> void:
 	var s: Dictionary = slots(station)[index]
 	if not s.running:
 		return
-	s.progress += T.TICK_SECONDS
+	if station == "line" and s.crate > 0:
+		_run(station, index, dt)   # the Starter Crate changes speed mid-step
+		return
+	s.progress += dt
+	var cycle := slot_cycle(station, index)
+	var due := floori((s.progress + EPSILON) / cycle)
+	if due <= 0:
+		return
+	var inputs := recipe_inputs(s.recipe)
+	var more := due - 1
+	for item in inputs:
+		more = mini(more, stock[item] / inputs[item])
+	for item in inputs:
+		stock[item] -= more * inputs[item]
+		stats.consumed[item] += more * inputs[item]
+	var done := 1 + more
+	s.progress -= done * cycle
+	s.running = false
+	s.taken = {}
+	var out: String = data.recipes[s.recipe].output
+	stats.made[out] += done
+	if station == "line":
+		for i in done:
+			_bottle_made(out)
+	else:
+		stock[out] += done
+		for i in done:
+			_byproduct()
+	if has_items(inputs):
+		for item in inputs:
+			stock[item] -= inputs[item]
+			stats.consumed[item] += inputs[item]
+		s.running = true
+		s.taken = inputs.duplicate()
+	if not s.running or done < due:
+		s.progress = 0.0 if not s.running else minf(s.progress, cycle)
+
+
+func _run(station: String, index: int, dt: float) -> void:
+	var s: Dictionary = slots(station)[index]
+	if not s.running:
+		return
+	s.progress += dt
 	while s.running and s.progress >= slot_cycle(station, index) - EPSILON:
 		s.progress -= slot_cycle(station, index)
 		s.running = false
@@ -686,6 +801,13 @@ func _byproduct() -> void:
 		return
 	if rng.randf() >= fx.byproduct:
 		return
+	if _free_level():
+		byproduct_ready = stats.ticks + _ticks(T.BYPRODUCT_COOLDOWN)
+
+
+## Gives the owned plot with the fewest levels a free level, on whichever of its
+## upgrades is cheapest (D013). Returns false with no plot owned.
+func _free_level() -> bool:
 	var lowest := ""
 	var lowest_levels := 1 << 30
 	for crop in plots:
@@ -694,14 +816,14 @@ func _byproduct() -> void:
 			lowest = crop
 			lowest_levels = p.speed + p["yield"] + p.quality
 	if lowest == "":
-		return
+		return false
 	var best := ""
 	for upgrade in PLOT_UPGRADES:
 		if best == "" or plot_upgrade_cost(lowest, upgrade) < plot_upgrade_cost(lowest, best):
 			best = upgrade
 	plots[lowest][best] += 1
 	stats.free_levels += 1
-	byproduct_ready = stats.ticks + _ticks(T.BYPRODUCT_COOLDOWN)
+	return true
 
 
 ## The Raw Overflow Valve (D014): sells crops and mash above their keep amount,
@@ -755,17 +877,96 @@ func _sell(item: String, count: int) -> void:
 	_earn(count * sale_price(item) * heat_mult())
 
 
+## Adds sale cash. The account's best Operation Value is noted by the step or
+## action as a whole, not after every sale.
 func _earn(amount: float) -> void:
 	cash += amount
 	stats.cash_earned += amount
 	if stats.cash_earned >= T.STAGE_2_CASH - 1e-9:
 		revealed.deck = true
-	_note_value()
 
 
 ## Keeps the account's best Operation Value, which opens tabs.
 func _note_value() -> void:
 	account.best_ov = maxf(account.best_ov, operation_value())
+
+
+# --- Offline (docs/OFFLINE.md) -------------------------------------------------
+
+## Catches up `seconds` of time away (D018–D020). Production runs for the
+## counted time × the offline speed, with no input: no taps, Heat drains, and
+## only the Piston presses. Up to 5 minutes runs tick by tick; longer runs the
+## same rules in longer steps, at most OFFLINE_MAX_STEPS of them. The Market
+## Ticker and Factory Overdrive don't act during it. Then the clock moves on by
+## the whole time away, so every timer has really passed. Returns a report for
+## the "While you were away" card.
+func catch_up(seconds: float) -> Dictionary:
+	var away := maxf(0.0, seconds)
+	var counted := minf(away, offline_cap())
+	var offline := counted * offline_speed()
+	var report := {"away": away, "counted": counted, "capped": away > offline_cap() + EPSILON, "offline": offline,
+		"cash_earned": 0.0, "ov": 0.0, "made": {}, "step": T.TICK_SECONDS, "steps": 0}
+	if away <= 0.0:
+		return report
+	var ov_before := operation_value()
+	var earned_before: float = stats.cash_earned
+	var made_before: Dictionary = stats.made.duplicate()
+	var harvested_before: Dictionary = stats.harvested.duplicate()
+	var picked_before: int = stats.bell_picked
+	var start_ticks: int = stats.ticks
+	holding = false
+	# The market and Overdrive are put aside, and the market's schedule is
+	# replayed on wall-clock time afterwards.
+	var saved_ticker: Dictionary = ticker.duplicate()
+	ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
+	var saved_overdrive_until: int = overdrive.until
+	overdrive.until = 0
+
+	var total := _ticks(offline)
+	var k := 1
+	if offline > T.OFFLINE_EXACT_SECONDS + EPSILON:
+		k = maxi(1, ceili(total / float(T.OFFLINE_MAX_STEPS)))
+	report.step = k * T.TICK_SECONDS
+	while total > 0:
+		var n := mini(k, total)
+		_step(n)
+		total -= n
+		report.steps += 1
+
+	# The clock moves on by the whole time away.
+	stats.ticks = maxi(stats.ticks, start_ticks + _ticks(away))
+	overdrive.until = saved_overdrive_until
+	ticker = saved_ticker
+	_replay_market()
+	_note_value()
+
+	report.cash_earned = stats.cash_earned - earned_before
+	report.ov = operation_value() - ov_before
+	for item in stats.made:
+		var n: int = stats.made[item] - made_before.get(item, 0) + stats.harvested[item] - harvested_before.get(item, 0)
+		if item == "bell":
+			n += stats.bell_picked - picked_before   # the Piston's presses
+		if n > 0:
+			report.made[item] = n
+	return report
+
+
+## Replays the Market Ticker's schedule up to now on wall-clock time: spikes
+## that started and ended while away are missed; one still running carries on.
+func _replay_market() -> void:
+	if ticker.next < 0:
+		return
+	while ticker.next <= stats.ticks:
+		var start: int = ticker.next
+		var sauces := unlocked_bottles()
+		ticker.sauce = sauces[rng.randi_range(0, sauces.size() - 1)]
+		ticker.mult = T.TICKER_MULTS[rng.randi_range(0, T.TICKER_MULTS.size() - 1)]
+		ticker.ends = start + _ticks(T.TICKER_SECONDS)
+		ticker.next = start + _ticks(rng.randi_range(T.TICKER_GAP[0], T.TICKER_GAP[1]))
+		stats.spikes += 1
+	if ticker.sauce != "" and stats.ticks >= ticker.ends:
+		ticker.sauce = ""
+		ticker.mult = 1.0
 
 
 # --- Saving --------------------------------------------------------------------
@@ -827,6 +1028,7 @@ func load_state(s: Variant) -> String:
 		return problem
 	if version == 3:
 		s = _migrate_3_to_4(s)
+	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md).
 	var run: Dictionary = s.run
 	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "revealed": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
 		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,

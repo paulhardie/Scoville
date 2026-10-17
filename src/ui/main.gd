@@ -5,6 +5,7 @@ extends Control
 ## from a save.
 
 const Game = preload("res://src/core/game.gd")
+const RealClock = preload("res://src/core/real_clock.gd")
 const T = preload("res://src/core/tuning.gd")
 const S = preload("res://src/ui/style.gd")
 
@@ -16,7 +17,16 @@ const KEEP_STEP := 10
 
 ## Where the game saves. Tests clear it so nothing is read or written.
 var save_path := "user://save.json"
+## Wall-clock time (D021). Tests set their own before the screen is added.
+var clock = RealClock.new()
 var game: Game
+## The last "While you were away" report shown, for tests.
+var last_return := {}
+
+var _saved_at := -1.0
+var _last_frame := -1.0
+var _return_card: Control
+var _return_text := {}
 
 var _acc := 0.0
 var _since_save := 0.0
@@ -69,13 +79,23 @@ class WebLines extends Control:
 
 
 func _ready() -> void:
-	game = Game.new()
+	game = Game.new({}, int(clock.now()))
 	_load()
 	_build()
+	if _saved_at > 0.0:
+		_return_from(clock.now() - _saved_at)
+	_last_frame = clock.now()
 	_refresh(false)
 
 
 func _process(delta: float) -> void:
+	# A gap longer than AWAY_SECONDS (the app in the background, or a frozen
+	# screen) is time away, caught up at once rather than ticked (D021).
+	var now: float = clock.now()
+	if _last_frame > 0.0 and now - _last_frame > T.AWAY_SECONDS:
+		_return_from(now - _last_frame)
+		delta = 0.0
+	_last_frame = now
 	_acc += delta
 	while _acc >= T.TICK_SECONDS:
 		_acc -= T.TICK_SECONDS
@@ -87,8 +107,18 @@ func _process(delta: float) -> void:
 
 
 func _notification(what: int) -> void:
-	if what == NOTIFICATION_WM_CLOSE_REQUEST or what == NOTIFICATION_APPLICATION_PAUSED:
+	if what in [NOTIFICATION_WM_CLOSE_REQUEST, NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_FOCUS_OUT]:
 		_save()
+
+
+## Catches up time away and, after more than a minute, says what it brought.
+func _return_from(seconds: float) -> void:
+	if seconds <= 0.0:
+		return
+	var report := game.catch_up(seconds)
+	if seconds > T.RETURN_CARD_SECONDS:
+		last_return = report
+		_show_card(report)
 
 
 # --- Saving ----------------------------------------------------------------
@@ -98,6 +128,8 @@ func _load() -> void:
 		return
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(save_path))
 	var problem := game.load_state(parsed)
+	if problem == "" and typeof(parsed.get("saved_at")) in [TYPE_FLOAT, TYPE_INT]:
+		_saved_at = float(parsed.saved_at)
 	if problem != "":
 		# Keep the unreadable save beside the new one rather than overwrite it.
 		push_warning("Scoville: save not loaded (%s); kept as %s.bad" % [problem, save_path])
@@ -111,7 +143,9 @@ func _save() -> void:
 	var f := FileAccess.open(save_path + ".tmp", FileAccess.WRITE)
 	if f == null:
 		return
-	f.store_string(JSON.stringify(game.to_state(), "", false, true))
+	var state := game.to_state()
+	state.saved_at = clock.now()
+	f.store_string(JSON.stringify(state, "", false, true))
 	f.close()
 	DirAccess.rename_absolute(save_path + ".tmp", save_path)
 
@@ -127,6 +161,7 @@ func _build() -> void:
 	_build_nav()
 	_build_upper()
 	_build_status_bar()
+	_build_card()
 
 
 ## Stage 2: the Operation Deck, the lower 65%, which slides up from below. Its
@@ -494,6 +529,80 @@ func _build_status_bar() -> void:
 	_sell.name = "SellRaw"
 	_sell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_sell)
+
+
+## The "While you were away" card (OFFLINE.md): over everything, closed by a tap
+## anywhere.
+func _build_card() -> void:
+	_return_card = ColorRect.new()
+	_return_card.name = "ReturnCard"
+	(_return_card as ColorRect).color = S.SHADE
+	_return_card.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_return_card.mouse_filter = Control.MOUSE_FILTER_STOP
+	_return_card.gui_input.connect(func(e: InputEvent) -> void:
+		if (e is InputEventMouseButton or e is InputEventScreenTouch) and e.pressed:
+			close_card())
+	_return_card.visible = false
+	add_child(_return_card)
+	var panel := PanelContainer.new()
+	var box := _box(S.PANEL, S.RADIUS)
+	box.set_content_margin_all(22)
+	box.border_color = S.LINE
+	box.set_border_width_all(1)
+	panel.add_theme_stylebox_override("panel", box)
+	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
+	panel.custom_minimum_size = Vector2(400, 0)
+	panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	_return_card.add_child(panel)
+	var col := VBoxContainer.new()
+	col.add_theme_constant_override("separation", 10)
+	panel.add_child(col)
+	col.add_child(_label("While you were away", S.SIZE_SMALL, S.DIM))
+	for key in ["time", "cap", "cash", "ov", "made"]:
+		var l := _label("", S.SIZE_BODY if key == "time" else S.SIZE_SMALL, S.GREEN if key == "cash" else S.TEXT)
+		l.name = "Return_" + key
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		col.add_child(l)
+		_return_text[key] = l
+	col.add_child(_label("Tap to carry on", S.SIZE_TINY, S.MUTED))
+
+
+func _show_card(r: Dictionary) -> void:
+	_return_text.time.text = _duration(r.away)
+	_return_text.cap.visible = r.capped
+	var more := false
+	for id in game.data.tech:
+		for e in game.data.tech[id].effects:
+			if e.has("offline") and not game.is_researched(id):
+				more = true
+	_return_text.cap.text = "Counted up to %s at %d%%.%s" % [_duration(r.counted), roundi(game.offline_speed() * 100.0), " Night Shift Protocols raise it." if more else ""]
+	_return_text.cash.text = "+%s cash" % _money(r.cash_earned)
+	_return_text.ov.text = "Operation Value +%s" % _money(r.ov)
+	var made: Array = r.made.keys()
+	# The three worth most, so sauces aren't crowded out by heaps of crops.
+	made.sort_custom(func(a, b): return r.made[a] * game.appraisal(a) > r.made[b] * game.appraisal(b))
+	var top := []
+	for item in made.slice(0, 3):
+		top.append("%s %s" % [_count(r.made[item]), game.data.items[item].plural])
+	_return_text.made.text = "Made: " + ", ".join(top) if not top.is_empty() else "Nothing was running."
+	_return_card.visible = true
+	_return_card.move_to_front()
+
+
+func close_card() -> void:
+	_return_card.visible = false
+
+
+## "3 h 12 m", "12 m", "40 s".
+static func _duration(seconds: float) -> String:
+	var s := int(seconds)
+	if s >= 3600:
+		return "%d h %d m" % [s / 3600, (s / 60) % 60]
+	if s >= 60:
+		return "%d m" % (s / 60)
+	return "%d s" % s
 
 
 ## A plot's card: what it grows, a cycle bar, then its buy button or upgrades.
@@ -915,6 +1024,8 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
 		elif e.has("byproduct_recycling"):
 			out.append("Vat cycles can give your lowest-level plot a free level, up to one a minute.")
+		elif e.has("offline"):
+			out.append("Time away counts %d hours longer, and runs %d points faster." % [int(e.offline.hours), roundi(e.offline.speed * 100.0)])
 		elif e.has("stock_value_bonus"):
 			out.append("Stock counts %d%% more in Operation Value." % roundi(e.stock_value_bonus * 100.0))
 	return " ".join(out)

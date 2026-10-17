@@ -97,3 +97,20 @@ const CROP_QUALITY_STEP := 0.03
 const CROP_QUALITY_MAX := 10
 const CROP_QUALITY_COST := 30.0
 const CROP_QUALITY_GROWTH := 2.0
+
+# --- v0.5: offline (docs/OFFLINE.md) -------------------------------------------
+
+## Time away that counts, and production speed while away, before Night Shift
+## Protocols (D018).
+const OFFLINE_HOURS := 4.0
+const OFFLINE_SPEED := 0.5
+
+## The catch-up (D020): offline time run tick by tick, and beyond that the
+## most steps it runs in (each step then covers several ticks).
+const OFFLINE_EXACT_SECONDS := 300.0
+const OFFLINE_MAX_STEPS := 4000
+
+## A screen gap longer than this counts as away (D021), and one longer than
+## this shows the "While you were away" card (OFFLINE.md).
+const AWAY_SECONDS := 10.0
+const RETURN_CARD_SECONDS := 60.0

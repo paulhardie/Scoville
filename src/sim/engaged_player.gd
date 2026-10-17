@@ -15,8 +15,8 @@ const RESEARCH := [
 	"jalapeno_blueprint", "calloused_thumbs", "verde_blueprint", "vinegar_blueprint", "brine_blueprint",
 	"bistro_blueprint", "delivery_van", "double_tap", "slot_expansion_1", "cayenne_blueprint", "garlic_blueprint",
 	"paste_blueprint", "cayenne_mash_blueprint", "slot_expansion_2", "louisiana_blueprint", "ergonomic_grip",
-	"heat_meter", "overflow_valve", "overclock_1", "smart_stockpiling", "flint_glass", "zero_waste_1",
-	"overclock_2", "market_ticker", "slow_burn", "byproduct_recycling", "franchise_auditors", "zero_waste_2",
+	"heat_meter", "night_shift_1", "overflow_valve", "overclock_1", "smart_stockpiling", "flint_glass", "zero_waste_1",
+	"overclock_2", "night_shift_2", "market_ticker", "slow_burn", "byproduct_recycling", "franchise_auditors", "zero_waste_2",
 	"overclock_3", "automated_piston", "foil_wraps", "hydroponic_bell", "overdrive_turbines",
 ]
 ## What each slot is meant to run, in buying order.

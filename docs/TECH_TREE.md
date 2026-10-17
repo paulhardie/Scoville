@@ -165,3 +165,12 @@ All PASS: `tests/button_tests.gd` (R5–R8, H1–H3) and `tests/upgrades_tests.g
 | H1 | Heat: +5 a press, −12 a second (−6 with Slow Burn), always 0–100, and none before the Heat Meter. |
 | H2 | Sale cash × (1 + 0.5 × Heat/100) on every kind of sale. Stock is valued as normal. |
 | H3 | The steady states in the table above hold: Piston alone falls to 0; Grip holds 100 only with Slow Burn; 3 presses a second hold 100. |
+
+## v0.5: Night Shift Protocols (draft)
+
+Two West Wing nodes for offline play. The rules and criteria are in [OFFLINE.md](OFFLINE.md#night-shift-protocols-west-wing) (D018).
+
+| Id | Node | Needs | Cost | Effect | Expected | Pos |
+| --- | --- | --- | --- | --- | --- | --- |
+| W5 | Night Shift Protocols I | W1 | 15 Classic Louisiana | Offline cap +2 hours, offline speed +10 points | 0:55 | −2, −1 |
+| W6 | Night Shift Protocols II | W5 | 25 Classic Louisiana | Offline cap +2 hours, offline speed +10 points | 1:20 | −3, −1 |

@@ -229,7 +229,7 @@ func quality_chance(crop: String) -> float:
 
 ## "speed", "yield" or "quality".
 func plot_upgrade_cost(crop: String, upgrade: String) -> float:
-	var scale := sqrt(plot_price(crop) / data.plots.bell.price)
+	var scale := sqrt(maxf(plot_price(crop), T.PLOT_PRICE_REFERENCE) / T.PLOT_PRICE_REFERENCE)
 	var lv: int = plots[crop][upgrade]
 	match upgrade:
 		"speed":
@@ -281,8 +281,8 @@ func can_buy_slot(station: String) -> bool:
 
 
 func slot_upgrade_cost(station: String, index: int) -> float:
-	var prices: Array = data.slots[station].prices
-	var scale := sqrt(prices[index] / prices[0])
+	var ref := T.VAT_PRICE_REFERENCE if station == "vat" else T.LINE_PRICE_REFERENCE
+	var scale := sqrt(maxf(data.slots[station].prices[index], ref) / ref)
 	var lv: int = slots(station)[index].speed
 	if station == "vat":
 		return T.VAT_SPEED_COST * scale * pow(T.VAT_SPEED_GROWTH, lv)
@@ -433,7 +433,9 @@ func bottles_value() -> float:
 
 ## One press of the Blank Button. Returns the Bell Peppers it picked.
 func press() -> int:
-	return _press()
+	var picked := _press()
+	_note_value()
+	return picked
 
 
 ## Holding the button down (Ergonomic Grip presses it while held).
@@ -615,9 +617,14 @@ func _step(k: int) -> void:
 			_press()
 	if fx.piston > 0.0:
 		press_acc.piston += fx.piston * dt
-		while press_acc.piston >= 1.0 - EPSILON:
-			press_acc.piston -= 1.0
-			_press()
+		if k == 1:
+			while press_acc.piston >= 1.0 - EPSILON:
+				press_acc.piston -= 1.0
+				_press()
+		else:
+			var n := floori(press_acc.piston + EPSILON)
+			press_acc.piston -= n
+			_press_batch(n)
 	if heat > 0.0:
 		heat = maxf(0.0, heat - T.HEAT_DRAIN * fx.heat_drain * dt)
 
@@ -686,8 +693,36 @@ func _press() -> int:
 	revealed.counter = true
 	if stats.bell_picked >= T.STAGE_1_PEPPERS:
 		revealed.status_bar = true
-	_note_value()
 	return picked
+
+
+## `n` automatic presses at once, for a long step (the catch-up): the same
+## peppers, Heat and Overclock as n presses, with one draw for Double-Tap.
+func _press_batch(n: int) -> void:
+	if n <= 0:
+		return
+	var doubles := 0
+	if fx.double > 0.0:
+		if n < 12:
+			for i in n:
+				if rng.randf() < fx.double:
+					doubles += 1
+		else:
+			doubles = clampi(roundi(rng.randfn(n * fx.double, sqrt(n * fx.double * (1.0 - fx.double)))), 0, n)
+	var presses := n + doubles
+	stats.doubles += doubles
+	stats.presses += presses
+	var picked := presses * tap_yield()
+	stock.bell += picked
+	stats.bell_picked += picked
+	if fx.heat:
+		heat = minf(T.HEAT_MAX, heat + T.HEAT_PER_PRESS * presses)
+	if fx.overclock > 0.0:
+		for station in ["vat", "line"]:
+			for j in slots(station).size():
+				var s: Dictionary = slots(station)[j]
+				if s.running:
+					s.progress = minf(s.progress + fx.overclock * presses, slot_cycle(station, j))
 
 
 ## A long step's harvests at once (the catch-up, D020): every whole cycle in the
@@ -748,7 +783,10 @@ func _run_batch(station: String, index: int, dt: float) -> void:
 		stock[out] += done
 		for i in done:
 			_byproduct()
-	if has_items(inputs):
+		# As in a tick, slots waiting for this mash take it at once, before
+		# later vats in the step can (shared inputs such as Pickled Brine).
+		_start_cycles()
+	if not s.running and has_items(inputs):
 		for item in inputs:
 			stock[item] -= inputs[item]
 			stats.consumed[item] += inputs[item]

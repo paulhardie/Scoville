@@ -55,7 +55,7 @@ bash tools/serve_web.sh                              # export, then serve it on 
 | --- | --- |
 | `src/core/` | Simulation: `game.gd` (state, rules, time, saves, the offline catch-up; the run apart from the account), `data_loader.gd` (reads and checks `data/`), `tuning.gd` (every tuning number that isn't data, with its source), `real_clock.gd` (the one place wall-clock time enters) |
 | `data/` | Game data: `items`, `recipes`, `plots`, `slots`, `tech` (JSON). Only `data_loader.gd` reads it |
-| `src/sim/` | Scripted players for measuring: `engaged_player.gd` (the pacing player, [D003](docs/DECISIONS.md)) |
+| `src/sim/` | Scripted players for measuring: `engaged_player.gd` (the pacing player, [D003](docs/DECISIONS.md); `Player.casual()` is the casual phone player, [D022](docs/DECISIONS.md)) |
 | `src/ui/` | The screen (`main.gd`, built in code) and `style.gd` (palette and sizes) |
 | `scenes/` | `main.tscn`, the entry scene |
 | `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 110 minutes against FACTORY.md's F and ECONOMY.md's N and M criteria. `button_tests.gd` (whose `with()` builds a game with chosen research) and `upgrades_tests.gd` cover v0.4's nodes; `offline_tests.gd` covers the catch-up |

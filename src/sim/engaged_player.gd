@@ -5,8 +5,15 @@ extends RefCounted
 
 const T = preload("res://src/core/tuning.gd")
 
-## Taps a second (GUESS: quick but not frantic). Zero for an idle player.
+## Taps a second while tapping (GUESS: quick but not frantic). Zero for an
+## idle player.
 var taps_per_second := 3.0
+## Tapping in bursts: seconds of tapping, then seconds of rest. A rest of 0
+## taps all the time.
+var burst_seconds := 60.0
+var rest_seconds := 0.0
+## Seconds between looks at the game (selling, buying, research).
+var decide_every := 1.0
 ## Raw peppers it lets pile up before selling them all, once a vat runs (until
 ## the Overflow Valve does it).
 const RAW_SELL_ABOVE := 50
@@ -36,12 +43,27 @@ var events: Array = []
 var _tap_acc := 0.0
 
 
+## A casual phone player (GUESS, docs/FACTORY.md): 2 taps a second in
+## 45-second bursts with 15-second rests (1.5 a second on average), looking at
+## the game every 2 seconds.
+static func casual():
+	var p = load("res://src/sim/engaged_player.gd").new()
+	p.taps_per_second = 2.0
+	p.burst_seconds = 45.0
+	p.rest_seconds = 15.0
+	p.decide_every = 2.0
+	return p
+
+
 func step(g) -> void:
-	_tap_acc += taps_per_second * T.TICK_SECONDS
-	while _tap_acc >= 1.0:
-		_tap_acc -= 1.0
-		g.press()
-	if g.stats.ticks % roundi(1.0 / T.TICK_SECONDS) == 0:
+	var t: float = g.now_seconds()
+	var tapping := rest_seconds <= 0.0 or fmod(t, burst_seconds + rest_seconds) < burst_seconds
+	if tapping:
+		_tap_acc += taps_per_second * T.TICK_SECONDS
+		while _tap_acc >= 1.0:
+			_tap_acc -= 1.0
+			g.press()
+	if g.stats.ticks % roundi(decide_every / T.TICK_SECONDS) == 0:
 		decide(g)
 
 

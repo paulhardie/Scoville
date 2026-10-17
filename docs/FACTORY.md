@@ -28,9 +28,9 @@ All GUESSES (G4) except the recipes and the £5 bottle (brief §3). They're in `
 
 | Station | Price | Base | Speed upgrade | Other |
 | --- | --- | --- | --- | --- |
-| Bell Pepper Plot | £10 | 1 pepper every 2.0 s | +15% a level; £15 × 2.0^lv | Yield per Cycle: +1 pepper a level; £40 × 2.0^lv |
-| Sweet Pepper Mash vat | £25 | 10 peppers → 1 mash in 8.0 s | +25% a level; £30 × 1.45^lv | — |
-| Table Mild line | £35 | 1 mash → 1 bottle (£5) in 8.0 s | +25% a level; £45 × 1.5^lv | Starter Crate: 50 bottles at 10× (0.8 s each) |
+| Bell Pepper Plot | £5 since v0.5.1 (was £10) | 1 pepper every 1.0 s since v0.5.1 (was 2.0 s) | +15% a level; £15 × 2.0^lv | Yield per Cycle: +1 pepper a level; £40 × 2.0^lv |
+| Sweet Pepper Mash vat | £15 since v0.5.1 (was £25) | 10 peppers → 1 mash in 8.0 s | +25% a level; £30 × 1.45^lv | — |
+| Table Mild line | £10 since v0.5.1 (was £35) | 1 mash → 1 bottle (£5) in 8.0 s | +25% a level; £45 × 1.5^lv | Starter Crate: 50 bottles at 10× (0.8 s each) |
 
 What the numbers are doing:
 - Bottling is worth 5× selling raw: 10 peppers raw make £1.00, bottled £5.00.
@@ -183,3 +183,50 @@ All PASS (`tests/factory_tests.gd`, `tests/upgrades_tests.gd`). S9 uses a v0.3 s
 | S8 | Crop Quality: 3% a level up to 30%; over 10,000 harvests the doubled share is within 1 point of it. |
 | S9 | A v3 save migrates to v4 and goes on producing exactly what it did. |
 | S10 | The same seed and the same inputs give the same game, and a save mid-game plays on identically, chances included (D017). |
+
+## v0.5.1: the early-game pass
+
+**Why.** On a phone (W1), the owner found the start "incredibly slow". The F criteria were deadlines measured by a player tapping 3 times a second without a break, so a slow-feeling start still passed. With a realistic player, the casual player below:
+- the deck came at 1:06 and the vat at 3:10;
+- then **nothing new happened for 7½ minutes** until the line at 10:40, while the vat turned peppers into mash nothing could use.
+
+### The casual player
+
+A GUESS at a phone player (`Player.casual()` in `src/sim/engaged_player.gd`):
+- taps 2 times a second in 45-second bursts with 15-second rests (1.5 a second on average);
+- looks at the game every 2 seconds.
+
+Otherwise it plays like the pacing player. Both are measured over the first 20 minutes.
+
+### Criteria (v0.5.1)
+
+"Something new" is a purchase, a research or a reveal (the deck, the nav bar, the Tech Tree).
+
+| Id | Criterion | Measured |
+| --- | --- | --- |
+| E1 | The casual player gets the deck by 1:30 (the brief's £10, at £0.10 a pepper) | 1:06 |
+| E2 | The first line by 2:30 for the pacing player, by 4:00 for the casual one | 1:35 and 3:16 |
+| E3 | From the deck to 15:00, never longer than 75 s (pacing) or 100 s (casual) without something new | 64 s and 96 s |
+| E4 | The plot matters: in the first 5 minutes it picks at least a third of the casual player's peppers | 37% |
+| E5 | The casual player reaches the Tech Tree by 15:00 | 13:10 |
+| E6 | The Starter Crate has a pile to bottle: at least 10 Sweet Pepper Mash waiting when the casual player buys the line | 11 |
+
+**E6 was narrowed after measuring.** It was written for both players, but the pacing player buys the line 36 s after the vat, so only 3 mash waits. That's what a flat-out player gets, so it's now judged on the casual player only.
+
+**E3 is tight** (96 s of 100). The wait is the vat-to-line saving, while the casual player keeps 50 peppers back for the vat. Trying a £12 vat didn't shorten it, because the line's price is what's being saved for.
+
+### What moved
+
+- **Bell Pepper Plot:** £10 → £5, and 1 pepper every 2.0 s → 1.0 s. It now picks about a third of a casual player's peppers, so it matters.
+- **Vat slot 1:** £25 → £15.
+- **Line slot 1:** £35 → £10. The pacing player waits 36 s between them, the casual one 96 s.
+- **Upgrade prices are unchanged.** Upgrades scale against fixed reference prices, v0.2's £10, £25 and £35 (`PLOT_PRICE_REFERENCE` and so on in `tuning.gd`), not against the first station's price. Without that, the cheaper first stations would have raised every Tier 2 and 3 upgrade by up to 40%.
+- **Brief numbers untouched:** 1 pepper a tap, £0.10 a pepper, 20 peppers to Stage 1, and £10 to Stage 2.
+
+**Knock-on effects, all still passing:**
+- Everything after the start comes earlier: Stage 3 at 6:53 (was 8:06), the Tech Tree at 11:02 (was 12:59), £10,000 at 42:46 (was 47:35), £100,000 at 1:24 (was 1:30).
+- That makes W7 (the run outpacing the 3-hour curve) a little bigger, for v0.6.
+- The bigger factory at 1:40 exposed two catch-up faults (OFFLINE.md):
+  - **Shared Pickled Brine went to the wrong slot.** In a long step every vat ran before any line, so the Cayenne Mash vat took the Brine a waiting Bistro Verde line should have had. A vat's output is now offered to waiting slots at once, as in a tick.
+  - **The Piston's presses were slow.** They are now batched in long steps.
+- **P2 measurement fix:** its "2 hours of tapping" is a minute scaled by 120. At 1:40 a ×3 Market spike was running, and it was being counted for all 2 hours though a spike lasts 30 minutes. That minute is now measured without the spike.

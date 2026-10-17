@@ -266,7 +266,7 @@ func test_hydroponic_bell() -> void:
 	var g := with(["hydroponic_bell"])
 	g.cash = 1000.0
 	g.buy_plot("bell")
-	check(close(g.plot_cycle("bell"), 0.5), "R18: the Bell Pepper Plot's cycle is a quarter: %.2f s" % g.plot_cycle("bell"))
+	check(close(g.plot_cycle("bell"), g.data.plots.bell.seconds / 4.0), "R18: the Bell Pepper Plot's cycle is a quarter: %.2f s" % g.plot_cycle("bell"))
 	g.buy_plot("jalapeno")
 	check(close(g.plot_cycle("jalapeno"), 2.0), "R18: other plots unchanged")
 

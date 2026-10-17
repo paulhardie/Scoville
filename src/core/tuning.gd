@@ -34,8 +34,12 @@ const TAB_THRESHOLDS := {
 const TABS_BUILT := ["farms", "processing", "tech"]
 
 # --- Upgrades (docs/FACTORY.md, GUESSES tuned in v0.2) -------------------------
-# A level's price is base × growth^level × √(the station's price ÷ the first
-# one of its kind: the Bell Pepper Plot, vat slot 1, line slot 1).
+# A level's price is base × growth^level × √(the station's price ÷ its kind's
+# reference price), never below × 1. The references are v0.2's first prices,
+# so cheaper first stations (v0.5.1) leave every upgrade's price alone.
+const PLOT_PRICE_REFERENCE := 10.0
+const VAT_PRICE_REFERENCE := 25.0
+const LINE_PRICE_REFERENCE := 35.0
 
 ## Plot Harvest Speed: +step a level.
 const PLOT_SPEED_STEP := 0.15

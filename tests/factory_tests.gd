@@ -81,21 +81,24 @@ func test_tier_1_offered_in_order() -> void:
 	check(not g.slot_offered("line") and not g.buy_slot("line"), "the line isn't offered before a vat")
 	check(g.buy_slot("vat") and g.slot_offered("line"), "buying a vat offers the line")
 	check(not g.slot_offered("vat"), "no second vat before Stage 3")
-	check(close(g.cash, 1000.0 - 25.0), "vat slot 1 costs £25")
+	check(close(g.cash, 1000.0 - g.data.slots.vat.prices[0]), "vat slot 1 costs its listed price")
 	check(not g.plot_offered("jalapeno") and not g.buy_plot("jalapeno"), "no Jalapeño Plot without its blueprint")
 
 
 func test_plot_harvests() -> void:
-	var g := opened(10.0)
-	check(g.buy_plot("bell") and g.cash == 0.0, "the plot costs £10")
+	var price: float = Game.new().plot_price("bell")
+	var cycle: float = Game.new().data.plots.bell.seconds
+	var g := opened(price)
+	check(g.buy_plot("bell") and g.cash == 0.0, "the plot costs its listed £%.0f" % price)
 	check(not g.buy_plot("bell"), "a plot can't be bought twice")
 	var before: int = g.stock.bell
 	g.advance(seconds(10.0))
-	check(g.stock.bell - before == 5, "1 pepper every 2 s: %d in 10 s" % (g.stock.bell - before))
+	var cycles := roundi(10.0 / cycle)
+	check(g.stock.bell - before == cycles, "1 pepper every %.1f s: %d in 10 s" % [cycle, g.stock.bell - before])
 	g.plots.bell["yield"] = 2
 	before = g.stock.bell
 	g.advance(seconds(10.0))
-	check(g.stock.bell - before == 15, "yield 2 levels: 3 a cycle, %d in 10 s" % (g.stock.bell - before))
+	check(g.stock.bell - before == 3 * cycles, "yield 2 levels: 3 a cycle, %d in 10 s" % (g.stock.bell - before))
 
 
 func test_vat_takes_ten_and_makes_mash() -> void:
@@ -145,7 +148,7 @@ func test_upgrades() -> void:
 	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST), "first speed level at base cost")
 	check(g.upgrade_plot("bell", "speed") and g.plots.bell.speed == 1, "buys a speed level")
 	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST * T.PLOT_SPEED_GROWTH), "the next costs more")
-	check(close(g.plot_cycle("bell"), 2.0 / (1.0 + T.PLOT_SPEED_STEP)), "and the cycle is shorter")
+	check(close(g.plot_cycle("bell"), g.data.plots.bell.seconds / (1.0 + T.PLOT_SPEED_STEP)), "and the cycle is shorter")
 	check(not g.upgrade_plot("bell", "colour"), "unknown upgrades don't buy")
 	g.buy_slot("vat")
 	check(close(g.slot_upgrade_cost("vat", 0), T.VAT_SPEED_COST), "vat 1's speed at base cost")
@@ -156,12 +159,13 @@ func test_upgrades() -> void:
 func test_upgrades_scale_with_price() -> void:
 	var g := tier_2()
 	check(g.buy_plot("jalapeno"), "buys the Jalapeño Plot")
-	var plot_scale := sqrt(g.plot_price("jalapeno") / g.plot_price("bell"))
-	check(close(g.plot_upgrade_cost("jalapeno", "speed"), T.PLOT_SPEED_COST * plot_scale), "its upgrades cost the Bell curve × √(price ratio)")
+	var plot_scale := sqrt(g.plot_price("jalapeno") / T.PLOT_PRICE_REFERENCE)
+	check(close(g.plot_upgrade_cost("jalapeno", "speed"), T.PLOT_SPEED_COST * plot_scale), "its upgrades cost the Bell curve × √(price ÷ the £10 reference)")
+	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST), "a plot cheaper than the reference isn't scaled down")
 	g.buy_slot("vat")
 	g.buy_slot("vat")
 	var prices: Array = g.data.slots.vat.prices
-	check(close(g.slot_upgrade_cost("vat", 1), T.VAT_SPEED_COST * sqrt(prices[1] / prices[0])), "vat slot 2's speed costs vat 1's × √(price ratio)")
+	check(close(g.slot_upgrade_cost("vat", 1), T.VAT_SPEED_COST * sqrt(prices[1] / T.VAT_PRICE_REFERENCE)), "vat slot 2's speed costs the vat curve × √(price ÷ the £25 reference)")
 
 
 func test_slot_caps() -> void:
@@ -381,9 +385,10 @@ func test_v2_migration_produces_the_same() -> void:
 	var g := Game.new()
 	g.load_state(v2_save())
 	g.advance(seconds(60.0))
-	var plot_cycle := 2.0 / (1.0 + 0.15 * 3)        # 1.379 s
+	# Production follows today's rules: the migrated levels at today's plot speed.
+	var plot_cycle: float = g.data.plots.bell.seconds / (1.0 + 0.15 * 3)
 	var harvested := floori((60.0 + 0.7) / plot_cycle + 1e-6) * 2
-	check(g.stats.harvested.bell - 1500 == harvested, "S4: v2's plot rate: %d (want %d)" % [g.stats.harvested.bell - 1500, harvested])
+	check(g.stats.harvested.bell - 1500 == harvested, "S4: the migrated plot's rate: %d (want %d)" % [g.stats.harvested.bell - 1500, harvested])
 	check(g.stats.made.sweet_mash > 210 and g.stats.made.table_mild > 200, "S4: the vat and line keep going")
 
 
@@ -445,9 +450,10 @@ func test_v3_save_migrates() -> void:
 	check(JSON.stringify(again.to_state()) == JSON.stringify(g.to_state()), "S9: the same save migrates the same way, random stream included")
 	# Production goes on as v0.3's rules had it: the plot's harvests, by hand.
 	g.advance(seconds(60.0))
-	var bell_cycle := 2.0 / (1.0 + 0.15 * 4)
+	# The migrated levels at today's plot speed.
+	var bell_cycle: float = g.data.plots.bell.seconds / (1.0 + 0.15 * 4)
 	var harvested := floori((60.0 + 0.4) / bell_cycle + 1e-6) * 3
-	check(g.stats.harvested.bell - 8000 == harvested, "S9: v0.3's Bell plot rate: %d (want %d)" % [g.stats.harvested.bell - 8000, harvested])
+	check(g.stats.harvested.bell - 8000 == harvested, "S9: the migrated Bell plot's rate: %d (want %d)" % [g.stats.harvested.bell - 8000, harvested])
 	var sm_cycle := 8.0 / (1.0 + 0.25 * 5)
 	check(g.stats.made.sweet_mash - 700 >= floori(60.0 / sm_cycle) - 1, "S9: the vat keeps going")
 	var h := Game.new()

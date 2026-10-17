@@ -81,7 +81,7 @@ func _new_stats() -> Dictionary:
 ## Sums every researched node's effects (D010). Called whenever research changes.
 func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
-		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
+		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "plot_yield": {}, "concentrate": {}, "reserve": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
 		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
 		"byproduct": 0.0, "forage": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
 	for node in research:
@@ -100,6 +100,9 @@ func _refresh_fx() -> void:
 				"overclock": fx.overclock = maxf(fx.overclock, v)
 				"piston": fx.piston = maxf(fx.piston, v)
 				"plot_speed": fx.plot_speed[v.crop] = fx.plot_speed.get(v.crop, 1.0) * v.mult
+				"plot_yield": fx.plot_yield[v.crop] = fx.plot_yield.get(v.crop, 1.0) * v.mult
+				"concentrate": fx.concentrate[v.item] = maxf(fx.concentrate.get(v.item, 0.0), v.share)
+				"reserve": fx.reserve[v.item] = fx.reserve.get(v.item, 0.0) + v.bonus
 				"slot_cap":
 					for st in v:
 						fx.slot_cap[st] += int(v[st])
@@ -120,6 +123,16 @@ func _refresh_fx() -> void:
 	fx.inputs = {}
 	for id in data.recipes:
 		fx.inputs[id] = _inputs_after_reduction(id)
+	# Reserve (D026): each sauce's sale bonus from the mashes its recipe takes.
+	fx.sale_bonus = {}
+	for id in data.recipes:
+		var r: Dictionary = data.recipes[id]
+		if r.station == "line":
+			var bonus := 0.0
+			for item in r.inputs:
+				bonus += fx.reserve.get(item, 0.0)
+			if bonus > 0.0:
+				fx.sale_bonus[r.output] = bonus
 	fx.default_keep = {}
 	for item in data.items:
 		var n := 0
@@ -153,11 +166,12 @@ func appraisal(item: String) -> float:
 	return v * (1.0 + fx.stock_bonus)
 
 
-## What an item sells for before Heat: bottles with packaging and any spike.
+## What an item sells for before Heat: bottles with packaging, Reserve (D026)
+## and any spike.
 func sale_price(item: String) -> float:
 	var v := value(item)
 	if data.items[item].kind == "bottle":
-		v *= fx.packaging
+		v *= fx.packaging * (1.0 + fx.sale_bonus.get(item, 0.0))
 		if ticker.sauce == item:
 			v *= ticker.mult
 	return v
@@ -228,7 +242,7 @@ func plot_cycle(crop: String) -> float:
 
 
 func plot_yield(crop: String) -> int:
-	return data.plots[crop]["yield"] + plots[crop]["yield"]
+	return roundi((data.plots[crop]["yield"] + plots[crop]["yield"]) * fx.plot_yield.get(crop, 1.0))
 
 
 ## The chance a harvest gives double (Crop Quality, D016).
@@ -323,13 +337,14 @@ func recipe_inputs(recipe: String) -> Dictionary:
 
 func _inputs_after_reduction(recipe: String) -> Dictionary:
 	var r: Dictionary = data.recipes[recipe]
-	if r.station != "vat" or fx.reduction <= 0.0:
+	if r.station != "vat" or (fx.reduction <= 0.0 and fx.concentrate.is_empty()):
 		return r.inputs
 	var out := {}
 	for item in r.inputs:
 		var n: int = r.inputs[item]
 		if data.items[item].kind == "crop":
-			n = maxi(1, floori(n * (1.0 - fx.reduction) + 1e-9))
+			var keep_share: float = (1.0 - fx.reduction) * (1.0 - fx.concentrate.get(item, 0.0))
+			n = maxi(1, floori(n * keep_share + 1e-9))
 		out[item] = n
 	return out
 
@@ -376,7 +391,16 @@ func research_reachable(node: String) -> bool:
 	for need in data.tech[node].needs:
 		if not is_researched(need):
 			return false
-	return true
+	return not fork_taken(node)
+
+
+## The other side of a fork already researched (D026), "" if none: then this
+## node is locked for the run.
+func fork_taken(node: String) -> String:
+	for other in data.tech[node].excludes:
+		if is_researched(other):
+			return other
+	return ""
 
 
 func can_research(node: String) -> bool:

@@ -186,10 +186,20 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0:
 						errors.append(where + ": %s needs a number above 0" % kind)
 						ok = false
-				"plot_speed":
+				"plot_speed", "plot_yield":
 					var v: Variant = e[kind]
 					if typeof(v) != TYPE_DICTIONARY or not data.plots.has(v.get("crop")) or typeof(v.get("mult")) != TYPE_FLOAT or v.mult <= 1.0:
-						errors.append(where + ": plot_speed needs {crop, mult above 1}")
+						errors.append(where + ": %s needs {crop, mult above 1}" % kind)
+						ok = false
+				"concentrate":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or not data.items.has(v.get("item")) or data.items[v.item].kind != "crop" or typeof(v.get("share")) != TYPE_FLOAT or v.share <= 0.0 or v.share >= 1.0:
+						errors.append(where + ": concentrate needs {item: a crop, share between 0 and 1}")
+						ok = false
+				"reserve":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or not data.items.has(v.get("item")) or data.items[v.item].kind != "mash" or typeof(v.get("bonus")) != TYPE_FLOAT or v.bonus <= 0.0:
+						errors.append(where + ": reserve needs {item: a mash, bonus above 0}")
 						ok = false
 				"offline":
 					var v: Variant = e[kind]
@@ -214,8 +224,19 @@ static func check(raw: Dictionary) -> Dictionary:
 			errors.append(where + ": pos is [x, y]")
 			ok = false
 		if ok:
-			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1])}
+			var excludes: Variant = r.get("excludes", [])
+			if typeof(excludes) != TYPE_ARRAY:
+				errors.append(where + ": excludes is a list of node ids")
+				excludes = []
+			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1]), "excludes": excludes.duplicate()}
 			data.tech_order.append(r.id)
+	# A fork (D026) names the nodes it locks; each side has to name the other.
+	for id in data.tech:
+		for other in data.tech[id].excludes:
+			if not data.tech.has(other):
+				errors.append("tech.json (%s): excludes unknown node %s" % [id, str(other)])
+			elif not data.tech[other].excludes.has(id):
+				errors.append("tech.json (%s): excludes %s, which doesn't exclude it back" % [id, other])
 	if not data.tech.has("kitchen_table"):
 		errors.append("tech.json: no kitchen_table root")
 	for station in data.slots:

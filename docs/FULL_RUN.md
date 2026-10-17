@@ -4,7 +4,7 @@ Everything a first run needs to reach the £1,000,000 Prestige line in about 3 h
 
 Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedures) is v0.6b ([D028](DECISIONS.md)). It needs G8 and G16 from the owner, and a run that actually reaches £1M to test it on.
 
-Status: **design, criteria first.** Numbers marked GUESS get tuned in the build against the criteria below; recipes and the brief's bottle values don't.
+Status: **being built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. Next: the pacing player, then tuning against U1–U9. Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
 
 ## The sauce ladder (G17, as assumed: D029)
 
@@ -110,6 +110,20 @@ One track per ingredient, east of the Tech Tree's centre beside the boosters. Ea
 
 That's 46 new nodes in all (E12–E38, 12 Pantry, S8–S10).
 
+## Rule criteria (v0.6a)
+
+All PASS (`tests/full_run_tests.gd`, 66 checks).
+
+| Id | Criterion |
+| --- | --- |
+| V1 | Every mash is worth 2× its inputs and every sauce 4.9–5.1× the raw value inside (D004). |
+| V2 | Each rung of the sauce ladder is ×1.6–2.7 the one below. |
+| V3 | Each new station feeds exactly one vat of its mash at base speed. |
+| V4 | Booster halves the station's cycle; Concentrate takes 40% off the ingredient in its vat recipe (with Zero-Waste, multiplied, rounded down, at least 1); Bulk doubles a harvest. |
+| V5 | Reserve adds 25% to the sale price of every sauce whose recipe takes that mash, adds up when a sauce takes two, and leaves stock value alone. |
+| V6 | A fork: after one side, the other can't be researched, stays locked across a save, and other tracks are untouched. |
+| V7 | A one-sided fork fails at load; every node can be researched in file order except the sides not taken. |
+
 ## Criteria (v0.6a)
 
 Measured over the first 3:15 by the pacing player, extended to run the new content (below). Every earlier criterion stays in force, except where a "not before" bound below takes over.
@@ -138,9 +152,9 @@ W4 (the player buys the cheapest upgrade, not the bottleneck) is a risk here: wi
 
 ## Assumed
 
-- **G17 (D029):** one mash and one in-between sauce per new pepper, with the recipes above. The owner hasn't accepted D023's ladder yet; this design assumes it.
+- **G17 (D029):** one mash and one in-between sauce per new pepper, with the recipes above. Accepted by the owner with D023.
 - **G18:** the Pantry's three steps and their numbers (2×, −40%, 2× or +25%), and Pickled Brine as the base that grows with heat.
 - Sauce names (Smoky Ancho, Serrano Fire, Cajun Red, Island Heat, Savina Gold) and mash names. Placeholders.
 - Every station price, cycle and yield marked GUESS; the brief's recipes and bottle values are fixed.
 - Moruga Scorpion, Carolina Reaper and Pepper X stay in Tier 6, after the first Prestige (D006), so they're v0.6b.
-- Save v7 for the new stations, slots and the forks taken.
+- No new save version: new stations and slots load as unowned from the data, and a fork is just research. The save's shape is unchanged (v6).

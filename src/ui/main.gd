@@ -951,8 +951,11 @@ func _refresh_tech() -> void:
 	var costs := []
 	for item in node.cost:
 		costs.append("%d %s (have %d)" % [node.cost[item], game.data.items[item].plural, game.stock[item]])
+	var fork := game.fork_taken(_selected)
 	if game.is_researched(_selected):
 		_detail.cost.text = "Researched."
+	elif fork != "":
+		_detail.cost.text = "Chose %s instead: locked for this run." % game.data.tech[fork].name.get_slice(": ", 1)
 	elif costs.is_empty():
 		_detail.cost.text = "Free."
 	else:
@@ -1008,6 +1011,12 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Presses the button once a second, always, with every button perk.")
 		elif e.has("plot_speed"):
 			out.append("The %s runs %d× faster." % [game.data.plots[e.plot_speed.crop].name, int(e.plot_speed.mult)])
+		elif e.has("plot_yield"):
+			out.append("The %s yields %d× a harvest." % [game.data.plots[e.plot_yield.crop].name, int(e.plot_yield.mult)])
+		elif e.has("concentrate"):
+			out.append("Vats need %d%% less %s." % [roundi(e.concentrate.share * 100.0), game.data.items[e.concentrate.item].name])
+		elif e.has("reserve"):
+			out.append("Every sauce made with %s sells for +%d%%." % [game.data.items[e.reserve.item].name, roundi(e.reserve.bonus * 100.0)])
 		elif e.has("slot_cap"):
 			out.append("One more vat slot and one more line slot.")
 		elif e.has("packaging"):
@@ -1030,6 +1039,8 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Time away counts %d hours longer, and runs %d points faster." % [int(e.offline.hours), roundi(e.offline.speed * 100.0)])
 		elif e.has("stock_value_bonus"):
 			out.append("Stock counts %d%% more in Operation Value." % roundi(e.stock_value_bonus * 100.0))
+	for other in node.excludes:
+		out.append("Either/or: it locks %s for this run." % game.data.tech[other].name)
 	return " ".join(out)
 
 

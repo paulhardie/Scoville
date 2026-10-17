@@ -15,7 +15,7 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | G13 | Manager art: who makes it and in what style. | v0.7 | Open |
 | G14 | Cook-Off reward table: Golden Seeds and Ribbons per threshold. | v0.8 | Open |
 | G18 | Ingredients as the bottleneck: base amounts, the Pantry's nodes and numbers | v0.6a | Assumed in [FULL_RUN.md](FULL_RUN.md#the-pantry-branch-d026-g18-as-assumed): Brine 0–3 a new sauce; booster 2×, concentrate −40%, fork Bulk 2× or Reserve +25% |
-| G17 | The pepper ladder's new peppers (D023) need recipes; Tier 6's (Moruga Scorpion, Pepper X) and the fictional six still do | v0.6a, v0.6b | Assumed through Tier 5 (D029): one mash and one in-between sauce each. Tier 6 with v0.6b |
+| G17 | Tier 6's new peppers (Moruga Scorpion, Pepper X) and the fictional six need recipes | v0.6b | Through Tier 5 settled (D029, accepted) |
 
 ## Work
 
@@ -28,5 +28,5 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | W6 | Tier 2 oversupply: by 30:00 the pacing player has 249 Jalapeños and 41 Verde Mash waiting, because Pickled Brine (Vinegar) is the bottleneck and the player's cheapest-first upgrades don't see that | Watch | Raw Overflow Valve (v0.4) gives the surplus a use; W4 would buy for the bottleneck |
 | W7 | The run is ahead of the 3-hour curve: £100k at 1:24 (target 1:50), £454k at 1:50. One night away from 1:40 adds £3.6M, past the £1M Prestige line. The criteria are only deadlines, so nothing fails | Criteria set (U1, U8) | Built with v0.6a |
 | W8 | Visual pass: on a phone it "looks like a 2010 web game rather than a mobile app in 2026" (owner, after W1). Today's look is placeholder panels, flat colours and the default font | Open | Owner: reference games and a mood, and whether art will come later |
-| W10 | Build v0.6a ([FULL_RUN.md](FULL_RUN.md)): 9 stations, 9 mashes and 7 sauces of data, 46 nodes, the fork rule, slots 6–7 and lines 5–6, save v7, the extended pacing player, criteria U1–U9 | Designed | Owner accepts D023 and D029 (or changes them) |
+| W10 | Build v0.6a ([FULL_RUN.md](FULL_RUN.md)): 9 stations, 9 mashes and 7 sauces of data, 46 nodes, the fork rule, slots 6–7 and lines 5–6, save v7, the extended pacing player, criteria U1–U9 | Stage 1 built (data, rules, V1–V7); next the pacing player and U1–U9 | Nothing |
 | W9 | The pacing player never sets Bistro Verde's Auto-Sell back to 100% after Smart Stockpiling, so Bistro piles up in late runs. A measuring quirk, not a game fault | Open | Fix with W4's smarter player |

@@ -153,3 +153,11 @@ Stepping runs the real rules, so all three take care of themselves. It measures 
 Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without something new") as well as deadlines.
 
 **Why:** On a phone the start felt "incredibly slow" while every deadline passed. A tireless player and deadline-only criteria can't see a dead stretch.
+
+## D023: The pepper ladder (proposed)
+
+**Status:** Proposed, waiting on the owner.
+
+**Decision:** The game's crops become a ladder of 13 real peppers ordered by Scoville, Bell Pepper (0) to Pepper X (2.69M), then 6 fictional ones up to 16 billion ([INGREDIENTS.md](INGREDIENTS.md)). The brief's six peppers keep their D004 values as anchors; each new real pepper sits on the geometric line between its neighbours; past the Carolina Reaper each rung is ×2.15, Idle Planet Miner's ore step. How the new peppers are used in recipes is G17.
+
+**Why:** The owner asked for real hot sauce peppers from Bell to Pepper X and fictional ones beyond, valued with Idle Planet Miner as the reference. Keeping the brief's values as anchors means the brief's bottles and the built, tuned Tiers 1–3 don't move.

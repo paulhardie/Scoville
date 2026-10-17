@@ -21,14 +21,18 @@ Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
 - P2's measurement, fixed;
 - the run now gets ahead of the 3-hour curve a little sooner (W7).
 
+**Also in design: the pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional up to 16 billion SHU, each with a value. The brief's six peppers keep their values, so nothing built changes. Not in `data/` yet (W10).
+
 ## Open decisions
 
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
 - **W7, the whole curve:** for v0.6, as agreed.
 - **E6 was narrowed** to the casual player after measuring, because the pacing player leaves only 3 mash for the Starter Crate. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
+- **The pepper ladder (D023):** accept the list and values, or rename and swap peppers.
+- **G17, how the new peppers are used:** recommend one mash and one sauce per new pepper (Idle Planet Miner's ore→bar), built with v0.6. The cheaper option, any pepper of a tier filling that tier's mash, adds no recipes but makes them interchangeable.
 
 ## Next
 
-1. W8, once you've sent references; otherwise G8 and G16 for v0.6 Prestige.
+1. W8, once you've sent references; otherwise G8, G16 and G17 for v0.6 Prestige, with the pepper ladder (W10).
 
-Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W9, G16. Next: W8 or G8/G16, your call.
+Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W10, G16, G17. Next: W8 or G8/G16/G17, your call.

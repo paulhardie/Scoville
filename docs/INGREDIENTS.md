@@ -56,7 +56,7 @@ The brief's non-pepper ingredients are unchanged. Each comes from its own statio
 
 ### Ingredients as the bottleneck (G18, proposed)
 
-The Pantry branch with forks is accepted ([D026](DECISIONS.md)); amounts and costs are still to set.
+The Pantry branch with forks is accepted ([D026](DECISIONS.md)). Its numbers are assumed in [FULL_RUN.md](FULL_RUN.md#the-pantry-branch-d026-g18-as-assumed).
 
 The brief already makes them one: Pickled Brine (Vinegar) goes into Bistro Verde, Cayenne Mash and Liquid Smoke, and Garlic Paste into Classic Louisiana and Caramelized Glaze. Vinegar is already the binding constraint at 30:00 (W6). The proposal makes that deliberate:
 
@@ -77,7 +77,10 @@ The brief already makes them one: Pickled Brine (Vinegar) goes into Bistro Verde
 - Fictional names and Scoville figures. Placeholders for fun; the owner can rename them.
 - Same-range order (Tabasco above Cayenne, Scotch Bonnet below Habanero) so the brief's peppers keep their slots.
 
-## Open (G17)
+## G17: how the new peppers are used
+
+Assumed for v0.6a ([D029](DECISIONS.md)): the recommendation below, with each new sauce priced between the brief's. Recipes and values are in [FULL_RUN.md](FULL_RUN.md#the-sauce-ladder-g17-as-assumed-d029).
+
 
 Each new pepper needs a use, or its plot is dead weight: nothing in the brief's recipes takes a Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina, Moruga Scorpion or Pepper X. The recommendation is Idle Planet Miner's ore→bar rule: **every pepper gets its own single-pepper mash, and each new pepper adds one sauce in its tier**, priced by D004. That's 7 more mashes, 7 more sauces and about 14 more blueprints on the East Wing for the real peppers alone, which adds to the first run (13 crops instead of 9 through Tier 5), so it belongs with v0.6's re-pacing of the whole curve (W7). The cheaper alternative, any pepper of a tier filling that tier's mash, adds no recipes but makes the new peppers interchangeable.
 

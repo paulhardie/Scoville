@@ -185,3 +185,15 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision:** X7 compares the catch-up with the same machine: working out 8 hours away may take at most 3× as long as ticking 10 minutes from the same save, best of 3 each ([OFFLINE.md](OFFLINE.md)). It replaces "under 0.5 s on the development Mac". **Chosen by the owner** (machine-relative); the 3× is the agent's.
 
 **Why:** 0.5 s held only on the Mac. CI's runner takes 0.73–0.75 s, so main was red from PR #9 on with nothing wrong. A ratio means the same anywhere and still fails if the catch-up gets slower relative to play. **The bar is a little looser than before:** today's ratio is 2.38–2.56×, so 3× leaves about 20% for noise; on the Mac it's roughly 0.56 s rather than 0.5 s (estimated, assuming the Mac's ratio matches). A bar at the old 0.5 s equivalent (about 2.7×) would leave 5% over the worst run measured, too little for shared machines. The phone itself is still W1.
+
+## D028: v0.6 is built in two halves
+
+**Decision:** v0.6a, the full run ([FULL_RUN.md](FULL_RUN.md)): Tiers 4–5, the ladder's extra peppers through Tier 5, the Pantry branch, the last boosters and slots, and the whole curve to £1M with bounds both ways. Then v0.6b, Prestige: Franchise Credits, HQ rooms with the draft, the anti-exploit cost formula, Standard Operating Procedures and Tier 6. **Proposed;** the owner can merge them back into one.
+
+**Why:** v0.6 as written was the biggest version yet, by far. v0.6b needs G8 and G16 from the owner and a run that reaches £1M to test on; v0.6a needs neither, so it can start now.
+
+## D029: Each new pepper gets an in-between sauce (G17, assumed)
+
+**Decision:** Every pepper the ladder adds through Tier 5 (Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina) gets a single-pepper mash and one sauce priced between the brief's sauces, so ten sauces climb about ×2.2 a rung ([FULL_RUN.md](FULL_RUN.md#the-sauce-ladder-g17-as-assumed-d029)). The new sauces take 0–3 Pickled Brine and some take lower-tier mash or bottles. **Assumed for the v0.6a design; the owner's call, along with D023.**
+
+**Why:** It's the recommendation the owner was given for G17 (Idle Planet Miner's ore → bar). Pricing each new sauce between its neighbours makes every pepper the best line until the next one, rather than a sideways copy, and smooths the climb into Idle Planet Miner's ×2-ish steps.

@@ -2,27 +2,27 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). This branch adds **Forager's Luck, built**, and D024–D026; it was pushed after PR #10 merged, so it's a new PR.
+Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). Open: PR #11, which holds Forager's Luck (built), D024–D027 (X7 now machine-relative, CI green), and now the **v0.6a design**.
 
-**Forager's Luck (N10, D025), built.** A North Wing node off Double-Tap (20 Bistro Verde). Each press, the Piston's included, has a 2.5% chance to drop one harvest of whichever ingredient the factory is shortest of. All its criteria pass ([TECH_TREE.md](TECH_TREE.md#n10-foragers-luck-d025)): +13% to the shortest ingredient at 0:45 (target 10–20%). T4's window grew from 1 to 10 minutes after a noisy first measurement (+9%), bar unchanged. Save v6 (adds `stats.foraged`). The White Vinegar Plot is now shown as the Vinegar Cask (D024).
+**v0.6a, the full run, is designed ([FULL_RUN.md](FULL_RUN.md)), not built.** v0.6 is split in two (D028): v0.6a takes the first run to £1M in about 3 hours; v0.6b is Prestige.
+- **A ten-rung sauce ladder** climbing about ×2.2 a rung, from Table Mild £5 to Phantom Smokehouse £5,200. The ladder's new peppers each get a mash and an in-between sauce (D029, G17 assumed): Smoky Ancho £10.50, Serrano Fire £60, Cajun Red £280, Island Heat £500, Savina Gold £2,000.
+- **Pickled Brine as the base that grows with heat,** and the Pantry branch: booster, concentrate, then a Bulk or Reserve fork per ingredient (G18 assumed).
+- **9 stations, 46 nodes,** Slot Expansion III–IV, Artisan Decanters, two GMO boosters.
+- **Criteria U1–U9,** including the first "not before" bounds on the curve (£100k between 1:35 and 1:55, £1M between 2:45 and 3:15) and "a night at 1:40 doesn't reach £1M" (W7).
 
-**Designed, not built:**
-- **The pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional ones up to 16 billion SHU, each with a value. The brief's six peppers keep their values. Not in `data/` yet (W10).
-- **Ingredients as stations (D024, accepted)** and **as the deliberate bottleneck, with a Pantry branch whose tracks end in either/or forks (D026, accepted)**. Amounts and costs are G18, for v0.6.
-
-Checks: every suite passes locally (32 pacing criteria; X7 at 2.38–2.56× of 3×), and the headless boot is clean. **X7 is now machine-relative (D027):** it failed on CI from PR #9 on because its 0.5 s limit only held on the development Mac.
+Checks: docs only since PR #11's last green CI.
 
 ## Open decisions
 
-
+- **The pepper ladder and its sauces (D023, D029):** accept, rename or swap before v0.6a is built. The design assumes them.
+- **The v0.6 split (D028):** fine as two halves?
+- **G8 and G16, for v0.6b:** Franchise Credits, HQ room costs, the draft, and Night Watchman's Desk.
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
-- **W7, the whole curve:** for v0.6, as agreed.
-- **E6 was narrowed** to the casual player after measuring. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
-- **The pepper ladder (D023):** accept the list and values, or rename and swap peppers.
-- **G17, how the new peppers are used:** recommend one mash and one sauce per new pepper (Idle Planet Miner's ore→bar), built with v0.6.
+- **E6 was narrowed** to the casual player after measuring. Say if you'd rather the eager player saw a bigger crate moment too.
 
 ## Next
 
-1. W8, once you've sent references; otherwise v0.6: G8, G16, G17 and G18, with the pepper ladder (W10) and the Pantry branch.
+1. Build v0.6a (W10) once D023 and D029 are settled: data first, then the fork rule and save v7, then the pacing player, then tune against U1–U9.
+2. Then G8 and G16 for v0.6b, or W8 if references arrive first.
 
-Touches: X7's measurement (D027), the simulation (Forager's Luck, a shared binomial draw), data (`ingredient`, station names, N10), the UI's node and station text, tests (T1–T4), save v6, and docs. Stubbed or open: W3–W10, G16–G18.
+Touches: docs only (FULL_RUN.md, D028–D029, roadmap, backlog). Stubbed or open: W3–W10, G8, G16–G18.

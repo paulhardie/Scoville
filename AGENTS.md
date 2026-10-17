@@ -60,9 +60,9 @@ bash tools/serve_web.sh                              # export, then serve it on 
 | `scenes/` | `main.tscn`, the entry scene |
 | `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 110 minutes against FACTORY.md's F and ECONOMY.md's N and M criteria. `button_tests.gd` (whose `with()` builds a game with chosen research) and `upgrades_tests.gd` cover v0.4's nodes (`button_tests.gd` also Forager's Luck, T1–T3; `pacing_tests.gd` its T4); `offline_tests.gd` covers the catch-up |
 | `tools/` | `capture_ui.gd`, `export_web.sh`, `serve_web.sh`/`.py` (phone build), `install_godot_linux.sh` |
-| `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`, `ECONOMY.md`, `TECH_TREE.md`, `OFFLINE.md`, `INGREDIENTS.md`) |
+| `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`, `ECONOMY.md`, `TECH_TREE.md`, `OFFLINE.md`, `INGREDIENTS.md`, `FULL_RUN.md`) |
 
 ## Sources of truth
 
-- What the game should do: my explicit instructions, then decisions in `docs/DECISIONS.md`, then the brief (`docs/BRIEF.md`), then each system's design doc (`docs/ONBOARDING.md`, `docs/FACTORY.md`, `docs/ECONOMY.md` for values, Operation Value and the run's pacing, `docs/INGREDIENTS.md` for the pepper ladder, `docs/TECH_TREE.md`), which owns that system's criteria and assumptions.
+- What the game should do: my explicit instructions, then decisions in `docs/DECISIONS.md`, then the brief (`docs/BRIEF.md`), then each system's design doc (`docs/ONBOARDING.md`, `docs/FACTORY.md`, `docs/ECONOMY.md` for values, Operation Value and the run's pacing, `docs/INGREDIENTS.md` for the pepper ladder, `docs/FULL_RUN.md` for v0.6a's content and curve, `docs/TECH_TREE.md`), which owns that system's criteria and assumptions.
 - What comes next: `docs/ROADMAP.md` (versions) and `docs/BACKLOG.md` (gaps and work). Where we are: `docs/HANDOVER.md`.

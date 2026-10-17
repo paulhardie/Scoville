@@ -10,11 +10,10 @@ Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). This 
 - **The pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional ones up to 16 billion SHU, each with a value. The brief's six peppers keep their values. Not in `data/` yet (W10).
 - **Ingredients as stations (D024, accepted)** and **as the deliberate bottleneck, with a Pantry branch whose tracks end in either/or forks (D026, accepted)**. Amounts and costs are G18, for v0.6.
 
-Checks: button, core, factory, tech, upgrades, ui and pacing suites pass (32 pacing criteria). Offline passes except **X7** (8 hours away in under 0.5 s). **X7 has failed on CI since PR #9 merged** (0.73 s on the runner; 0.84 s on a cloud container, best of 7, with or without this branch), so main is red. Profiling found no single hot spot: two exact-result speed-ups saved under 1%, so they were dropped.
+Checks: every suite passes locally (32 pacing criteria; X7 at 2.38–2.56× of 3×), and the headless boot is clean. **X7 is now machine-relative (D027):** it failed on CI from PR #9 on because its 0.5 s limit only held on the development Mac.
 
 ## Open decisions
 
-- **X7 on CI (W3):** the limit was set for the development Mac, and CI is a slower, shared machine. Recommend measuring X7 relative to the machine (8 hours' catch-up against the same machine ticking 5 minutes exactly), which catches the catch-up getting slower anywhere. The alternatives are fewer, longer steps (less accurate: D020) or a rewrite of the step for speed (uncertain gain).
 
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
 - **W7, the whole curve:** for v0.6, as agreed.
@@ -26,4 +25,4 @@ Checks: button, core, factory, tech, upgrades, ui and pacing suites pass (32 pac
 
 1. W8, once you've sent references; otherwise v0.6: G8, G16, G17 and G18, with the pepper ladder (W10) and the Pantry branch.
 
-Touches: the simulation (Forager's Luck, a shared binomial draw), data (`ingredient`, station names, N10), the UI's node and station text, tests (T1–T4), save v6, and docs. Stubbed or open: W3–W10, G16–G18.
+Touches: X7's measurement (D027), the simulation (Forager's Luck, a shared binomial draw), data (`ingredient`, station names, N10), the UI's node and station text, tests (T1–T4), save v6, and docs. Stubbed or open: W3–W10, G16–G18.

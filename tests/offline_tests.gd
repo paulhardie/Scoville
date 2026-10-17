@@ -160,10 +160,26 @@ func test_deterministic() -> void:
 	check(JSON.stringify(a.to_state()) == JSON.stringify(b.to_state()) and JSON.stringify(ra) == JSON.stringify(rb), "X6: the same save and time away give the same result")
 
 
+## X7 (OFFLINE.md, D027): the catch-up's time against the same machine ticking
+## 10 minutes from the same save, so it means the same on the Mac, CI or a
+## cloud container.
+const X7_MAX_RATIO := 3.0
+
+
 func test_speed() -> void:
-	var g := loaded(100)
-	var t0 := Time.get_ticks_usec()
-	var r := g.catch_up(8 * 3600.0)
-	var spent := (Time.get_ticks_usec() - t0) / 1000000.0
-	print("  X7: 8 hours away worked out in %.3f s (%d steps of %.1f s)" % [spent, r.steps, r.step])
-	check(spent < 0.5, "X7: 8 hours away in under 0.5 s: %.3f s" % spent)
+	# Best of 3 each, against noise from other work on the machine.
+	var catch_up_best := INF
+	var tick_best := INF
+	var r := {}
+	for attempt in 3:
+		var g := loaded(100)
+		var t0 := Time.get_ticks_usec()
+		r = g.catch_up(8 * 3600.0)
+		catch_up_best = minf(catch_up_best, (Time.get_ticks_usec() - t0) / 1000000.0)
+		var h := loaded(100)
+		t0 = Time.get_ticks_usec()
+		h.advance(seconds(10 * 60.0))
+		tick_best = minf(tick_best, (Time.get_ticks_usec() - t0) / 1000000.0)
+	var ratio := catch_up_best / tick_best
+	print("  X7: 8 hours away worked out in %.3f s (%d steps of %.1f s); 10 minutes tick by tick %.3f s; ratio %.2f" % [catch_up_best, r.steps, r.step, tick_best, ratio])
+	check(ratio <= X7_MAX_RATIO, "X7: 8 hours away takes %.2f× this machine's 10 minutes tick by tick (at most %.1f×)" % [ratio, X7_MAX_RATIO])

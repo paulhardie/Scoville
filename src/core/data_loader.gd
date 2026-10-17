@@ -189,6 +189,11 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(v) != TYPE_DICTIONARY or not data.plots.has(v.get("crop")) or typeof(v.get("mult")) != TYPE_FLOAT or v.mult <= 1.0:
 						errors.append(where + ": plot_speed needs {crop, mult above 1}")
 						ok = false
+				"offline":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or typeof(v.get("hours")) != TYPE_FLOAT or typeof(v.get("speed")) != TYPE_FLOAT or v.hours < 0.0 or v.speed < 0.0:
+						errors.append(where + ": offline needs {hours, speed}, neither below 0")
+						ok = false
 				"slot_cap":
 					var v: Variant = e[kind]
 					if typeof(v) != TYPE_DICTIONARY or v.is_empty():

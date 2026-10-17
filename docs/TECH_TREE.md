@@ -166,7 +166,7 @@ All PASS: `tests/button_tests.gd` (R5–R8, H1–H3) and `tests/upgrades_tests.g
 | H2 | Sale cash × (1 + 0.5 × Heat/100) on every kind of sale. Stock is valued as normal. |
 | H3 | The steady states in the table above hold: Piston alone falls to 0; Grip holds 100 only with Slow Burn; 3 presses a second hold 100. |
 
-## v0.5: Night Shift Protocols (draft)
+## v0.5: Night Shift Protocols
 
 Two West Wing nodes for offline play. The rules and criteria are in [OFFLINE.md](OFFLINE.md#night-shift-protocols-west-wing) (D018).
 

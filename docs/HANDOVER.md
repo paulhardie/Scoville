@@ -2,24 +2,34 @@
 
 ## Where it's at
 
-Built: v0.1–v0.4 (PRs #1–#6, waiting to merge); v0.4 details in [ECONOMY.md](ECONOMY.md#results-v04). W7 (the run is ahead of the 3-hour curve) is left for v0.6, as agreed.
+v0.5 Offline is built, on top of v0.1–v0.4 (PRs #1–#7, still to merge).
+- **Time away:** closing the app, or the screen not running for over 10 s (a phone backgrounding the tab), counts as away. It counts for up to 4 hours at 50% speed; Night Shift Protocols I–II (West Wing) take that to 8 hours at 70%.
+- **The catch-up** runs the real rules in up to 4,000 longer steps (D020, revised: see below). Timers keep wall-clock time, and missed Market spikes are skipped.
+- **The return card** shows the time away, the cap note, the cash, the rise in Operation Value and the top three items.
+- **Saves** are v5 and carry `saved_at`.
 
-This branch is design only: G11 is settled and v0.5 Offline is drafted ([OFFLINE.md](OFFLINE.md)).
-- **D018, cap and speed:** 4 hours at 50% to start. Night Shift Protocols I–II add +2 h and +10 points each, giving 8 h at 70%.
-- **D019, while away:** production only. Heat falls to 0, the Piston keeps pressing, nothing is bought or pressed for the player, timers keep wall-clock time, and missed spikes are missed.
-- **D020, the catch-up:** run 5 real minutes, measure, scale to the rest. When a pile would run dry it re-measures, up to 4 times. Stock is never negative, and the result is deterministic.
-- **D021, counting as away:** the app was closed, or the screen didn't run for over 10 s. The device clock is used; a clock that went backwards counts as no time.
-- **Also drafted:** the "While you were away" card, save v5 (`saved_at`), two Night Shift nodes (W5, W6), and criteria X1–X8, P1–P2.
-- **New gap G16:** the brief's Night Watchman's Desk can't be both "+1 hour a level, hard cap Lv 15" and "+8 hours max". It's for v0.6.
+Checks:
+- All criteria pass: X1–X8, P1–P2, and F1–F8, N1–N8, M1–M7.
+- 552 rule and screen checks.
+- The headless boot is clean and the web export works.
+- The card was captured and looked at.
+
+**What moved from the draft:** the catch-up method. Measuring 5 minutes and scaling them missed the 2% accuracy target three ways (pins, buffers, a growing factory), up to 14% off. Running the real rules in longer steps measures within 0.74%. Speeding that up to 0.38 s for 8 hours took three changes:
+- caching what research decides;
+- batching harvests and cycles within a step;
+- noting Operation Value once per step instead of after every sale, which also speeds up normal play.
+
+Details: [D020](DECISIONS.md), [OFFLINE.md](OFFLINE.md#results-v05).
 
 ## Open decisions
 
-- **Review the v0.5 draft.** X3's 2% accuracy bar and P1/P2's targets are mine; the Night Shift costs are starting guesses.
-- **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0. v0.5 is where it matters most, since a phone really does pause the game in the background (W1).
+- **W7, now with offline in it:** one night away from 1:40 adds £3.2M, past the £1M Prestige line. Agreed for v0.6: set the whole curve with "not before" bounds, offline included.
+- **W1, the phone:** v0.5 is the version most worth trying on a phone. The catch-up's speed there, and how the browser pauses the tab, are both unmeasured.
+- **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0.
 
 ## Next
 
-1. Build v0.5 against X1–X8 and P1–P2, with F, N and M kept.
-2. W1: open the Web build on a phone, ideally with v0.5's offline catch-up.
+1. W1: open the Web build on a phone (`bash tools/serve_web.sh`).
+2. Settle G8 and G16 (Franchise Credits, HQ room costs, Night Watchman's Desk) for v0.6 Prestige, with W7's whole-curve work.
 
-Touches: docs only (D018–D021, OFFLINE.md, the tree, roadmap, backlog). Stubbed: none new; G16 added. Next: build v0.5, since every gap it needs is settled.
+Touches: simulation (stepped `_step`, the catch-up, Night Shift, save v5), the screen (clock, return card), tests, docs. Stubbed or open: W1–W7, G16. Next: W1, then G8/G16, because v0.6 needs them.

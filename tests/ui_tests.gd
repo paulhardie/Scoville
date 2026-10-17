@@ -170,7 +170,75 @@ func run() -> void:
 
 	screen.queue_free()
 	await process_frame
+	await test_return_card()
 	for failure in failures:
 		printerr("FAIL: ", failure)
 	print("%s: ui tests (%d checks)" % ["PASS" if failures.is_empty() else "FAIL", checks])
 	quit(0 if failures.is_empty() else 1)
+
+
+## A clock the test moves by hand.
+class FakeClock:
+	var t := 1000000.0
+
+	func now() -> float:
+		return t
+
+
+## X8: the "While you were away" card, with a fake clock.
+func test_return_card() -> void:
+	var fake := FakeClock.new()
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.clock = fake
+	root.add_child(screen)
+	await process_frame
+	var g = screen.game
+	g.revealed.deck = true
+	g.revealed.status_bar = true
+	g.cash = 100.0
+	g.buy_plot("bell")
+	var card: Control = screen.find_child("ReturnCard", true, false)
+	check(not card.visible, "X8: no card at the start")
+
+	var ticks: int = g.stats.ticks
+	fake.t += 30.0
+	await process_frame
+	check(not card.visible, "X8: no card after 30 s away")
+	check(g.stats.ticks - ticks >= 300, "X8: but the 30 s are caught up")
+
+	fake.t += 3 * 3600.0
+	await process_frame
+	check(card.visible, "X8: the card after 3 hours away")
+	var text := func(key): return (screen.find_child("Return_" + key, true, false) as Label)
+	check(text.call("time").text == "3 h 0 m", "X8: it shows the time away: %s" % text.call("time").text)
+	check(not text.call("cap").visible, "X8: no cap note under the cap")
+	check(text.call("cash").text.begins_with("+£") and text.call("ov").text.begins_with("Operation Value +£"), "X8: cash and Operation Value")
+	check(text.call("made").text.contains("Bell Peppers"), "X8: and what was made: %s" % text.call("made").text)
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.pressed = true
+	card.gui_input.emit(tap)
+	check(not card.visible, "X8: a tap closes it")
+
+	fake.t += 10 * 3600.0
+	await process_frame
+	check(card.visible and text.call("cap").visible and text.call("cap").text.contains("4 h 0 m at 50%"), "X8: 10 hours away notes the cap: %s" % text.call("cap").text)
+	screen.close_card()
+
+	# Closing the app and coming back: the save carries the time.
+	screen.save_path = "user://offline_test_save.json"
+	screen._save()
+	screen.queue_free()
+	await process_frame
+	fake.t += 2 * 3600.0
+	var again := Main.instantiate()
+	again.save_path = "user://offline_test_save.json"
+	again.clock = fake
+	root.add_child(again)
+	await process_frame
+	var card2: Control = again.find_child("ReturnCard", true, false)
+	check(card2.visible and again.last_return.away >= 7200.0 - 1.0, "X8: reopening 2 hours after saving shows the card")
+	again.queue_free()
+	DirAccess.remove_absolute("user://offline_test_save.json")
+	await process_frame

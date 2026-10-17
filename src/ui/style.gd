@@ -24,6 +24,8 @@ const CONTROL_DISABLED := Color("#181c26")
 const ORANGE := Color("#f97316")
 ## Heat, and the pinned node.
 const HEAT := Color("#ef4444")
+## Behind the "While you were away" card.
+const SHADE := Color("#000000b0")
 
 const SIZE_BODY := 22
 const SIZE_SMALL := 18

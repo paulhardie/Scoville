@@ -1,8 +1,8 @@
-# Offline (v0.5, draft)
+# Offline (v0.5)
 
 Brief header "Local, Offline-First", §4 Night Shift Protocols: the factory keeps working while the player is away. It settles G11 ([D018–D021](DECISIONS.md)).
 
-The rules will be in `src/core/game.gd` (the catch-up) and `src/core/real_clock.gd` (the only place wall-clock time enters, as AGENTS.md requires). The return card will be in `src/ui/main.gd`.
+The rules are in `src/core/game.gd` (`catch_up`, `_step`). Wall-clock time enters only through `src/core/real_clock.gd`, as AGENTS.md requires, and the screen swaps in a fake clock for tests. The return card is in `src/ui/main.gd`.
 
 ## Rules
 
@@ -18,18 +18,21 @@ The rules will be in `src/core/game.gd` (the catch-up) and `src/core/real_clock.
   - The gap counts from whichever is later. A clock that went backwards counts as no time.
 - **Tabs and Operation Value:** offline earnings count towards Operation Value, so they can open tabs (the account's best value).
 
-## How it's worked out (D020)
+## How it's worked out (D020, revised in the build)
 
 With **away** = min(time away, cap), the **offline time** is away × speed.
 
-1. **Offline time up to 5 minutes:** run the real simulation tick by tick for the offline time, with no input except the Piston. This is exact.
-2. **Longer:** run the real simulation for 5 minutes and measure how much each item's stock, the cash and every count changed. Then scale those changes to the rest of the offline time:
-   - Work out how far the scale can go before any pile of stock would fall below zero.
-   - If that point comes before the end, scale only to there, set that pile to 0, measure 5 minutes again from that state, and carry on.
-   - Re-measure at most 4 times. Whatever time is left after that is credited at the last rate, with every pile held at zero.
-3. **Afterwards:** move the clock on by the whole time away (not just the offline time), so every timer has really passed. Heat is set to what the Piston alone would hold.
+1. **Offline time up to 5 minutes:** the game runs tick by tick for the offline time, with no input except the Piston. This is exact.
+2. **Longer:** the same rules run in longer steps, at most 4,000 of them (`Game._step`). In one step:
+   - A plot harvests every whole cycle, with one draw for how many come up double.
+   - A vat or line finishes every cycle its time and inputs allow, then restarts if it can.
+   - The valve, pins and keep amounts, Auto-Sell and Byproduct Recycling work as in play.
+   - Plots run first, then vats, then lines, as in a tick, so what one makes feeds the next in the same step.
+3. **Afterwards:** the clock moves on by the whole time away (not just the offline time), so every timer has really passed. The Market Ticker's schedule is replayed on that clock: missed spikes are skipped, and one still running carries on.
 
-Every chance draws from the game's own stream, so the same save and the same time away always give the same result. Scaling never creates stock that the measured minutes couldn't have produced.
+Every chance draws from the game's own stream, so the same save and the same time away always give the same result. No stock can go negative.
+
+The draft measured 5 minutes and scaled them; why that was replaced is in [D020](DECISIONS.md).
 
 ## Night Shift Protocols (West Wing)
 
@@ -42,18 +45,19 @@ Brief §4: "Extends the current run's Offline production cap (+2 hours per node)
 
 ## The return card
 
-- **When it shows:** on a return from more than 60 seconds away. Shorter gaps (a glance at another app) are caught up silently.
+- **When it shows:** on a return from more than 60 seconds away. Shorter gaps (a glance at another app) are caught up silently. Gaps over 10 s count as away; shorter ones are just slow frames.
 - **What it says:**
   - "While you were away: 3 h 12 m".
   - If the cap applied: "Counted up to 4 h at 50%; Night Shift Protocols raise it."
-  - The cash earned, the rise in Operation Value, and the three items made most.
+  - The cash earned, the rise in Operation Value, and the three items made that are worth most (by count, crops would always win).
+  - The cap note mentions Night Shift Protocols only while one is still to research.
 - **Dismissing it:** tapping anywhere closes it. Nothing on it is a choice.
 
 ## Saves
 
 Version 5 adds `saved_at`, the device time when the save was written, beside `run` and `account`. A v4 save migrates with no `saved_at`, so its first load gives no offline progress (a v4 game never promised any).
 
-## Criteria (v0.5, draft)
+## Criteria (v0.5)
 
 | Id | Criterion |
 | --- | --- |
@@ -68,4 +72,25 @@ Version 5 adds `saved_at`, the device time when the save was written, beside `ru
 | P1 | Checking in pays: a player who plays 30 minutes (the pacing player), is away 8 hours, then plays another 30 minutes ends with at least twice the Operation Value the pacing player has after a straight hour. |
 | P2 | A night's sleep is worth more than an evening's tapping: with both Night Shift nodes, 8 hours away from the pacing player's 1:40 state raises Operation Value at least as much as 2 hours of tapping with Heat at that same factory, buying nothing. (Measured like M5: the active rate, × 120 minutes.) |
 
-v0.2–v0.4's F, N and M criteria stay in force. The pacing player will research W5 and W6 near their expected times; their exact place in its order gets written down with the build.
+v0.2–v0.4's F, N and M criteria stay in force. The pacing player researches W5 after the Heat Meter and W6 after Overclock II.
+
+## Results (v0.5)
+
+All pass: `tests/offline_tests.gd` (X1–X7, 48 checks), `tests/ui_tests.gd` (X8, with a fake clock) and `tests/pacing_tests.gd` (P1–P2, and F, N and M).
+
+| Id | Target | Measured |
+| --- | --- | --- |
+| X1–X2 | 4 h at 50%, +2 h and +10 points a node | 4 h 50%, 6 h 60%, 8 h 70%; 10 h away counts 4; a backwards clock counts 0 |
+| X3 | Within 2% of tick by tick | 0:30 0.14%, 1:00 0.02%, 1:40 0.74% (2 hours away); 10 minutes away exact |
+| X4 | No negative stock; nothing bought or pressed | holds at 0:30, 1:00 and 1:40 over 8 hours; the Piston keeps pressing |
+| X5 | Timers keep wall-clock time | Overdrive's cooldown, and the Ticker's schedule and running spike, match a tick-by-tick run |
+| X6 | Deterministic | the same save and time away give identical results |
+| X7 | 8 hours in under 0.5 s | 0.38 s (3,953 steps of 5.1 s) on the development Mac |
+| X8 | The card | shows after 3 h, not after 30 s; notes the cap at 10 h; shows after reopening a save 2 h later |
+| P1 | 30 min, 8 h away, 30 min ≥ 2× a straight hour | £101,944 against £25,643 (4×) |
+| P2 | A night beats 2 hours' tapping (from 1:40) | +£3,159,375 against £1,206,245 |
+
+Researching the Night Shift nodes moved v0.4's M7 (the Piston) from 1:37 to 1:41 (by 1:50). Everything else held.
+
+**A night away is worth a lot.** From 1:40, one night (8 hours at 70%) adds £3.2M of Operation Value, past the £1M Prestige line. That's the W7 pacing question again, now with offline time in it. It belongs with v0.6's whole-curve work.
+

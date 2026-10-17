@@ -120,16 +120,23 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 
 **Why:** "Offline-first" means the factory works while the player sleeps, but choices stay the player's. Missing spikes keeps the Ticker a reason to check in.
 
-## D020: Offline progress is measured, then scaled
+## D020: Offline progress is simulated in longer steps (revised in the build)
 
-**Decision:** The offline time is (time away, up to the cap) × the offline speed.
-- **Up to 5 minutes of it:** the real simulation runs, with no input.
-- **Longer:** the simulation runs 5 minutes for real, measures what changed, and scales that to the rest.
-  - When scaling would empty a pile of stock, it stops at that point, measures again from there, and carries on, up to 4 times. Whatever time is left after the fourth measurement is credited at the last measured rate, holding every pile at zero.
-  - No stock ever goes negative.
-  - Chances come from the game's own random stream, so the same save and the same time away always give the same result.
+**Decision:** The offline time is (time away, up to the cap) × the offline speed. Up to 5 minutes of it runs tick by tick, exactly. Longer runs the game's own rules in longer steps: at most 4,000 of them, so a step is about 1 s for 2 hours and 5 s for 8. In one step:
+- A plot harvests every whole cycle, with one draw for how many come up double.
+- A vat or line finishes every cycle its time and inputs allow, then restarts if it can.
+- The valve sells, Byproduct Recycling's chance is drawn, and the pin and keep amounts work as in play.
 
-**Why:** Simulating 8 hours tick by tick is 288,000 ticks: seconds on a desktop, far too long on a phone. Measuring the real factory keeps every rule and bottleneck right, without a second, simplified model of the game to keep in step. Re-measuring when a pile empties stops a draining pile from being counted as if it lasted for ever.
+Chances come from the game's own random stream, so the same save and the same time away always give the same result. No stock can go negative.
+
+**Why:** 8 hours tick by tick is 288,000 ticks: seconds on a desktop, far too long on a phone.
+
+**Revised from the draft.** The draft measured 5 minutes and scaled them up. Built, that missed X3's 2% target three ways: by 3% at 0:30, and by 10–14% at 1:40. Patching each flaw broke another state.
+- A pile rising to a pin or keep amount was scaled straight past the point where it starts selling.
+- Stock flowing through a buffer looked like a pile running dry.
+- A factory that grows while away (Byproduct Recycling's free levels) was scaled at its starting rate.
+
+Stepping runs the real rules, so all three take care of themselves. It measures within 0.74% of tick by tick, and works out 8 hours in 0.38 s.
 
 ## D021: When the player counts as away
 

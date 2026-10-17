@@ -83,6 +83,11 @@ func run() -> void:
 	(screen.find_child("Tech_automated_piston", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v04_tech.png"), 0.3)
 
+	# Back after a night: the "While you were away" card, capped.
+	screen._return_from(9 * 3600.0 + 720.0)
+	await _shot(out.path_join("v05_return.png"), 0.2)
+	screen.close_card()
+
 	# The Tech Tree just opened: nothing researched yet, the first node selected.
 	var fresh := Game.new()
 	var early := Player.new()

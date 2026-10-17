@@ -4,8 +4,8 @@ The brief ([BRIEF.md](BRIEF.md)) is the v1.0 scope. It's built in the versions b
 
 | Version | What | Brief | Needs |
 | --- | --- | --- | --- |
-| **v0.1 Blank Hook** | Onboarding Stages 0–1: the unlabelled button, the Bell Peppers counter, Cash and Sell Raw Peppers. Save and restore. | §2 | — (assumptions in [ONBOARDING.md](ONBOARDING.md)) |
-| v0.2 Operation Deck | Stage 2: the split viewport (35/65), the Farms tab, the Tier 1 spine (Bell Pepper farm → Sweet Pepper Mash vat → Table Mild line), the Starter Crate, Sell Batch, cash upgrade knobs, the fixed simulation tick. | §2, §3 | G3, G4 |
+| v0.1 Blank Hook (PR #1) | Onboarding Stages 0–1: the unlabelled button, the Bell Peppers counter, Cash and Sell Raw Peppers. Save and restore. | §2 | — (assumptions in [ONBOARDING.md](ONBOARDING.md)) |
+| **v0.2 Operation Deck** | Stage 2: the split viewport (35/65), the Farms tab, the Tier 1 spine (Bell Pepper plot → Sweet Pepper Mash vat → Table Mild line), the Starter Crate, Sell Batch, speed and yield upgrades, the fixed simulation tick. Design and criteria: [FACTORY.md](FACTORY.md). | §2, §3 | G4 (drafted, for review) |
 | v0.3 Full Navigation | Stage 3: the bottom bar with locked tabs, Operation Value, the Processing tab, Tiers 2–3, parallel slots. | §2, §3 | G5, G6, G7 |
 | v0.4 Tech Tree | The five-wing web with item turn-ins: Blank Button evolution and Heat, Delivery Van auto-sell, Smart Stockpiling, packaging tiers, Overdrive. | §3, §4 | G9, G10 |
 | v0.5 Offline | Offline production and its cap, Night Shift Protocols. | §4 | G11 |

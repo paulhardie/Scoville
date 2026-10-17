@@ -4,7 +4,7 @@ Everything a first run needs to reach the £1,000,000 Prestige line in about 3 h
 
 Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedures) is v0.6b ([D028](DECISIONS.md)). It needs G8 and G16 from the owner, and a run that actually reaches £1M to test it on.
 
-Status: **being built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. Next: the pacing player, then tuning against U1–U9. Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
+Status: **being built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. Stage 2, the pacing player, plays the whole ladder; tuning against U1–U9 is under way and has raised three questions for the owner ([below](#build-log-stage-2)). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
 
 ## The sauce ladder (G17, as assumed: D029)
 
@@ -149,6 +149,30 @@ U1's lower bounds are new: until now the curve only had deadlines, and the run w
 - Otherwise as v0.4's.
 
 W4 (the player buys the cheapest upgrade, not the bottleneck) is a risk here: with fourteen mashes, a naive player may starve its own top line. If it does, the build gets a bottleneck-aware buyer before any criterion is retuned.
+
+## Build log (stage 2)
+
+**The pacing player plays the whole ladder.** It runs a layout of slots per rung, lends slots to whatever research is short of (following the recipe chain down), keeps bottles a running recipe takes, and only upgrades stations in use. Five deadlocks in the player were found and fixed on the way; they were the player's, not the game's.
+
+**Repriced (D010):** Tier 3's blueprints (E6–E10) are now paid in Serrano Fire, Cane Sugar and Glaze (E21–E22) in Cajun Red, and Smoked Oak and Liquid Smoke (E32–E33) in Savina Gold, the rung before each. Priced in the old bottles, they starved the new rungs.
+
+**Measured now (not tuned yet):**
+
+| Id | Result |
+| --- | --- |
+| U1 | £1k 15:29, £10k 47:13, £100k 1:39:44 (all in band), **£1M 2:25:21 (FAIL: band 2:45–3:15)** |
+| U3 | PASS: every rung made, each within 20 minutes of its time (Savina Gold 2:18, Phantom 2:25) |
+| U6 | PASS: 4 forks taken; swapping Vinegar's fork moves Operation Value at 3:00 by 59% |
+| U2, U5, U7, U8, U4 | FAIL (below) |
+| F, N, E, P1, T4 | PASS |
+| M2, M4, M6, M7, P2 | FAIL: Louisiana at 55:52 (by 55:00), a 213 s wait, M6's lines, the Piston at 2:06 (by 1:50), P2 |
+
+**Why the late game runs away.** From Savina Gold on, Operation Value grows about £800k a minute at 2:30, and tapping adds 5% (U7). A slot's speed upgrades are priced from the slot's own price (D009), not from what it makes, so a slot bought for Table Mild upgrades at Table Mild prices while it bottles Phantom Smokehouse. Every slot ends up at very high speed for small change.
+
+**Three questions for the owner:**
+1. **Slot upgrades priced by what the slot makes.** Price a slot's upgrades from √(the value of its recipe's output ÷ Table Mild's) instead of its purchase price, so upgrading a Phantom line costs Phantom money. Recommended: it's Idle Planet Miner's model (a planet's upgrades scale with the planet) and the one lever that slows the late game without touching the early one. It changes D009.
+2. **U8 and P2 pull against U1.** For the curve to go from £100k at 1:40 to £1M at 3:00, the factory at 1:40 has to earn about £2,900 a minute. A night (8 hours at 70%) of that is about £1M, so U8 (a night from 1:40 stays under £1M) sits right at the edge of U1. P2 (a night beats 2 hours' tapping) then holds easily. Recommended: keep U8 but move it to "from 1:20".
+3. **U4 asks for Table Mild and Verde Mash at 2:30–2:40.** Nothing late takes them any more (Sweet Heat is the last sauce to take Table Mild, and Serrano Fire the last to take Verde Mash). Recommended: narrow U4 to Classic Louisiana and Pickled Brine, which Savina Gold and Phantom really do need. Likewise M6 (the Table Mild and Bistro Verde lines busy at 1:30) was v0.4's form of the same check, and U4 supersedes it. M2's 55:00 deadline is missed by 52 s, with the Serrano rung added in front.
 
 ## Assumed
 

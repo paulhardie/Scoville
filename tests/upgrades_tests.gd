@@ -152,9 +152,10 @@ func test_overflow_valve() -> void:
 
 
 func test_smart_stockpiling() -> void:
-	var g := with(["smart_stockpiling", "bistro_blueprint"])
-	var cost: Dictionary = g.data.tech.cayenne_blueprint.cost
-	check(g.set_pin("cayenne_blueprint"), "pins E6")
+	# E16 is paid in Bistro Verde and Verde Mash (E6 was, before v0.6a).
+	var g := with(["smart_stockpiling", "serrano_blueprint"])
+	var cost: Dictionary = g.data.tech.serrano_mash_blueprint.cost
+	check(g.set_pin("serrano_mash_blueprint"), "pins E16")
 	g.cash = 1e6
 	for s in ["vat", "vat", "line", "line"]:
 		g.buy_slot(s)
@@ -175,8 +176,8 @@ func test_smart_stockpiling() -> void:
 	check(g.stats.sold.bistro_verde > 0, "R14: then Auto-Sell works as set again")
 	check(g.stock.verde_mash <= cost.verde_mash, "R13/R14: the valve keeps the pinned node's Verde Mash, no more: %d" % g.stock.verde_mash)
 	g.stock.verde_mash = cost.verde_mash
-	check(g.research_node("cayenne_blueprint") and g.pin == "", "researching the node unpins it")
-	check(not with([]).set_pin("cayenne_blueprint"), "no pins before the node")
+	check(g.research_node("serrano_mash_blueprint") and g.pin == "", "researching the node unpins it")
+	check(not with([]).set_pin("serrano_mash_blueprint"), "no pins before the node")
 
 
 func test_market_ticker() -> void:

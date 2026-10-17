@@ -1,0 +1,71 @@
+# Ingredients
+
+The pepper ladder: every crop the game will grow, ordered by real heat, with its value. The owner asked for real hot sauce peppers from the Bell Pepper (0 Scoville) up to Pepper X (the hottest on record), then fictional ones past it, priced with Idle Planet Miner's ore ladder as the reference ([D023](DECISIONS.md), proposed).
+
+Status: **design only.** Nothing here is in `data/` yet. The six peppers the brief already names keep their current values, so Tiers 1–3 as built don't change.
+
+## The value rule
+
+1. **The brief's peppers are anchors.** Bell, Jalapeño, Cayenne, Habanero, Ghost and Reaper keep the values D004 already derives from the brief's bottle prices ([ECONOMY.md](ECONOMY.md#item-values-g6-d004)). Changing them would mean changing the brief's bottles or recipes, and re-pacing Tiers 1–3.
+2. **A new real pepper sits on the geometric line between the anchors either side of it.** One pepper between two anchors is their geometric mean; two split the gap into three equal ratios.
+3. **Past the last anchor (Reaper), each rung is ×2.15**, rounded to two significant figures. That's Idle Planet Miner's ore step: its ores start Copper $1, Iron $2, Lead $4 and keep roughly doubling up the list.
+4. **Hotter is always worth more.** Two peppers with the same real range (Cayenne and Tabasco, Scotch Bonnet and Habanero) are ordered so the brief's pepper keeps its slot.
+
+The value is what one crop sells for and counts for in Operation Value, as now. Mash and bottles follow D004 (mash 2× its inputs, a bottle 5× the raw value inside it).
+
+## The ladder
+
+Scoville figures are the commonly quoted ranges, or the tested average for record holders. Tier is the farm tier it unlocks with; a tier is roughly a decade of heat, the way it's roughly a decade of Operation Value (D005).
+
+| # | Pepper | Scoville (SHU) | Tier | Value | Source of value |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Bell Pepper | 0 | 1 | £0.10 | Brief (anchor) |
+| 2 | Poblano | 1,000–2,000 | 2 | £0.14 | Between Bell and Jalapeño |
+| 3 | Jalapeño | 2,500–8,000 | 2 | £0.20 | D004 (anchor) |
+| 4 | Serrano | 10,000–23,000 | 3 | £0.35 | Between Jalapeño and Cayenne |
+| 5 | Cayenne | 30,000–50,000 | 3 | £0.60 | D004 (anchor) |
+| 6 | Tabasco | 30,000–50,000 | 3 | £0.83 | Between Cayenne and Habanero |
+| 7 | Scotch Bonnet | 100,000–350,000 | 4 | £1.15 | Between Cayenne and Habanero |
+| 8 | Habanero | 100,000–350,000 | 4 | £1.60 | D004 (anchor) |
+| 9 | Red Savina | up to 577,000 | 5 | £4.20 | Between Habanero and Ghost |
+| 10 | Ghost Pepper (Bhut Jolokia) | 855,000–1,041,000 | 5 | £11.00 | D004 (anchor) |
+| 11 | Trinidad Moruga Scorpion | about 1,200,000 (peaks 2,000,000) | 6 | £16.40 | Between Ghost and Reaper |
+| 12 | Carolina Reaper | 1,640,000 average | 6 | £24.40 | D004 (anchor) |
+| 13 | Pepper X | 2,690,000 average (Guinness, 2023) | 6 | £52 | ×2.15 |
+| 14 | *Lava Lantern* | 5,000,000 | 7 | £110 | ×2.15 |
+| 15 | *Solar Flare* | 10,000,000 | 7 | £240 | ×2.15 |
+| 16 | *Capsaicin Crystal* | 16,000,000 | 8 | £520 | ×2.15 |
+| 17 | *Brimstone Jolokia* | 50,000,000 | 8 | £1,100 | ×2.15 |
+| 18 | *Supernova Scorpion* | 500,000,000 | 9 | £2,400 | ×2.15 |
+| 19 | *Event Horizon* | 16,000,000,000 | 9 | £5,200 | ×2.15 |
+
+Fictional peppers are in italics. The joke runs on real numbers: 16 million SHU is pure capsaicin, the physical ceiling for a chilli, so the Capsaicin Crystal is "grown in a lab", and everything after it is impossible. The Event Horizon's 16 billion is resiniferatoxin's real rating, the hottest substance known.
+
+Tier 6 is still after the first Prestige ([D006](DECISIONS.md)); Tiers 7–9 are later runs and the Cook-Off's high thresholds.
+
+## Supporting ingredients
+
+The brief's non-pepper crops are unchanged. Each fictional tier will need its own when its recipes are designed (G17).
+
+| Ingredient | Tier | Value | Source |
+| --- | --- | --- | --- |
+| White Vinegar | 2 | £0.15 | D004 |
+| Garlic | 3 | £0.55 | D004 |
+| Cane Sugar | 4 | £1.30 | D004 |
+| Smoked Oak | 5 | £9.50 | D004 |
+
+## How it compares with Idle Planet Miner
+
+- **Idle Planet Miner climbs about ×2.1 per ore.** Bell to Reaper here climbs about ×1.65 per rung (244× over 11 steps), because the brief puts the rest of the growth into recipe sizes: a mash takes 10 Bell Peppers but 80 Reapers. Bottles climb ×5–8 a tier, which is what two or three of Idle Planet Miner's ores cover.
+- **Past Pepper X it's the reference curve exactly** (×2.15 a rung), since there's no brief value to keep.
+- The steps under the anchors are uneven (×1.4 Bell to Poblano, ×2.6 Habanero to Red Savina). Smoothing them would mean moving the anchors, so re-pricing the brief's bottles and re-pacing the built tiers. Not worth it: the player feels the bottle prices, not the ratio between two crops.
+
+## Assumed
+
+- The pepper list itself (13 real, 6 fictional). Left out as near-duplicates in heat: Pimento, Banana, Anaheim, Fresno, Thai Bird's Eye, Piri Piri, 7 Pot Douglah. Any can be swapped in at the same rule.
+- Fictional names and Scoville figures. Placeholders for fun; the owner can rename them.
+- Same-range order (Tabasco above Cayenne, Scotch Bonnet below Habanero) so the brief's peppers keep their slots.
+
+## Open (G17)
+
+Each new pepper needs a use, or its plot is dead weight: nothing in the brief's recipes takes a Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina, Moruga Scorpion or Pepper X. The recommendation is Idle Planet Miner's ore→bar rule: **every pepper gets its own single-pepper mash, and each new pepper adds one sauce in its tier**, priced by D004. That's 7 more mashes, 7 more sauces and about 14 more blueprints on the East Wing for the real peppers alone, which adds to the first run (13 crops instead of 9 through Tier 5), so it belongs with v0.6's re-pacing of the whole curve (W7). The cheaper alternative, any pepper of a tier filling that tier's mash, adds no recipes but makes the new peppers interchangeable.

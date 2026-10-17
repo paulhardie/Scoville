@@ -169,15 +169,15 @@ func test_slot_caps() -> void:
 	g.account.best_ov = 500.0
 	for i in 3:
 		check(g.buy_slot("vat"), "buys vat slot %d" % (i + 1))
-	check(not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: no fourth vat")
+	check(g.slot_cap("vat") == 3 and not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: no fourth vat before Slot Expansion")
 	for i in 2:
 		check(g.buy_slot("line"), "buys line slot %d" % (i + 1))
 	check(not g.buy_slot("line"), "S3: no third line")
 	check(g.lines[1].crate == 0, "only the first line has a Starter Crate")
 	var spent := 0.0
 	for station in ["vat", "line"]:
-		for p in g.data.slots[station].prices:
-			spent += p
+		for i in g.data.slots[station].base_cap:
+			spent += g.data.slots[station].prices[i]
 	check(close(g.cash, 100000.0 - spent), "each slot costs its listed price")
 
 
@@ -401,3 +401,85 @@ func test_v1_save_migrates() -> void:
 	var broken := v1.duplicate(true)
 	broken.erase("bell")
 	check(Game.new().load_state(broken) != "", "a broken v1 save is refused")
+
+
+## A save as v0.3 wrote it: Tier 2 running, a vat mid-cycle, the Van researched.
+func v3_save() -> Dictionary:
+	return {
+		"version": 3,
+		"run": {
+			"cash": 812.5,
+			"stock": {"bell": 40, "jalapeno": 30, "vinegar": 12, "sweet_mash": 2, "pickled_brine": 1, "verde_mash": 1, "table_mild": 3, "bistro_verde": 0},
+			"revealed": {"counter": true, "status_bar": true, "deck": true},
+			"plots": {
+				"bell": {"owned": true, "speed": 4, "yield": 2, "progress": 0.4},
+				"jalapeno": {"owned": true, "speed": 1, "yield": 0, "progress": 1.1},
+				"vinegar": {"owned": false, "speed": 0, "yield": 0, "progress": 0.0},
+			},
+			"vats": [
+				{"recipe": "sweet_mash", "speed": 5, "progress": 2.0, "running": true},
+				{"recipe": "verde_mash", "speed": 1, "progress": 0.0, "running": false},
+			],
+			"lines": [{"recipe": "table_mild", "speed": 3, "progress": 1.5, "running": true, "crate": 0}],
+			"research": ["kitchen_table", "jalapeno_blueprint", "calloused_thumbs", "verde_blueprint", "delivery_van"],
+			"autosell": {"table_mild": 50, "bistro_verde": 100},
+			"autosell_acc": {"table_mild": 50, "bistro_verde": 0},
+			"stats": {"presses": 4000, "bell_picked": 9000, "cash_earned": 3100.0, "ticks": 15000, "researched": 4,
+				"harvested": {"bell": 8000, "jalapeno": 300}, "made": {"sweet_mash": 700, "table_mild": 650, "verde_mash": 10},
+				"sold": {"table_mild": 600}, "consumed": {"bell": 7000}},
+		},
+		"account": {"best_ov": 3300.0},
+	}
+
+
+func test_v3_save_migrates() -> void:
+	var g := Game.new()
+	var problem := g.load_state(v3_save())
+	check(problem == "", "S9: a v3 save loads: " + problem)
+	check(close(g.cash, 812.5) and g.stock.jalapeno == 30 and g.autosell.table_mild == 50, "S9: cash, stock and sliders carry over")
+	check(g.vats[0].running and g.vats[0].taken == {"bell": 10}, "S9: a running vat's taken inputs are its recipe's")
+	check(g.heat == 0.0 and g.pin == "" and g.keep.is_empty() and g.plots.bell.quality == 0, "S9: new state starts empty")
+	check(g.has_van() and g.tap_yield() == 3, "S9: research carries over, with its effects")
+	var again := Game.new()
+	again.load_state(v3_save())
+	check(JSON.stringify(again.to_state()) == JSON.stringify(g.to_state()), "S9: the same save migrates the same way, random stream included")
+	# Production goes on as v0.3's rules had it: the plot's harvests, by hand.
+	g.advance(seconds(60.0))
+	var bell_cycle := 2.0 / (1.0 + 0.15 * 4)
+	var harvested := floori((60.0 + 0.4) / bell_cycle + 1e-6) * 3
+	check(g.stats.harvested.bell - 8000 == harvested, "S9: v0.3's Bell plot rate: %d (want %d)" % [g.stats.harvested.bell - 8000, harvested])
+	var sm_cycle := 8.0 / (1.0 + 0.25 * 5)
+	check(g.stats.made.sweet_mash - 700 >= floori(60.0 / sm_cycle) - 1, "S9: the vat keeps going")
+	var h := Game.new()
+	h.load_state(v3_save())
+	check(h.assign("vat", 0, "") and h.stock.bell == 50, "S9: switching the migrated vat off returns its 10 peppers")
+
+
+func test_chances_are_deterministic() -> void:
+	# S10: a game with every chance in play, played twice from the same seed,
+	# and saved and reloaded halfway.
+	var Helpers = load("res://tests/button_tests.gd")
+	var a: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip"], 99)
+	var b: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip"], 99)
+	for g in [a, b]:
+		g.cash = 1e6
+		g.buy_plot("bell")
+		g.upgrade_plot("bell", "quality")
+		g.upgrade_plot("bell", "quality")
+		g.buy_slot("vat")
+		g.set_holding(true)
+		g.advance(seconds(1800.0))
+	check(a.stats.doubles > 0 and a.stats.free_levels > 0 and a.stats.spikes > 0, "every chance came up")
+	check(JSON.stringify(a.to_state()) == JSON.stringify(b.to_state()), "S10: the same seed and inputs give the same game")
+	var c := Game.new()
+	check(c.load_state(JSON.parse_string(JSON.stringify(a.to_state(), "", false, true))) == "", "S10: a mid-game save loads")
+	c.set_holding(true)
+	a.advance(seconds(1800.0))
+	c.advance(seconds(1800.0))
+	check(JSON.stringify(c.to_state()) == JSON.stringify(a.to_state()), "S10: and plays on identically, chances included")
+	var other: Game = Helpers.with(["double_tap"], 100)
+	var same: Game = Helpers.with(["double_tap"], 99)
+	for g in [other, same]:
+		for i in 200:
+			g.press()
+	check(other.stats.doubles != same.stats.doubles or other.rng.state != same.rng.state, "a different seed gives different chances")

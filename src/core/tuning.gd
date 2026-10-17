@@ -60,3 +60,40 @@ const STARTER_CRATE_SPEED := 10.0
 
 ## Delivery Van Auto-Sell slider step, in percent (GUESS).
 const AUTOSELL_STEP := 10
+
+# --- v0.4: the button, Heat and the factory upgrades (docs/TECH_TREE.md) -------
+
+## Heat (D011): added a press, drained a second (× the Slow Burn share), its
+## ceiling, and the most it adds to sale cash at full Heat.
+const HEAT_PER_PRESS := 5.0
+const HEAT_DRAIN := 12.0
+const HEAT_MAX := 100.0
+const HEAT_BONUS := 0.5
+
+## Overdrive Turbines (brief §4): the lasting speed bonus, then the button's
+## boost, how long it lasts and its cooldown from the press.
+const TURBINE_SPEED := 0.25
+const OVERDRIVE_BOOST := 2.0
+const OVERDRIVE_SECONDS := 60.0
+const OVERDRIVE_COOLDOWN := 900.0
+
+## Raw Overflow Valve (D014): default keep amount, in cycles of the researched
+## recipes that use an item, and how often it sells.
+const OVERFLOW_KEEP_CYCLES := 5
+const OVERFLOW_EVERY_SECONDS := 1.0
+
+## Market Ticker (D015): the first spike's delay after research, the gap
+## between spike starts, a spike's length (all in seconds), and its multipliers.
+const TICKER_FIRST := [60, 300]
+const TICKER_GAP := [2700, 4500]
+const TICKER_SECONDS := 1800
+const TICKER_MULTS := [2.0, 3.0]
+
+## Byproduct Recycling (D013): seconds between free levels at most.
+const BYPRODUCT_COOLDOWN := 60.0
+
+## Crop Quality (D016): chance a level, its cap in levels, and its price curve.
+const CROP_QUALITY_STEP := 0.03
+const CROP_QUALITY_MAX := 10
+const CROP_QUALITY_COST := 30.0
+const CROP_QUALITY_GROWTH := 2.0

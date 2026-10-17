@@ -1,13 +1,18 @@
 {
 	"_source": "docs/ECONOMY.md: bottle values are the brief's (§3); crop and mash values follow D004.",
 	"items": [
-		{"id": "bell", "name": "Bell Pepper", "plural": "Bell Peppers", "short": "Bell", "kind": "crop", "tier": 1, "value": 0.10},
-		{"id": "jalapeno", "name": "Jalapeño", "plural": "Jalapeños", "short": "Jalapeño", "kind": "crop", "tier": 2, "value": 0.20},
+		{"id": "bell", "name": "Bell Pepper", "plural": "Bell Peppers", "short": "Bell", "kind": "crop", "tier": 1, "value": 0.1},
+		{"id": "jalapeno", "name": "Jalapeño", "plural": "Jalapeños", "short": "Jalapeño", "kind": "crop", "tier": 2, "value": 0.2},
 		{"id": "vinegar", "name": "White Vinegar", "plural": "White Vinegar", "short": "Vinegar", "kind": "crop", "tier": 2, "value": 0.15},
-		{"id": "sweet_mash", "name": "Sweet Pepper Mash", "plural": "Sweet Pepper Mash", "short": "Sweet Mash", "kind": "mash", "tier": 1, "value": 2.00},
-		{"id": "pickled_brine", "name": "Pickled Brine", "plural": "Pickled Brine", "short": "Brine", "kind": "mash", "tier": 2, "value": 4.00},
-		{"id": "verde_mash", "name": "Verde Mash", "plural": "Verde Mash", "short": "Verde", "kind": "mash", "tier": 2, "value": 6.00},
-		{"id": "table_mild", "name": "Table Mild", "plural": "Table Mild", "short": "Table Mild", "kind": "bottle", "tier": 1, "value": 5.00},
-		{"id": "bistro_verde", "name": "Bistro Verde", "plural": "Bistro Verde", "short": "Bistro", "kind": "bottle", "tier": 2, "value": 25.00}
+		{"id": "cayenne", "name": "Cayenne", "plural": "Cayenne", "short": "Cayenne", "kind": "crop", "tier": 3, "value": 0.6},
+		{"id": "garlic", "name": "Garlic", "plural": "Garlic", "short": "Garlic", "kind": "crop", "tier": 3, "value": 0.55},
+		{"id": "sweet_mash", "name": "Sweet Pepper Mash", "plural": "Sweet Pepper Mash", "short": "Sweet Mash", "kind": "mash", "tier": 1, "value": 2.0},
+		{"id": "pickled_brine", "name": "Pickled Brine", "plural": "Pickled Brine", "short": "Brine", "kind": "mash", "tier": 2, "value": 4.0},
+		{"id": "verde_mash", "name": "Verde Mash", "plural": "Verde Mash", "short": "Verde", "kind": "mash", "tier": 2, "value": 6.0},
+		{"id": "garlic_paste", "name": "Roasted Garlic Paste", "plural": "Roasted Garlic Paste", "short": "Paste", "kind": "mash", "tier": 3, "value": 22.0},
+		{"id": "cayenne_mash", "name": "Cayenne Mash", "plural": "Cayenne Mash", "short": "Cayenne Mash", "kind": "mash", "tier": 3, "value": 38.0},
+		{"id": "table_mild", "name": "Table Mild", "plural": "Table Mild", "short": "Table Mild", "kind": "bottle", "tier": 1, "value": 5.0},
+		{"id": "bistro_verde", "name": "Bistro Verde", "plural": "Bistro Verde", "short": "Bistro", "kind": "bottle", "tier": 2, "value": 25.0},
+		{"id": "classic_louisiana", "name": "Classic Louisiana", "plural": "Classic Louisiana", "short": "Louisiana", "kind": "bottle", "tier": 3, "value": 140.0}
 	]
 }

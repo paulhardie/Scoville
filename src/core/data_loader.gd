@@ -125,7 +125,11 @@ static func check(raw: Dictionary) -> Dictionary:
 				errors.append("slots.json: %s prices must be numbers above 0" % station)
 				break
 			prices.append(float(p))
-		data.slots[station] = {"prices": prices}
+		var base: Variant = s.get("base_cap", float(prices.size()))
+		if typeof(base) != TYPE_FLOAT or base < 1.0 or base > prices.size():
+			errors.append("slots.json: %s base_cap must be between 1 and the number of prices" % station)
+			continue
+		data.slots[station] = {"prices": prices, "base_cap": int(base)}
 
 	rows = _rows(raw, "tech", "nodes", errors)
 	for i in rows.size():
@@ -164,12 +168,37 @@ static func check(raw: Dictionary) -> Dictionary:
 					if not data.recipes.has(e[kind]):
 						errors.append(where + ": unlocks unknown recipe " + str(e[kind]))
 						ok = false
-				"delivery_van":
-					pass
+				"delivery_van", "heat_meter", "overdrive", "overflow_valve", "smart_stockpiling", "market_ticker":
+					if e[kind] != true:
+						errors.append(where + ": %s takes true" % kind)
+						ok = false
 				"tap_yield":
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0:
 						errors.append(where + ": tap_yield needs a whole number of at least 1")
 						ok = false
+				"double_tap", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
+					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0 or e[kind] >= 1.0:
+						errors.append(where + ": %s needs a share between 0 and 1" % kind)
+						ok = false
+				"grip", "piston", "overclock", "packaging":
+					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0:
+						errors.append(where + ": %s needs a number above 0" % kind)
+						ok = false
+				"plot_speed":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or not data.plots.has(v.get("crop")) or typeof(v.get("mult")) != TYPE_FLOAT or v.mult <= 1.0:
+						errors.append(where + ": plot_speed needs {crop, mult above 1}")
+						ok = false
+				"slot_cap":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or v.is_empty():
+						errors.append(where + ": slot_cap needs {vat, line}")
+						ok = false
+					else:
+						for st in v:
+							if not STATIONS.has(st) or typeof(v[st]) != TYPE_FLOAT or v[st] < 1.0:
+								errors.append(where + ": slot_cap %s needs a whole number of at least 1" % st)
+								ok = false
 				_:
 					errors.append(where + ": unknown effect " + kind)
 					ok = false
@@ -182,6 +211,14 @@ static func check(raw: Dictionary) -> Dictionary:
 			data.tech_order.append(r.id)
 	if not data.tech.has("kitchen_table"):
 		errors.append("tech.json: no kitchen_table root")
+	for station in data.slots:
+		var cap: int = data.slots[station].base_cap
+		for id in data.tech:
+			for e in data.tech[id].effects:
+				if e.has("slot_cap"):
+					cap += int(e.slot_cap.get(station, 0))
+		if cap > data.slots[station].prices.size():
+			errors.append("slots.json: Slot Expansion opens %d %s slots but only %d are priced" % [cap, station, data.slots[station].prices.size()])
 	return {"data": data if errors.is_empty() else {}, "errors": errors}
 
 

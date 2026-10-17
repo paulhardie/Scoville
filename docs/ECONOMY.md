@@ -44,7 +44,7 @@ These values are what Operation Value counts and what the Raw Overflow Valve (v0
 | --- | --- | --- | --- |
 | £1,000 | 0:16 | Tier 1 | 0:16 (v0.2's pacing player passes £943 at 15:00 and £1,030 at 16:00) |
 | £10,000 | 0:50 | Tier 2 | 0:42 (v0.3) |
-| £100,000 | 1:50 | Tier 3 | v0.4 |
+| £100,000 | 1:50 | Tier 3 | 1:29 (v0.4; £379k by 1:50, well ahead: see below) |
 | £1,000,000 | 3:00 | Tiers 4–5 | v0.6 |
 
 Without a new tier, Operation Value grows in a straight line: Tier 1 alone adds about £100 a minute and reaches only £2,400 at 30:00. Each tier has to arrive in time to bend the curve.
@@ -113,7 +113,7 @@ Timeline: research starts at 12:53 and Tier 2 is fully built by 21:29, with the 
 
 Close to the edge: F6 (85 s of 90) and N6 (104 s of 120).
 
-## Criteria (v0.4, draft)
+## Criteria (v0.4)
 
 Measured by the pacing player over the first 110 minutes. v0.2's F1–F8 and v0.3's N1–N8 stay in force.
 
@@ -127,9 +127,39 @@ Measured by the pacing player over the first 110 minutes. v0.2's F1–F8 and v0.
 | M6 | Tiers 1 and 2 stay in use (brief pillar 3): from 1:30 to 1:40 the Table Mild and Bistro Verde lines are each busy at least half the time. |
 | M7 | The button evolves within the run: the Automated Piston is researched by 1:50. |
 
-For v0.4 the pacing player also:
-- researches the new nodes, in an order to be written down with the build;
-- uses Heat by tapping;
-- presses Factory Overdrive whenever it's ready;
-- leaves the Overflow Valve's keep amounts at their defaults;
-- pins the next node it's saving for.
+For v0.4 the pacing player (`src/sim/engaged_player.gd`):
+- **Researches in this order:** the Tier 2 path and Van as before, then Double-Tap, Slot Expansion I, the five Tier 3 blueprints with Slot Expansion II, then Ergonomic Grip, Heat Meter, Overflow Valve, Overclock I, Smart Stockpiling, Flint Glass, Zero-Waste I, Overclock II, Market Ticker, Slow Burn, Byproduct Recycling, Franchise Auditors, Zero-Waste II, Overclock III, Automated Piston, Foil Wraps, Hydroponic Bell, Overdrive Turbines.
+- **Holds back what the next node needs.** Once it has Smart Stockpiling it pins the node. Before that, it turns Auto-Sell down to 50% for the bottles and raises the valve's keep amounts for the crops and mash.
+- **Switches off a slot that would eat a needed item it's short of,** unless the node also needs that slot's output.
+- Buys Tier 3's stations in order as each is unlocked, including a second Classic Louisiana line.
+- Taps 3 times a second, which keeps Heat full.
+- Presses Factory Overdrive whenever it's ready.
+- Otherwise buys the cheapest upgrade, Crop Quality included.
+
+### Results (v0.4)
+
+All 23 criteria pass (F1–F8, N1–N8, M1–M7).
+
+| Id | Target | Measured |
+| --- | --- | --- |
+| M1 | First Tier 3 blueprint by 48:00 | 28:54 |
+| M2 | First Classic Louisiana by 55:00 | 46:09 |
+| M3 | £100,000 by 1:50 | 1:29:32 (£378,814 at 1:50) |
+| M4 | No wait over 150 s, 50:00–1:50 | longest 81 s |
+| M5 | Tapping adds ≥ 30% at 1:30 | +69% (£16,696 against £9,907 a minute) |
+| M6 | Table Mild and Bistro Verde lines each busy ≥ 50%, 1:30–1:40 | 100% and 54% |
+| M7 | Automated Piston by 1:50 | 1:37:00 |
+
+v0.3's N criteria moved a little, with Tier 3 research now spending Bistro Verde before 50:00:
+- N5 (£10,000) went from 42:18 to 47:35.
+- N6's longest wait went from 104 s to 115 s, of 120.
+
+**The run is now well ahead of the 3-hour curve.** £100,000 comes at 1:29, not 1:50, and Operation Value is £379k by 1:50. The criteria are "by" deadlines, so nothing fails. But with Tiers 4–5 still to come (v0.6), £1M would land long before 3:00. Most of the late surge comes from multipliers stacking from about 1:20:
+- Heat: up to ×1.5
+- Flint Glass, then Foil Wraps: ×1.5, then ×2.2
+- Overclock
+- two Classic Louisiana lines
+- a ×3 Market spike
+
+This is the open question in [HANDOVER.md](HANDOVER.md) and backlog row W7.
+

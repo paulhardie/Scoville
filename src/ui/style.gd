@@ -22,6 +22,8 @@ const CONTROL_DISABLED := Color("#181c26")
 
 ## Researched nodes, and things you can afford now.
 const ORANGE := Color("#f97316")
+## Heat, and the pinned node.
+const HEAT := Color("#ef4444")
 
 const SIZE_BODY := 22
 const SIZE_SMALL := 18

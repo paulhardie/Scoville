@@ -1,17 +1,30 @@
 extends RefCounted
 ## The pacing player (D003): a GUESS at an engaged first-time player. It only
 ## uses the game's real actions. Call step() once per tick, before the game's
-## tick(). Its policy is described in docs/FACTORY.md and docs/ECONOMY.md.
+## tick(). Its policy is described in docs/ECONOMY.md.
 
 const T = preload("res://src/core/tuning.gd")
 
 ## Taps a second (GUESS: quick but not frantic). Zero for an idle player.
 var taps_per_second := 3.0
-## Raw peppers it lets pile up before selling them all, once a vat runs.
+## Raw peppers it lets pile up before selling them all, once a vat runs (until
+## the Overflow Valve does it).
 const RAW_SELL_ABOVE := 50
-## Research in this order, as soon as each can be paid for.
-const RESEARCH := ["jalapeno_blueprint", "calloused_thumbs", "verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint", "delivery_van"]
-## Auto-Sell share for Table Mild while saving bottles for research.
+## Research in this order, saving for each in turn.
+const RESEARCH := [
+	"jalapeno_blueprint", "calloused_thumbs", "verde_blueprint", "vinegar_blueprint", "brine_blueprint",
+	"bistro_blueprint", "delivery_van", "double_tap", "slot_expansion_1", "cayenne_blueprint", "garlic_blueprint",
+	"paste_blueprint", "cayenne_mash_blueprint", "slot_expansion_2", "louisiana_blueprint", "ergonomic_grip",
+	"heat_meter", "overflow_valve", "overclock_1", "smart_stockpiling", "flint_glass", "zero_waste_1",
+	"overclock_2", "market_ticker", "slow_burn", "byproduct_recycling", "franchise_auditors", "zero_waste_2",
+	"overclock_3", "automated_piston", "foil_wraps", "hydroponic_bell", "overdrive_turbines",
+]
+## What each slot is meant to run, in buying order.
+const INTENDED := {
+	"vat": ["sweet_mash", "verde_mash", "pickled_brine", "garlic_paste", "cayenne_mash"],
+	"line": ["table_mild", "bistro_verde", "classic_louisiana", "classic_louisiana"],
+}
+## Auto-Sell share for a bottle research needs, before Smart Stockpiling.
 const SAVING_AUTOSELL := 50
 
 ## Whether it buys and researches (off when measuring a minute as things stand).
@@ -32,31 +45,56 @@ func step(g) -> void:
 		decide(g)
 
 
-## Once a second: research, sell, then buy.
+## Once a second: research, hold back what research needs, sell, then buy.
 func decide(g) -> void:
-	var now: float = g.stats.ticks * T.TICK_SECONDS
+	var now: float = g.now_seconds()
 	var target := next_research(g) if buys else ""
 	if target != "" and g.research_node(target):
 		_note(now, "research " + target)
 		target = next_research(g)
 	var need: Dictionary = g.data.tech[target].cost if target != "" and g.research_reachable(target) else {}
 
-	# Bottles: keep Table Mild back while research needs it; sell everything else.
-	if g.has_van():
-		g.set_autosell("table_mild", SAVING_AUTOSELL if need.has("table_mild") else 100)
+	# Hold back what the next research needs: pin it once Smart Stockpiling
+	# allows, otherwise turn Auto-Sell down and raise the valve's keep amounts.
+	if g.fx.stockpile:
+		g.set_pin(target if not need.is_empty() else "")
+	else:
+		if g.has_van():
+			for bottle in g.autosell:
+				g.set_autosell(bottle, SAVING_AUTOSELL if need.has(bottle) else 100)
+		if g.fx.valve:
+			for item in g.stock:
+				if g.data.items[item].kind == "bottle":
+					continue
+				if need.has(item):
+					g.set_keep(item, maxi(g.default_keep(item), need[item]))
+				elif g.keep.has(item):
+					g.clear_keep(item)
 	for bottle in g.autosell:
 		if g.stock[bottle] > 0 and not need.has(bottle):
 			g.sell_batch(bottle)
 			_note(now, "sell_batch")
-	if g.vats.is_empty() or g.stock.bell > RAW_SELL_ABOVE:
+	if not g.fx.valve and (g.vats.is_empty() or g.stock.bell > RAW_SELL_ABOVE):
 		g.sell_raw()
-	# Mash wanted for research: pause the Table Mild line until there's enough.
-	if not g.lines.is_empty():
-		var short: bool = need.has("sweet_mash") and g.stock.sweet_mash < need.sweet_mash
-		g.assign("line", 0, "" if short else "table_mild")
+	# A slot that would eat what research is short of waits, unless research
+	# also needs what it makes and is short of that too.
+	for station in INTENDED:
+		for i in g.slots(station).size():
+			var recipe: String = INTENDED[station][i]
+			if not g.recipe_unlocked(recipe):
+				continue
+			var out: String = g.data.recipes[recipe].output
+			var wanted: bool = need.has(out) and g.stock[out] < need[out]
+			var short := false
+			for item in g.recipe_inputs(recipe):
+				if need.has(item) and g.stock[item] < need[item]:
+					short = true
+			g.assign(station, i, "" if short and not wanted else recipe)
 
 	if not buys:
 		return
+	if g.activate_overdrive():
+		_note(now, "overdrive")
 	# The next station in order: buy it, or save for it if it's on offer.
 	for step in plan(g):
 		if step.done:
@@ -74,17 +112,28 @@ func decide(g) -> void:
 func plan(g) -> Array:
 	var out := []
 	out.append(_step("buy plot bell", g.plots.bell.owned, g.plot_offered("bell"), func(): return g.buy_plot("bell")))
-	out.append(_step("buy vat 1", g.vats.size() >= 1, g.slot_offered("vat"), func(): return g.buy_slot("vat")))
-	out.append(_step("buy line 1", g.lines.size() >= 1, g.slot_offered("line"), func(): return g.buy_slot("line")))
+	out.append(_slot(g, "vat", 0))
+	out.append(_slot(g, "line", 0))
 	out.append(_step("buy plot jalapeno", g.plots.jalapeno.owned, g.plot_offered("jalapeno"), func(): return g.buy_plot("jalapeno")))
-	out.append(_step("buy vat 2 (verde)", g.vats.size() >= 2, g.recipe_unlocked("verde_mash") and g.slot_offered("vat"),
-		func(): return g.buy_slot("vat") and g.assign("vat", 1, "verde_mash")))
+	out.append(_slot(g, "vat", 1))
 	out.append(_step("buy plot vinegar", g.plots.vinegar.owned, g.plot_offered("vinegar"), func(): return g.buy_plot("vinegar")))
-	out.append(_step("buy vat 3 (brine)", g.vats.size() >= 3, g.recipe_unlocked("pickled_brine") and g.slot_offered("vat"),
-		func(): return g.buy_slot("vat") and g.assign("vat", 2, "pickled_brine")))
-	out.append(_step("buy line 2 (bistro)", g.lines.size() >= 2, g.recipe_unlocked("bistro_verde") and g.slot_offered("line"),
-		func(): return g.buy_slot("line") and g.assign("line", 1, "bistro_verde")))
+	out.append(_slot(g, "vat", 2))
+	out.append(_slot(g, "line", 1))
+	out.append(_step("buy plot cayenne", g.plots.cayenne.owned, g.plot_offered("cayenne") and g.recipe_unlocked("cayenne_mash"), func(): return g.buy_plot("cayenne")))
+	out.append(_step("buy plot garlic", g.plots.garlic.owned, g.plot_offered("garlic") and g.recipe_unlocked("garlic_paste"), func(): return g.buy_plot("garlic")))
+	out.append(_slot(g, "vat", 3))
+	out.append(_slot(g, "vat", 4))
+	out.append(_slot(g, "line", 2))
+	out.append(_slot(g, "line", 3))
 	return out
+
+
+## Buying slot `index` of a station, on offer once its recipe is researched.
+func _slot(g, station: String, index: int) -> Dictionary:
+	var recipe: String = INTENDED[station][index]
+	var offered: bool = g.slots(station).size() == index and g.slot_offered(station) and g.recipe_unlocked(recipe)
+	return _step("buy %s %d (%s)" % [station, index + 1, recipe], g.slots(station).size() > index, offered,
+		func(): return g.buy_slot(station) and g.assign(station, index, recipe))
 
 
 func next_research(g) -> String:
@@ -101,7 +150,7 @@ func _buy_upgrades(g, now: float) -> void:
 		var best_cost := INF
 		for crop in g.plots:
 			if g.plots[crop].owned:
-				for upgrade in ["speed", "yield"]:
+				for upgrade in g.PLOT_UPGRADES:
 					var c: float = g.plot_upgrade_cost(crop, upgrade)
 					if c < best_cost:
 						best_cost = c

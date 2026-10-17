@@ -10,7 +10,9 @@ const S = preload("res://src/ui/style.gd")
 
 const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "roster": "Shift Roster", "hq": "HQ"}
 const STATION_NAMES := {"vat": "Vat", "line": "Line"}
-const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle"}
+const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "quality": "Crop Quality"}
+## Steps for the valve's keep amounts.
+const KEEP_STEP := 10
 
 ## Where the game saves. Tests clear it so nothing is read or written.
 var save_path := "user://save.json"
@@ -43,6 +45,14 @@ var _van_rows := {}                 # bottle → {row, slider, label}
 var _nav: PanelContainer
 var _tab_buttons := {}
 var _hint: Label
+var _spike: Label
+var _heat_bar: ProgressBar
+var _heat_label: Label
+var _overdrive := {}                # card, status, button
+var _valve_card: PanelContainer
+var _valve_rows := {}               # item → {row, label, minus, plus, toggle, reset}
+var _web_scroll: ScrollContainer
+var _web_centred := false
 var _web: WebLines
 var _web_nodes := {}                # node id → Button
 var _selected := "kitchen_table"
@@ -167,6 +177,57 @@ func _page_column(holder: Control, tab: String) -> VBoxContainer:
 
 
 func _build_processing(parent: VBoxContainer) -> void:
+	# Factory Overdrive (Overdrive Turbines): ×2 for 60 s, then a cooldown.
+	var od := PanelContainer.new()
+	od.name = "OverdriveCard"
+	od.add_theme_stylebox_override("panel", _card_box())
+	parent.add_child(od)
+	var od_row := HBoxContainer.new()
+	od.add_child(od_row)
+	var od_text := VBoxContainer.new()
+	od_text.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	od_row.add_child(od_text)
+	od_text.add_child(_label("Factory Overdrive", S.SIZE_BODY, S.TEXT))
+	var od_status := _label("", S.SIZE_SMALL, S.DIM)
+	od_text.add_child(od_status)
+	var od_button := _control_button("Overdrive", func() -> void: game.activate_overdrive())
+	od_button.name = "Overdrive"
+	od_button.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	od_row.add_child(od_button)
+	_overdrive = {"card": od, "status": od_status, "button": od_button}
+
+	# The Raw Overflow Valve's keep amounts, one row per crop and mash (D014).
+	_valve_card = PanelContainer.new()
+	_valve_card.name = "ValveCard"
+	_valve_card.add_theme_stylebox_override("panel", _card_box())
+	parent.add_child(_valve_card)
+	var valve_col := VBoxContainer.new()
+	_valve_card.add_child(valve_col)
+	valve_col.add_child(_label("Raw Overflow Valve: keep", S.SIZE_BODY, S.TEXT))
+	var hint := _label("Anything above the keep amount is sold.", S.SIZE_TINY, S.MUTED)
+	valve_col.add_child(hint)
+	for item in game.data.items:
+		if game.data.items[item].kind == "bottle":
+			continue
+		var row := HBoxContainer.new()
+		row.add_theme_constant_override("separation", 6)
+		valve_col.add_child(row)
+		var l := _label("", S.SIZE_SMALL, S.DIM)
+		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(l)
+		var minus := _small_button("−", func() -> void: game.set_keep(item, maxi(0, game.keep_amount(item) - KEEP_STEP)))
+		var plus := _small_button("+", func() -> void: game.set_keep(item, maxi(0, game.keep_amount(item)) + KEEP_STEP))
+		var toggle := _small_button("", func() -> void:
+			if game.keep_amount(item) < 0:
+				game.clear_keep(item)
+			else:
+				game.set_keep(item, -1))
+		toggle.name = "ValveToggle_" + item
+		var reset := _small_button("Default", func() -> void: game.clear_keep(item))
+		for b in [minus, plus, toggle, reset]:
+			row.add_child(b)
+		_valve_rows[item] = {"row": row, "label": l, "minus": minus, "plus": plus, "toggle": toggle, "reset": reset}
+
 	# The Delivery Van's Auto-Sell sliders, one per sauce (TECH_TREE.md).
 	_van_card = PanelContainer.new()
 	_van_card.name = "VanCard"
@@ -203,19 +264,25 @@ func _build_processing(parent: VBoxContainer) -> void:
 		b.name = "BuySlot_" + station
 		parent.add_child(b)
 		_buy_slot[station] = b
+	# The vats and lines come first; the Van's sliders and the valve after them.
+	parent.move_child(_van_card, -1)
+	parent.move_child(_valve_card, -1)
 
 
+## The Tech Tree page: the web pans in both directions above a fixed panel for
+## the selected node.
 func _build_tech(holder: Control) -> void:
-	var scroll := ScrollContainer.new()
-	scroll.name = "Page_tech"
-	scroll.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
-	holder.add_child(scroll)
-	_pages.tech = scroll
 	var col := VBoxContainer.new()
-	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	col.add_theme_constant_override("separation", 12)
-	scroll.add_child(col)
+	col.name = "Page_tech"
+	col.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	col.add_theme_constant_override("separation", 10)
+	holder.add_child(col)
+	_pages.tech = col
 	col.add_child(_label("TECH TREE", S.SIZE_SMALL, S.DIM))
+	_web_scroll = ScrollContainer.new()
+	_web_scroll.name = "WebScroll"
+	_web_scroll.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	col.add_child(_web_scroll)
 
 	# The web: node buttons on a grid around the Kitchen Table, joined by lines.
 	var lo := Vector2(INF, INF)
@@ -227,7 +294,7 @@ func _build_tech(holder: Control) -> void:
 	_web = WebLines.new()
 	_web.name = "Web"
 	_web.custom_minimum_size = (hi - lo) * S.WEB_STEP + S.WEB_NODE
-	col.add_child(_web)
+	_web_scroll.add_child(_web)
 	for id in game.data.tech_order:
 		var node: Dictionary = game.data.tech[id]
 		var b := Button.new()
@@ -262,9 +329,17 @@ func _build_tech(holder: Control) -> void:
 	_detail.cost = _label("", S.SIZE_SMALL, S.MUTED)
 	_detail.cost.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.add_child(_detail.cost)
+	var buttons := HBoxContainer.new()
+	buttons.add_theme_constant_override("separation", 8)
+	detail.add_child(buttons)
 	_detail.button = _control_button("Research", func() -> void: game.research_node(_selected))
 	_detail.button.name = "Research"
-	detail.add_child(_detail.button)
+	_detail.button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	buttons.add_child(_detail.button)
+	# Smart Stockpiling: pin the node to hold back what it needs.
+	_detail.pin = _control_button("Pin", func() -> void: game.set_pin("" if game.pin == _selected else _selected))
+	_detail.pin.name = "Pin"
+	buttons.add_child(_detail.pin)
 
 
 ## Stage 3: the bottom navigation bar, one button per tab.
@@ -318,8 +393,39 @@ func _build_upper() -> void:
 		_blank.add_theme_stylebox_override(state, box)
 	_blank.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	_blank.pressed.connect(_on_blank_pressed)
+	# Holding the button down: Ergonomic Grip presses it while held.
+	_blank.button_down.connect(func() -> void: game.set_holding(true))
+	_blank.button_up.connect(func() -> void: game.set_holding(false))
 	add_child(_blank)
 	_place_blank(false)
+
+	# The Heat Meter (D011): a bar under the button and the bonus beside it.
+	_heat_bar = ProgressBar.new()
+	_heat_bar.name = "HeatBar"
+	_heat_bar.max_value = T.HEAT_MAX
+	_heat_bar.show_percentage = false
+	_heat_bar.add_theme_stylebox_override("background", _box(S.CONTROL_DISABLED, 3))
+	_heat_bar.add_theme_stylebox_override("fill", _box(S.HEAT, 3))
+	_heat_bar.anchor_left = 0.5
+	_heat_bar.anchor_right = 0.5
+	_heat_bar.anchor_top = S.UPPER_FRACTION
+	_heat_bar.anchor_bottom = S.UPPER_FRACTION
+	_heat_bar.offset_left = -S.BLANK_BUTTON_COMPACT / 2.0
+	_heat_bar.offset_right = S.BLANK_BUTTON_COMPACT / 2.0
+	_heat_bar.offset_top = -13.0
+	_heat_bar.offset_bottom = -6.0
+	add_child(_heat_bar)
+	_heat_label = _label("", S.SIZE_SMALL, S.HEAT)
+	_heat_label.name = "HeatLabel"
+	_heat_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_heat_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_heat_label.anchor_top = S.UPPER_FRACTION
+	_heat_label.anchor_bottom = S.UPPER_FRACTION
+	_heat_label.offset_left = S.GUTTER
+	_heat_label.offset_right = S.GUTTER + S.SELL_BATCH_WIDTH
+	_heat_label.offset_bottom = -18.0 - (S.BLANK_BUTTON_COMPACT - S.SELL_BATCH_HEIGHT) / 2.0
+	_heat_label.offset_top = _heat_label.offset_bottom - S.SELL_BATCH_HEIGHT
+	add_child(_heat_label)
 
 	# Sell Batch sits beside the compact button, always in reach.
 	_sell_batch = _control_button("", func() -> void: game.sell_batch())
@@ -375,7 +481,15 @@ func _build_status_bar() -> void:
 	# Stage 3: Operation Value under Cash.
 	_ov = _label("", S.SIZE_TINY, S.DIM)
 	_ov.name = "OperationValue"
+	_ov.clip_text = true
 	money.add_child(_ov)
+	# A Market Ticker spike, while one runs.
+	_spike = _label("", S.SIZE_TINY, S.HEAT)
+	_spike.name = "Spike"
+	_spike.clip_text = true
+	money.add_child(_spike)
+	money.custom_minimum_size.x = 0
+	money.clip_contents = true
 	_sell = _control_button("Sell Raw Peppers (%s/ea)" % _money(game.value("bell")), func() -> void: game.sell_raw())
 	_sell.name = "SellRaw"
 	_sell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
@@ -479,6 +593,9 @@ func _on_blank_pressed() -> void:
 func _on_tab(tab: String) -> void:
 	if game.tab_open(tab):
 		_page = tab
+		if tab == "tech" and not _web_centred:
+			_web_centred = true
+			_centre_web.call_deferred()
 	else:
 		var at: float = T.TAB_THRESHOLDS.get(tab, INF)
 		_hint.text = "Opens at %s Operation Value%s" % [_money(at), "" if tab in T.TABS_BUILT else ", in a later version"]
@@ -496,6 +613,15 @@ func _refresh(animate: bool) -> void:
 	_cash.text = "Cash: " + _money(game.cash)
 	_ov.visible = game.nav_shown()
 	_ov.text = "Operation Value " + _money(game.operation_value())
+	_spike.visible = game.ticker.sauce != ""
+	if _spike.visible:
+		var left: float = (game.ticker.ends - game.stats.ticks) * T.TICK_SECONDS
+		_spike.text = "%s ×%d · %d min left" % [game.data.items[game.ticker.sauce].short, int(game.ticker.mult), ceili(left / 60.0)]
+	var heat_on: bool = game.fx.heat and game.revealed.deck
+	_heat_bar.visible = heat_on
+	_heat_label.visible = heat_on
+	_heat_bar.value = game.heat
+	_heat_label.text = "HEAT\n+%d%%" % roundi((game.heat_mult() - 1.0) * 100.0)
 	_sell.disabled = not game.can_sell_raw()
 	_sell_batch.visible = not game.lines.is_empty()
 	_sell_batch.text = "Sell Batch\n%s" % _money(game.bottles_value())
@@ -580,11 +706,41 @@ func _refresh_plot(crop: String) -> void:
 	for upgrade in UPGRADE_NAMES:
 		var b: Button = nodes[upgrade]
 		b.visible = p.owned
-		b.text = "%s   Lv %d   %s" % [UPGRADE_NAMES[upgrade], p[upgrade], _money(game.plot_upgrade_cost(crop, upgrade))]
+		var cost := game.plot_upgrade_cost(crop, upgrade)
+		b.text = "%s   Lv %d   %s" % [UPGRADE_NAMES[upgrade], p[upgrade], _money(cost) if cost < INF else "max"]
+		if upgrade == "quality" and p.quality > 0:
+			b.text += "   (%d%% double)" % roundi(game.quality_chance(crop) * 100.0)
 		b.disabled = not game.can_upgrade_plot(crop, upgrade)
 
 
 func _refresh_processing() -> void:
+	_overdrive.card.visible = game.fx.overdrive
+	if game.fx.overdrive:
+		if game.overdrive_active():
+			_overdrive.status.text = "Running: ×2 for %d s" % ceili((game.overdrive.until - game.stats.ticks) * T.TICK_SECONDS)
+		elif game.can_overdrive():
+			_overdrive.status.text = "Ready: ×2 vat and line speed for 60 s"
+		else:
+			var wait: int = ceili((game.overdrive.ready - game.stats.ticks) * T.TICK_SECONDS)
+			_overdrive.status.text = "Ready in %d:%02d" % [wait / 60, wait % 60]
+		_overdrive.button.disabled = not game.can_overdrive()
+	_valve_card.visible = game.fx.valve
+	if game.fx.valve:
+		for item in _valve_rows:
+			var r: Dictionary = _valve_rows[item]
+			var seen: bool = game.stock[item] > 0 or game.stats.made[item] > 0 or game.stats.harvested[item] > 0
+			r.row.visible = seen
+			var k := game.keep_amount(item)
+			var name: String = game.data.items[item].name
+			if k < 0:
+				r.label.text = "%s: not sold" % name
+			else:
+				r.label.text = "%s: %d%s" % [name, k, "" if game.keep.has(item) else " (default)"]
+			if game.pinned_need(item) > k and k >= 0:
+				r.label.text += ", pinned %d" % game.pinned_need(item)
+			r.toggle.text = "On" if k < 0 else "Off"
+			r.minus.disabled = k <= 0
+			r.reset.disabled = not game.keep.has(item)
 	_van_card.visible = game.has_van()
 	if game.has_van():
 		for item in _van_rows:
@@ -629,9 +785,10 @@ func _refresh_slot(station: String, i: int) -> void:
 		nodes.bar.value = 0.0
 	else:
 		var r: Dictionary = game.data.recipes[s.recipe]
+		var inputs := game.recipe_inputs(s.recipe)
 		var ins := []
-		for item in r.inputs:
-			var n: int = r.inputs[item]
+		for item in inputs:
+			var n: int = inputs[item]
 			ins.append("%d %s" % [n, game.data.items[item].name if n == 1 else game.data.items[item].plural])
 		var out: Dictionary = game.data.items[r.output]
 		var worth := " (%s)" % _money(out.value) if out.kind == "bottle" else ""
@@ -663,6 +820,8 @@ func _refresh_tech() -> void:
 			edge = S.ORANGE
 		elif reachable:
 			fill = S.CONTROL
+		if id == game.pin:
+			edge = S.HEAT
 		var box := _box(fill, 10)
 		box.border_color = S.TEXT if id == _selected else edge
 		box.set_border_width_all(3 if id == _selected else 2)
@@ -695,6 +854,21 @@ func _refresh_tech() -> void:
 		_detail.cost.text = "Costs " + ", ".join(costs) + (".  Needs %s first." % ", ".join(needs) if not needs.is_empty() else ".")
 	_detail.button.visible = not game.is_researched(_selected)
 	_detail.button.disabled = not game.can_research(_selected)
+	_detail.pin.visible = game.fx.stockpile and not game.is_researched(_selected)
+	_detail.pin.text = "Unpin" if game.pin == _selected else "Pin"
+	if game.pin != "" and game.pin == _selected:
+		_detail.cost.text += "  Pinned: what it needs is held back."
+
+
+## Scrolls the web so the Kitchen Table is in the middle, once the page has
+## been laid out.
+func _centre_web() -> void:
+	await get_tree().process_frame
+	await get_tree().process_frame
+	var b: Button = _web_nodes.kitchen_table
+	var centre := b.position + S.WEB_NODE / 2.0
+	_web_scroll.scroll_horizontal = int(centre.x - _web_scroll.size.x / 2.0)
+	_web_scroll.scroll_vertical = int(centre.y - _web_scroll.size.y / 2.0)
 
 
 func _effect_text(node: Dictionary) -> String:
@@ -711,6 +885,38 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Auto-Sell sliders: finished bottles sell the moment they're made.")
 		elif e.has("tap_yield"):
 			out.append("+%d Bell Peppers a press of the button." % int(e.tap_yield))
+		elif e.has("double_tap"):
+			out.append("%d%% of presses count twice." % roundi(e.double_tap * 100.0))
+		elif e.has("grip"):
+			out.append("Holding the button presses it %d times a second." % int(e.grip))
+		elif e.has("heat_meter"):
+			out.append("Pressing builds Heat, up to +50% on every sale while you keep it up.")
+		elif e.has("heat_drain"):
+			out.append("Heat drains half as fast.")
+		elif e.has("overclock"):
+			out.append("Each press takes %.2f s off every running vat and line." % e.overclock)
+		elif e.has("piston"):
+			out.append("Presses the button once a second, always, with every button perk.")
+		elif e.has("plot_speed"):
+			out.append("The %s Plot runs %d× faster." % [game.data.items[e.plot_speed.crop].name, int(e.plot_speed.mult)])
+		elif e.has("slot_cap"):
+			out.append("One more vat slot and one more line slot.")
+		elif e.has("packaging"):
+			out.append("Every bottle is worth %.1f× (packaging, every line)." % e.packaging)
+		elif e.has("input_reduction"):
+			out.append("Vats need %d%% fewer raw crops." % roundi(e.input_reduction * 100.0))
+		elif e.has("overdrive"):
+			out.append("Vats and lines +25% faster, and the Factory Overdrive button: ×2 for 60 s, every 15 minutes.")
+		elif e.has("overflow_valve"):
+			out.append("Crops and mash above their keep amount sell automatically.")
+		elif e.has("smart_stockpiling"):
+			out.append("Pin a node to hold back the bottles, mash and crops it needs.")
+		elif e.has("market_ticker"):
+			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
+		elif e.has("byproduct_recycling"):
+			out.append("Vat cycles can give your lowest-level plot a free level, up to one a minute.")
+		elif e.has("stock_value_bonus"):
+			out.append("Stock counts %d%% more in Operation Value." % roundi(e.stock_value_bonus * 100.0))
 	return " ".join(out)
 
 
@@ -764,6 +970,17 @@ func _control_button(text: String, action: Callable) -> Button:
 	b.pressed.connect(func() -> void:
 		action.call()
 		_refresh(true))
+	return b
+
+
+## A compact button for rows of controls.
+func _small_button(text: String, action: Callable) -> Button:
+	var b := _control_button(text, action)
+	b.add_theme_font_size_override("font_size", S.SIZE_TINY)
+	for state in ["normal", "hover", "pressed", "disabled"]:
+		var box: StyleBoxFlat = b.get_theme_stylebox(state).duplicate()
+		box.set_content_margin_all(6)
+		b.add_theme_stylebox_override(state, box)
 	return b
 
 

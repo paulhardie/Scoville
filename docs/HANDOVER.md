@@ -2,32 +2,34 @@
 
 ## Where it's at
 
-Built: v0.1–v0.3 (PRs #1–#4, waiting to merge); v0.3 details in [FACTORY.md](FACTORY.md#v03-slots-recipes-and-tier-2). D008 (Calloused Thumbs) is confirmed.
+v0.4 Tech Tree is built, on top of v0.1–v0.3 (PRs #1–#5, still to merge). The tree has 34 nodes.
+- **North Wing:** Double-Tap, Ergonomic Grip (hold the button), Heat (a bar under the button, up to +50% on every sale), Slow Burn, Overclock I–III, and the Automated Piston.
+- **East Wing:** Tier 3 (Cayenne, Garlic, Roasted Garlic Paste, Cayenne Mash, Classic Louisiana at £140) and Hydroponic Bell Peppers.
+- **South Wing:** Slot Expansion I–II (caps 5 and 4), Heavy Flint Glass and Foil Neck Wraps, Zero-Waste Piping I–II, and Overdrive Turbines with the Factory Overdrive button.
+- **West Wing:** the Raw Overflow Valve with keep amounts, Smart Stockpiling (pins), and the Market Ticker.
+- **Bridges:** Byproduct Recycling and Franchise Auditors.
+- **Also:** Crop Quality on every plot, one seeded random stream, and saves at v4 (migrating v1–v3).
 
-This branch is design only: G9 and G10 are settled and v0.4 is drafted.
-- **D010, the tree for v0.4:** 26 nodes across the four wings and two bridges. Nodes needing later systems wait for their version. Costs are about 2–4 minutes of what they're paid in, rising to about 8 on the outer rim.
-- **D011, Heat:** +5 a press, −12 a second (−6 with Slow Burn), up to +50% on all sale cash. 3 presses a second hold it; the Piston alone can't.
-- **The six gaps found on the way:**
-  - D012: packaging is one global tier.
-  - D013: Byproduct Recycling gives at most one level a minute.
-  - D014: the Overflow Valve keeps an amount of each item.
-  - D015: one Market Ticker spike at a time, about hourly.
-  - D016: Crop Quality doubles a harvest, 3% a level up to 30%.
-  - D017: one seeded random stream, saved.
-- **v0.4 drafts:**
-  - [TECH_TREE.md](TECH_TREE.md#v04-the-rest-of-the-tree-draft): every node with cost, effect, expected time and place in the web; Heat; rules R5–R18 and H1–H3.
-  - [FACTORY.md](FACTORY.md#v04-tier-3-and-the-factory-upgrades-draft): Tier 3 numbers, Crop Quality, save v4, S7–S10.
-  - [ECONOMY.md](ECONOMY.md#criteria-v04-draft): pacing M1–M7 over 110 minutes.
+Checks:
+- All criteria pass: R5–R18, H1–H3, S7–S10, pacing M1–M7, and v0.2–v0.3's F1–F8 and N1–N8.
+- 535 rule and screen checks.
+- The headless boot is clean and the web export works.
+- Every new screen was captured and looked at.
+
+What moved from the draft:
+- Cheaper Tier 3 research and stations.
+- The pacing player's research order and saving rules.
+
+The details are in [TECH_TREE.md](TECH_TREE.md#v04-the-rest-of-the-tree), [FACTORY.md](FACTORY.md#v04-tier-3-and-the-factory-upgrades) and [ECONOMY.md](ECONOMY.md#results-v04).
 
 ## Open decisions
 
-- **Review the v0.4 drafts.** Node costs and Tier 3 prices are starting guesses. As with v0.3, expect the build to move some of them and report what moved.
-- **Heat's place on screen:** the brief puts the meter under the button, which sits at the foot of the upper viewport. Expect a thin bar between the button and the deck, judged from captures in the build.
+- **W7: the run is ahead of the 3-hour curve.** £100k arrives at 1:29 (target 1:50), and it's £379k by 1:50, because Heat, packaging, Overclock and a second Louisiana line stack from about 1:20. Recommendation: wait for v0.6. When Tiers 4–5 and Prestige exist, set the whole curve against D005 with "not before" bounds as well as deadlines. Retuning now would have to be redone once Tiers 4–5 land.
 - **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0.
 
 ## Next
 
-1. Build v0.4 against R5–R18, H1–H3, S7–S10 and M1–M7, with F1–F8 and N1–N8 kept.
+1. Settle G11 (offline cap and speed) for v0.5 Offline.
 2. W1: open the Web build on a phone.
 
-Touches: docs only (decisions D008 confirmed and D010–D017, roadmap, backlog, three design docs). Stubbed: none new. Next: build v0.4, since every gap it needs is now settled.
+Touches: data (Tier 3, 26 nodes, slot caps), the simulation (Heat, presses, effects, valve, pins, market, Overdrive, Crop Quality, random stream, save v4), the pacing player, the screen, and docs. Stubbed or open: W1–W7. Next: G11, because v0.5 can't be built without it.

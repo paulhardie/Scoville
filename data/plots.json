@@ -1,0 +1,8 @@
+{
+	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md). `unlocked` plots need no blueprint.",
+	"plots": [
+		{"crop": "bell", "price": 10.0, "seconds": 2.0, "yield": 1, "unlocked": true},
+		{"crop": "jalapeno", "price": 100.0, "seconds": 2.0, "yield": 3},
+		{"crop": "vinegar", "price": 120.0, "seconds": 2.0, "yield": 2}
+	]
+}

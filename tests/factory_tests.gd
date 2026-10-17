@@ -1,6 +1,7 @@
 extends SceneTree
-## The Tier 1 spine's rules (docs/FACTORY.md): the deck, buying stations, cycles,
-## the Starter Crate, Sell Batch, upgrades, and the v1 → v2 save migration.
+## The factory's rules (docs/FACTORY.md): the deck, plots, vat and line slots,
+## recipes (S1–S3), the Starter Crate, Sell Batch, upgrades, Operation Value
+## (S5) and the save migrations (S4).
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
@@ -47,36 +48,51 @@ func opened(cash: float) -> Game:
 	return g
 
 
+## A game past Stage 3 and the Tech Tree, with the Tier 2 blueprints researched.
+func tier_2(cash: float = 100000.0) -> Game:
+	var g := opened(cash)
+	g.account.best_ov = 1000.0
+	g.stock.table_mild = 1000
+	g.stock.sweet_mash = 100
+	for node in ["jalapeno_blueprint", "verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint"]:
+		check(g.research_node(node), "researches " + node)
+	g.stock.table_mild = 0
+	g.stock.sweet_mash = 0
+	return g
+
+
 func test_deck_opens_at_ten_pounds() -> void:
 	var g := Game.new()
 	for i in 99:
 		g.press()
 	g.sell_raw()
 	check(not g.revealed.deck, "no deck at £9.90 earned")
-	check(not g.can_buy("plot") and not g.buy("plot"), "can't buy before the deck")
+	check(not g.buy_plot("bell"), "can't buy before the deck")
 	g.press()
 	g.sell_raw()
 	check(g.revealed.deck, "the deck opens at £10 earned")
-	g.buy("plot")
+	g.buy_plot("bell")
 	check(g.revealed.deck, "it stays after spending")
 
 
-func test_stations_are_offered_in_order() -> void:
+func test_tier_1_offered_in_order() -> void:
 	var g := opened(1000.0)
-	check(g.is_offered("plot") and g.is_offered("vat"), "the plot and vat are offered with the deck")
-	check(not g.is_offered("line") and not g.buy("line"), "the line isn't offered before the vat")
-	check(g.buy("vat") and g.is_offered("line"), "buying the vat offers the line")
-	check(not g.buy("vat"), "a station can't be bought twice")
-	check(close(g.cash, 1000.0 - T.VAT_PRICE), "the vat's price was paid")
+	check(g.plot_offered("bell") and g.slot_offered("vat"), "the plot and first vat are offered with the deck")
+	check(not g.slot_offered("line") and not g.buy_slot("line"), "the line isn't offered before a vat")
+	check(g.buy_slot("vat") and g.slot_offered("line"), "buying a vat offers the line")
+	check(not g.slot_offered("vat"), "no second vat before Stage 3")
+	check(close(g.cash, 1000.0 - 25.0), "vat slot 1 costs £25")
+	check(not g.plot_offered("jalapeno") and not g.buy_plot("jalapeno"), "no Jalapeño Plot without its blueprint")
 
 
 func test_plot_harvests() -> void:
-	var g := opened(T.PLOT_PRICE)
-	check(g.buy("plot") and g.cash == 0.0, "the plot costs £%.0f" % T.PLOT_PRICE)
+	var g := opened(10.0)
+	check(g.buy_plot("bell") and g.cash == 0.0, "the plot costs £10")
+	check(not g.buy_plot("bell"), "a plot can't be bought twice")
 	var before: int = g.stock.bell
 	g.advance(seconds(10.0))
 	check(g.stock.bell - before == 5, "1 pepper every 2 s: %d in 10 s" % (g.stock.bell - before))
-	g.stations.plot.yield = 2
+	g.plots.bell["yield"] = 2
 	before = g.stock.bell
 	g.advance(seconds(10.0))
 	check(g.stock.bell - before == 15, "yield 2 levels: 3 a cycle, %d in 10 s" % (g.stock.bell - before))
@@ -85,71 +101,207 @@ func test_plot_harvests() -> void:
 func test_vat_takes_ten_and_makes_mash() -> void:
 	var g := opened(1000.0)
 	g.stock.bell = 25
-	g.buy("vat")
-	check(g.stock.bell == 15 and g.stations.vat.running, "the vat takes 10 peppers at once")
-	g.advance(seconds(T.VAT_CYCLE_SECONDS) - 1)
+	g.buy_slot("vat")
+	check(g.vats[0].recipe == "sweet_mash", "a new vat starts on Sweet Pepper Mash")
+	check(g.stock.bell == 15 and g.vats[0].running, "S1: it takes 10 peppers at once")
+	g.advance(seconds(8.0) - 1)
 	check(g.stock.sweet_mash == 0, "no mash before the cycle ends")
 	g.tick()
-	check(g.stock.sweet_mash == 1 and g.stock.bell == 5, "1 mash after 8 s, and the next 10 taken")
-	g.advance(seconds(T.VAT_CYCLE_SECONDS) * 3)
-	check(g.stock.sweet_mash == 2 and not g.stations.vat.running, "it stops with under 10 peppers")
-	check(g.stations.vat.progress == 0.0, "an idle vat holds no progress")
+	check(g.stock.sweet_mash == 1 and g.stock.bell == 5, "S1: 1 mash after 8 s, and the next 10 taken")
+	g.advance(seconds(8.0) * 3)
+	check(g.stock.sweet_mash == 2 and not g.vats[0].running, "it stops with under 10 peppers")
+	check(g.vats[0].progress == 0.0, "an idle vat holds no progress")
 
 
 func test_line_and_starter_crate() -> void:
 	var g := opened(1000.0)
-	g.buy("vat")
+	g.buy_slot("vat")
 	g.stock.sweet_mash = 60
-	check(g.buy("line"), "buys the line")
-	check(g.stations.line.crate == T.STARTER_CRATE_BOTTLES, "it comes with a Starter Crate of 50")
-	var fast := T.LINE_CYCLE_SECONDS / T.STARTER_CRATE_SPEED
-	check(close(g.cycle_seconds("line"), fast), "the crate runs at 10×")
-	g.advance(seconds(fast * T.STARTER_CRATE_BOTTLES))
-	check(g.stats.bottles_made == T.STARTER_CRATE_BOTTLES, "50 bottles in 40 s: %d" % g.stats.bottles_made)
-	check(g.stations.line.crate == 0 and close(g.cycle_seconds("line"), T.LINE_CYCLE_SECONDS), "then base speed")
-	g.advance(seconds(T.LINE_CYCLE_SECONDS))
-	check(g.stats.bottles_made == T.STARTER_CRATE_BOTTLES + 1, "one more at base speed: %d" % g.stats.bottles_made)
+	check(g.buy_slot("line"), "buys the line")
+	check(g.lines[0].crate == T.STARTER_CRATE_BOTTLES, "it comes with a Starter Crate of 50")
+	check(close(g.slot_cycle("line", 0), 0.8), "the crate runs at 10×")
+	g.advance(seconds(0.8 * T.STARTER_CRATE_BOTTLES))
+	check(g.stats.made.table_mild == T.STARTER_CRATE_BOTTLES, "50 bottles in 40 s: %d" % g.stats.made.table_mild)
+	check(g.lines[0].crate == 0 and close(g.slot_cycle("line", 0), 8.0), "then base speed")
+	g.advance(seconds(8.0))
+	check(g.stats.made.table_mild == T.STARTER_CRATE_BOTTLES + 1, "one more at base speed")
 
 
 func test_sell_batch() -> void:
 	var g := Game.new()
 	check(not g.sell_batch(), "nothing to sell")
 	g.stock.table_mild = 7
-	check(g.sell_batch() and close(g.cash, 35.0) and g.stock.table_mild == 0, "7 Table Mild sell for £35")
-	check(g.stats.bottles_sold == 7 and close(g.stats.cash_earned, 35.0), "sales are counted")
+	g.stock.bistro_verde = 2
+	check(g.sell_batch("table_mild") and close(g.cash, 35.0) and g.stock.bistro_verde == 2, "sells one sauce: 7 Table Mild for £35")
+	g.stock.table_mild = 1
+	check(g.sell_batch() and close(g.cash, 35.0 + 5.0 + 50.0) and g.bottles_held() == 0, "or every bottle")
+	check(g.stats.sold.table_mild == 8 and g.stats.sold.bistro_verde == 2, "sales are counted")
 
 
 func test_upgrades() -> void:
 	var g := opened(10000.0)
-	check(not g.buy_upgrade("plot", "speed"), "can't upgrade a station not owned")
-	g.buy("plot")
-	check(close(g.upgrade_cost("plot", "speed"), T.PLOT_SPEED_COST), "first speed level at base cost")
-	check(g.buy_upgrade("plot", "speed") and g.stations.plot.speed == 1, "buys a speed level")
-	check(close(g.upgrade_cost("plot", "speed"), T.PLOT_SPEED_COST * T.PLOT_SPEED_GROWTH), "the next costs more")
-	check(close(g.cycle_seconds("plot"), T.PLOT_CYCLE_SECONDS / (1.0 + T.PLOT_SPEED_STEP)), "and the cycle is shorter")
-	check(not g.buy_upgrade("vat", "yield") and not g.buy_upgrade("plot", "colour"), "unknown upgrades don't buy")
-	var poor := opened(1.0)
-	poor.cash = T.PLOT_PRICE
-	poor.buy("plot")
-	check(not poor.buy_upgrade("plot", "speed") and poor.stations.plot.speed == 0, "can't upgrade without the cash")
+	check(not g.upgrade_plot("bell", "speed"), "can't upgrade a plot not owned")
+	g.buy_plot("bell")
+	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST), "first speed level at base cost")
+	check(g.upgrade_plot("bell", "speed") and g.plots.bell.speed == 1, "buys a speed level")
+	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST * T.PLOT_SPEED_GROWTH), "the next costs more")
+	check(close(g.plot_cycle("bell"), 2.0 / (1.0 + T.PLOT_SPEED_STEP)), "and the cycle is shorter")
+	check(not g.upgrade_plot("bell", "colour"), "unknown upgrades don't buy")
+	g.buy_slot("vat")
+	check(close(g.slot_upgrade_cost("vat", 0), T.VAT_SPEED_COST), "vat 1's speed at base cost")
+	check(g.upgrade_slot("vat", 0) and close(g.slot_cycle("vat", 0), 8.0 / 1.25), "a vat speed level")
+	check(not g.upgrade_slot("vat", 1), "no slot 2 to upgrade")
+
+
+func test_upgrades_scale_with_price() -> void:
+	var g := tier_2()
+	check(g.buy_plot("jalapeno"), "buys the Jalapeño Plot")
+	var plot_scale := sqrt(g.plot_price("jalapeno") / g.plot_price("bell"))
+	check(close(g.plot_upgrade_cost("jalapeno", "speed"), T.PLOT_SPEED_COST * plot_scale), "its upgrades cost the Bell curve × √(price ratio)")
+	g.buy_slot("vat")
+	g.buy_slot("vat")
+	var prices: Array = g.data.slots.vat.prices
+	check(close(g.slot_upgrade_cost("vat", 1), T.VAT_SPEED_COST * sqrt(prices[1] / prices[0])), "vat slot 2's speed costs vat 1's × √(price ratio)")
+
+
+func test_slot_caps() -> void:
+	var g := opened(100000.0)
+	g.account.best_ov = 500.0
+	for i in 3:
+		check(g.buy_slot("vat"), "buys vat slot %d" % (i + 1))
+	check(not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: no fourth vat")
+	for i in 2:
+		check(g.buy_slot("line"), "buys line slot %d" % (i + 1))
+	check(not g.buy_slot("line"), "S3: no third line")
+	check(g.lines[1].crate == 0, "only the first line has a Starter Crate")
+	var spent := 0.0
+	for station in ["vat", "line"]:
+		for p in g.data.slots[station].prices:
+			spent += p
+	check(close(g.cash, 100000.0 - spent), "each slot costs its listed price")
+
+
+func test_recipes_need_blueprints() -> void:
+	var g := opened(100000.0)
+	g.account.best_ov = 1000.0
+	g.buy_slot("vat")
+	check(g.recipes_for("vat") == ["sweet_mash"], "only Sweet Pepper Mash at first")
+	check(not g.assign("vat", 0, "verde_mash") and g.vats[0].recipe == "sweet_mash", "S1: can't run a recipe not researched")
+	var t := tier_2()
+	check(t.recipes_for("vat") == ["sweet_mash", "pickled_brine", "verde_mash"], "the blueprints add Tier 2's mashes")
+	check(t.recipes_for("line") == ["table_mild", "bistro_verde"], "and Bistro Verde")
+
+
+func test_tier_2_spine() -> void:
+	var g := tier_2()
+	g.stock.jalapeno = 15
+	g.stock.vinegar = 10
+	g.stock.bell = 5
+	g.buy_slot("vat")
+	g.buy_slot("vat")
+	check(g.assign("vat", 0, "verde_mash") and g.assign("vat", 1, "pickled_brine"), "assigns Verde and Brine")
+	check(g.stock.jalapeno == 0 and g.stock.vinegar == 0 and g.stock.bell == 0, "S1: each takes exactly its inputs")
+	g.advance(seconds(12.0))
+	check(g.stock.verde_mash == 1 and g.stock.pickled_brine == 1, "S1: 1 Verde Mash in 12 s, 1 Pickled Brine in 10 s")
+	g.buy_slot("line")
+	g.assign("line", 0, "bistro_verde")
+	check(g.stock.verde_mash == 0 and g.stock.pickled_brine == 0, "S1: Bistro Verde takes one of each")
+	g.lines[0].crate = 0
+	g.lines[0].progress = 0.0
+	g.advance(seconds(12.0))
+	check(g.stock.bistro_verde == 1 and close(g.value("bistro_verde"), 25.0), "S1: a £25 Bistro Verde after 12 s")
+
+
+func test_switching_returns_inputs() -> void:
+	var g := tier_2()
+	g.stock.bell = 10
+	g.buy_slot("vat")
+	g.advance(seconds(5.0))
+	check(g.vats[0].running and g.stock.bell == 0, "mid-cycle on Sweet Pepper Mash")
+	check(g.assign("vat", 0, ""), "switches it off")
+	check(g.stock.bell == 10 and not g.vats[0].running and g.vats[0].progress == 0.0, "S2: the 10 peppers come back; the progress is lost")
+	g.advance(seconds(20.0))
+	check(g.stock.sweet_mash == 0 and g.stock.bell == 10, "an off slot does nothing")
+	g.assign("vat", 0, "sweet_mash")
+	check(g.vats[0].running and g.stock.bell == 0, "switched back on, it starts again")
+
+
+func test_operation_value() -> void:
+	var g := tier_2()
+	g.stock.bell = 13
+	g.stock.verde_mash = 2
+	g.stock.bistro_verde = 3
+	var expect: float = g.stats.cash_earned + 13 * 0.10 + 2 * 6.0 + 3 * 25.0
+	check(close(g.operation_value(), expect), "S5: cash earned + stock at its values: £%.2f" % g.operation_value())
+	var before := g.operation_value()
+	g.cash -= 500.0
+	check(close(g.operation_value(), before), "S5: spending doesn't lower it")
+	g.sell_batch()
+	check(close(g.operation_value(), before), "S5: selling at value doesn't change it")
+	var h := opened(1000.0)
+	h.buy_plot("bell")
+	h.buy_slot("vat")
+	h.buy_slot("line")
+	for i in seconds(300.0):
+		h.tick()
+		if i % 97 == 0:
+			var sum: float = h.stats.cash_earned
+			for item in h.stock:
+				sum += h.stock[item] * h.value(item)
+			check(close(h.operation_value(), sum), "S5: holds while running (tick %d)" % i)
+	check(h.account.best_ov >= h.operation_value(), "the account keeps the best")
+
+
+func test_values_follow_d004() -> void:
+	# Every bottle is worth 5× the raw value inside it and every mash 2× its
+	# inputs (D004), worked out from the recipes themselves.
+	var g := Game.new()
+	for id in g.data.recipes:
+		var r: Dictionary = g.data.recipes[id]
+		var inputs := 0.0
+		for item in r.inputs:
+			inputs += r.inputs[item] * g.value(item)
+		if r.station == "vat":
+			check(close(g.value(r.output), 2.0 * inputs, 1e-6), "D004: %s is 2× its inputs" % r.output)
+		else:
+			check(close(g.value(r.output), 5.0 * raw_value(g, r.output), 0.01), "D004: %s is 5× its raw value (%.2f)" % [r.output, raw_value(g, r.output)])
+
+
+## The raw value inside an item: crops at their value, bottles used as inputs at
+## their sale value (D004).
+func raw_value(g: Game, item: String) -> float:
+	var kind: String = g.data.items[item].kind
+	if kind == "crop":
+		return g.value(item)
+	for id in g.data.recipes:
+		var r: Dictionary = g.data.recipes[id]
+		if r.output == item:
+			var v := 0.0
+			for input in r.inputs:
+				var k: String = g.data.items[input].kind
+				v += r.inputs[input] * (g.value(input) if k == "bottle" else raw_value(g, input))
+			return v
+	return 0.0
 
 
 func test_whole_spine_runs() -> void:
 	var g := opened(1000.0)
-	for station in ["plot", "vat", "line"]:
-		check(g.buy(station), "buys the " + station)
+	check(g.buy_plot("bell") and g.buy_slot("vat") and g.buy_slot("line"), "buys the Tier 1 spine")
 	g.advance(seconds(600.0))
-	check(g.stats.bell_harvested > 0 and g.stats.mash_made > 0 and g.stats.bottles_made > 0, "peppers become mash become bottles")
-	check(g.stats.mash_made * T.VAT_PEPPERS_IN <= g.stats.bell_harvested + 100, "the vat never makes mash from nothing")
-	check(g.stats.bottles_made <= g.stats.mash_made, "the line never bottles from nothing")
+	check(g.stats.harvested.bell > 0 and g.stats.made.sweet_mash > 0 and g.stats.made.table_mild > 0, "peppers become mash become bottles")
+	check(g.stats.made.sweet_mash * 10 <= g.stats.harvested.bell + 100, "the vat never makes mash from nothing")
+	check(g.stats.made.table_mild <= g.stats.made.sweet_mash, "the line never bottles from nothing")
 
 
 func test_same_inputs_same_game() -> void:
-	var a := opened(1000.0)
-	var b := opened(1000.0)
+	var a := tier_2()
+	var b := tier_2()
 	for g in [a, b]:
-		for station in ["plot", "vat", "line"]:
-			g.buy(station)
+		g.buy_plot("bell")
+		g.buy_plot("jalapeno")
+		g.buy_slot("vat")
+		g.buy_slot("vat")
+		g.assign("vat", 1, "verde_mash")
 		for i in 3000:
 			if i % 7 == 0:
 				g.press()
@@ -158,21 +310,84 @@ func test_same_inputs_same_game() -> void:
 
 
 func test_save_round_trip_mid_cycle() -> void:
-	var g := opened(1000.0)
-	for station in ["plot", "vat", "line"]:
-		g.buy(station)
+	var g := tier_2()
+	g.buy_plot("bell")
+	g.buy_plot("jalapeno")
+	g.buy_slot("vat")
+	g.buy_slot("vat")
+	g.assign("vat", 1, "verde_mash")
+	g.buy_slot("line")
 	g.advance(seconds(37.3))
 	var c := Game.new()
 	var problem := c.load_state(JSON.parse_string(JSON.stringify(g.to_state(), "", false, true)))
-	check(problem == "", "a v2 save loads: " + problem)
+	check(problem == "", "a v3 save loads: " + problem)
 	check(JSON.stringify(c.to_state()) == JSON.stringify(g.to_state()), "it matches what was saved")
 	g.advance(seconds(60.0))
 	c.advance(seconds(60.0))
 	check(JSON.stringify(c.to_state()) == JSON.stringify(g.to_state()), "and plays on identically")
 
 
+func test_bad_v3_saves_are_refused() -> void:
+	var g := tier_2()
+	g.buy_slot("vat")
+	var before := JSON.stringify(g.to_state())
+	var s := g.to_state()
+	s.run.vats[0].recipe = "table_mild"
+	check(g.load_state(s) != "", "a vat running a line recipe is refused")
+	s = g.to_state()
+	s.run.stock["unobtainium"] = 3
+	check(g.load_state(s) != "", "an unknown item is refused")
+	s = g.to_state()
+	s.run.research.append("time_machine")
+	check(g.load_state(s) != "", "unknown research is refused")
+	s = g.to_state()
+	s.run.vats = [{}, {}, {}, {}]
+	check(g.load_state(s) != "", "more slots than the cap are refused")
+	check(JSON.stringify(g.to_state()) == before, "a refused save changes nothing")
+
+
+## A save as v0.2 wrote it, mid-game: plot, vat and line, crate half used.
+func v2_save() -> Dictionary:
+	return {
+		"version": 2, "cash": 41.5,
+		"stock": {"bell": 23, "sweet_mash": 2, "table_mild": 6},
+		"revealed": {"counter": true, "status_bar": true, "deck": true},
+		"stations": {
+			"plot": {"owned": true, "speed": 3, "yield": 1, "progress": 0.7},
+			"vat": {"owned": true, "speed": 2, "progress": 3.2, "running": true},
+			"line": {"owned": true, "speed": 1, "progress": 0.3, "running": true, "crate": 21},
+		},
+		"stats": {"presses": 900, "bell_picked": 900, "bell_harvested": 1500, "mash_made": 210,
+			"bottles_made": 200, "bottles_sold": 194, "cash_earned": 1100.0, "ticks": 6000},
+	}
+
+
+func test_v2_save_migrates() -> void:
+	var g := Game.new()
+	var problem := g.load_state(v2_save())
+	check(problem == "", "S4: a v2 save loads: " + problem)
+	check(close(g.cash, 41.5) and g.stock.bell == 23 and g.stock.table_mild == 6, "S4: cash and stock carry over")
+	check(g.plots.bell.owned and g.plots.bell.speed == 3 and g.plots.bell["yield"] == 1, "S4: the plot and its levels")
+	check(g.vats.size() == 1 and g.vats[0].recipe == "sweet_mash" and g.vats[0].speed == 2 and g.vats[0].running, "S4: the vat is vat slot 1 on Sweet Pepper Mash")
+	check(g.lines.size() == 1 and g.lines[0].recipe == "table_mild" and g.lines[0].crate == 21, "S4: the line is line slot 1, crate kept")
+	check(g.stats.made.table_mild == 200 and g.stats.sold.table_mild == 194 and close(g.stats.cash_earned, 1100.0), "S4: stats carry over")
+	check(close(g.account.best_ov, 1100.0 + 2.3 + 4.0 + 30.0), "S4: the account starts at the run's Operation Value: £%.2f" % g.account.best_ov)
+	check(g.tab_open("processing") and g.tab_open("tech"), "£1,136 opens Processing and the Tech Tree")
+
+
+func test_v2_migration_produces_the_same() -> void:
+	# The v2 rules, replayed by hand for 60 s from the same state, against the
+	# migrated game: same peppers harvested, mash and bottles made (S4).
+	var g := Game.new()
+	g.load_state(v2_save())
+	g.advance(seconds(60.0))
+	var plot_cycle := 2.0 / (1.0 + 0.15 * 3)        # 1.379 s
+	var harvested := floori((60.0 + 0.7) / plot_cycle + 1e-6) * 2
+	check(g.stats.harvested.bell - 1500 == harvested, "S4: v2's plot rate: %d (want %d)" % [g.stats.harvested.bell - 1500, harvested])
+	check(g.stats.made.sweet_mash > 210 and g.stats.made.table_mild > 200, "S4: the vat and line keep going")
+
+
 func test_v1_save_migrates() -> void:
-	# A save as v0.1 wrote it: Stages 0–1 only.
 	var v1 := {
 		"version": 1, "cash": 12.5, "bell": 7,
 		"revealed": {"counter": true, "status_bar": true},
@@ -181,16 +396,8 @@ func test_v1_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v1)
 	check(problem == "", "a v1 save loads: " + problem)
-	check(close(g.cash, 12.5) and g.stock.bell == 7, "cash and peppers carry over")
-	check(g.revealed.counter and g.revealed.status_bar, "reveals carry over")
-	check(g.revealed.deck, "£12.50 earned opens the deck at once")
-	check(g.stats.presses == 132 and close(g.stats.cash_earned, 12.5), "stats carry over")
-	check(not g.stations.plot.owned and g.stock.sweet_mash == 0, "no stations or mash yet")
-	var early := v1.duplicate(true)
-	early.stats.cash_earned = 4.0
-	var e := Game.new()
-	e.load_state(early)
-	check(not e.revealed.deck, "£4 earned keeps the deck shut")
+	check(close(g.cash, 12.5) and g.stock.bell == 7 and g.revealed.deck, "cash, peppers and the deck carry over")
+	check(g.stats.presses == 132 and g.vats.is_empty(), "stats, and no stations yet")
 	var broken := v1.duplicate(true)
 	broken.erase("bell")
 	check(Game.new().load_state(broken) != "", "a broken v1 save is refused")

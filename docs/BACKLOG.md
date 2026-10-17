@@ -9,7 +9,7 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | G1 | Platform: native iOS and Android builds, or the Web build (as a phone PWA) until v1.0? Native needs Xcode, the Android SDK and signing. | v1.0 (testing now) | Open: recommend Web for testing, native from v1.0 |
 | G2 | Title: the brief says Hot Sauce Empire, the repository is Scoville. | — | Assumed: the game is Hot Sauce Empire, the project is Scoville |
 | G4 | Farm, vat and line numbers: cycle times, yields, prices and upgrade curves are drafted in [FACTORY.md](FACTORY.md) and pass its criteria. Still open: what Crop Quality Chance does. | v0.2 (review); v0.4 (Crop Quality) | Drafted: owner to review |
-| G15 | Vat and line slots: the brief has "Parallel Vat Slots" as a cash knob and Slot Expansion as a Tech Tree unlock, but no base cap. Assumed 3 vat and 2 line slots in run 1, each assigned a recipe ([FACTORY.md](FACTORY.md#v03-slots-recipes-and-tier-2-draft)). | v0.3 | Assumed: owner to review |
+| G15 | Vat and line slots: the brief has "Parallel Vat Slots" as a cash knob and Slot Expansion as a Tech Tree unlock, but no base cap. Built as 3 vat and 2 line slots in run 1, each assigned a recipe ([FACTORY.md](FACTORY.md#v03-slots-recipes-and-tier-2)). | v0.3 | Built as assumed; owner approved the draft |
 | G8 | Franchise Credits formula ("scaled logarithmically"), HQ room level costs, and when a room draft is offered. | v0.6 | Open |
 | G9 | Tech Tree: the full node list per wing, each node's item cost, and which nodes connect. | v0.4 | Open |
 | G10 | Heat meter: build and decay rates, and how "+50% while maintained" scales between 0 and 100%. | v0.4 | Open |
@@ -24,5 +24,7 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | --- | --- | --- | --- |
 | W1 | Open the Web build on a phone (it exports cleanly; not yet tried on a device) | Not started | `bash tools/serve_web.sh` and a phone on the same Wi-Fi |
 | W2 | Sound and haptics for the button press | Not started | Nothing |
-| W3 | Pacing at 15 minutes: F6 passes with 87 s of 90 and F4 with 28 s to spare, so small retunes may break them | Watch | Re-run `tests/pacing_tests.gd` after any change to `tuning.gd` |
+| W3 | Pacing margins: F6 passes with 85 s of 90 and N6 with 104 s of 120, so small retunes may break them | Watch | CI runs `tests/pacing_tests.gd` on every push |
 | W4 | The pacing player buys the cheapest upgrade, not the bottleneck; a smarter player would progress faster, so the criteria are measured against a fairly naive one | Open | A second, bottleneck-aware player if pacing needs a range rather than one figure |
+| W5 | Shift Roster threshold: £10,000 is reached at 42:18, a little before the 45–60 minute target. £14,000 would land at 50:00 | Open | Settle in v0.7, when the tab is built |
+| W6 | Tier 2 oversupply: by 30:00 the pacing player has 249 Jalapeños and 41 Verde Mash waiting, because Pickled Brine (Vinegar) is the bottleneck and the player's cheapest-first upgrades don't see that | Watch | Raw Overflow Valve (v0.4) gives the surplus a use; W4 would buy for the bottleneck |

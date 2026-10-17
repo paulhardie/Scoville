@@ -1,0 +1,10 @@
+{
+	"_source": "Inputs and outputs are the brief's (§3). Seconds are GUESSES (docs/FACTORY.md). `unlocked` recipes need no blueprint.",
+	"recipes": [
+		{"id": "sweet_mash", "station": "vat", "inputs": {"bell": 10}, "output": "sweet_mash", "seconds": 8.0, "unlocked": true},
+		{"id": "pickled_brine", "station": "vat", "inputs": {"vinegar": 10, "bell": 5}, "output": "pickled_brine", "seconds": 10.0},
+		{"id": "verde_mash", "station": "vat", "inputs": {"jalapeno": 15}, "output": "verde_mash", "seconds": 10.0},
+		{"id": "table_mild", "station": "line", "inputs": {"sweet_mash": 1}, "output": "table_mild", "seconds": 8.0, "unlocked": true},
+		{"id": "bistro_verde", "station": "line", "inputs": {"verde_mash": 1, "pickled_brine": 1}, "output": "bistro_verde", "seconds": 10.0}
+	]
+}

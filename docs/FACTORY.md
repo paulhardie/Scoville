@@ -79,46 +79,59 @@ How the draft got here from the first guesses (each change measured):
 3. Vat and line upgrades grew too fast for the income, leaving waits of 92–100 s (F6). Fix: lower base costs and slower growth, and the line's cycle cut from 10 s to 8 s to match the vat.
 4. Bigger vat and line speed steps (+35%) were tried and dropped: the line became the bottleneck and F8 fell to 13%.
 
-## v0.3: slots, recipes and Tier 2 (draft)
+## v0.3: slots, recipes and Tier 2
 
 Brief §2 Stage 3 and §3: the Processing tab takes over the vats and lines, which become slots that each run a chosen recipe. Tier 2's crops and recipes arrive through the Tech Tree's blueprints ([TECH_TREE.md](TECH_TREE.md)). Values are in [ECONOMY.md](ECONOMY.md).
 
 ### Rules
 
 - **Farms tab:** one plot per crop. A crop's plot can be bought once its Crop Blueprint is researched (Bell Pepper needs none).
-- **Processing tab:** vat slots and line slots. Each slot runs one recipe, picked from the recipes researched so far, and can be switched at any time. Switching hands any inputs taken for the current cycle back to stock and drops that cycle's progress.
-- **Slot caps in v0.3:** 3 vat slots and 2 line slots, bought with cash (the brief's "Parallel Vat Slots" knob). The Tech Tree's Slot Expansion raises the caps in v0.4.
+- **Processing tab:** vat slots and line slots. Each slot runs one recipe, picked from the recipes researched so far, or is switched off. It can be switched at any time. Switching hands any inputs taken for the current cycle back to stock and drops that cycle's progress.
+- **Slot caps in v0.3 (G15):** 3 vat slots and 2 line slots, bought with cash. The first vat comes with the deck and the first line once a vat is owned, as in v0.2. More of either are offered once the Processing tab is open. The Tech Tree's Slot Expansion raises the caps in v0.4.
 - **Recipes** set the inputs, output and base cycle time. A slot's speed level divides it, as in v0.2.
 - **The Starter Crate** comes with the first line only.
-- **Upgrades** keep v0.2's curves, scaled by price. A plot's upgrades cost the Tier 1 plot's curve × (its price ÷ £10). A slot's speed upgrades cost the vat or line curve × (its price ÷ slot 1's price).
-- **Data:** crops, recipes, stations, item values and tech nodes move into `data/*.json`, loaded and checked only by `src/core/data_loader.gd`. Bad data fails at load with a message naming the file and row.
-- **Saves:** version 3. A v2 save migrates with its vat as vat slot 1 running Sweet Pepper Mash and its line as line slot 1 running Table Mild, with levels, progress and crate kept.
+- **Upgrades** keep v0.2's curves, scaled by **√(price ÷ the first of its kind)**. A plot compares with the Bell Pepper Plot (£10); a slot with vat slot 1 (£25) or line slot 1 (£35). Tier 1's prices are unchanged.
+- **Data:** items, recipes, plots, slots and tech nodes are in `data/*.json`, loaded and checked only by `src/core/data_loader.gd`. Bad data fails at load with a message naming the file and row.
+- **Saves:** version 3, with the run apart from the account. A v2 save migrates with its vat as vat slot 1 on Sweet Pepper Mash and its line as line slot 1 on Table Mild, keeping levels, progress and crate.
 
-### Numbers (starting guesses, G4)
+### Numbers (tuned in the build, G4)
 
-To be tuned against [ECONOMY.md](ECONOMY.md#criteria-v03)'s N1–N8 during the build. Recipes and bottle values are the brief's.
+Recipes and bottle values are the brief's; everything else is a GUESS tuned against [ECONOMY.md](ECONOMY.md#criteria-v03)'s N1–N8.
 
 | What | Price | Base |
 | --- | --- | --- |
-| Jalapeño Plot | £150 | 1 Jalapeño every 2.5 s |
-| White Vinegar Plot | £200 | 1 Vinegar every 2.0 s |
-| Vat slot 2 / 3 | £150 / £400 | — |
-| Line slot 2 | £500 | — |
+| Jalapeño Plot | £100 | 3 Jalapeños every 2.0 s |
+| White Vinegar Plot | £120 | 2 Vinegar every 2.0 s |
+| Vat slots 1 / 2 / 3 | £25 / £100 / £120 | — |
+| Line slots 1 / 2 | £35 / £120 | — |
 | Sweet Pepper Mash (10 Bell) | — | 8 s (v0.2) |
 | Pickled Brine (10 Vinegar + 5 Bell) | — | 10 s |
-| Verde Mash (15 Jalapeño) | — | 12 s |
+| Verde Mash (15 Jalapeño) | — | 10 s |
 | Table Mild (1 Sweet Pepper Mash), £5 | — | 8 s (v0.2) |
-| Bistro Verde (1 Verde Mash + 1 Pickled Brine), £25 | — | 12 s |
+| Bistro Verde (1 Verde Mash + 1 Pickled Brine), £25 | — | 10 s |
 
-A full Tier 2 setup (two plots, two more vat slots and a second line) costs £1,400 in cash. The research costs another £555 or so in bottles that aren't sold. That's about £1,950 between the Tech Tree (13:00) and N4's first Bistro Verde (by 30:00). At v0.2's late income of about £90 a minute, those 17 minutes bring in roughly £1,530. **As drafted, N4 probably misses by a few minutes.** I expect the build to lower these prices or the research costs, and the measurement will show which.
+The Tier 2 plots are sized to feed one Verde vat, one Brine vat and the Bistro Verde line at their base speeds: 1.5 Jalapeños and 1 Vinegar a second against 1.5 and 1 needed.
 
-### Criteria (v0.3 rules)
+### What moved from the draft (each change measured)
 
-| Id | Criterion |
-| --- | --- |
-| S1 | A slot runs only a researched recipe, takes exactly its inputs, and gives exactly its output after its cycle. |
-| S2 | Switching a slot's recipe returns the inputs taken and loses only that cycle's progress. |
-| S3 | No more slots than the cap can be bought. |
-| S4 | A v2 save migrates to v3 and goes on producing exactly what it did. |
-| S5 | Operation Value equals cash earned plus stock at ECONOMY.md's values, after every action and tick. |
-| S6 | Bad data in `data/` fails at load with a message naming the file and row. |
+As the draft warned, it missed N4. It also missed N5 and N6. In order:
+
+1. **The Jalapeño Plot starved Tier 2:** at 1 every 2.5 s, one Verde Mash took 37 s. It now gives 3 every 2.0 s, and the Vinegar Plot 2 every 2.0 s. Verde Mash and Bistro Verde went from 12 s to 10 s to match.
+2. **Building Tier 2 meant 3–7-minute waits** (N6 measured 421 s) on Tier 1's £65 a minute. Prices came down: plots £150/£200 → £100/£120, slots vat £150/£400 → £100/£120, line £500 → £120.
+3. **Research ate too many bottles.** The Tier 2 path fell from 105 to 53 Table Mild, and from 15 to 10 Sweet Pepper Mash. See TECH_TREE.md.
+4. **Tier 2 upgrades priced at the full price ratio** (×10–×20 the Tier 1 curve) were never worth buying. They now scale by √ of it (×2–×4).
+5. **The button faded:** with Tier 2, tapping added only 6% at 30:00 (N8), and F8 fell to 22%. A tap was still one Bell Pepper. The fix is the brief's own first North Wing node, Calloused Thumbs (+2 a tap), added to the slice ([D008](DECISIONS.md)). This is the one change that's a feature, not a number.
+6. **Measurement fix:** "a minute's earnings" (F7, F8, N8) now counts the rise in Operation Value. Counting cash alone credited bottles saved up for research and sold in that minute.
+
+### Results (v0.3 rules)
+
+All pass (`tests/factory_tests.gd`, `tests/tech_tests.gd`):
+
+| Id | Criterion | Result |
+| --- | --- | --- |
+| S1 | A slot runs only a researched recipe, takes exactly its inputs, gives exactly its output after its cycle | PASS |
+| S2 | Switching a recipe returns the inputs and loses only that cycle | PASS |
+| S3 | No more slots than the cap | PASS |
+| S4 | A v2 save migrates and goes on producing as before | PASS (fixture checked against v2's plot rate) |
+| S5 | Operation Value = cash earned + stock at its values, after every action and tick | PASS |
+| S6 | Bad data fails at load naming the file and row | PASS (seven kinds of bad data) |

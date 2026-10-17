@@ -5,6 +5,8 @@ extends SceneTree
 
 const Main = preload("res://scenes/main.tscn")
 const T = preload("res://src/core/tuning.gd")
+const Game = preload("res://src/core/game.gd")
+const Player = preload("res://src/sim/engaged_player.gd")
 
 
 func _init() -> void:
@@ -36,19 +38,46 @@ func run() -> void:
 	(screen.find_child("SellRaw", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("deck.png"), 1.2)
 
-	# Mid-factory: everything bought, the crate half used, some upgrades.
+	# Mid-factory: the Tier 1 spine bought, the crate half used, some upgrades.
 	var g = screen.game
 	g.cash = 1234.5
-	for station in ["plot", "vat", "line"]:
-		g.buy(station)
-	g.stations.plot.speed = 3
-	g.stations.plot.yield = 1
-	g.stations.vat.speed = 2
-	g.stations.line.crate = 23
+	g.buy_plot("bell")
+	g.buy_slot("vat")
+	g.buy_slot("line")
+	g.plots.bell.speed = 3
+	g.plots.bell["yield"] = 1
+	g.vats[0].speed = 2
+	g.lines[0].crate = 23
 	g.stock.bell = 48
 	g.stock.sweet_mash = 3
 	g.stock.table_mild = 17
 	await _shot(out.path_join("factory.png"), 0.6)
+
+	# 30 minutes of the pacing player: Tier 2 running, the Van researched.
+	var played := Game.new()
+	var player := Player.new()
+	for t in roundi(30 * 60 / T.TICK_SECONDS):
+		player.step(played)
+		played.tick()
+	g.load_state(played.to_state())
+	await _shot(out.path_join("stage3_farms.png"), 1.0)
+	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("stage3_processing.png"), 0.2)
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_bistro_blueprint", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("stage3_tech.png"), 0.2)
+
+	# The Tech Tree just opened: nothing researched yet, the first node selected.
+	var fresh := Game.new()
+	var early := Player.new()
+	while not fresh.tab_open("tech"):
+		early.step(fresh)
+		fresh.tick()
+	g.load_state(fresh.to_state())
+	(screen.find_child("Tech_jalapeno_blueprint", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("stage3_tech_open.png"), 0.2)
+	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("stage3_locked_hint.png"), 0.1)
 
 	print("PASS: captured to ", out)
 	quit()

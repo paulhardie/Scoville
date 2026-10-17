@@ -2,25 +2,30 @@
 
 ## Where it's at
 
-Built: v0.1 (PR #1) and v0.2 (PR #2), waiting to merge. Details of v0.2 in [FACTORY.md](FACTORY.md#results): all eight pacing criteria pass.
+v0.3 First Research is built (on top of v0.1 and v0.2, PRs #1–#3, still to merge):
+- **Stage 3:** the nav bar at £400 Operation Value, with Processing open and the Tech Tree at £750. Shift Roster and HQ stay `[ ? ]`, and tapping one says when it opens. Operation Value shows under Cash.
+- **Processing tab:** vat and line slots (caps 3 and 2), each running a picked recipe or switched off.
+- **Tech Tree tab:** the web with seven nodes: Kitchen Table, Calloused Thumbs, the five Tier 2 blueprints and the Delivery Van with its Auto-Sell sliders.
+- **Tier 2:** Jalapeño and White Vinegar plots, Pickled Brine, Verde Mash, and Bistro Verde (£25).
+- **Data and saves:** game data lives in `data/*.json` behind a checking loader. Saves are v3, with the account (best Operation Value) kept apart from the run, and they migrate v1 and v2 saves.
 
-This branch is design only: G5–G7 are settled and v0.3 is drafted.
-- **Item values (D004):** a bottle is worth 5× the raw value inside it, and mash 2× its inputs. That prices every crop up to Tier 6 ([ECONOMY.md](ECONOMY.md#item-values-g6-d004)).
-- **First run (D005):** about 3 hours to £1M, with checkpoints at £1k (0:16), £10k (0:50) and £100k (1:50).
-- **Tab thresholds (D005):** nav bar and Processing at £400, Tech Tree at £750, Shift Roster at £10,000 (provisional), HQ at £1M.
-- **Tier 6 (D006):** Carolina Reaper after the first Prestige.
-- **Roadmap fix (D007):** the first Tech Tree slice comes with Tier 2 in v0.3, because blueprints gate higher tiers.
-- **v0.3 drafts:** [ECONOMY.md](ECONOMY.md#criteria-v03) (pacing N1–N8), [TECH_TREE.md](TECH_TREE.md) (slice and R1–R4), [FACTORY.md](FACTORY.md#v03-slots-recipes-and-tier-2-draft) (slots, Tier 2 and S1–S6), [ONBOARDING.md](ONBOARDING.md#stage-3-v03-draft) (Stage 3 and O8–O10).
+Checks:
+- All criteria pass: S1–S6, R1–R4, O8–O10, pacing N1–N8, and v0.2's F1–F8.
+- 349 rule and screen checks.
+- The headless boot is clean and the web export works.
+- Every new screen was captured and looked at.
+
+What moved to get there is in [FACTORY.md](FACTORY.md#what-moved-from-the-draft-each-change-measured): cheaper Tier 2, stronger Tier 2 plots, faster recipes, half the research cost, gentler upgrade scaling (D009), and Calloused Thumbs (D008).
 
 ## Open decisions
 
-- **G15, the slot model:** assumed 3 vat and 2 line slots in run 1, each assigned a recipe, with more from Slot Expansion in v0.4. Recommendation: keep it, since it gives the brief's "recipe assignment" real choices without the Tech Tree. Fewer slots would make Tier 2 a juggling act on one vat.
-- **The Tier 2 cost draft probably misses N4** (first Bistro Verde by 30:00) by a few minutes. I expect the build to lower plot, slot or research costs. The measurement will say which, and the change will be reported, not hidden.
-- **G1, platform for testing** (unchanged): Web on the phone until v1.0 is recommended.
+- **Confirm D008:** Calloused Thumbs was added to the slice so the button still counts at 30:00 (+17%; without it, 6%). Recommendation: keep it, since it's the brief's first North Wing node. The alternative is to lower N8 and F8 until v0.4.
+- **W5, Shift Roster threshold:** £10,000 now arrives at 42:18, before the 45–60 minute target. It's fine to leave until v0.7 builds the tab.
+- **G1, platform for testing** (unchanged): Web on the phone is recommended until v1.0.
 
 ## Next
 
-1. Build v0.3 against N1–N8, R1–R4, S1–S6 and O8–O10.
-2. Then re-measure the Shift Roster threshold (D005), and settle G9 and G10 for v0.4.
+1. Settle G9 (the rest of the tree) and G10 (Heat) for v0.4.
+2. W1: open the Web build on a phone.
 
-Touches: docs only (decisions, roadmap, backlog, four design docs). Stubbed: none new; G15 assumed for review. Next: build v0.3, since every gap it needs is now settled or assumed.
+Touches: simulation (slots, recipes, research, Van, Operation Value, save v3), data files and loader, the screen (nav bar, Processing, Tech Tree web), the pacing player, docs. Stubbed or open: W1–W6, Shift Roster and HQ tabs (v0.6, v0.7). Next: G9/G10, because v0.4 can't be built without them.

@@ -1,0 +1,211 @@
+extends RefCounted
+## Loads and checks the game data in data/*.json. The only place data is read.
+## Bad data is reported with the file and row, never half-loaded
+## (docs/FACTORY.md S6).
+
+const FILES := ["items", "recipes", "plots", "slots", "tech"]
+const KINDS := ["crop", "mash", "bottle"]
+const STATIONS := {"vat": "mash", "line": "bottle"}
+
+static var _default: Dictionary = {}
+
+
+## The real data, loaded once. Fails loudly: a game can't run on bad data.
+static func default_data() -> Dictionary:
+	if _default.is_empty():
+		var loaded := load_dir()
+		if not loaded.errors.is_empty():
+			push_error("game data: " + "; ".join(loaded.errors))
+		_default = loaded.data
+	return _default
+
+
+## Reads every file from a folder. Returns {data, errors}; data is only usable
+## when errors is empty.
+static func load_dir(dir: String = "res://data") -> Dictionary:
+	var raw := {}
+	var errors: Array[String] = []
+	for name in FILES:
+		var path := dir.path_join(name + ".json")
+		if not FileAccess.file_exists(path):
+			errors.append("%s.json: missing" % name)
+			continue
+		var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(path))
+		if typeof(parsed) != TYPE_DICTIONARY:
+			errors.append("%s.json: not a JSON object" % name)
+			continue
+		raw[name] = parsed
+	if not errors.is_empty():
+		return {"data": {}, "errors": errors}
+	return check(raw)
+
+
+## Checks parsed files and builds the lookup tables the game uses:
+## items, recipes, plots (by id), slots, tech (by id), tech_order (ids in file order).
+static func check(raw: Dictionary) -> Dictionary:
+	var errors: Array[String] = []
+	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": []}
+
+	var rows := _rows(raw, "items", "items", errors)
+	for i in rows.size():
+		var r: Variant = rows[i]
+		var where := _where("items", i, r)
+		if not _fields(r, {"id": TYPE_STRING, "name": TYPE_STRING, "plural": TYPE_STRING, "kind": TYPE_STRING, "tier": TYPE_FLOAT, "value": TYPE_FLOAT}, where, errors):
+			continue
+		if data.items.has(r.id):
+			errors.append(where + ": duplicate id")
+		elif not r.kind in KINDS:
+			errors.append(where + ": kind must be one of " + str(KINDS))
+		elif r.value <= 0.0:
+			errors.append(where + ": value must be above 0")
+		else:
+			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value)}
+
+	rows = _rows(raw, "recipes", "recipes", errors)
+	for i in rows.size():
+		var r: Variant = rows[i]
+		var where := _where("recipes", i, r)
+		if not _fields(r, {"id": TYPE_STRING, "station": TYPE_STRING, "inputs": TYPE_DICTIONARY, "output": TYPE_STRING, "seconds": TYPE_FLOAT}, where, errors):
+			continue
+		var ok := true
+		if data.recipes.has(r.id):
+			errors.append(where + ": duplicate id")
+			ok = false
+		if not STATIONS.has(r.station):
+			errors.append(where + ": station must be vat or line")
+			ok = false
+		elif not data.items.has(r.output) or data.items[r.output].kind != STATIONS[r.station]:
+			errors.append(where + ": output %s must be a %s item" % [r.output, STATIONS[r.station]])
+			ok = false
+		if r.seconds <= 0.0:
+			errors.append(where + ": seconds must be above 0")
+			ok = false
+		if r.inputs.is_empty():
+			errors.append(where + ": no inputs")
+			ok = false
+		var inputs := {}
+		for item in r.inputs:
+			if not data.items.has(item):
+				errors.append(where + ": unknown input " + str(item))
+				ok = false
+			elif typeof(r.inputs[item]) != TYPE_FLOAT or r.inputs[item] < 1.0 or r.inputs[item] != floorf(r.inputs[item]):
+				errors.append(where + ": input %s needs a whole count of at least 1" % item)
+				ok = false
+			else:
+				inputs[item] = int(r.inputs[item])
+		if ok:
+			data.recipes[r.id] = {"id": r.id, "station": r.station, "inputs": inputs, "output": r.output, "seconds": float(r.seconds), "unlocked": bool(r.get("unlocked", false))}
+
+	rows = _rows(raw, "plots", "plots", errors)
+	for i in rows.size():
+		var r: Variant = rows[i]
+		var where := _where("plots", i, r)
+		if not _fields(r, {"crop": TYPE_STRING, "price": TYPE_FLOAT, "seconds": TYPE_FLOAT, "yield": TYPE_FLOAT}, where, errors):
+			continue
+		if not data.items.has(r.crop) or data.items[r.crop].kind != "crop":
+			errors.append(where + ": %s is not a crop" % r.crop)
+		elif data.plots.has(r.crop):
+			errors.append(where + ": a second plot for " + r.crop)
+		elif r.price <= 0.0 or r.seconds <= 0.0 or r["yield"] < 1.0:
+			errors.append(where + ": price and seconds must be above 0, and yield at least 1")
+		else:
+			data.plots[r.crop] = {"crop": r.crop, "price": float(r.price), "seconds": float(r.seconds), "yield": int(r["yield"]), "unlocked": bool(r.get("unlocked", false))}
+	if not data.plots.has("bell"):
+		errors.append("plots.json: no bell plot (onboarding needs one)")
+
+	var slots: Variant = raw.get("slots", {})
+	for station in STATIONS:
+		var s: Variant = slots.get(station) if typeof(slots) == TYPE_DICTIONARY else null
+		if typeof(s) != TYPE_DICTIONARY or typeof(s.get("prices")) != TYPE_ARRAY or s.prices.is_empty():
+			errors.append("slots.json: %s needs a non-empty prices list" % station)
+			continue
+		var prices: Array[float] = []
+		for p in s.prices:
+			if typeof(p) != TYPE_FLOAT or p <= 0.0:
+				errors.append("slots.json: %s prices must be numbers above 0" % station)
+				break
+			prices.append(float(p))
+		data.slots[station] = {"prices": prices}
+
+	rows = _rows(raw, "tech", "nodes", errors)
+	for i in rows.size():
+		var r: Variant = rows[i]
+		var where := _where("tech", i, r)
+		if not _fields(r, {"id": TYPE_STRING, "label": TYPE_STRING, "name": TYPE_STRING, "wing": TYPE_STRING, "needs": TYPE_ARRAY, "cost": TYPE_DICTIONARY, "effects": TYPE_ARRAY, "pos": TYPE_ARRAY}, where, errors):
+			continue
+		if data.tech.has(r.id):
+			errors.append(where + ": duplicate id")
+			continue
+		var ok := true
+		var cost := {}
+		for item in r.cost:
+			if not data.items.has(item) or typeof(r.cost[item]) != TYPE_FLOAT or r.cost[item] < 1.0:
+				errors.append(where + ": bad cost " + str(item))
+				ok = false
+			else:
+				cost[item] = int(r.cost[item])
+		for need in r.needs:
+			if not data.tech.has(need):
+				errors.append(where + ": needs %s, which isn't an earlier node" % str(need))
+				ok = false
+		var effects: Array = []
+		for e in r.effects:
+			if typeof(e) != TYPE_DICTIONARY or e.size() != 1:
+				errors.append(where + ": each effect is one {kind: target}")
+				ok = false
+				continue
+			var kind: String = e.keys()[0]
+			match kind:
+				"unlock_plot":
+					if not data.plots.has(e[kind]):
+						errors.append(where + ": unlocks unknown plot " + str(e[kind]))
+						ok = false
+				"unlock_recipe":
+					if not data.recipes.has(e[kind]):
+						errors.append(where + ": unlocks unknown recipe " + str(e[kind]))
+						ok = false
+				"delivery_van":
+					pass
+				"tap_yield":
+					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0:
+						errors.append(where + ": tap_yield needs a whole number of at least 1")
+						ok = false
+				_:
+					errors.append(where + ": unknown effect " + kind)
+					ok = false
+			effects.append(e)
+		if r.pos.size() != 2:
+			errors.append(where + ": pos is [x, y]")
+			ok = false
+		if ok:
+			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1])}
+			data.tech_order.append(r.id)
+	if not data.tech.has("kitchen_table"):
+		errors.append("tech.json: no kitchen_table root")
+	return {"data": data if errors.is_empty() else {}, "errors": errors}
+
+
+static func _rows(raw: Dictionary, file: String, key: String, errors: Array[String]) -> Array:
+	var f: Variant = raw.get(file)
+	if typeof(f) != TYPE_DICTIONARY or typeof(f.get(key)) != TYPE_ARRAY:
+		errors.append("%s.json: needs a %s list" % [file, key])
+		return []
+	return f[key]
+
+
+static func _where(file: String, i: int, r: Variant) -> String:
+	var id: Variant = null
+	if typeof(r) == TYPE_DICTIONARY:
+		id = r.get("id", r.get("crop"))
+	return "%s.json row %d%s" % [file, i + 1, " (%s)" % id if id != null else ""]
+
+
+static func _fields(r: Variant, want: Dictionary, where: String, errors: Array[String]) -> bool:
+	if typeof(r) != TYPE_DICTIONARY:
+		errors.append(where + ": not an object")
+		return false
+	for key in want:
+		if not r.has(key) or typeof(r[key]) != want[key]:
+			errors.append("%s: %s missing or the wrong type" % [where, key])
+			return false
+	return true

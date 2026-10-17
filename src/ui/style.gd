@@ -20,8 +20,12 @@ const CONTROL := Color("#232a3a")
 const CONTROL_PRESSED := Color("#343e55")
 const CONTROL_DISABLED := Color("#181c26")
 
+## Researched nodes, and things you can afford now.
+const ORANGE := Color("#f97316")
+
 const SIZE_BODY := 22
 const SIZE_SMALL := 18
+const SIZE_TINY := 15
 
 const GUTTER := 20
 const RADIUS := 12
@@ -39,6 +43,15 @@ const UPPER_FRACTION := 0.35
 const PROGRESS_HEIGHT := 8.0
 const PROGRESS_FILL := Color("#f97316")
 const PROGRESS_TRACK := Color("#0c0e14")
+
+## The bottom navigation bar (Stage 3).
+const NAV_HEIGHT := 64.0
+## The Tech Tree web: grid step between nodes, and each node's size.
+const WEB_STEP := Vector2(100, 88)
+const WEB_NODE := Vector2(90, 70)
+const SIZE_WEB := 13
+const WEB_LINE := Color("#ffffff30")
+const WEB_LINE_DONE := Color("#10b981")
 
 ## Motion, in seconds.
 const PRESS_SQUASH := 0.12

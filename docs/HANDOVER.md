@@ -2,7 +2,7 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.5.1 (PRs #1–#9). This branch (PR #10) adds the pepper ladder design and **Forager's Luck, built**.
+Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). This branch adds **Forager's Luck, built**, and D024–D026; it was pushed after PR #10 merged, so it's a new PR.
 
 **Forager's Luck (N10, D025), built.** A North Wing node off Double-Tap (20 Bistro Verde). Each press, the Piston's included, has a 2.5% chance to drop one harvest of whichever ingredient the factory is shortest of. All its criteria pass ([TECH_TREE.md](TECH_TREE.md#n10-foragers-luck-d025)): +13% to the shortest ingredient at 0:45 (target 10–20%). T4's window grew from 1 to 10 minutes after a noisy first measurement (+9%), bar unchanged. Save v6 (adds `stats.foraged`). The White Vinegar Plot is now shown as the Vinegar Cask (D024).
 
@@ -10,9 +10,11 @@ Merged: v0.1–v0.5.1 (PRs #1–#9). This branch (PR #10) adds the pepper ladder
 - **The pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional ones up to 16 billion SHU, each with a value. The brief's six peppers keep their values. Not in `data/` yet (W10).
 - **Ingredients as stations (D024, accepted)** and **as the deliberate bottleneck, with a Pantry branch whose tracks end in either/or forks (D026, accepted)**. Amounts and costs are G18, for v0.6.
 
-Checks: button, core, factory, tech, upgrades, ui and pacing suites pass (32 pacing criteria). Offline passes except **X7** (8 hours away in under 0.5 s), which measures 0.85–1.4 s on the cloud container with or without this change; CI decides it (W3).
+Checks: button, core, factory, tech, upgrades, ui and pacing suites pass (32 pacing criteria). Offline passes except **X7** (8 hours away in under 0.5 s). **X7 has failed on CI since PR #9 merged** (0.73 s on the runner; 0.84 s on a cloud container, best of 7, with or without this branch), so main is red. Profiling found no single hot spot: two exact-result speed-ups saved under 1%, so they were dropped.
 
 ## Open decisions
+
+- **X7 on CI (W3):** the limit was set for the development Mac, and CI is a slower, shared machine. Recommend measuring X7 relative to the machine (8 hours' catch-up against the same machine ticking 5 minutes exactly), which catches the catch-up getting slower anywhere. The alternatives are fewer, longer steps (less accurate: D020) or a rewrite of the step for speed (uncertain gain).
 
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
 - **W7, the whole curve:** for v0.6, as agreed.

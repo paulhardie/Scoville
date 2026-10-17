@@ -22,7 +22,7 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | Id | What | Status | Needs |
 | --- | --- | --- | --- |
 | W2 | Sound and haptics for the button press | Not started | Nothing |
-| W3 | Tight margins: E3 (casual) 96 s of 100, N6 91 s of 120, X3 at 1:40 1.82% of 2%, X7 0.46 s of 0.5 (on CI; 0.85–1.4 s on a cloud session container, so it fails there regardless of the change) | Watch | CI runs the pacing and offline tests on every push |
+| W3 | Tight margins: E3 (casual) 96 s of 100, N6 91 s of 120, X3 at 1:40 1.82% of 2%, X7 0.46 s of 0.5 on the development Mac | **X7 FAILS on CI** | X7 is a wall-clock limit set for the Mac; the CI runner takes 0.73 s and a cloud container 0.84 s (best of 7), so main has been red since PR #9 merged. Owner's call: a machine-relative X7 (recommended), fewer steps, or a rewrite of the catch-up's hot path |
 | W4 | The pacing player buys the cheapest upgrade, not the bottleneck; a smarter player would progress faster, so the criteria are measured against a fairly naive one | Open | A second, bottleneck-aware player if pacing needs a range rather than one figure |
 | W5 | Shift Roster threshold: £10,000 is reached at 42:18, a little before the 45–60 minute target. £14,000 would land at 50:00 | Open | Settle in v0.7, when the tab is built |
 | W6 | Tier 2 oversupply: by 30:00 the pacing player has 249 Jalapeños and 41 Verde Mash waiting, because Pickled Brine (Vinegar) is the bottleneck and the player's cheapest-first upgrades don't see that | Watch | Raw Overflow Valve (v0.4) gives the surplus a use; W4 would buy for the bottleneck |

@@ -4,12 +4,12 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 
 ## D001: Build Scoville in Godot 4.7.2
 
-**Decision:** Scoville is a Godot 4.7.2 project, exported to the Web for phones, set up the way Clicker Lab is: a pure simulation in `src/core/`, screens that only present and report, GDScript test suites, and every Godot run through `run_godot.sh`.
+**Decision:** Scoville is a Godot 4.7.2 project, set up the way Clicker Lab is: a pure simulation in `src/core/`, screens that only present and report, GDScript test suites, and every Godot run through `run_godot.sh`. Phone testing uses the Web export until native builds are decided (G1).
 
-**Why:** The same engine, scripts and habits as Clicker Lab and Number Go Up, so tools and lessons carry over. The HTML prototype stays in `reference/web-prototype/` as the design reference.
+**Why:** The same engine, scripts and habits as Clicker Lab and Number Go Up, so tools and lessons carry over. Godot also exports to iOS and Android, which the brief targets.
 
-## D002: Port the prototype's Day-1 loop as it is first
+## D002: The brief is the design source
 
-**Decision:** The first version reproduces the prototype's rules and numbers, with only the changes listed in [CORE.md](CORE.md#changes-from-the-prototype). Retuning and new systems come after, each with criteria.
+**Decision:** [BRIEF.md](BRIEF.md) (Hot Sauce Empire v1.0) defines the game. It replaces the first commit's port of an older HTML hot-sauce prototype, which was removed along with that prototype. Gaps in the brief become G rows in the backlog instead of silent guesses; small ones needed to build a version are assumed in that version's design doc and listed there.
 
-**Why:** It gives a working, tested baseline to measure against before anything moves.
+**Why:** The prototype was a different design (a different loop, heat as a tap multiplier, dollars). The owner's brief is what's being built.

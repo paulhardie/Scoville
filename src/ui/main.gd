@@ -607,7 +607,7 @@ static func _duration(seconds: float) -> String:
 
 ## A plot's card: what it grows, a cycle bar, then its buy button or upgrades.
 func _plot_card(parent: Container, crop: String) -> Dictionary:
-	var nodes := _card(parent, "Card_plot_" + crop, "%s Plot" % game.data.items[crop].name)
+	var nodes := _card(parent, "Card_plot_" + crop, game.data.plots[crop].name)
 	nodes.buy = _control_button("", func() -> void: game.buy_plot(crop))
 	nodes.buy.name = "Buy_plot_" + crop
 	nodes.col.add_child(nodes.buy)
@@ -986,7 +986,7 @@ func _effect_text(node: Dictionary) -> String:
 	var out := []
 	for e in node.effects:
 		if e.has("unlock_plot"):
-			out.append("The %s Plot can be bought." % game.data.items[e.unlock_plot].name)
+			out.append("The %s can be bought." % game.data.plots[e.unlock_plot].name)
 		elif e.has("unlock_recipe"):
 			var r: Dictionary = game.data.recipes[e.unlock_recipe]
 			out.append("Vats and lines can make %s." % game.data.items[r.output].name if r.station == "vat" else "Lines can bottle %s." % game.data.items[r.output].name)
@@ -1007,7 +1007,7 @@ func _effect_text(node: Dictionary) -> String:
 		elif e.has("piston"):
 			out.append("Presses the button once a second, always, with every button perk.")
 		elif e.has("plot_speed"):
-			out.append("The %s Plot runs %d× faster." % [game.data.items[e.plot_speed.crop].name, int(e.plot_speed.mult)])
+			out.append("The %s runs %d× faster." % [game.data.plots[e.plot_speed.crop].name, int(e.plot_speed.mult)])
 		elif e.has("slot_cap"):
 			out.append("One more vat slot and one more line slot.")
 		elif e.has("packaging"):
@@ -1022,6 +1022,8 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Pin a node to hold back the bottles, mash and crops it needs.")
 		elif e.has("market_ticker"):
 			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
+		elif e.has("forage"):
+			out.append("Each press has a %.1f%% chance to drop a harvest of the ingredient you're shortest of." % (e.forage * 100.0))
 		elif e.has("byproduct_recycling"):
 			out.append("Vat cycles can give your lowest-level plot a free level, up to one a minute.")
 		elif e.has("offline"):

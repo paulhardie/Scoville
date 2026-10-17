@@ -1,9 +1,9 @@
 {
-	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md). `unlocked` plots need no blueprint.",
+	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md). `unlocked` plots need no blueprint. `name` is the station's name on screen, by default <crop> Plot; made ingredients get their own (D024).",
 	"plots": [
 		{"crop": "bell", "price": 5.0, "seconds": 1.0, "yield": 1, "unlocked": true},
 		{"crop": "jalapeno", "price": 100.0, "seconds": 2.0, "yield": 3},
-		{"crop": "vinegar", "price": 120.0, "seconds": 2.0, "yield": 2},
+		{"crop": "vinegar", "name": "Vinegar Cask", "price": 120.0, "seconds": 2.0, "yield": 2},
 		{"crop": "cayenne", "price": 400.0, "seconds": 2.4, "yield": 5},
 		{"crop": "garlic", "price": 450.0, "seconds": 2.4, "yield": 4}
 	]

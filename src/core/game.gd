@@ -14,7 +14,7 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 5
+const SAVE_VERSION := 6
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
@@ -71,7 +71,7 @@ func _init(game_data: Dictionary = {}, seed_value: int = 0) -> void:
 
 func _new_stats() -> Dictionary:
 	var s := {"presses": 0, "doubles": 0, "bell_picked": 0, "cash_earned": 0.0, "ticks": 0, "researched": 0,
-		"free_levels": 0, "spikes": 0, "harvested": {}, "made": {}, "sold": {}, "consumed": {}}
+		"free_levels": 0, "spikes": 0, "foraged": 0, "harvested": {}, "made": {}, "sold": {}, "consumed": {}}
 	for item in data.items:
 		for k in ["harvested", "made", "sold", "consumed"]:
 			s[k][item] = 0
@@ -83,7 +83,7 @@ func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
 		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
 		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
-		"byproduct": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
+		"byproduct": 0.0, "forage": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
 	for node in research:
 		for e in data.tech[node].effects:
 			var kind: String = e.keys()[0]
@@ -110,6 +110,7 @@ func _refresh_fx() -> void:
 				"smart_stockpiling": fx.stockpile = true
 				"market_ticker": fx.ticker = true
 				"byproduct_recycling": fx.byproduct = maxf(fx.byproduct, v)
+				"forage": fx.forage = maxf(fx.forage, v)
 				"stock_value_bonus": fx.stock_bonus += v
 				"offline":
 					fx.offline_hours += v.hours
@@ -126,6 +127,14 @@ func _refresh_fx() -> void:
 			if recipe_unlocked(id):
 				n += fx.inputs[id].get(item, 0) * T.OVERFLOW_KEEP_CYCLES
 		fx.default_keep[item] = n
+	# Forager's Luck (D025): the most any researched recipe takes of each
+	# ingredient a cycle; an ingredient no researched recipe uses isn't short.
+	fx.ingredient_need = {}
+	for item in data.items:
+		if data.items[item].ingredient:
+			for id in data.recipes:
+				if recipe_unlocked(id) and fx.inputs[id].has(item):
+					fx.ingredient_need[item] = maxi(fx.ingredient_need.get(item, 0), fx.inputs[id][item])
 
 
 # --- Reading: value and reveals ------------------------------------------------
@@ -688,6 +697,10 @@ func _press() -> int:
 					var s: Dictionary = slots(station)[j]
 					if s.running:
 						s.progress = minf(s.progress + fx.overclock, slot_cycle(station, j))
+	if fx.forage > 0.0:
+		for i in n:
+			if _shortest_ingredient() != "" and rng.randf() < fx.forage:
+				_forage_drop()
 	stock.bell += picked
 	stats.bell_picked += picked
 	revealed.counter = true
@@ -701,14 +714,7 @@ func _press() -> int:
 func _press_batch(n: int) -> void:
 	if n <= 0:
 		return
-	var doubles := 0
-	if fx.double > 0.0:
-		if n < 12:
-			for i in n:
-				if rng.randf() < fx.double:
-					doubles += 1
-		else:
-			doubles = clampi(roundi(rng.randfn(n * fx.double, sqrt(n * fx.double * (1.0 - fx.double)))), 0, n)
+	var doubles := _binomial(n, fx.double) if fx.double > 0.0 else 0
 	var presses := n + doubles
 	stats.doubles += doubles
 	stats.presses += presses
@@ -723,6 +729,46 @@ func _press_batch(n: int) -> void:
 				var s: Dictionary = slots(station)[j]
 				if s.running:
 					s.progress = minf(s.progress + fx.overclock * presses, slot_cycle(station, j))
+	if fx.forage > 0.0 and _shortest_ingredient() != "":
+		for i in _binomial(presses, fx.forage):
+			_forage_drop()
+
+
+## Forager's Luck (D025): of the owned ingredient stations that a researched
+## recipe uses, the one whose stock covers the fewest cycles of that use (ties
+## in data order); "" when there is none.
+func _shortest_ingredient() -> String:
+	var best := ""
+	var best_cycles := INF
+	for crop in fx.ingredient_need:
+		if plots.has(crop) and plots[crop].owned:
+			var cycles: float = stock[crop] / float(fx.ingredient_need[crop])
+			if cycles < best_cycles:
+				best = crop
+				best_cycles = cycles
+	return best
+
+
+## One harvest of the shortest ingredient, yield upgrades included and without
+## Crop Quality's double.
+func _forage_drop() -> void:
+	var crop := _shortest_ingredient()
+	var n := plot_yield(crop)
+	stock[crop] += n
+	stats.harvested[crop] += n
+	stats.foraged += 1
+
+
+## How many of n draws at chance p come up: drawn one by one when few, by the
+## binomial's normal approximation once there are enough (the catch-up, D020).
+func _binomial(n: int, p: float) -> int:
+	if n < 12:
+		var hits := 0
+		for i in n:
+			if rng.randf() < p:
+				hits += 1
+		return hits
+	return clampi(roundi(rng.randfn(n * p, sqrt(n * p * (1.0 - p)))), 0, n)
 
 
 ## A long step's harvests at once (the catch-up, D020): every whole cycle in the
@@ -735,15 +781,8 @@ func _harvest_batch(crop: String) -> void:
 	if n <= 0:
 		return
 	p.progress -= n * cycle
-	var doubled := 0
 	var chance := quality_chance(crop)
-	if chance > 0.0:
-		if n < 12:
-			for i in n:
-				if rng.randf() < chance:
-					doubled += 1
-		else:
-			doubled = clampi(roundi(rng.randfn(n * chance, sqrt(n * chance * (1.0 - chance)))), 0, n)
+	var doubled := _binomial(n, chance) if chance > 0.0 else 0
 	var got := (n + doubled) * plot_yield(crop)
 	stock[crop] += got
 	stats.harvested[crop] += got
@@ -1066,7 +1105,8 @@ func load_state(s: Variant) -> String:
 		return problem
 	if version == 3:
 		s = _migrate_3_to_4(s)
-	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md).
+	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
+	# only adds stats.foraged (Forager's Luck), read below with a default of 0.
 	var run: Dictionary = s.run
 	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "revealed": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
 		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,
@@ -1157,7 +1197,7 @@ func load_state(s: Variant) -> String:
 	rng.seed = String(run.rng.get("seed", "0")).to_int()
 	rng.state = String(run.rng.get("state", str(rng.state))).to_int()
 	stats = fresh.stats
-	for k in ["presses", "doubles", "bell_picked", "ticks", "researched", "free_levels", "spikes"]:
+	for k in ["presses", "doubles", "bell_picked", "ticks", "researched", "free_levels", "spikes", "foraged"]:
 		stats[k] = int(run.stats.get(k, 0))
 	stats.cash_earned = float(run.stats.get("cash_earned", 0.0))
 	for k in ["harvested", "made", "sold", "consumed"]:

@@ -10,6 +10,9 @@ const T = preload("res://src/core/tuning.gd")
 const Player = preload("res://src/sim/engaged_player.gd")
 
 const MINUTES := 110
+## T4's window. Ten minutes, not one: a minute holds only about five drops, so
+## one minute's measurement swings by ±40% with the random stream.
+const FORAGE_MINUTES := 10.0
 
 var failures: Array[String] = []
 var checks := 0
@@ -55,6 +58,7 @@ func run() -> void:
 	}
 	var at_15: Dictionary = {}
 	var at_30: Dictionary = {}
+	var at_45: Dictionary = {}
 	var at_90: Dictionary = {}
 	var at_100: Dictionary = {}
 	var ov_60 := 0.0
@@ -71,6 +75,8 @@ func run() -> void:
 			at_15 = g.to_state()
 		if g.stats.ticks == minute(30):
 			at_30 = g.to_state()
+		if g.stats.ticks == minute(45):
+			at_45 = g.to_state()
 		if g.stats.ticks == minute(90):
 			at_90 = g.to_state()
 		if g.stats.ticks == minute(60):
@@ -181,6 +187,19 @@ func run() -> void:
 	criterion("P2", slept.ov >= tapping_rate * 120.0, "from 1:40, 8 h away (counted %s at %d%%) raise Operation Value £%.0f; 2 h of tapping would £%.0f" % [
 		clock(slept.counted), roundi(night.offline_speed() * 100.0), slept.ov, tapping_rate * 120.0])
 
+	# Forager's Luck (TECH_TREE.md T4): its top-up for this player at 0:45.
+	var lucky := forage_minute(at_45, p.taps_per_second, true)
+	var plain := forage_minute(at_45, p.taps_per_second, false)
+	var gain := 0.0
+	var short := ""
+	for crop in lucky.drops:
+		if lucky.drops[crop] > lucky.drops.get(short, 0):
+			short = crop
+	if short != "":
+		gain = float(lucky.got[short] - plain.got[short]) / maxf(plain.got[short], 1.0)
+	criterion("T4", gain >= 0.10 and gain <= 0.20, "Forager's Luck from 0:45 adds %.0f%% to the shortest ingredient (%s over 10 min: %d against %d; want 10–20%%)" % [
+		gain * 100.0, short if short != "" else "none", lucky.got.get(short, 0), plain.got.get(short, 0)])
+
 	for failure in failures:
 		printerr("FAIL: ", failure)
 	print("%s: pacing tests (%d criteria)" % ["PASS" if failures.is_empty() else "FAIL", checks])
@@ -259,3 +278,32 @@ func minute_from(state: Dictionary, taps_per_second: float, no_spike: bool = fal
 		p.step(c)
 		c.tick()
 	return c.operation_value() - start
+
+
+## FORAGE_MINUTES from a saved state, tapping at the given rate and buying nothing,
+## with or without Forager's Luck granted: each ingredient's harvest (drops
+## included), and how many drops it got.
+func forage_minute(state: Dictionary, taps_per_second: float, lucky: bool) -> Dictionary:
+	var c := Game.new()
+	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	if lucky:
+		c.research["foragers_luck"] = true
+		c._refresh_fx()
+	var p := Player.new()
+	p.taps_per_second = taps_per_second
+	p.buys = false
+	var out := {"got": {}, "drops": {}}
+	var before := {}
+	for crop in c.plots:
+		before[crop] = c.stats.harvested[crop]
+	for i in minute(FORAGE_MINUTES):
+		var short := c._shortest_ingredient()
+		var foraged: int = c.stats.foraged
+		p.step(c)
+		c.tick()
+		if c.stats.foraged > foraged:
+			out.drops[short] = out.drops.get(short, 0) + c.stats.foraged - foraged
+	for crop in c.plots:
+		if c.data.items[crop].ingredient:
+			out.got[crop] = c.stats.harvested[crop] - before[crop]
+	return out

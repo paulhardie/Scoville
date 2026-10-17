@@ -101,7 +101,7 @@ Recipes and bottle values are the brief's; everything else is a GUESS tuned agai
 | What | Price | Base |
 | --- | --- | --- |
 | Jalapeño Plot | £100 | 3 Jalapeños every 2.0 s |
-| White Vinegar Plot | £120 | 2 Vinegar every 2.0 s |
+| Vinegar Cask (was White Vinegar Plot, D024) | £120 | 2 Vinegar every 2.0 s |
 | Vat slots 1 / 2 / 3 | £25 / £100 / £120 | — |
 | Line slots 1 / 2 | £35 / £120 | — |
 | Sweet Pepper Mash (10 Bell) | — | 8 s (v0.2) |

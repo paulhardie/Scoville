@@ -56,11 +56,13 @@ The brief's non-pepper ingredients are unchanged. Each comes from its own statio
 
 ### Ingredients as the bottleneck (G18, proposed)
 
+The Pantry branch with forks is accepted ([D026](DECISIONS.md)); amounts and costs are still to set.
+
 The brief already makes them one: Pickled Brine (Vinegar) goes into Bistro Verde, Cayenne Mash and Liquid Smoke, and Garlic Paste into Classic Louisiana and Caramelized Glaze. Vinegar is already the binding constraint at 30:00 (W6). The proposal makes that deliberate:
 
 - **Hotter recipes need more base.** The new peppers' mashes (G17) take Pickled Brine, more of it the higher the tier, so a growing operation needs ever more Vinegar. That keeps Tier 2's station relevant all run, which is pillar 3.
 - **Relief comes from one Pantry branch in the East Wing,** next to the GMO boosters, not a tree per ingredient. Each ingredient gets a short track: a yield booster (like Hydroponic Bell Peppers), then a "concentrate" node (its recipes need 20% less of it, like Zero-Waste Piping but for that ingredient alone). HQ's Cooperage gives permanent relief across Prestiges.
-- **The choice:** optionally, each track ends in a fork where only one can be researched per run, such as Aged (that ingredient's mash is worth 1.5×) or Bulk (its station yields 2×). The brief's tree has no either/or nodes, so this would be a new rule.
+- **The choice:** each track ends in a fork where only one can be researched per run, such as Aged (that ingredient's mash is worth 1.5×) or Bulk (its station yields 2×). The brief's tree has no either/or nodes, so this would be a new rule.
 - **Criterion to set before building:** whenever an ingredient is the bottleneck, something that relieves it (a purchase or a node) is within the player's reach in a few minutes. A bottleneck with no way out is a wall, not a choice.
 
 ## How it compares with Idle Planet Miner

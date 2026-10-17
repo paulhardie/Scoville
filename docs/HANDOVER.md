@@ -2,38 +2,26 @@
 
 ## Where it's at
 
-Built: v0.1–v0.5 (PRs #1–#8, waiting to merge), and now **v0.5.1, the early-game pass** ([FACTORY.md](FACTORY.md#v051-the-early-game-pass)).
+Merged: v0.1–v0.5.1 (PRs #1–#9). This branch (PR #10) adds the pepper ladder design and **Forager's Luck, built**.
 
-**The phone test (W1, done).** The Web build plays fine on the owner's phone, and the "While you were away" card works. Two findings:
-- **The start felt "incredibly slow".** That's fixed here.
-- **It "looks like a 2010 web game rather than a mobile app in 2026".** That's W8, the visual pass.
+**Forager's Luck (N10, D025), built.** A North Wing node off Double-Tap (20 Bistro Verde). Each press, the Piston's included, has a 2.5% chance to drop one harvest of whichever ingredient the factory is shortest of. All its criteria pass ([TECH_TREE.md](TECH_TREE.md#n10-foragers-luck-d025)): +13% to the shortest ingredient at 0:45 (target 10–20%). T4's window grew from 1 to 10 minutes after a noisy first measurement (+9%), bar unchanged. Save v6 (adds `stats.foraged`). The White Vinegar Plot is now shown as the Vinegar Cask (D024).
 
-**What v0.5.1 changes:**
-- **A casual phone player for the first 20 minutes (D022),** beside the tireless pacing player.
-- **New early-game criteria, E1–E6,** with "never longer than … without something new" gaps as well as deadlines.
-- **Cheaper, stronger first stations:** a £5 plot giving a pepper a second, a £15 vat and a £10 line. Upgrade prices are unchanged.
-- **Results for the casual player:** the line at 3:16 (was 10:40), the longest wait 96 s (was 450 s), and the Tech Tree at 13:10.
+**Designed, not built:**
+- **The pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional ones up to 16 billion SHU, each with a value. The brief's six peppers keep their values. Not in `data/` yet (W10).
+- **Ingredients as stations (D024, accepted)** and **as the deliberate bottleneck, with a Pantry branch whose tracks end in either/or forks (D026, accepted)**. Amounts and costs are G18, for v0.6.
 
-All criteria pass: E1–E6, F, N, M, X, P (31 pacing and offline criteria, 553 rule and screen checks).
-
-Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
-- two catch-up faults that a bigger factory exposed, fixed;
-- P2's measurement, fixed;
-- the run now gets ahead of the 3-hour curve a little sooner (W7).
-
-**Also in design: the pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional up to 16 billion SHU, each with a value. The brief's six peppers keep their values, so nothing built changes. Not in `data/` yet (W10). Since then: ingredients come from their own stations unlocked by blueprints (D024, accepted), the button tops them up through a new node, Forager's Luck (D025, designed, W11), and making ingredients the deliberate bottleneck is proposed as G18.
+Checks: button, core, factory, tech, upgrades, ui and pacing suites pass (32 pacing criteria). Offline passes except **X7** (8 hours away in under 0.5 s), which measures 0.85–1.4 s on the cloud container with or without this change; CI decides it (W3).
 
 ## Open decisions
 
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
 - **W7, the whole curve:** for v0.6, as agreed.
-- **E6 was narrowed** to the casual player after measuring, because the pacing player leaves only 3 mash for the Starter Crate. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
+- **E6 was narrowed** to the casual player after measuring. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
 - **The pepper ladder (D023):** accept the list and values, or rename and swap peppers.
-- **G18, ingredients as the bottleneck:** recommend one Pantry branch in the East Wing rather than a tree per ingredient; say whether you want either/or forks.
-- **G17, how the new peppers are used:** recommend one mash and one sauce per new pepper (Idle Planet Miner's ore→bar), built with v0.6. The cheaper option, any pepper of a tier filling that tier's mash, adds no recipes but makes them interchangeable.
+- **G17, how the new peppers are used:** recommend one mash and one sauce per new pepper (Idle Planet Miner's ore→bar), built with v0.6.
 
 ## Next
 
-1. W8, once you've sent references; otherwise G8, G16 and G17 for v0.6 Prestige, with the pepper ladder (W10).
+1. W8, once you've sent references; otherwise v0.6: G8, G16, G17 and G18, with the pepper ladder (W10) and the Pantry branch.
 
-Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W11, G16–G18. Next: W8 or G8/G16/G17, your call.
+Touches: the simulation (Forager's Luck, a shared binomial draw), data (`ingredient`, station names, N10), the UI's node and station text, tests (T1–T4), save v6, and docs. Stubbed or open: W3–W10, G16–G18.

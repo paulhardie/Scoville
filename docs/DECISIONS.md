@@ -173,3 +173,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision:** A North Wing node, N10 Forager's Luck ([TECH_TREE.md](TECH_TREE.md#n10-foragers-luck-d025)): each press has a 2.5% chance to drop one harvest of whichever ingredient the factory is shortest of. Every press counts (Double-Tap, Grip, the Piston), so it keeps working while away through the Piston. **Asked for by the owner;** the numbers are GUESSES until measured.
 
 **Why:** It rewards active play where the factory actually hurts, without the factory depending on it. At 3 presses a second it adds about 15% to an early ingredient station; the Piston alone adds about 5%.
+
+## D026: The Pantry branch, with either/or forks
+
+**Decision:** Non-pepper ingredients are made a deliberate bottleneck ([INGREDIENTS.md](INGREDIENTS.md#ingredients-as-the-bottleneck-g18-proposed)): hotter recipes take more of the base, and relief comes from one Pantry branch in the East Wing, a short track per ingredient (a yield booster, then a "concentrate" node). Each track ends in a fork where only one side can be researched in a run (for example Aged, its mash worth 1.5×, or Bulk, its station yielding 2×). The other side stays locked until Prestige resets the tree. **Accepted by the owner.** Node numbers and costs are set with v0.6 (G18).
+
+**Why:** Every other node is a question of when, not whether. Forks give real choices without a tree per ingredient, which the brief's single web argues against.

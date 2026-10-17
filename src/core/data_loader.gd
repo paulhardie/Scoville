@@ -59,7 +59,9 @@ static func check(raw: Dictionary) -> Dictionary:
 		elif r.value <= 0.0:
 			errors.append(where + ": value must be above 0")
 		else:
-			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value)}
+			if r.get("ingredient", false) and r.kind != "crop":
+				errors.append(where + ": only a crop can be an ingredient")
+			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value), "ingredient": bool(r.get("ingredient", false))}
 
 	rows = _rows(raw, "recipes", "recipes", errors)
 	for i in rows.size():
@@ -109,7 +111,7 @@ static func check(raw: Dictionary) -> Dictionary:
 		elif r.price <= 0.0 or r.seconds <= 0.0 or r["yield"] < 1.0:
 			errors.append(where + ": price and seconds must be above 0, and yield at least 1")
 		else:
-			data.plots[r.crop] = {"crop": r.crop, "price": float(r.price), "seconds": float(r.seconds), "yield": int(r["yield"]), "unlocked": bool(r.get("unlocked", false))}
+			data.plots[r.crop] = {"crop": r.crop, "name": str(r.get("name", data.items[r.crop].name + " Plot")), "price": float(r.price), "seconds": float(r.seconds), "yield": int(r["yield"]), "unlocked": bool(r.get("unlocked", false))}
 	if not data.plots.has("bell"):
 		errors.append("plots.json: no bell plot (onboarding needs one)")
 
@@ -176,7 +178,7 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0:
 						errors.append(where + ": tap_yield needs a whole number of at least 1")
 						ok = false
-				"double_tap", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
+				"double_tap", "forage", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0 or e[kind] >= 1.0:
 						errors.append(where + ": %s needs a share between 0 and 1" % kind)
 						ok = false

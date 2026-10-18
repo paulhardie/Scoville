@@ -51,7 +51,7 @@ func opened(cash: float) -> Game:
 ## A game past Stage 3 and the Tech Tree, with the Tier 2 blueprints researched.
 func tier_2(cash: float = 100000.0) -> Game:
 	var g := opened(cash)
-	g.account.best_ov = 1000.0
+	g.account.best_ov = T.TAB_THRESHOLDS.tech
 	g.stock.table_mild = 1000
 	g.stock.sweet_mash = 100
 	for node in ["jalapeno_blueprint", "verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint"]:
@@ -61,16 +61,16 @@ func tier_2(cash: float = 100000.0) -> Game:
 	return g
 
 
-func test_deck_opens_at_ten_pounds() -> void:
+func test_deck_opens_at_stage_2_cash() -> void:
 	var g := Game.new()
 	for i in 99:
 		g.press()
 	g.sell_raw()
-	check(not g.revealed.deck, "no deck at £9.90 earned")
+	check(not g.revealed.deck, "no deck at $%.2f earned" % g.stats.cash_earned)
 	check(not g.buy_plot("bell"), "can't buy before the deck")
 	g.press()
 	g.sell_raw()
-	check(g.revealed.deck, "the deck opens at £10 earned")
+	check(g.revealed.deck, "the deck opens at $%.0f earned" % T.STAGE_2_CASH)
 	g.buy_plot("bell")
 	check(g.revealed.deck, "it stays after spending")
 
@@ -89,7 +89,7 @@ func test_plot_harvests() -> void:
 	var price: float = Game.new().plot_price("bell")
 	var cycle: float = Game.new().data.plots.bell.seconds
 	var g := opened(price)
-	check(g.buy_plot("bell") and g.cash == 0.0, "the plot costs its listed £%.0f" % price)
+	check(g.buy_plot("bell") and g.cash == 0.0, "the plot costs its listed $%.0f" % price)
 	check(not g.buy_plot("bell"), "a plot can't be bought twice")
 	var before: int = g.stock.bell
 	g.advance(seconds(10.0))
@@ -135,9 +135,10 @@ func test_sell_batch() -> void:
 	check(not g.sell_batch(), "nothing to sell")
 	g.stock.table_mild = 7
 	g.stock.bistro_verde = 2
-	check(g.sell_batch("table_mild") and close(g.cash, 35.0) and g.stock.bistro_verde == 2, "sells one sauce: 7 Table Mild for £35")
+	var seven: float = 7 * g.value("table_mild")
+	check(g.sell_batch("table_mild") and close(g.cash, seven) and g.stock.bistro_verde == 2, "sells one sauce: 7 Table Mild for $%.0f" % seven)
 	g.stock.table_mild = 1
-	check(g.sell_batch() and close(g.cash, 35.0 + 5.0 + 50.0) and g.bottles_held() == 0, "or every bottle")
+	check(g.sell_batch() and close(g.cash, seven + g.value("table_mild") + 2 * g.value("bistro_verde")) and g.bottles_held() == 0, "or every bottle")
 	check(g.stats.sold.table_mild == 8 and g.stats.sold.bistro_verde == 2, "sales are counted")
 
 
@@ -159,18 +160,18 @@ func test_upgrades() -> void:
 func test_upgrades_scale_with_price() -> void:
 	var g := tier_2()
 	check(g.buy_plot("jalapeno"), "buys the Jalapeño Plot")
-	var plot_scale := sqrt(g.plot_price("jalapeno") / T.PLOT_PRICE_REFERENCE)
-	check(close(g.plot_upgrade_cost("jalapeno", "speed"), T.PLOT_SPEED_COST * plot_scale), "its upgrades cost the Bell curve × √(price ÷ the £10 reference)")
+	var plot_scale := pow(g.plot_price("jalapeno") / T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER)
+	check(close(g.plot_upgrade_cost("jalapeno", "speed"), T.PLOT_SPEED_COST * plot_scale), "its upgrades cost the Bell curve × (price ÷ the $%.0f reference)^%.1f" % [T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER])
 	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST), "a plot cheaper than the reference isn't scaled down")
 	g.buy_slot("vat")
 	g.buy_slot("vat")
 	var prices: Array = g.data.slots.vat.prices
-	check(close(g.slot_upgrade_cost("vat", 1), T.VAT_SPEED_COST * sqrt(prices[1] / T.VAT_PRICE_REFERENCE)), "vat slot 2's speed costs the vat curve × √(price ÷ the £25 reference)")
+	check(close(g.slot_upgrade_cost("vat", 1), T.VAT_SPEED_COST * pow(prices[1] / T.VAT_PRICE_REFERENCE, T.COST_SCALE_POWER)), "vat slot 2's speed costs the vat curve × (price ÷ the $%.0f reference)^%.1f" % [T.VAT_PRICE_REFERENCE, T.COST_SCALE_POWER])
 
 
 func test_slot_caps() -> void:
 	var g := opened(100000.0)
-	g.account.best_ov = 500.0
+	g.account.best_ov = T.TAB_THRESHOLDS.processing
 	for i in 3:
 		check(g.buy_slot("vat"), "buys vat slot %d" % (i + 1))
 	check(g.slot_cap("vat") == 3 and not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: no fourth vat before Slot Expansion")
@@ -187,7 +188,7 @@ func test_slot_caps() -> void:
 
 func test_recipes_need_blueprints() -> void:
 	var g := opened(100000.0)
-	g.account.best_ov = 1000.0
+	g.account.best_ov = T.TAB_THRESHOLDS.tech
 	g.buy_slot("vat")
 	check(g.recipes_for("vat") == ["sweet_mash"], "only Sweet Pepper Mash at first")
 	check(not g.assign("vat", 0, "verde_mash") and g.vats[0].recipe == "sweet_mash", "S1: can't run a recipe not researched")
@@ -213,7 +214,7 @@ func test_tier_2_spine() -> void:
 	g.lines[0].crate = 0
 	g.lines[0].progress = 0.0
 	g.advance(seconds(12.0))
-	check(g.stock.bistro_verde == 1 and close(g.value("bistro_verde"), 25.0), "S1: a £25 Bistro Verde after 12 s")
+	check(g.stock.bistro_verde == 1 and close(g.value("bistro_verde"), 425.0), "S1: a $425 Bistro Verde after 12 s")
 
 
 func test_switching_returns_inputs() -> void:
@@ -235,8 +236,8 @@ func test_operation_value() -> void:
 	g.stock.bell = 13
 	g.stock.verde_mash = 2
 	g.stock.bistro_verde = 3
-	var expect: float = g.stats.cash_earned + 13 * 0.10 + 2 * 6.0 + 3 * 25.0
-	check(close(g.operation_value(), expect), "S5: cash earned + stock at its values: £%.2f" % g.operation_value())
+	var expect: float = g.stats.cash_earned + 13 * g.value("bell") + 2 * g.value("verde_mash") + 3 * g.value("bistro_verde")
+	check(close(g.operation_value(), expect), "S5: cash earned + stock at its values: $%.2f" % g.operation_value())
 	var before := g.operation_value()
 	g.cash -= 500.0
 	check(close(g.operation_value(), before), "S5: spending doesn't lower it")
@@ -370,13 +371,15 @@ func test_v2_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v2_save())
 	check(problem == "", "S4: a v2 save loads: " + problem)
-	check(close(g.cash, 41.5) and g.stock.bell == 23 and g.stock.table_mild == 6, "S4: cash and stock carry over")
+	check(close(g.cash, 41.5 * T.SAVE_V8_MONEY) and g.stock.bell == 23 and g.stock.table_mild == 6, "S4: cash and stock carry over")
 	check(g.plots.bell.owned and g.plots.bell.speed == 3 and g.plots.bell["yield"] == 1, "S4: the plot and its levels")
 	check(g.vats.size() == 1 and g.vats[0].recipe == "sweet_mash" and g.vats[0].speed == 2 and g.vats[0].running, "S4: the vat is vat slot 1 on Sweet Pepper Mash")
 	check(g.lines.size() == 1 and g.lines[0].recipe == "table_mild" and g.lines[0].crate == 21, "S4: the line is line slot 1, crate kept")
-	check(g.stats.made.table_mild == 200 and g.stats.sold.table_mild == 194 and close(g.stats.cash_earned, 1100.0), "S4: stats carry over")
-	check(close(g.account.best_ov, 1100.0 + 2.3 + 4.0 + 30.0), "S4: the account starts at the run's Operation Value: £%.2f" % g.account.best_ov)
-	check(g.tab_open("processing") and g.tab_open("tech"), "£1,136 opens Processing and the Tech Tree")
+	check(g.stats.made.table_mild == 200 and g.stats.sold.table_mild == 194 and close(g.stats.cash_earned, 1100.0 * T.SAVE_V8_MONEY), "S4: stats carry over, money ×10 (D035)")
+	# v8: pounds became dollars ×10; the stock is valued at today's values.
+	var ov: float = 1100.0 * T.SAVE_V8_MONEY + 23 * g.value("bell") + 2 * g.value("sweet_mash") + 6 * g.value("table_mild")
+	check(close(g.account.best_ov, ov), "S4: the account starts at the run's Operation Value, $%.2f: $%.2f" % [ov, g.account.best_ov])
+	check(g.tab_open("processing") and g.tab_open("tech"), "$%.0f opens Processing and the Tech Tree" % ov)
 
 
 func test_v2_migration_produces_the_same() -> void:
@@ -401,7 +404,7 @@ func test_v1_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v1)
 	check(problem == "", "a v1 save loads: " + problem)
-	check(close(g.cash, 12.5) and g.stock.bell == 7 and g.revealed.deck, "cash, peppers and the deck carry over")
+	check(close(g.cash, 12.5 * T.SAVE_V8_MONEY) and g.stock.bell == 7 and g.revealed.deck, "cash (×10, D035), peppers and the deck carry over")
 	check(g.stats.presses == 132 and g.vats.is_empty(), "stats, and no stations yet")
 	var broken := v1.duplicate(true)
 	broken.erase("bell")
@@ -441,7 +444,7 @@ func test_v3_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v3_save())
 	check(problem == "", "S9: a v3 save loads: " + problem)
-	check(close(g.cash, 812.5) and g.stock.jalapeno == 30 and g.autosell.table_mild == 50, "S9: cash, stock and sliders carry over")
+	check(close(g.cash, 812.5 * T.SAVE_V8_MONEY) and g.stock.jalapeno == 30 and g.autosell.table_mild == 50, "S9: cash, stock and sliders carry over")
 	check(g.vats[0].running and g.vats[0].taken == {"bell": 10}, "S9: a running vat's taken inputs are its recipe's")
 	check(g.heat == 0.0 and g.pin == "" and g.keep.is_empty() and g.plots.bell.quality == 0, "S9: new state starts empty")
 	check(g.has_van() and g.tap_yield() == 3, "S9: research carries over, with its effects")

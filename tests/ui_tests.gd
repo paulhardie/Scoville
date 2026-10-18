@@ -55,24 +55,24 @@ func run() -> void:
 	await process_frame
 	check(bar.visible, "O4: the status bar shows at 20 peppers")
 	var texts := visible_text(screen)
-	check("Cash: £0.00" in texts, "O4: it shows 'Cash: £0.00': %s" % str(texts))
-	check("Sell Raw Peppers (£0.10/ea)" in texts, "O4: it shows the sell button: %s" % str(texts))
+	check("Cash: $0.00" in texts, "O4: it shows 'Cash: $0.00': %s" % str(texts))
+	check("Sell Raw Peppers ($1.00/ea)" in texts, "O4: it shows the sell button: %s" % str(texts))
 
 	var sell: Button = screen.find_child("SellRaw", true, false)
 	sell.pressed.emit()
 	await process_frame
-	check("Cash: £2.00" in visible_text(screen) and counter.text == "Bell Peppers: 0", "selling updates cash and the counter")
+	check("Cash: $20.00" in visible_text(screen) and counter.text == "Bell Peppers: 0", "selling updates cash and the counter")
 	check(sell.disabled, "the sell button is disabled with no peppers")
 
-	# Stage 2 (docs/FACTORY.md): the deck opens at £10 earned.
+	# Stage 2 (docs/FACTORY.md): the deck opens at $100 earned (T.STAGE_2_CASH).
 	var deck: Control = screen.find_child("Deck", true, false)
-	check(not deck.visible, "no deck at £2 earned")
+	check(not deck.visible, "no deck at $20 earned")
 	var big := blank.size
 	for i in 80:
 		blank.pressed.emit()
 	sell.pressed.emit()
 	await create_timer(1.2).timeout
-	check(deck.visible, "the deck shows at £10 earned")
+	check(deck.visible, "the deck shows at $100 earned")
 	check(blank.size.x < big.x, "the Blank Button shrinks into the upper viewport: %s" % str(blank.size))
 	check(blank.get_global_rect().end.y <= deck.get_global_rect().position.y + 1.0, "it sits above the deck")
 	var plot_card: Control = screen.find_child("Card_plot_bell", true, false)
@@ -80,21 +80,21 @@ func run() -> void:
 	var buy_line: Control = screen.find_child("BuySlot_line", true, false)
 	check(plot_card.visible and buy_vat.visible and not buy_line.visible, "the plot and vat are offered, not the line")
 	var buy_plot: Button = screen.find_child("Buy_plot_bell", true, false)
-	check(not buy_plot.disabled, "£10 buys the plot")
+	check(not buy_plot.disabled, "$100 buys the plot")
 	buy_plot.pressed.emit()
 	await process_frame
 	check(screen.game.plots.bell.owned and not buy_plot.visible, "the buy button buys it and goes")
 	var speed: Button = screen.find_child("Upgrade_plot_bell_speed", true, false)
 	check(speed.visible and speed.text.begins_with("Harvest Speed"), "its upgrades show: %s" % speed.text)
 
-	# Stage 3 (O8): the nav bar at £400 Operation Value.
+	# Stage 3 (O8): the nav bar at $4,000 Operation Value.
 	var nav: Control = screen.find_child("Nav", true, false)
-	check(not nav.visible, "O8: no nav bar before £400")
-	screen.game.cash = 1000.0
+	check(not nav.visible, "O8: no nav bar before $%.0f" % T.TAB_THRESHOLDS.processing)
+	screen.game.cash = 10000.0
 	(screen.find_child("BuySlot_vat", true, false) as Button).pressed.emit()
-	screen.game.account.best_ov = 400.0
+	screen.game.account.best_ov = T.TAB_THRESHOLDS.processing
 	await create_timer(0.6).timeout
-	check(nav.visible, "O8: the nav bar shows at £400")
+	check(nav.visible, "O8: the nav bar shows at $%.0f" % T.TAB_THRESHOLDS.processing)
 	var tabs := []
 	for tab in ["farms", "processing", "tech", "roster", "hq"]:
 		tabs.append((screen.find_child("Tab_" + tab, true, false) as Button).text)
@@ -109,10 +109,10 @@ func run() -> void:
 	await process_frame
 	check(not (screen.find_child("Page_tech", true, false) as Control).visible, "O9: a locked tab doesn't open")
 
-	# O9: the Tech Tree at £750.
-	screen.game.account.best_ov = 750.0
+	# O9: the Tech Tree at $7,500.
+	screen.game.account.best_ov = T.TAB_THRESHOLDS.tech
 	await process_frame
-	check((screen.find_child("Tab_tech", true, false) as Button).text == "Tech Tree", "O9: the Tech Tree tab opens at £750")
+	check((screen.find_child("Tab_tech", true, false) as Button).text == "Tech Tree", "O9: the Tech Tree tab opens at $%.0f" % T.TAB_THRESHOLDS.tech)
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
 	await process_frame
 	check((screen.find_child("Page_tech", true, false) as Control).visible, "the Tech Tree page shows")
@@ -205,7 +205,7 @@ func test_return_card() -> void:
 	var g = screen.game
 	g.revealed.deck = true
 	g.revealed.status_bar = true
-	g.cash = 100.0
+	g.cash = g.plot_price("bell")
 	g.buy_plot("bell")
 	var card: Control = screen.find_child("ReturnCard", true, false)
 	check(not card.visible, "X8: no card at the start")
@@ -222,7 +222,7 @@ func test_return_card() -> void:
 	var text := func(key): return (screen.find_child("Return_" + key, true, false) as Label)
 	check(text.call("time").text == "3 h 0 m", "X8: it shows the time away: %s" % text.call("time").text)
 	check(not text.call("cap").visible, "X8: no cap note under the cap")
-	check(text.call("cash").text.begins_with("+£") and text.call("ov").text.begins_with("Operation Value +£"), "X8: cash and Operation Value")
+	check(text.call("cash").text.begins_with("+$") and text.call("ov").text.begins_with("Operation Value +$"), "X8: cash and Operation Value")
 	check(text.call("made").text.contains("Bell Peppers"), "X8: and what was made: %s" % text.call("made").text)
 	var tap := InputEventMouseButton.new()
 	tap.button_index = MOUSE_BUTTON_LEFT
@@ -263,18 +263,18 @@ func test_hq() -> void:
 	await process_frame
 	var g = screen.game
 	g.revealed = {"counter": true, "status_bar": true, "deck": true}
-	g.stats.cash_earned = 2e6
+	g.stats.cash_earned = 1e8
 	g._note_value()
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await process_frame
 	var sell: Button = screen.find_child("SellFranchise", true, false)
-	check(sell.is_visible_in_tree() and not sell.disabled and sell.text == "Sell (+13 credits)", "Q9: HQ offers the sale: %s" % sell.text)
+	check(sell.is_visible_in_tree() and not sell.disabled and sell.text == "Sell (+30 credits)", "Q9: HQ offers the sale at $100M: %s" % sell.text)
 	sell.pressed.emit()
 	await process_frame
 	check(g.account.prestiges == 0 and sell.text == "Tap again to sell", "Q9: the first tap only asks again")
 	sell.pressed.emit()
 	await process_frame
-	check(g.account.prestiges == 1 and g.account.credits == 13, "Q9: the second tap sells")
+	check(g.account.prestiges == 1 and g.account.credits == 30, "Q9: the second tap sells")
 	check(sell.disabled, "Q9: and the new run can't sell yet")
 	var open: Button = screen.find_child("OpenRoom", true, false)
 	open.pressed.emit()
@@ -290,7 +290,7 @@ func test_hq() -> void:
 	check(up != null and up.text == "Lv 2: 2" and not up.disabled, "Q9: its row offers Level 2 for 2 credits: %s" % (up.text if up else "none"))
 	up.pressed.emit()
 	await process_frame
-	check(g.account.rooms[picks[0]] == 2 and g.account.credits == 6, "Q9: and levels it")
+	check(g.account.rooms[picks[0]] == 2 and g.account.credits == 23, "Q9: and levels it")
 	screen.queue_free()
 	await process_frame
 

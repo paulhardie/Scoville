@@ -69,7 +69,7 @@ func test_values_follow_d004() -> void:
 			var inputs := 0.0
 			for item in r.inputs:
 				inputs += r.inputs[item] * g.value(item)
-			check(absf(g.value(out) - 2.0 * inputs) < 0.01, "V1: %s is worth 2× its inputs (£%.2f against £%.2f)" % [out, g.value(out), 2.0 * inputs])
+			check(absf(g.value(out) - 2.0 * inputs) < 0.01, "V1: %s is worth 2× its inputs ($%.2f against $%.2f)" % [out, g.value(out), 2.0 * inputs])
 		else:
 			var m: float = g.value(out) / raw_inside(g, out)
 			check(m >= 4.9 and m <= 5.1, "V1: %s is worth 5× the raw value inside (%.2f×)" % [out, m])
@@ -79,7 +79,7 @@ func test_ladder_climbs() -> void:
 	var g := Game.new()
 	for i in range(1, LADDER.size()):
 		var step: float = g.value(LADDER[i]) / g.value(LADDER[i - 1])
-		check(step >= 1.6 and step <= 2.7, "V2: %s is ×1.6–2.7 the rung below (×%.2f)" % [LADDER[i], step])
+		check(step >= 2.0 and step <= 3.4, "V2/D035: %s is ×2.0–3.4 the rung below (×%.2f)" % [LADDER[i], step])
 
 
 func test_stations_feed_one_vat() -> void:
@@ -104,7 +104,7 @@ func test_tier6() -> void:
 	var top := ["phantom", "scorpion_sting", "widowmaker", "extinction_event"]
 	for i in range(1, top.size()):
 		var step: float = g.value(top[i]) / g.value(top[i - 1])
-		check(step >= 1.6 and step <= 3.0, "Q11: %s is ×1.6–3.0 the rung below (×%.2f)" % [top[i], step])
+		check(step >= 2.0 and step <= 3.4, "Q11/D035: %s is ×2.0–3.4 the rung below (×%.2f)" % [top[i], step])
 	for crop in ["moruga", "reaper", "pepper_x"]:
 		var p: Dictionary = g.data.plots[crop]
 		var r: Dictionary = g.data.recipes[crop + "_mash"]

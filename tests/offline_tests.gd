@@ -98,8 +98,8 @@ func test_long_absence_matches_ticks() -> void:
 		slow.advance(seconds(7200.0 * speed))
 		var want := slow.operation_value() - ov_before
 		var diff := absf(r.ov - want) / want
-		print("  X3: at %d:%02d, 2 h away: £%.0f against £%.0f tick by tick, %.2f%% off (%d steps of %.1f s)" % [m / 60, m % 60, r.ov, want, diff * 100.0, r.steps, r.step])
-		check(diff <= 0.02, "X3: at %d:%02d, 2 h away gives £%.0f against £%.0f tick by tick (%.2f%% off, at most 2%%)" % [m / 60, m % 60, r.ov, want, diff * 100.0])
+		print("  X3: at %d:%02d, 2 h away: $%.0f against $%.0f tick by tick, %.2f%% off (%d steps of %.1f s)" % [m / 60, m % 60, r.ov, want, diff * 100.0, r.steps, r.step])
+		check(diff <= 0.02, "X3: at %d:%02d, 2 h away gives $%.0f against $%.0f tick by tick (%.2f%% off, at most 2%%)" % [m / 60, m % 60, r.ov, want, diff * 100.0])
 
 
 func test_safety() -> void:

@@ -49,19 +49,22 @@ static func worth(ov: float, rooms: Dictionary = {}) -> Game:
 
 
 func test_selling_threshold() -> void:
-	check(not worth(999999.0).can_prestige() and not worth(999999.0).prestige(), "Q1: no sale below £1,000,000")
-	check(worth(1000000.0).prestige(), "Q1: a sale at £1,000,000")
+	var below := T.PRESTIGE_OV - 1.0
+	check(not worth(below).can_prestige() and not worth(below).prestige(), "Q1: no sale below $%.0f" % T.PRESTIGE_OV)
+	check(worth(T.PRESTIGE_OV).prestige(), "Q1: a sale at $%.0f" % T.PRESTIGE_OV)
 
 
 func test_credits() -> void:
-	check(worth(1e6).prestige_credits() == 10, "Q2: 10 credits at £1M (got %d)" % worth(1e6).prestige_credits())
-	check(worth(2e6).prestige_credits() == 13, "Q2: 13 at £2M (got %d)" % worth(2e6).prestige_credits())
-	check(worth(1e7).prestige_credits() == 20, "Q2: 20 at £10M (got %d)" % worth(1e7).prestige_credits())
-	var lounge := worth(1e7, {"executive_lounge": 1})
-	check(lounge.prestige_credits() == 21, "Q2: the Executive Lounge adds 8%%, rounded down: 21 (got %d)" % lounge.prestige_credits())
-	var g := worth(1e7)
+	# Idle Planet Miner's table (D035): 10, 30, 60 at $10M, $100M, $1B, straight
+	# lines between, rounded.
+	for c in [[1e7, 10], [1.25e7, 11], [1.75e7, 12], [1e8, 30], [5.5e8, 45], [1e9, 60], [1e10, 101]]:
+		var got: int = worth(c[0]).prestige_credits()
+		check(got == c[1], "Q2: %d credits at $%.0f (got %d)" % [c[1], c[0], got])
+	var lounge := worth(1e8, {"executive_lounge": 1})
+	check(lounge.prestige_credits() == 32, "Q2: the Executive Lounge adds 8%%, rounded: 30 × 1.08 = 32 (got %d)" % lounge.prestige_credits())
+	var g := worth(1e8)
 	g.prestige()
-	check(g.account.credits == 20 and g.account.prestiges == 1, "Q2: the sale pays them into the account")
+	check(g.account.credits == 30 and g.account.prestiges == 1, "Q2: the sale pays them into the account")
 
 
 func test_reset_scope() -> void:
@@ -78,11 +81,11 @@ func test_reset_scope() -> void:
 	g.set_keep("bell", 7)
 	g.set_pin("foil_wraps")
 	g.advance(600)
-	g.stats.cash_earned = 2e6
+	g.stats.cash_earned = 2.0 * T.PRESTIGE_OV
 	var best: float = g.operation_value()
 	var credits: int = g.prestige_credits()
-	check(g.prestige(), "Q3: sells at £2M")
-	check(close(g.cash, 500.0), "Q3: cash restarts at Seed Capital Level 2's £500 (got %.2f)" % g.cash)
+	check(g.prestige(), "Q3: sells at $%.0f" % g.stats.cash_earned)
+	check(close(g.cash, 5000.0), "Q3: cash restarts at Seed Capital Level 2's $5,000 (got %.2f)" % g.cash)
 	var owned := 0
 	for crop in g.plots:
 		owned += 1 if g.plots[crop].owned else 0
@@ -164,7 +167,7 @@ func test_room_effects() -> void:
 	var amounts := []
 	for lv in range(1, 6):
 		amounts.append(worth(0.0, {"seed_capital": lv}).start_cash())
-	check(amounts == [100.0, 500.0, 2500.0, 50000.0, 250000.0], "Q6: Seed Capital: %s" % str(amounts))
+	check(amounts == [1000.0, 5000.0, 25000.0, 500000.0, 2500000.0], "Q6: Seed Capital: %s" % str(amounts))
 	var taste := worth(0.0, {"tasting_room": 1})
 	check(close(taste.sale_price("bistro_verde"), base.sale_price("bistro_verde") * 1.1) and close(taste.appraisal("bistro_verde"), base.appraisal("bistro_verde") * 1.1), "Q6: Tasting Room Lv1: bottles 10% more, sold and in stock")
 	check(close(taste.sale_price("bell"), base.sale_price("bell")), "Q6: but not crops")
@@ -192,7 +195,19 @@ func test_saves() -> void:
 	s.account = {"best_ov": 1234.0}
 	var g := Game.new()
 	var problem := g.load_state(JSON.parse_string(JSON.stringify(s)))
-	check(problem == "" and g.account.credits == 0 and g.account.prestiges == 0 and g.account.rooms.is_empty() and g.account.draft.is_empty() and g.account.best_ov == 1234.0, "Q8: a v6 save loads with an account that has never sold: %s" % problem)
+	check(problem == "" and g.account.credits == 0 and g.account.prestiges == 0 and g.account.rooms.is_empty() and g.account.draft.is_empty() and close(g.account.best_ov, 1234.0 * T.SAVE_V8_MONEY), "Q8: a v6 save loads with an account that has never sold, its best ×10 (D035): %s" % problem)
+	# v7 → v8 (D035): pounds became dollars ×10, Event Horizon became Extinction Event.
+	var v7: Dictionary = JSON.parse_string(JSON.stringify(old.to_state()).replace("extinction_event", "event_horizon"))
+	v7.version = 7
+	v7.run.cash = 123.5
+	v7.run.stats.cash_earned = 4567.0
+	v7.run.stock.event_horizon = 3
+	v7.account.best_ov = 5e8  # above the stock's worth, so the record isn't raised on loading
+	var m := Game.new()
+	problem = m.load_state(JSON.parse_string(JSON.stringify(v7)))
+	check(problem == "", "Q8/D035: a v7 save loads: %s" % problem)
+	check(close(m.cash, 123.5 * T.SAVE_V8_MONEY) and close(m.stats.cash_earned, 4567.0 * T.SAVE_V8_MONEY) and close(m.account.best_ov, 5e8 * T.SAVE_V8_MONEY), "Q8/D035: a v7 save's cash, cash earned and best Operation Value come back ×10: $%.2f, $%.2f, $%.2f" % [m.cash, m.stats.cash_earned, m.account.best_ov])
+	check(m.stock.get("extinction_event", 0) == 3 and not m.stock.has("event_horizon"), "Q8/D035: a v7 save's Event Horizon loads as Extinction Event")
 	var a := worth(0.0, {"tasting_room": 4, "cooperage": 2})
 	a.account.credits = 37
 	a.account.prestiges = 3
@@ -262,7 +277,7 @@ func test_sop() -> void:
 	var nodes := ["standard_operating_procedures", "pantry_vinegar_concentrate", "phantom_blueprint"]
 	var g := sold(nodes, "phantom")
 	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
-	check(bar > 0.0, "Q12: a running Phantom line sets a bar (£%.0f)" % bar)
+	check(bar > 0.0, "Q12: a running Phantom line sets a bar ($%.0f)" % bar)
 	var due := under_bar(g)
 	var waiting := []
 	var later := []
@@ -278,7 +293,7 @@ func test_sop() -> void:
 			if parents_due:
 				later.append(id)
 	var forks := ["pantry_vinegar_bulk", "pantry_vinegar_reserve"]
-	check(g.tech_cost_value(forks[0]) < bar and g.research_reachable(forks[0]), "Q12: a fork side is reachable and under the bar (£%.0f)" % g.tech_cost_value(forks[0]))
+	check(g.tech_cost_value(forks[0]) < bar and g.research_reachable(forks[0]), "Q12: a fork side is reachable and under the bar ($%.0f)" % g.tech_cost_value(forks[0]))
 	check(not due.is_empty() and not later.is_empty(), "Q12: the setup has nodes due now (%d) and children due after (%d)" % [due.size(), later.size()])
 	g.advance(9)
 	var missed := []

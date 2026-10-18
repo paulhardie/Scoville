@@ -1319,10 +1319,14 @@ func load_state(s: Variant) -> String:
 	if version < 1 or version > SAVE_VERSION:
 		return "unknown save version %s" % str(s.get("version"))
 	var problem := ""
+	# Money moves to dollars once, before any migration reads it (D035).
+	var dollars := version >= 8
 	if version == 1:
 		problem = _check(s, {"cash": TYPE_FLOAT, "bell": TYPE_FLOAT, "revealed": TYPE_DICTIONARY, "stats": TYPE_DICTIONARY})
 		if problem != "":
 			return problem
+		s = _to_dollars(s, 1)
+		dollars = true
 		s = _migrate_1_to_2(s)
 		version = 2
 	if version == 2:
@@ -1332,6 +1336,9 @@ func load_state(s: Variant) -> String:
 				problem = "save's station %s is not an object" % k
 		if problem != "":
 			return problem
+		if not dollars:
+			s = _to_dollars(s, 2)
+			dollars = true
 		s = _migrate_2_to_3(s)
 		version = 3
 	problem = _check(s, {"run": TYPE_DICTIONARY, "account": TYPE_DICTIONARY})
@@ -1339,10 +1346,12 @@ func load_state(s: Variant) -> String:
 		return problem
 	if version == 3:
 		s = _migrate_3_to_4(s)
-	if version < 8:
+	if not dollars:
 		problem = _check(s.run, {"cash": TYPE_FLOAT, "stats": TYPE_DICTIONARY})
 		if problem != "":
 			return problem
+		s = _to_dollars(s, 3)
+	if int(s.get("version", version)) < 8:
 		s = _migrate_7_to_8(s)
 	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
@@ -1471,15 +1480,25 @@ func load_state(s: Variant) -> String:
 	return ""
 
 
-## v8 (D035): money moved from pounds to Idle Planet Miner's dollars, about ×10
-## at Tier 1, so cash, cash earned and the best Operation Value are ×10; items
-## keep their counts and are simply worth more. The Tier 6 sauce Event Horizon
-## became Extinction Event (the name is the last fictional pepper's).
+## v8 (D035): the Tier 6 sauce Event Horizon became Extinction Event (the name
+## is the last fictional pepper's).
 func _migrate_7_to_8(s: Dictionary) -> Dictionary:
 	var out: Dictionary = JSON.parse_string(JSON.stringify(s).replace("event_horizon", "extinction_event"))
-	out.run.cash = float(out.run.cash) * T.SAVE_V8_MONEY
-	out.run.stats.cash_earned = float(out.run.stats.get("cash_earned", 0.0)) * T.SAVE_V8_MONEY
-	out.account.best_ov = float(out.account.get("best_ov", 0.0)) * T.SAVE_V8_MONEY
+	out.version = 8
+	return out
+
+
+## A pre-v8 save's money in Idle Planet Miner's dollars (D035): about ×10 at
+## Tier 1, so cash, cash earned and the best Operation Value are ×10; items keep
+## their counts and are simply worth more. v1–v2 keep them at the top level.
+func _to_dollars(s: Dictionary, layout: int) -> Dictionary:
+	var out := s.duplicate(true)
+	var run: Dictionary = out if layout <= 2 else out.run
+	run.cash = float(run.cash) * T.SAVE_V8_MONEY
+	if typeof(run.get("stats")) == TYPE_DICTIONARY and run.stats.has("cash_earned"):
+		run.stats.cash_earned = float(run.stats.cash_earned) * T.SAVE_V8_MONEY
+	if layout > 2:
+		out.account.best_ov = float(out.account.get("best_ov", 0.0)) * T.SAVE_V8_MONEY
 	return out
 
 

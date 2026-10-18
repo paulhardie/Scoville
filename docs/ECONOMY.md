@@ -64,7 +64,7 @@ A locked tab shows `[ ? ]`. Tapping it shows the Operation Value it unlocks at (
 
 ## Tier 6 (G7, D006)
 
-Carolina Reaper is a Tier 6 that **unlocks only after the first Prestige**. Runs after the first get a new goal, and Tier 6 feeds the Cook-Off's £100M+ thresholds. Draft recipes:
+Carolina Reaper is a Tier 6 that **unlocks only after the first Prestige**. Runs after the first get a new goal, and Tier 6 feeds the Cook-Off's £100M+ thresholds. Built in v0.6b part 2 with Moruga Scorpion and Pepper X either side of it ([PRESTIGE.md](PRESTIGE.md#part-2-standard-operating-procedures-and-tier-6), D034):
 
 - **Reaper Mash:** 80 Carolina Reaper.
 - **Widowmaker Reserve:** 1 Reaper Mash + 1 Phantom Smokehouse + 1 Sweet Heat Reserve, worth £40,000.

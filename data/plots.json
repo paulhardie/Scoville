@@ -14,6 +14,9 @@
 		{"crop": "habanero", "price": 20000.0, "seconds": 2.8, "yield": 8},
 		{"crop": "savina", "price": 60000.0, "seconds": 3.0, "yield": 12},
 		{"crop": "oak", "name": "Oak Smokehouse", "price": 50000.0, "seconds": 3.2, "yield": 5},
-		{"crop": "ghost", "price": 45000.0, "seconds": 3.2, "yield": 12}
+		{"crop": "ghost", "price": 45000.0, "seconds": 3.2, "yield": 12},
+		{"crop": "moruga", "price": 150000.0, "seconds": 3.2, "yield": 12},
+		{"crop": "reaper", "price": 400000.0, "seconds": 3.6, "yield": 16},
+		{"crop": "pepper_x", "price": 1500000.0, "seconds": 4.0, "yield": 20}
 	]
 }

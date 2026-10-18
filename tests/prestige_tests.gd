@@ -1,6 +1,7 @@
 extends SceneTree
 ## Selling the franchise, credits, HQ rooms and the draft (docs/PRESTIGE.md
-## Q1–Q8).
+## Q1–Q8), and part 2: after-sale nodes and Standard Operating Procedures
+## (Q10, Q12, Q13).
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
@@ -79,6 +80,7 @@ func test_reset_scope() -> void:
 	g.advance(600)
 	g.stats.cash_earned = 2e6
 	var best: float = g.operation_value()
+	var credits: int = g.prestige_credits()
 	check(g.prestige(), "Q3: sells at £2M")
 	check(close(g.cash, 500.0), "Q3: cash restarts at Seed Capital Level 2's £500 (got %.2f)" % g.cash)
 	var owned := 0
@@ -90,7 +92,7 @@ func test_reset_scope() -> void:
 	check(owned == 0 and g.vats.is_empty() and g.lines.is_empty() and stocked == 0, "Q3: plots, slots and stock reset")
 	check(g.research.keys() == ["kitchen_table"] and not g.fx.piston, "Q3: the Tech Tree resets to the Kitchen Table")
 	check(g.heat == 0.0 and g.keep.is_empty() and g.pin == "" and g.ticker.next == -1 and g.stats.ticks == 0 and g.stats.cash_earned == 0.0, "Q3: Heat, keep amounts, the pin, the Ticker and the statistics reset")
-	check(g.account.best_ov >= best and g.account.rooms == {"seed_capital": 2} and g.account.credits == 13, "Q3: the account stays")
+	check(g.account.best_ov >= best and g.account.rooms == {"seed_capital": 2} and g.account.credits == credits, "Q3: the account stays")
 	check(g.revealed.deck and g.nav_shown() and g.tab_open("tech") and g.tab_open("hq"), "Q3: the reveals and tabs stay")
 	check(g.buy_plot("bell") and g.plots.bell.owned, "Q3: the new run plays on: the Bell Pepper Plot can be bought at once")
 
@@ -202,6 +204,123 @@ func test_saves() -> void:
 	var bad: Dictionary = a.to_state()
 	bad.account.rooms = {"moon_base": 1}
 	check(Game.new().load_state(JSON.parse_string(JSON.stringify(bad))) != "", "Q8: an unknown room is refused, not loaded")
+
+
+## A game after one sale with these nodes (and their parents) researched and
+## nothing in stock, and a line bottling `sauce` with its inputs stocked.
+static func sold(nodes: Array, sauce: String = "") -> Game:
+	var g := Game.new({}, 5)
+	g.revealed = {"counter": true, "status_bar": true, "deck": true}
+	g.account.best_ov = 1e9
+	g.account.prestiges = 1
+	for item in g.stock:
+		g.stock[item] = 100000
+	for node in nodes:
+		Helpers.research_with_parents(g, node)
+	for item in g.stock:
+		g.stock[item] = 0
+	if sauce != "":
+		g.cash = 1e9
+		g.buy_slot("vat")
+		g.buy_slot("line")
+		g.assign("line", 0, sauce)
+		for item in g.data.recipes[sauce].inputs:
+			g.stock[item] = 1000
+		g.advance(1)
+	return g
+
+
+## Nodes Standard Operating Procedures would research now.
+static func under_bar(g: Game) -> Array:
+	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
+	var out := []
+	for id in g.data.tech_order:
+		if g.data.tech[id].excludes.is_empty() and g.research_reachable(id) and g.tech_cost_value(id) < bar:
+			out.append(id)
+	return out
+
+
+func test_after_sale_gate() -> void:
+	var g := worth(1e9)
+	for item in g.stock:
+		g.stock[item] = 100000
+	Helpers.research_with_parents(g, "phantom_blueprint")
+	Helpers.research_with_parents(g, "delivery_van")
+	var gated := []
+	for id in g.data.tech:
+		if g.data.tech[id].after_sale:
+			gated.append(id)
+	check(gated.size() == 10, "Q10: ten nodes open after a sale (got %d)" % gated.size())
+	for id in ["moruga_blueprint", "standard_operating_procedures"]:
+		check(not g.can_research(id) and not g.research_node(id), "Q10: %s can't be researched before a sale" % id)
+	g.account.prestiges = 1
+	for id in ["moruga_blueprint", "standard_operating_procedures"]:
+		check(g.research_node(id), "Q10: %s can after one" % id)
+
+
+func test_sop() -> void:
+	var nodes := ["standard_operating_procedures", "pantry_vinegar_concentrate", "phantom_blueprint"]
+	var g := sold(nodes, "phantom")
+	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
+	check(bar > 0.0, "Q12: a running Phantom line sets a bar (£%.0f)" % bar)
+	var due := under_bar(g)
+	var waiting := []
+	var later := []
+	for id in g.data.tech_order:
+		if g.is_researched(id) or due.has(id):
+			continue
+		if g.research_reachable(id):
+			waiting.append(id)
+		elif g.data.tech[id].excludes.is_empty() and g.tech_cost_value(id) < bar and (not g.data.tech[id].after_sale or g.account.prestiges > 0):
+			var parents_due := true
+			for need in g.data.tech[id].needs:
+				parents_due = parents_due and (g.is_researched(need) or due.has(need))
+			if parents_due:
+				later.append(id)
+	var forks := ["pantry_vinegar_bulk", "pantry_vinegar_reserve"]
+	check(g.tech_cost_value(forks[0]) < bar and g.research_reachable(forks[0]), "Q12: a fork side is reachable and under the bar (£%.0f)" % g.tech_cost_value(forks[0]))
+	check(not due.is_empty() and not later.is_empty(), "Q12: the setup has nodes due now (%d) and children due after (%d)" % [due.size(), later.size()])
+	g.advance(9)
+	var missed := []
+	for id in due:
+		if not g.is_researched(id):
+			missed.append(id)
+	check(missed.is_empty(), "Q12: every node under the bar researched itself within a second: missed %s" % str(missed))
+	check(g.stock.table_mild == 0 and g.stock.bistro_verde == 0, "Q12: free: nothing was in stock to pay with")
+	var over := []
+	for id in waiting:
+		if g.is_researched(id):
+			over.append(id)
+	check(over.is_empty(), "Q12: nothing at or over the bar: %s" % str(over))
+	check(not g.is_researched(forks[0]) and not g.is_researched(forks[1]), "Q12: a fork side never researches itself")
+	var early := []
+	for id in later:
+		if g.is_researched(id):
+			early.append(id)
+	check(early.is_empty(), "Q12: a child waits for the second after its parent: %s" % str(early))
+	g.advance(10)
+	var late := []
+	for id in later:
+		if not g.is_researched(id):
+			late.append(id)
+	check(late.is_empty(), "Q12: and then researches itself: missed %s" % str(late))
+
+	var plain := sold(["delivery_van", "pantry_vinegar_concentrate", "phantom_blueprint"], "phantom")
+	var before: int = plain.stats.researched
+	plain.advance(50)
+	check(plain.stats.researched == before, "Q12: without Standard Operating Procedures nothing researches itself")
+
+
+func test_sop_offline() -> void:
+	var g := sold(["standard_operating_procedures", "phantom_blueprint"], "phantom")
+	var due := under_bar(g)
+	g.catch_up(600.0)
+	var missed := []
+	for id in due:
+		if not g.is_researched(id):
+			missed.append(id)
+	check(not due.is_empty() and missed.is_empty(), "Q13: the catch-up researches what play would: missed %s of %d" % [str(missed), due.size()])
+	check(under_bar(g).is_empty(), "Q13: nothing under the bar is left after time away: %s" % str(under_bar(g)))
 
 
 static func research(g: Game, node: String) -> void:

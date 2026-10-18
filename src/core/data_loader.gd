@@ -172,7 +172,7 @@ static func check(raw: Dictionary) -> Dictionary:
 					if not data.recipes.has(e[kind]):
 						errors.append(where + ": unlocks unknown recipe " + str(e[kind]))
 						ok = false
-				"delivery_van", "heat_meter", "overdrive", "overflow_valve", "smart_stockpiling", "market_ticker":
+				"delivery_van", "heat_meter", "overdrive", "overflow_valve", "smart_stockpiling", "market_ticker", "sop":
 					if e[kind] != true:
 						errors.append(where + ": %s takes true" % kind)
 						ok = false
@@ -230,7 +230,11 @@ static func check(raw: Dictionary) -> Dictionary:
 			if typeof(excludes) != TYPE_ARRAY:
 				errors.append(where + ": excludes is a list of node ids")
 				excludes = []
-			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1]), "excludes": excludes.duplicate()}
+			var after_sale: Variant = r.get("after_sale", false)
+			if typeof(after_sale) != TYPE_BOOL:
+				errors.append(where + ": after_sale is true or false")
+				after_sale = false
+			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1]), "excludes": excludes.duplicate(), "after_sale": after_sale}
 			data.tech_order.append(r.id)
 	# A fork (D026) names the nodes it locks; each side has to name the other.
 	for id in data.tech:

@@ -1,5 +1,5 @@
 {
-	"_source": "docs/ECONOMY.md: bottle values are the brief's (§3); crop and mash values follow D004. `ingredient` marks a non-pepper crop (D024), which Forager's Luck tops up (D025). v0.6a's items are docs/FULL_RUN.md's (D029).",
+	"_source": "docs/ECONOMY.md: bottle values are the brief's (§3); crop and mash values follow D004. `ingredient` marks a non-pepper crop (D024), which Forager's Luck tops up (D025). v0.6a's items are docs/FULL_RUN.md's (D029); Tier 6's are docs/PRESTIGE.md's (D034).",
 	"items": [
 		{"id": "bell", "name": "Bell Pepper", "plural": "Bell Peppers", "short": "Bell", "kind": "crop", "tier": 1, "value": 0.1},
 		{"id": "jalapeno", "name": "Jalapeño", "plural": "Jalapeños", "short": "Jalapeño", "kind": "crop", "tier": 2, "value": 0.2},
@@ -38,6 +38,15 @@
 		{"id": "island_heat", "name": "Island Heat", "plural": "Island Heat", "short": "Island", "kind": "bottle", "tier": 4, "value": 500.0},
 		{"id": "sweet_heat", "name": "Sweet Heat Reserve", "plural": "Sweet Heat Reserve", "short": "Sweet Heat", "kind": "bottle", "tier": 4, "value": 850.0},
 		{"id": "savina_gold", "name": "Savina Gold", "plural": "Savina Gold", "short": "Savina", "kind": "bottle", "tier": 5, "value": 2000.0},
-		{"id": "phantom", "name": "Phantom Smokehouse", "plural": "Phantom Smokehouse", "short": "Phantom", "kind": "bottle", "tier": 5, "value": 5200.0}
+		{"id": "phantom", "name": "Phantom Smokehouse", "plural": "Phantom Smokehouse", "short": "Phantom", "kind": "bottle", "tier": 5, "value": 5200.0},
+		{"id": "moruga", "name": "Trinidad Moruga Scorpion", "plural": "Moruga Scorpions", "short": "Moruga", "kind": "crop", "tier": 6, "value": 16.4},
+		{"id": "reaper", "name": "Carolina Reaper", "plural": "Carolina Reapers", "short": "Reaper", "kind": "crop", "tier": 6, "value": 24.4},
+		{"id": "pepper_x", "name": "Pepper X", "plural": "Pepper X", "short": "Pepper X", "kind": "crop", "tier": 6, "value": 52.0},
+		{"id": "moruga_mash", "name": "Moruga Mash", "plural": "Moruga Mash", "short": "Moruga Mash", "kind": "mash", "tier": 6, "value": 1968.0},
+		{"id": "reaper_mash", "name": "Reaper Mash", "plural": "Reaper Mash", "short": "Reaper Mash", "kind": "mash", "tier": 6, "value": 3904.0},
+		{"id": "pepper_x_mash", "name": "Pepper X Mash", "plural": "Pepper X Mash", "short": "PX Mash", "kind": "mash", "tier": 6, "value": 10400.0},
+		{"id": "scorpion_sting", "name": "Scorpion Sting", "plural": "Scorpion Sting", "short": "Scorpion", "kind": "bottle", "tier": 6, "value": 14920.0},
+		{"id": "widowmaker", "name": "Widowmaker Reserve", "plural": "Widowmaker Reserve", "short": "Widowmaker", "kind": "bottle", "tier": 6, "value": 40000.0},
+		{"id": "event_horizon", "name": "Event Horizon", "plural": "Event Horizon", "short": "Horizon", "kind": "bottle", "tier": 6, "value": 100000.0}
 	]
 }

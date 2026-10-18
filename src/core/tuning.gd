@@ -137,3 +137,11 @@ const ROOM_OPEN_COST := 5
 const ROOM_LEVEL_COST := 2
 ## Rooms dealt in a draft (brief §6: a 2-card draft).
 const DRAFT_SIZE := 2
+
+## Standard Operating Procedures (brief §4, D034): a node researches itself
+## when its cost is worth under SOP_SHARE of SOP_WINDOW seconds of the bottles
+## running lines make (the window is a GUESS at "throughput"), looked at every
+## SOP_EVERY_SECONDS (GUESS).
+const SOP_SHARE := 0.01
+const SOP_WINDOW := 3600.0
+const SOP_EVERY_SECONDS := 1.0

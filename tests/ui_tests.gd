@@ -177,6 +177,7 @@ func run() -> void:
 	await process_frame
 	await test_return_card()
 	await test_hq()
+	await test_after_sale()
 	await test_feel()
 	for failure in failures:
 		printerr("FAIL: ", failure)
@@ -290,6 +291,35 @@ func test_hq() -> void:
 	up.pressed.emit()
 	await process_frame
 	check(g.account.rooms[picks[0]] == 2 and g.account.credits == 6, "Q9: and levels it")
+	screen.queue_free()
+	await process_frame
+
+
+## Q14: after-sale nodes say so on the Tech Tree, and Standard Operating
+## Procedures says what it does (docs/PRESTIGE.md part 2).
+func test_after_sale() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	root.add_child(screen)
+	await process_frame
+	var g = screen.game
+	g.revealed = {"counter": true, "status_bar": true, "deck": true}
+	g.stats.cash_earned = 2e6
+	g._note_value()
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_moruga_blueprint", true, false) as Button).pressed.emit()
+	await process_frame
+	check("Opens after your first franchise sale." in visible_text(screen), "Q14: a Tier 6 node says it opens after the first sale")
+	g.account.prestiges = 1
+	(screen.find_child("Tech_standard_operating_procedures", true, false) as Button).pressed.emit()
+	await process_frame
+	var texts := visible_text(screen)
+	check(not "Opens after your first franchise sale." in texts, "Q14: not once the franchise has been sold")
+	var says := false
+	for t in texts:
+		says = says or t.contains("researches itself, free")
+	check(says, "Q14: Standard Operating Procedures says what it does")
 	screen.queue_free()
 	await process_frame
 

@@ -41,7 +41,7 @@ Scoville figures are the commonly quoted ranges, or the tested average for recor
 
 Fictional peppers are in italics. The joke runs on real numbers: 16 million SHU is pure capsaicin, the physical ceiling for a chilli, so the Capsaicin Crystal is "grown in a lab", and everything after it is impossible. The Event Horizon's 16 billion is resiniferatoxin's real rating, the hottest substance known.
 
-Tier 6 is still after the first Prestige ([D006](DECISIONS.md)); Tiers 7–9 are later runs and the Cook-Off's high thresholds.
+Tier 6 is after the first Prestige ([D006](DECISIONS.md)), built in v0.6b part 2 with a mash and a sauce for each of its three peppers ([PRESTIGE.md](PRESTIGE.md#part-2-standard-operating-procedures-and-tier-6), D034); Tiers 7–9 are later runs and the Cook-Off's high thresholds.
 
 ## Supporting ingredients
 

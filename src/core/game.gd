@@ -105,7 +105,7 @@ func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
 		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "plot_yield": {}, "concentrate": {}, "reserve": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
 		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
-		"byproduct": 0.0, "forage": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
+		"byproduct": 0.0, "forage": 0.0, "sop": false, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
 	for node in research:
 		for e in data.tech[node].effects:
 			var kind: String = e.keys()[0]
@@ -134,6 +134,7 @@ func _refresh_fx() -> void:
 				"overflow_valve": fx.valve = true
 				"smart_stockpiling": fx.stockpile = true
 				"market_ticker": fx.ticker = true
+				"sop": fx.sop = true
 				"byproduct_recycling": fx.byproduct = maxf(fx.byproduct, v)
 				"forage": fx.forage = maxf(fx.forage, v)
 				"stock_value_bonus": fx.stock_bonus += v
@@ -429,9 +430,12 @@ func is_researched(node: String) -> bool:
 	return research.has(node)
 
 
-## Every parent researched, and the tab open.
+## Every parent researched, and the tab open; an after-sale node only once
+## the franchise has been sold (D034).
 func research_reachable(node: String) -> bool:
 	if not data.tech.has(node) or is_researched(node) or not tab_open("tech"):
+		return false
+	if data.tech[node].after_sale and account.prestiges < 1:
 		return false
 	for need in data.tech[node].needs:
 		if not is_researched(need):
@@ -623,6 +627,44 @@ func research_node(node: String) -> bool:
 	for item in cost:
 		stock[item] -= cost[item]
 		stats.consumed[item] += cost[item]
+	_grant(node)
+	return true
+
+
+## Value a second of the bottles from running lines, at base values: what
+## Standard Operating Procedures measures a cost against (D034).
+func bottle_rate() -> float:
+	var rate := 0.0
+	for i in lines.size():
+		if lines[i].running:
+			rate += value(data.recipes[lines[i].recipe].output) / slot_cycle("line", i)
+	return rate
+
+
+## A node's cost at base values, after the Test Kitchen.
+func tech_cost_value(node: String) -> float:
+	var cost: Dictionary = tech_cost(node)
+	var v := 0.0
+	for item in cost:
+		v += cost[item] * value(item)
+	return v
+
+
+## Standard Operating Procedures (D034): nodes the player could research whose
+## cost is under the bar research themselves, free, in file order. Forks are
+## the player's choice.
+func _sop() -> void:
+	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * bottle_rate()
+	var due := []
+	for node in data.tech_order:
+		if data.tech[node].excludes.is_empty() and research_reachable(node) and tech_cost_value(node) < bar:
+			due.append(node)
+	for node in due:
+		_grant(node)
+
+
+## Marks a node researched and applies it; the caller has paid, or SOP waived it.
+func _grant(node: String) -> void:
 	research[node] = true
 	stats.researched += 1
 	if pin == node:
@@ -632,7 +674,6 @@ func research_node(node: String) -> bool:
 	if fx.ticker and not had_ticker:
 		ticker.next = stats.ticks + _ticks(rng.randi_range(T.TICKER_FIRST[0], T.TICKER_FIRST[1]))
 	_start_cycles()
-	return true
 
 
 ## Sets a sauce's Auto-Sell share (Delivery Van), in AUTOSELL_STEP steps.
@@ -752,6 +793,9 @@ func _step(k: int) -> void:
 	var every := _ticks(T.OVERFLOW_EVERY_SECONDS)
 	if fx.valve and ticks_before / every != stats.ticks / every:
 		_overflow()
+	var sop_every := _ticks(T.SOP_EVERY_SECONDS)
+	if fx.sop and ticks_before / sop_every != stats.ticks / sop_every:
+		_sop()
 	_market()
 	_note_value()
 

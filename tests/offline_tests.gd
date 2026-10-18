@@ -8,7 +8,7 @@ const Helpers = preload("res://tests/button_tests.gd")
 
 var failures: Array[String] = []
 var checks := 0
-## The pacing player's states at 0:30, 1:00 and 1:40.
+## The pacing player's states at 0:30, 1:00, 1:40 and 2:30 (2:30 for FULL_RUN.md's U9).
 var states := {}
 
 
@@ -29,10 +29,10 @@ func close(a: float, b: float, eps: float = 1e-9) -> bool:
 func run() -> void:
 	var g := Game.new()
 	var p := Player.new()
-	for i in roundi(100 * 60 / T.TICK_SECONDS):
+	for i in roundi(150 * 60 / T.TICK_SECONDS):
 		p.step(g)
 		g.tick()
-		for m in [30, 60, 100]:
+		for m in [30, 60, 100, 150]:
 			if g.stats.ticks == roundi(m * 60 / T.TICK_SECONDS):
 				states[m] = g.to_state()
 	for method in get_method_list():
@@ -86,7 +86,7 @@ func test_short_absence_is_exact() -> void:
 func test_long_absence_matches_ticks() -> void:
 	# X3: two hours away against the same offline time run tick by tick. The
 	# Market Ticker and Overdrive are held off in both, as D019 has them.
-	for m in [30, 60, 100]:
+	for m in [30, 60, 100, 150]:
 		var fast := loaded(m)
 		var slow := loaded(m)
 		var speed := fast.offline_speed()
@@ -167,19 +167,21 @@ const X7_MAX_RATIO := 3.0
 
 
 func test_speed() -> void:
-	# Best of 3 each, against noise from other work on the machine.
-	var catch_up_best := INF
-	var tick_best := INF
-	var r := {}
-	for attempt in 3:
-		var g := loaded(100)
-		var t0 := Time.get_ticks_usec()
-		r = g.catch_up(8 * 3600.0)
-		catch_up_best = minf(catch_up_best, (Time.get_ticks_usec() - t0) / 1000000.0)
-		var h := loaded(100)
-		t0 = Time.get_ticks_usec()
-		h.advance(seconds(10 * 60.0))
-		tick_best = minf(tick_best, (Time.get_ticks_usec() - t0) / 1000000.0)
-	var ratio := catch_up_best / tick_best
-	print("  X7: 8 hours away worked out in %.3f s (%d steps of %.1f s); 10 minutes tick by tick %.3f s; ratio %.2f" % [catch_up_best, r.steps, r.step, tick_best, ratio])
-	check(ratio <= X7_MAX_RATIO, "X7: 8 hours away takes %.2f× this machine's 10 minutes tick by tick (at most %.1f×)" % [ratio, X7_MAX_RATIO])
+	# X7 at 1:40, and at 2:30 for FULL_RUN.md's U9.
+	for at in [100, 150]:
+		# Best of 3 each, against noise from other work on the machine.
+		var catch_up_best := INF
+		var tick_best := INF
+		var r := {}
+		for attempt in 3:
+			var g := loaded(at)
+			var t0 := Time.get_ticks_usec()
+			r = g.catch_up(8 * 3600.0)
+			catch_up_best = minf(catch_up_best, (Time.get_ticks_usec() - t0) / 1000000.0)
+			var h := loaded(at)
+			t0 = Time.get_ticks_usec()
+			h.advance(seconds(10 * 60.0))
+			tick_best = minf(tick_best, (Time.get_ticks_usec() - t0) / 1000000.0)
+		var ratio := catch_up_best / tick_best
+		print("  X7 at %d:%02d: 8 hours away worked out in %.3f s (%d steps of %.1f s); 10 minutes tick by tick %.3f s; ratio %.2f" % [at / 60, at % 60, catch_up_best, r.steps, r.step, tick_best, ratio])
+		check(ratio <= X7_MAX_RATIO, "X7 at %d:%02d: 8 hours away takes %.2f× this machine's 10 minutes tick by tick (at most %.1f×)" % [at / 60, at % 60, ratio, X7_MAX_RATIO])

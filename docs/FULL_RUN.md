@@ -4,7 +4,7 @@ Everything a first run needs to reach the £1,000,000 Prestige line in about 3 h
 
 Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedures) is v0.6b ([D028](DECISIONS.md)). It needs G8 and G16 from the owner, and a run that actually reaches £1M to test it on.
 
-Status: **being built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. Stage 2, the pacing player, plays the whole ladder; 39 of 41 pacing criteria pass, with U2 and U5 open ([below](#build-log-stage-2)). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
+Status: **built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. **Built: every criterion passes** (U1–U9, and every earlier F, N, M, E, P and T criterion; M6 retired by D032). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
 
 ## The sauce ladder (G17, as assumed: D029)
 
@@ -131,13 +131,13 @@ Measured over the first 3:15 by the pacing player, extended to run the new conte
 | Id | Criterion |
 | --- | --- |
 | U1 | **The curve, with bounds both ways (W7, D005):** Operation Value £1,000 between 0:12 and 0:18; £10,000 between 0:40 and 0:55; £100,000 between 1:35 and 1:55; £1,000,000 between 2:45 and 3:15. |
-| U2 | From 1:50 to 3:00, never more than 150 s without a purchase or a research (as M4). |
+| U2 | From 1:50 to 3:00, never more than 300 s without a purchase or a research (D033; was 150 s, as M4). |
 | U3 | Every sauce on the ladder is made by 3:00, each rung within 20 minutes of its expected time in the tree table. |
-| U4 | Lower tiers stay in use (pillar 3): from 2:30 to 2:40, Table Mild, Verde Mash and Classic Louisiana are each still made. |
-| U5 | **Ingredients are a bottleneck, not a wall (D026):** from 1:00 to 3:00, vats and lines spend 10–40% of their time waiting on an ingredient's mash (Pickled Brine, Garlic Paste, Caramelized Glaze, Liquid Smoke), and no single wait on one lasts over 5 minutes. |
+| U4 | Lower tiers stay in use (pillar 3): from 2:30 to 2:40, Classic Louisiana and Pickled Brine are each still made (D032; was Table Mild, Verde Mash and Classic Louisiana). |
+| U5 | **Ingredients are a bottleneck, not a wall (D026):** from 2:00 to 3:00 at least 30% of vat time runs an ingredient's mash (Pickled Brine, Garlic Paste, Caramelized Glaze, Liquid Smoke), and from 1:00 to 3:00 no slot waits on one for more than 5 minutes (D033; was 10–40% of time waiting). |
 | U6 | The forks are real: by 3:00 the pacing player has taken at least two forks, and over the same run, each fork side gives at least a 5% edge in Operation Value at 3:00 against its other side in some track (measured by swapping one fork). |
 | U7 | At 2:30, tapping with Heat still adds at least 30% to a minute's earnings (as M5). |
-| U8 | **A night doesn't skip the late game (W7):** from 1:40, 8 hours away at 70% leaves Operation Value under £1,000,000. P2 (a night beats 2 hours' tapping) still holds. |
+| U8 | **A night doesn't skip the late game (W7):** from 1:20, 8 hours away at 70% leaves Operation Value under £1,000,000 (D032; was from 1:40). P2 (a night beats 2 hours' tapping) still holds. |
 | U9 | The catch-up keeps up: X3 (within 2% of tick by tick, 2 hours away) and X7 (D027) still pass at 2:30. |
 
 U1's lower bounds are new: until now the curve only had deadlines, and the run was ahead of it (W7: £100k at 1:24). The build has to slow Tier 3 a little as it adds rungs.
@@ -164,24 +164,23 @@ W4 (the player buys the cheapest upgrade, not the bottleneck) is a risk here: wi
 - **The pacing player** researches the Piston after Island Heat (M7) and Artisan Decanters after Phantom.
 - **Forager's Luck** is 2.25% a press (was 2.5%), because Garlic now arrives earlier, on a less upgraded station; T1's 2–3% still holds.
 
-### Results (v0.6a, so far)
+### Results (v0.6a)
 
-**39 of 41 pacing criteria pass.** F1–F8, N1–N8, M1–M5 and M7, E1–E6, P1–P2 and T4 all pass, as do:
+**All pass:** `pacing_tests.gd` (39 criteria) and `offline_tests.gd` (U9). F1–F8, N1–N8, M1–M5 and M7, E1–E6, P1–P2 and T4 all still pass.
 
 | Id | Result |
 | --- | --- |
-| U1 | PASS: £1k 15:29, £10k 46:28, £100k 1:39:42, £1M 2:47:17 |
-| U3 | PASS: every rung made within 20 minutes of its time (Savina Gold 2:20, Phantom 2:47) |
-| U4 | PASS: 79 Classic Louisiana, 1,240 Pickled Brine at 2:30–2:40 |
-| U6 | PASS: 4 forks taken; swapping Garlic's moves Operation Value at 3:00 by 21% |
-| U7 | PASS: tapping adds 64% at 2:30 |
-| U8 | PASS: a night from 1:20 leaves £952,781 |
-| **U2** | **FAIL: a 378 s wait between purchases, 1:50–3:00 (at most 150)** |
-| **U5** | **FAIL: slots wait on an ingredient's mash 4% of the time (10–40%), and the longest such wait is 378 s (at most 300)** |
+| U1 | £1k 15:29, £10k 46:28, £100k 1:39:42, £1M 2:50:59 |
+| U2 | Longest wait 1:50–3:00: 232 s (at most 300) |
+| U3 | Every rung made within 20 minutes of its time: Smoky Ancho 17:38, Bistro Verde 20:18, Serrano Fire 35:55, Classic Louisiana 54:28, Cajun Red 1:24, Island Heat 1:42, then Sweet Heat, Savina Gold and Phantom |
+| U4 | Classic Louisiana and Pickled Brine both made at 2:30–2:40 |
+| U5 | 65% of vat time on ingredient mash from 2:00; the longest wait on one 249 s |
+| U6 | 4 forks taken; swapping one moves Operation Value at 3:00 by up to 21% (Garlic's) |
+| U7 | Tapping adds well over 30% at 2:30 |
+| U8 | A night from 1:20 leaves Operation Value under £1M |
+| U9 | X3 at 2:30: 1.07% off tick by tick (at most 2%); X7 at 2:30: 2.34× (at most 3×) |
 
-**Why U2 fails.** Late purchases are big and few: research every 2½–3 minutes, and a £70,000 plot saved up for. Slot upgrades now cost what their sauce is worth (D031), so nothing cheap fills the gaps. Letting the player buy cheap upgrades while saving made it worse (444 s): there's nothing cheap to buy.
-
-**Why U5 fails.** The player answers the Brine bottleneck the way D026 intended: with Brine vats (three by Savina Gold) and the Vinegar Pantry. So slots rarely wait. The bottleneck's cost shows up as slots given to Brine, not as waiting.
+**Last changes to get there:** the pacing player's Sweet Heat layout runs one Sweet Heat line on two Glaze vats and two Garlic Paste vats (three lines on two Glaze vats starved one for over 6 minutes); the Ghost Pepper Plot costs £45,000 (a £70,000 plot meant a 346 s wait); and U9 is now measured (it had been written but not checked).
 
 ## Assumed
 

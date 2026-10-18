@@ -215,3 +215,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision (chosen by the owner):** U8 is measured from 1:20, not 1:40; U4 asks for Classic Louisiana and Pickled Brine (not Table Mild and Verde Mash) at 2:30–2:40; M6 is retired, as U4 checks the same thing for the full run. **Measurement fixes (the agent's, said here):** "tapping adds X%" (F7, F8, N8, M5, U7, and P2's tapping minute) now sells the saved backlog before the minute starts and starts the idle minute at Heat 0; U6 swaps each of the four forks and takes the biggest swing, as its wording ("in some track") says.
 
 **Why:** From 1:40 a night is worth about £1M by the curve's own maths, so U8 couldn't pass alongside U1. Nothing late takes Table Mild or Verde Mash. The tapping minute was dominated by selling a stockpile at the saved Heat in both runs, and the idle run kept the tapping run's Heat for most of the minute.
+
+## D033: U2 and U5 for the late run
+
+**Decision (chosen by the owner):** U2 allows waits of up to 300 s between purchases from 1:50 to 3:00 (M4 keeps 150 s to 1:50). U5 measures the ingredient bottleneck by what it costs in slots: from 2:00 to 3:00 at least 30% of vat time runs an ingredient's mash (Pickled Brine, Garlic Paste, Caramelized Glaze, Liquid Smoke), and no slot waits on one for more than 5 minutes from 1:00 to 3:00.
+
+**Why:** Late purchases are big and few once slot upgrades cost what their sauce is worth (D031), and nothing cheap fills the gaps. A player answers the Brine squeeze with more Brine vats, as D026 intended, so slots rarely wait; the bottleneck shows as vats given to ingredients (65% measured).

@@ -78,7 +78,7 @@ func run() -> void:
 	var at_150: Dictionary = {}
 	var u4 := {"classic_louisiana": 0, "pickled_brine": 0}
 	var at_80: Dictionary = {}
-	var u5 := {"waiting": 0, "busy": 0, "longest": 0.0, "since": {}}
+	var u5 := {"waiting": 0, "busy": 0, "longest": 0.0, "since": {}, "vats": 0, "ingredient_vats": 0}
 	var window := {"line_busy": 0, "ticks": 0, "brine_start": 0, "brine_end": 0}
 	for i in minute(MINUTES):
 		p.step(g)
@@ -115,6 +115,12 @@ func run() -> void:
 				u4[item] += g.stats.made[item]
 		if g.stats.ticks > minute(60) and g.stats.ticks <= minute(180):
 			u5_tick(g, u5)
+		if g.stats.ticks > minute(120) and g.stats.ticks <= minute(180):
+			for v in g.vats:
+				if v.recipe != "":
+					u5.vats += 1
+					if INGREDIENT_MASH.has(g.data.recipes[v.recipe].output):
+						u5.ingredient_vats += 1
 		if g.stats.ticks == minute(40):
 			window.brine_start = g.stats.made.pickled_brine
 		if g.stats.ticks == minute(50):
@@ -220,7 +226,7 @@ func run() -> void:
 		u1_text.append("%s at %s (%s–%s)" % [b[1], clock(at), clock(b[2] * 60.0), clock(b[3] * 60.0)])
 	criterion("U1", u1_ok, ", ".join(u1_text))
 	var wait_u := longest_wait(p, 110 * 60.0, 180 * 60.0)
-	criterion("U2", wait_u <= 150.0, "longest wait between purchases or research, 1:50–3:00: %.0f s (at most 150)" % wait_u)
+	criterion("U2", wait_u <= 300.0, "longest wait between purchases or research, 1:50–3:00: %.0f s (at most 300, D033)" % wait_u)
 	var u3_ok := true
 	var u3_text := []
 	for sauce in LADDER:
@@ -229,8 +235,8 @@ func run() -> void:
 		u3_text.append("%s %s (%s)" % [sauce, clock(at), clock(LADDER[sauce] * 60.0)])
 	criterion("U3", u3_ok, "first made, against expected: " + ", ".join(u3_text))
 	criterion("U4", u4.classic_louisiana > 0 and u4.pickled_brine > 0, "2:30–2:40 made: %d Classic Louisiana, %d Pickled Brine (each at least 1)" % [u4.classic_louisiana, u4.pickled_brine])
-	var share: float = u5.waiting / float(maxi(u5.busy, 1))
-	criterion("U5", share >= 0.10 and share <= 0.40 and u5.longest <= 300.0, "1:00–3:00: slots wait on an ingredient's mash %.0f%% of the time (10–40%%), longest %.0f s (at most 300)" % [share * 100.0, u5.longest])
+	var spent: float = u5.ingredient_vats / float(maxi(u5.vats, 1))
+	criterion("U5", spent >= 0.30 and u5.longest <= 300.0, "2:00–3:00: %.0f%% of vat time runs an ingredient's mash (at least 30%%, D033); 1:00–3:00: the longest wait on one %.0f s (at most 300)" % [spent * 100.0, u5.longest])
 	var edge := 0.0
 	var edge_text := ""
 	for swap in SWAPS:

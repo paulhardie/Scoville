@@ -57,8 +57,10 @@ const LAYOUTS := [
 		"line": ["table_mild", "cajun_red", "classic_louisiana", "classic_louisiana", "cajun_red", "bistro_verde"], "lend": [0, 6, 5]},
 	{"when": "island_heat", "vat": ["sweet_mash", "pickled_brine", "pickled_brine", "garlic_paste", "glaze", "bonnet_mash", "cayenne_mash"],
 		"line": ["table_mild", "island_heat", "island_heat", "classic_louisiana", "classic_louisiana", "island_heat"], "lend": [0, 6]},
-	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "habanero_mash", "bonnet_mash"],
-		"line": ["table_mild", "island_heat", "sweet_heat", "sweet_heat", "island_heat", "sweet_heat"], "lend": [6, 1]},
+	# Sweet Heat takes 2 Glaze a bottle, and each Glaze 1 Garlic Paste: one
+	# line is what two Glaze vats and two Paste vats keep fed.
+	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "habanero_mash", "garlic_paste"],
+		"line": ["table_mild", "sweet_heat", "table_mild"], "lend": [6, 1]},
 	{"when": "savina_gold", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "cayenne_mash"],
 		"line": ["classic_louisiana", "savina_gold", "savina_gold", "classic_louisiana", "savina_gold", "classic_louisiana"], "lend": [6, 2]},
 	{"when": "phantom", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "ghost_mash", "liquid_smoke"],

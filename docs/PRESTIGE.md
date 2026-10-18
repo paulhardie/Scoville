@@ -1,6 +1,6 @@
-# Prestige (v0.6b, first part)
+# Prestige (v0.6b)
 
-Brief §6: once a run's Operation Value reaches £1,000,000, the player can **sell the franchise**. That resets the run and pays **Franchise Credits**, spent on **HQ Facility rooms** that last across runs. A new room comes from a **2-card draft**. This first part builds the loop itself: selling, credits, the 12 rooms with their draft and levels, and the brief's anti-exploit cost formula. Standard Operating Procedures and Tier 6 come next (D028).
+Brief §6: once a run's Operation Value reaches £1,000,000, the player can **sell the franchise**. That resets the run and pays **Franchise Credits**, spent on **HQ Facility rooms** that last across runs. A new room comes from a **2-card draft**. This first part builds the loop itself: selling, credits, the 12 rooms with their draft and levels, and the brief's anti-exploit cost formula. The second part adds what changes on repeat runs: Standard Operating Procedures and Tier 6 ([below](#part-2-standard-operating-procedures-and-tier-6)).
 
 Status: **built** (rules, save v7, the HQ tab), all criteria PASS. It doesn't depend on v0.6a's tuning: the rules are checked with games set up directly, at any Operation Value.
 
@@ -67,3 +67,45 @@ All PASS: `tests/prestige_tests.gd` (Q1–Q8, 50 checks) and `tests/ui_tests.gd`
 - **G19:** level steps after Level 1 as in the table, and Seed Capital beyond the brief's four amounts (×5 a level, cap 10).
 - Selling needs a second tap; there's no undo.
 - Victoria Sterling's lower threshold (£800,000) waits for the Shift Roster (v0.7).
+
+## Part 2: Standard Operating Procedures and Tier 6
+
+Status: **criteria written, being built** (W12, [D034](DECISIONS.md)).
+
+A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 gives repeat runs two things the first run doesn't have: the early Tech Tree researching itself (brief §4, West Wing), and a sixth tier above Phantom Smokehouse (D006).
+
+### Rules
+
+- **After the first sale.** Tier 6's nine nodes and Standard Operating Procedures open only once the franchise has been sold at least once (`account.prestiges`, saved since v7). Before that they show on the web, muted, saying "Opens after your first franchise sale."
+- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it **free** if its cost is worth less than 1% of an hour's output. Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
+  - **A cost's worth** is its items at their base values (D004), after the Test Kitchen.
+  - **An hour's output** is 3,600 × the value a second of the bottles from lines that are running: each running line's sauce value ÷ its cycle. So 1% is 36 seconds of bottles.
+  - **Forks are never taken**: either/or is the player's choice (D026).
+  - The same rule runs in the offline catch-up, once a step.
+- **Tier 6** (G17, assumed like D029): three peppers from the ladder ([INGREDIENTS.md](INGREDIENTS.md)), each with its own mash and sauce, values by D004.
+
+| Pepper | Value | Plot | Mash | Sauce | Line |
+| --- | --- | --- | --- | --- | --- |
+| Trinidad Moruga Scorpion | £16.40 | £150,000; 12 every 3.2 s | Moruga Mash: 60 Moruga, 16 s, £1,968 | **Scorpion Sting** £14,920: 1 Moruga Mash + 1 Savina Gold | 20 s |
+| Carolina Reaper | £24.40 | £400,000; 16 every 3.6 s | Reaper Mash: 80 Reaper, 18 s, £3,904 | **Widowmaker Reserve** £40,000: 1 Reaper Mash + 1 Phantom Smokehouse + 1 Sweet Heat Reserve (D006) | 22 s |
+| Pepper X | £52 | £1,500,000; 20 every 4.0 s | Pepper X Mash: 100 Pepper X, 20 s, £10,400 | **Event Horizon** £100,000: 1 Pepper X Mash + 1 Scorpion Sting | 24 s |
+
+Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's pattern (D010): each rung's three nodes are paid in the rung below's sauce: Moruga in Phantom Smokehouse (20, 20 + 10 Ghost Mash, 30), Reaper in Scorpion Sting, Pepper X in Widowmaker Reserve. They run on east from Phantom Smokehouse (E39–E47).
+
+### Criteria (part 2)
+
+| Id | Criterion |
+| --- | --- |
+| Q10 | Before any sale, no Tier 6 node and not Standard Operating Procedures can be researched, even with every parent and the full cost in stock; after one sale they can. |
+| Q11 | Tier 6's mashes are worth 2× their inputs and its sauces 5× the raw value inside (V1, which covers every recipe); Phantom Smokehouse → Scorpion Sting → Widowmaker Reserve → Event Horizon each climb ×1.6–3.0; each Tier 6 plot feeds one vat at base (V3). |
+| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under 1% of an hour's bottles is researched, and its cost stays in stock; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
+| Q13 | After time away (the catch-up), every node under the bar with its parents done has been researched, as in play. |
+| Q14 | On screen: a Tier 6 node before the first sale says it opens after the first sale; Standard Operating Procedures says what it does. |
+
+Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief) and Widowmaker (£40,000, D006) are 7.7× apart, so one sauce between them climbs about ×2.8 either side.
+
+### Assumed (part 2)
+
+- **G17:** Tier 6's recipes, values, plot prices and timings above. Plot prices and line times are GUESSES; no pacing measures a second run yet (W17).
+- **Standard Operating Procedures:** "1% of current production throughput" read as 1% of an hour of the bottles running lines make, valued at base; research it grants is free; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
+- Tier 6 opens with the first sale, not with an HQ room.

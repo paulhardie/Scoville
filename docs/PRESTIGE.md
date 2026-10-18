@@ -6,8 +6,8 @@ Status: **built** (rules, save v7, the HQ tab), all criteria PASS. It doesn't de
 
 ## Rules
 
-- **Selling** is offered on the HQ tab while the run's Operation Value is at least £1,000,000. It asks for a second tap to confirm.
-- **Credits** = ⌊10 × log₁₀(Operation Value ÷ £100,000) × (1 + Executive Lounge)⌋: 10 at £1M, 13 at £2M, 20 at £10M, 30 at £100M.
+- **Selling** is offered on the HQ tab while the run's Operation Value is at least $10,000,000 (D035; £1,000,000 before). It asks for a second tap to confirm.
+- **Credits** follow Idle Planet Miner's table (D035): 10 at $10M, 30 at $100M, 60 at $1B, 101 at $10B, 150, 210, 285, 367, 459 a decade on, each next decade 10 more than the last step after that; in a straight line in Operation Value between decades, rounded, then × (1 + Executive Lounge), rounded. So 11 at $12.5M, 12 at $17.5M. Until D035 it was ⌊10 × log₁₀(OV ÷ £100,000)⌋.
 - **What resets (brief §6):** cash, plots, vats, lines, stock, the Tech Tree, Heat, Overdrive and the Market Ticker's schedule, the valve's keep amounts and the pin, and the run's statistics. Cash restarts at the Seed Capital Office's amount.
 - **What stays:** the account: the best Operation Value (so every tab stays open), credits, rooms and the number of sales. The onboarding reveals stay too, so a new run starts on the full screen, not the blank button.
 - **Opening a room** costs 5 × (rooms owned + 1) credits: 5, 10, 15… Paying deals a draft of 2 different rooms not yet owned (1 if only one is left), drawn from the game's random stream. Picking one opens it at Level 1. The draft is saved, so closing the app doesn't re-deal it, and no new room can be paid for while one is waiting.
@@ -88,7 +88,9 @@ A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 
 | --- | --- | --- | --- | --- | --- |
 | Trinidad Moruga Scorpion | £16.40 | £150,000; 12 every 3.2 s | Moruga Mash: 60 Moruga, 16 s, £1,968 | **Scorpion Sting** £14,920: 1 Moruga Mash + 1 Savina Gold | 20 s |
 | Carolina Reaper | £24.40 | £400,000; 16 every 3.6 s | Reaper Mash: 80 Reaper, 18 s, £3,904 | **Widowmaker Reserve** £40,000: 1 Reaper Mash + 1 Phantom Smokehouse + 1 Sweet Heat Reserve (D006) | 22 s |
-| Pepper X | £52 | £1,500,000; 20 every 4.0 s | Pepper X Mash: 100 Pepper X, 20 s, £10,400 | **Event Horizon** £100,000: 1 Pepper X Mash + 1 Scorpion Sting | 24 s |
+| Pepper X | £52 | £1,500,000; 20 every 4.0 s | Pepper X Mash: 100 Pepper X, 20 s, £10,400 | **Extinction Event** £100,000: 1 Pepper X Mash + 1 Scorpion Sting (named Event Horizon until D035; that's the last fictional pepper's name) | 24 s |
+
+Since D035 these are in dollars at Idle Planet Miner's values: Moruga $1,600, Reaper $3,500, Pepper X $7,800; Scorpion Sting $1.09M, Widowmaker Reserve $3.34M, Extinction Event $9.35M; plots $9.5M, $29M and $130M.
 
 Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's pattern (D010): each rung's three nodes are paid in the rung below's sauce: Moruga in Phantom Smokehouse (20, 20 + 10 Ghost Mash, 30), Reaper in Scorpion Sting, Pepper X in Widowmaker Reserve. They run on east from Phantom Smokehouse (E39–E47).
 
@@ -97,7 +99,7 @@ Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's patt
 | Id | Criterion |
 | --- | --- |
 | Q10 | Before any sale, no Tier 6 node and not Standard Operating Procedures can be researched, even with every parent and the full cost in stock; after one sale they can. |
-| Q11 | Tier 6's mashes are worth 2× their inputs and its sauces 5× the raw value inside (V1, which covers every recipe); Phantom Smokehouse → Scorpion Sting → Widowmaker Reserve → Event Horizon each climb ×1.6–3.0; each Tier 6 plot feeds one vat at base (V3). |
+| Q11 | Tier 6's mashes are worth 2× their inputs and its sauces 5× the raw value inside (V1, which covers every recipe); Phantom Smokehouse → Scorpion Sting → Widowmaker Reserve → Extinction Event each climb ×1.6–3.0 (×2.0–3.4 since D035); each Tier 6 plot feeds one vat at base (V3). |
 | Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under 1% of an hour's bottles is researched, and its cost stays in stock; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
 | Q13 | After time away (the catch-up), every node under the bar with its parents done has been researched, as in play. |
 | Q14 | On screen: a Tier 6 node before the first sale says it opens after the first sale; Standard Operating Procedures says what it does. |

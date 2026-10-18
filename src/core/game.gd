@@ -334,6 +334,12 @@ func can_buy_slot(station: String) -> bool:
 func slot_upgrade_cost(station: String, index: int) -> float:
 	var ref := T.VAT_PRICE_REFERENCE if station == "vat" else T.LINE_PRICE_REFERENCE
 	var scale := sqrt(maxf(data.slots[station].prices[index], ref) / ref)
+	# D031: a slot's upgrades are also priced by what it makes, so a slot
+	# bottling Phantom Smokehouse upgrades at Phantom prices; whichever is dearer.
+	var recipe: String = slots(station)[index].recipe
+	if recipe != "":
+		var ref_item: String = T.VAT_VALUE_REFERENCE if station == "vat" else T.LINE_VALUE_REFERENCE
+		scale = maxf(scale, sqrt(value(data.recipes[recipe].output) / value(ref_item)))
 	var lv: int = slots(station)[index].speed
 	if station == "vat":
 		return T.VAT_SPEED_COST * scale * pow(T.VAT_SPEED_GROWTH, lv)

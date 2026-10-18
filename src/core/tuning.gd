@@ -40,6 +40,10 @@ const TABS_BUILT := ["farms", "processing", "tech", "hq"]
 const PLOT_PRICE_REFERENCE := 10.0
 const VAT_PRICE_REFERENCE := 25.0
 const LINE_PRICE_REFERENCE := 35.0
+## D031: slot upgrades also scale by √(the value of what the slot makes ÷ the
+## value of these), Tier 1's mash and bottle.
+const VAT_VALUE_REFERENCE := "sweet_mash"
+const LINE_VALUE_REFERENCE := "table_mild"
 
 ## Plot Harvest Speed: +step a level.
 const PLOT_SPEED_STEP := 0.15

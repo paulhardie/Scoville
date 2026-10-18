@@ -10,10 +10,10 @@
 		{"crop": "serrano", "price": 220.0, "seconds": 2.2, "yield": 4},
 		{"crop": "tabasco", "price": 800.0, "seconds": 2.6, "yield": 10},
 		{"crop": "sugar", "price": 1500.0, "seconds": 2.8, "yield": 6},
-		{"crop": "bonnet", "price": 2000.0, "seconds": 2.8, "yield": 8},
-		{"crop": "habanero", "price": 3000.0, "seconds": 2.8, "yield": 8},
-		{"crop": "savina", "price": 8000.0, "seconds": 3.0, "yield": 12},
-		{"crop": "oak", "name": "Oak Smokehouse", "price": 12000.0, "seconds": 3.2, "yield": 5},
-		{"crop": "ghost", "price": 15000.0, "seconds": 3.2, "yield": 12}
+		{"crop": "bonnet", "price": 8000.0, "seconds": 2.8, "yield": 8},
+		{"crop": "habanero", "price": 20000.0, "seconds": 2.8, "yield": 8},
+		{"crop": "savina", "price": 60000.0, "seconds": 3.0, "yield": 12},
+		{"crop": "oak", "name": "Oak Smokehouse", "price": 50000.0, "seconds": 3.2, "yield": 5},
+		{"crop": "ghost", "price": 70000.0, "seconds": 3.2, "yield": 12}
 	]
 }

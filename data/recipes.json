@@ -23,7 +23,7 @@
 		{"id": "cajun_red", "station": "line", "inputs": {"tabasco_mash": 1, "pickled_brine": 2, "garlic_paste": 1}, "output": "cajun_red", "seconds": 13.0},
 		{"id": "island_heat", "station": "line", "inputs": {"bonnet_mash": 1, "pickled_brine": 2, "glaze": 1}, "output": "island_heat", "seconds": 14.0},
 		{"id": "sweet_heat", "station": "line", "inputs": {"habanero_mash": 1, "glaze": 2, "table_mild": 1}, "output": "sweet_heat", "seconds": 14.0},
-		{"id": "savina_gold", "station": "line", "inputs": {"savina_mash": 1, "pickled_brine": 3, "classic_louisiana": 1}, "output": "savina_gold", "seconds": 15.0},
-		{"id": "phantom", "station": "line", "inputs": {"ghost_mash": 1, "liquid_smoke": 1, "classic_louisiana": 1}, "output": "phantom", "seconds": 16.0}
+		{"id": "savina_gold", "station": "line", "inputs": {"savina_mash": 1, "pickled_brine": 3, "classic_louisiana": 1}, "output": "savina_gold", "seconds": 18.0},
+		{"id": "phantom", "station": "line", "inputs": {"ghost_mash": 1, "liquid_smoke": 1, "classic_louisiana": 1}, "output": "phantom", "seconds": 18.0}
 	]
 }

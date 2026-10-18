@@ -4,7 +4,7 @@ Everything a first run needs to reach the £1,000,000 Prestige line in about 3 h
 
 Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedures) is v0.6b ([D028](DECISIONS.md)). It needs G8 and G16 from the owner, and a run that actually reaches £1M to test it on.
 
-Status: **being built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. Stage 2, the pacing player, plays the whole ladder; tuning against U1–U9 is under way and has raised three questions for the owner ([below](#build-log-stage-2)). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
+Status: **being built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. Stage 2, the pacing player, plays the whole ladder; 39 of 41 pacing criteria pass, with U2 and U5 open ([below](#build-log-stage-2)). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
 
 ## The sauce ladder (G17, as assumed: D029)
 
@@ -154,25 +154,34 @@ W4 (the player buys the cheapest upgrade, not the bottleneck) is a risk here: wi
 
 **The pacing player plays the whole ladder.** It runs a layout of slots per rung, lends slots to whatever research is short of (following the recipe chain down), keeps bottles a running recipe takes, and only upgrades stations in use. Five deadlocks in the player were found and fixed on the way; they were the player's, not the game's.
 
-**Repriced (D010):** Tier 3's blueprints (E6–E10) are now paid in Serrano Fire, Cane Sugar and Glaze (E21–E22) in Cajun Red, and Smoked Oak and Liquid Smoke (E32–E33) in Savina Gold, the rung before each. Priced in the old bottles, they starved the new rungs.
+**What changed to tune it (all GUESS numbers, or the owner's calls):**
+- **D031 (owner):** slot upgrades priced by what the slot makes.
+- **D032 (owner):** U8 from 1:20, U4 narrowed to Classic Louisiana and Pickled Brine, M6 retired. Plus three measurement fixes, said in D032.
+- **Blueprints repriced in the rung before them (D010):** Tier 3 (E6–E10) in Serrano Fire, Cane Sugar and Glaze in Cajun Red, Smoked Oak and Liquid Smoke in Savina Gold. The Habanero chain costs 20, 20 + 10 Glaze and 30 Island Heat; Savina 20, 20 + 10 and 30 Sweet Heat; Ghost and Phantom 20, 20 + 10 and 30 Savina Gold.
+- **Artisan Decanters** cost 60 Savina Mash + 40 Liquid Smoke and are researched after Phantom: at 2:19 they lifted every bottle held to 3.5× at once.
+- **Cash gates Tier 5, not research.** Operation Value counts stock, so saving up an expensive blueprint in top bottles spiked it by hundreds of thousands. Station prices don't. Habanero Plot £20,000, Scotch Bonnet £8,000, Red Savina £60,000, Oak Smokehouse £50,000, Ghost Pepper £70,000; vat 7 £40,000, line 6 £50,000.
+- **Savina Gold and Phantom lines** take 18 s (were 15 and 16).
+- **The pacing player** researches the Piston after Island Heat (M7) and Artisan Decanters after Phantom.
+- **Forager's Luck** is 2.25% a press (was 2.5%), because Garlic now arrives earlier, on a less upgraded station; T1's 2–3% still holds.
 
-**Measured now (not tuned yet):**
+### Results (v0.6a, so far)
+
+**39 of 41 pacing criteria pass.** F1–F8, N1–N8, M1–M5 and M7, E1–E6, P1–P2 and T4 all pass, as do:
 
 | Id | Result |
 | --- | --- |
-| U1 | £1k 15:29, £10k 47:13, £100k 1:39:44 (all in band), **£1M 2:25:21 (FAIL: band 2:45–3:15)** |
-| U3 | PASS: every rung made, each within 20 minutes of its time (Savina Gold 2:18, Phantom 2:25) |
-| U6 | PASS: 4 forks taken; swapping Vinegar's fork moves Operation Value at 3:00 by 59% |
-| U2, U5, U7, U8, U4 | FAIL (below) |
-| F, N, E, P1, T4 | PASS |
-| M2, M4, M6, M7, P2 | FAIL: Louisiana at 55:52 (by 55:00), a 213 s wait, M6's lines, the Piston at 2:06 (by 1:50), P2 |
+| U1 | PASS: £1k 15:29, £10k 46:28, £100k 1:39:42, £1M 2:47:17 |
+| U3 | PASS: every rung made within 20 minutes of its time (Savina Gold 2:20, Phantom 2:47) |
+| U4 | PASS: 79 Classic Louisiana, 1,240 Pickled Brine at 2:30–2:40 |
+| U6 | PASS: 4 forks taken; swapping Garlic's moves Operation Value at 3:00 by 21% |
+| U7 | PASS: tapping adds 64% at 2:30 |
+| U8 | PASS: a night from 1:20 leaves £952,781 |
+| **U2** | **FAIL: a 378 s wait between purchases, 1:50–3:00 (at most 150)** |
+| **U5** | **FAIL: slots wait on an ingredient's mash 4% of the time (10–40%), and the longest such wait is 378 s (at most 300)** |
 
-**Why the late game runs away.** From Savina Gold on, Operation Value grows about £800k a minute at 2:30, and tapping adds 5% (U7). A slot's speed upgrades are priced from the slot's own price (D009), not from what it makes, so a slot bought for Table Mild upgrades at Table Mild prices while it bottles Phantom Smokehouse. Every slot ends up at very high speed for small change.
+**Why U2 fails.** Late purchases are big and few: research every 2½–3 minutes, and a £70,000 plot saved up for. Slot upgrades now cost what their sauce is worth (D031), so nothing cheap fills the gaps. Letting the player buy cheap upgrades while saving made it worse (444 s): there's nothing cheap to buy.
 
-**Three questions for the owner:**
-1. **Slot upgrades priced by what the slot makes.** Price a slot's upgrades from √(the value of its recipe's output ÷ Table Mild's) instead of its purchase price, so upgrading a Phantom line costs Phantom money. Recommended: it's Idle Planet Miner's model (a planet's upgrades scale with the planet) and the one lever that slows the late game without touching the early one. It changes D009.
-2. **U8 and P2 pull against U1.** For the curve to go from £100k at 1:40 to £1M at 3:00, the factory at 1:40 has to earn about £2,900 a minute. A night (8 hours at 70%) of that is about £1M, so U8 (a night from 1:40 stays under £1M) sits right at the edge of U1. P2 (a night beats 2 hours' tapping) then holds easily. Recommended: keep U8 but move it to "from 1:20".
-3. **U4 asks for Table Mild and Verde Mash at 2:30–2:40.** Nothing late takes them any more (Sweet Heat is the last sauce to take Table Mild, and Serrano Fire the last to take Verde Mash). Recommended: narrow U4 to Classic Louisiana and Pickled Brine, which Savina Gold and Phantom really do need. Likewise M6 (the Table Mild and Bistro Verde lines busy at 1:30) was v0.4's form of the same check, and U4 supersedes it. M2's 55:00 deadline is missed by 52 s, with the Serrano rung added in front.
+**Why U5 fails.** The player answers the Brine bottleneck the way D026 intended: with Brine vats (three by Savina Gold) and the Vinegar Pantry. So slots rarely wait. The bottleneck's cost shows up as slots given to Brine, not as waiting.
 
 ## Assumed
 

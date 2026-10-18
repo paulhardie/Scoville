@@ -181,7 +181,7 @@ Built (save v6, which adds `stats.foraged`). Asked for by the owner, beyond the 
 
 | Id | Node | Needs | Cost | Effect | Expected | Pos |
 | --- | --- | --- | --- | --- | --- | --- |
-| N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.5% chance to drop one harvest of the shortest ingredient | 0:35 | 1, −2 |
+| N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.25% chance (was 2.5% until v0.6a moved Garlic earlier) to drop one harvest of the shortest ingredient | 0:35 | 1, −2 |
 
 - **Shortest ingredient:** among owned non-pepper stations (D024) that a researched recipe uses, the one whose stock covers the fewest cycles of that use (stock ÷ the most any one of those recipes takes a cycle). Ties go in data order. With no such station, nothing drops and nothing is drawn.
 - **One harvest:** what that station's next harvest would give, yield upgrades included, without Crop Quality's double.

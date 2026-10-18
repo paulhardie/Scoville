@@ -50,7 +50,7 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 
 **Why:** Without it, Tier 2's income dwarfed a one-pepper tap. Tapping added 6% at 30:00 (N8 wanted 10%) and 22% at 15:00 (F8 wanted 25%), so the build missed the brief's "the button never becomes obsolete". The brief names this node as the button's first step, and with it N8 measures +17% and F8 +64%. The other choices were lowering the criteria, or leaving the build failing until v0.4.
 
-## D009: Upgrade prices scale with the square root of a station's price
+## D009: Upgrade prices scale with the square root of a station's price (slots amended by D031)
 
 **Decision:** A plot's or slot's upgrades cost v0.2's curve × √(its price ÷ the first of its kind). The draft used the full ratio.
 
@@ -203,3 +203,15 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision:** Franchise Credits = ⌊10 × log₁₀(Operation Value ÷ £100,000)⌋, so 10 at £1M and 20 at £10M, × the Executive Lounge. Opening the n-th HQ room costs 5n credits and deals a 2-room draft; levelling costs 2 × the current level. Room steps after Level 1 repeat Level 1's (the speed rooms +10% a level after +15%), and Night Watchman's Desk stops at Level 8 (+8 hours). Full table in [PRESTIGE.md](PRESTIGE.md). **Assumed to build v0.6b; the owner can change any of it.**
 
 **Why:** The brief says "scaled logarithmically" and gives each room's first level and cap, but no prices. With these, the first sale (10 credits) buys a room and a level. Opening all 12 costs 390 credits, roughly 20–30 sales at 10–20 credits each, so the full HQ is a long-term goal while each sale still buys something. G16's contradiction (+1 hour a level, cap Level 15, max +8 hours) is settled on the stated maximum.
+
+## D031: A slot's upgrades are priced by what it makes
+
+**Decision:** A vat's or line's speed upgrades cost v0.2's curve × the larger of √(its slot price ÷ the first slot's) (D009) and √(the value of what it makes ÷ Sweet Pepper Mash's or Table Mild's). A line bottling Phantom Smokehouse upgrades at about 32× Table Mild prices. **Chosen by the owner.**
+
+**Why:** Priced by the slot alone, a slot bought for Table Mild upgraded at Table Mild prices while making the top sauce, so every late slot was maxed for pocket change and the run reached £1M at 2:25. It's Idle Planet Miner's model, and early slots are unchanged (their price ratio is the larger).
+
+## D032: v0.6a's criteria and how they're measured
+
+**Decision (chosen by the owner):** U8 is measured from 1:20, not 1:40; U4 asks for Classic Louisiana and Pickled Brine (not Table Mild and Verde Mash) at 2:30–2:40; M6 is retired, as U4 checks the same thing for the full run. **Measurement fixes (the agent's, said here):** "tapping adds X%" (F7, F8, N8, M5, U7, and P2's tapping minute) now sells the saved backlog before the minute starts and starts the idle minute at Heat 0; U6 swaps each of the four forks and takes the biggest swing, as its wording ("in some track") says.
+
+**Why:** From 1:40 a night is worth about £1M by the curve's own maths, so U8 couldn't pass alongside U1. Nothing late takes Table Mild or Verde Mash. The tapping minute was dominated by selling a stockpile at the saved Heat in both runs, and the idle run kept the tapping run's Heat for most of the minute.

@@ -1,6 +1,7 @@
 extends SceneTree
 ## v0.6a's rules (docs/FULL_RUN.md V1–V7): the sauce ladder's values, station
-## sizing, the Pantry's effects and the fork.
+## sizing, the Pantry's effects and the fork; and Tier 6's (docs/PRESTIGE.md
+## Q11; V1 covers its values).
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
@@ -98,6 +99,20 @@ static func _mash_of(g: Game, crop: String) -> String:
 	return ""
 
 
+func test_tier6() -> void:
+	var g := Game.new()
+	var top := ["phantom", "scorpion_sting", "widowmaker", "event_horizon"]
+	for i in range(1, top.size()):
+		var step: float = g.value(top[i]) / g.value(top[i - 1])
+		check(step >= 1.6 and step <= 3.0, "Q11: %s is ×1.6–3.0 the rung below (×%.2f)" % [top[i], step])
+	for crop in ["moruga", "reaper", "pepper_x"]:
+		var p: Dictionary = g.data.plots[crop]
+		var r: Dictionary = g.data.recipes[crop + "_mash"]
+		var supply: float = p["yield"] / p.seconds
+		var need: float = r.inputs[crop] / r.seconds
+		check(absf(supply - need) < 0.01, "Q11: the %s feeds one vat at base (%.3f a second against %.3f)" % [p.name, supply, need])
+
+
 func test_booster_concentrate_bulk() -> void:
 	var g: Game = Helpers.with(["pantry_vinegar_bulk"])
 	check(close(g.plot_cycle("vinegar"), g.data.plots.vinegar.seconds / 2.0), "V4: the Vinegar Booster halves the Cask's cycle")
@@ -153,8 +168,10 @@ func test_bad_fork_data() -> void:
 
 func test_every_node_reachable() -> void:
 	# Researching everything in file order (skipping a fork's second side) must
-	# reach every node but the sides not taken: no node hangs off nothing.
+	# reach every node but the sides not taken: no node hangs off nothing. After
+	# a sale, so the after-sale nodes count too.
 	var g: Game = Helpers.with([])
+	g.account.prestiges = 1
 	for item in g.stock:
 		g.stock[item] = 10000000
 	var done := 0

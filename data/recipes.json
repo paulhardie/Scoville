@@ -24,6 +24,12 @@
 		{"id": "island_heat", "station": "line", "inputs": {"bonnet_mash": 1, "pickled_brine": 2, "glaze": 1}, "output": "island_heat", "seconds": 14.0},
 		{"id": "sweet_heat", "station": "line", "inputs": {"habanero_mash": 1, "glaze": 2, "table_mild": 1}, "output": "sweet_heat", "seconds": 14.0},
 		{"id": "savina_gold", "station": "line", "inputs": {"savina_mash": 1, "pickled_brine": 3, "classic_louisiana": 1}, "output": "savina_gold", "seconds": 18.0},
-		{"id": "phantom", "station": "line", "inputs": {"ghost_mash": 1, "liquid_smoke": 1, "classic_louisiana": 1}, "output": "phantom", "seconds": 18.0}
+		{"id": "phantom", "station": "line", "inputs": {"ghost_mash": 1, "liquid_smoke": 1, "classic_louisiana": 1}, "output": "phantom", "seconds": 18.0},
+		{"id": "moruga_mash", "station": "vat", "inputs": {"moruga": 60}, "output": "moruga_mash", "seconds": 16.0},
+		{"id": "reaper_mash", "station": "vat", "inputs": {"reaper": 80}, "output": "reaper_mash", "seconds": 18.0},
+		{"id": "pepper_x_mash", "station": "vat", "inputs": {"pepper_x": 100}, "output": "pepper_x_mash", "seconds": 20.0},
+		{"id": "scorpion_sting", "station": "line", "inputs": {"moruga_mash": 1, "savina_gold": 1}, "output": "scorpion_sting", "seconds": 20.0},
+		{"id": "widowmaker", "station": "line", "inputs": {"reaper_mash": 1, "phantom": 1, "sweet_heat": 1}, "output": "widowmaker", "seconds": 22.0},
+		{"id": "event_horizon", "station": "line", "inputs": {"pepper_x_mash": 1, "scorpion_sting": 1}, "output": "event_horizon", "seconds": 24.0}
 	]
 }

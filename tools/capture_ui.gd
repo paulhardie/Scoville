@@ -111,6 +111,10 @@ func run() -> void:
 	g._note_value()
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v06b_hq_sell.png"), 0.2)
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_moruga_blueprint", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("w12_tier6_locked.png"), 0.2)
+	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	g.prestige()
 	g.account.credits = 40
 	g.account.rooms = {"seed_vault": 3, "tasting_room": 1}
@@ -118,6 +122,9 @@ func run() -> void:
 	g.open_room()
 	screen._refresh(false)
 	await _shot(out.path_join("v06b_hq_draft.png"), 0.2)
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_standard_operating_procedures", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("w12_sop.png"), 0.2)
 
 	print("PASS: captured to ", out)
 	quit()

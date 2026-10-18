@@ -70,7 +70,7 @@ All PASS: `tests/prestige_tests.gd` (Q1–Q8, 50 checks) and `tests/ui_tests.gd`
 
 ## Part 2: Standard Operating Procedures and Tier 6
 
-Status: **criteria written, being built** (W12, [D034](DECISIONS.md)).
+Status: **built**, all criteria PASS ([D034](DECISIONS.md)). No save change: research and `account.prestiges` were already saved.
 
 A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 gives repeat runs two things the first run doesn't have: the early Tech Tree researching itself (brief §4, West Wing), and a sixth tier above Phantom Smokehouse (D006).
 
@@ -101,6 +101,10 @@ Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's patt
 | Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under 1% of an hour's bottles is researched, and its cost stays in stock; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
 | Q13 | After time away (the catch-up), every node under the bar with its parents done has been researched, as in play. |
 | Q14 | On screen: a Tier 6 node before the first sale says it opens after the first sale; Standard Operating Procedures says what it does. |
+
+### Results (part 2)
+
+All PASS: `tests/prestige_tests.gd` (Q10, Q12, Q13), `tests/full_run_tests.gd` (Q11; V1 now covers Tier 6's six recipes, V7 every node after a sale) and `tests/ui_tests.gd` (Q14). Looked at with `capture_ui.gd` (`w12_tier6_locked.png`, `w12_sop.png`). The pacing suite is unchanged: a first run never reaches an after-sale node.
 
 Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief) and Widowmaker (£40,000, D006) are 7.7× apart, so one sauce between them climbs about ×2.8 either side.
 

@@ -1164,6 +1164,8 @@ func _refresh_tech() -> void:
 	var fork := game.fork_taken(_selected)
 	if game.is_researched(_selected):
 		_detail.cost.text = "Researched."
+	elif node.after_sale and game.account.prestiges < 1:
+		_detail.cost.text = "Opens after your first franchise sale."
 	elif fork != "":
 		_detail.cost.text = "Chose %s instead: locked for this run." % game.data.tech[fork].name.get_slice(": ", 1)
 	elif costs.is_empty():
@@ -1239,6 +1241,8 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Crops and mash above their keep amount sell automatically.")
 		elif e.has("smart_stockpiling"):
 			out.append("Pin a node to hold back the bottles, mash and crops it needs.")
+		elif e.has("sop"):
+			out.append("Any node costing under 1% of an hour's bottles researches itself, free. Either/or nodes stay your choice.")
 		elif e.has("market_ticker"):
 			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
 		elif e.has("forage"):

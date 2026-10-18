@@ -21,6 +21,7 @@ func run() -> void:
 
 	var screen := Main.instantiate()
 	screen.save_path = ""
+	screen.settings_path = ""
 	root.add_child(screen)
 	await _shot(out.path_join("start.png"))
 
@@ -77,6 +78,11 @@ func run() -> void:
 	g.heat = 74.0
 	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v04_farms.png"), 0.3)
+	# The Settings card at the foot of Farms (FEEL.md).
+	var farms: ScrollContainer = screen.find_child("Page_farms", true, false)
+	farms.scroll_vertical = 1000000
+	await _shot(out.path_join("w2_settings.png"), 0.2)
+	farms.scroll_vertical = 0
 	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v04_processing.png"), 0.2)
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()

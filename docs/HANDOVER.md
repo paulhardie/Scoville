@@ -2,27 +2,27 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). **Open: PR #11, every suite passing**, waiting on the owner to merge. It holds:
+Merged: v0.1–v0.6a and v0.6b part 1 (PRs #1–#11): the full first run to £1M in about 3 hours, and Prestige with the 12 HQ rooms. This branch adds **W2, sound and haptics, built** ([FEEL.md](FEEL.md)), and fixes the stock line running over the Blank Button.
 
-- **Forager's Luck** (N10, D025): a 2.25% chance a press to drop a harvest of the shortest ingredient.
-- **X7 machine-relative** (D027).
-- **v0.6a, the full run** ([FULL_RUN.md](FULL_RUN.md), D028–D033), **built**. A ten-rung sauce ladder from Table Mild to Phantom Smokehouse; the pepper ladder's new peppers through Tier 5; the Pantry branch with Bulk or Reserve forks; Slot Expansion III–IV; Artisan Decanters; two GMO boosters. A pacing player that plays all of it. Every criterion passes: £1M at 2:51, every rung on time, the forks worth up to 21%, the catch-up accurate and fast at 2:30.
-- **v0.6b part 1, Prestige** ([PRESTIGE.md](PRESTIGE.md), D030), **built**: selling the franchise at £1M, Franchise Credits, the 12 HQ rooms with a saved 2-card draft and levels, the brief's cost formula, the HQ tab, save v7.
+**Sound and haptics:**
+- **A click on each finger press of the Blank Button.** The tone is made in code. Its pitch varies ±8% and rises up to +20% with Heat.
+- **A 15 ms buzz on phones that support it.**
+- **Grip and Piston presses stay silent and still.**
+- **Sound and Vibration switches** in a Settings card at the foot of Farms, kept in `user://settings.json` (not the game save).
+- K1–K5 pass in `ui_tests.gd`.
 
-Tuning decisions this round: slot upgrades priced by what the slot makes (D031); U8 from 1:20, U4 narrowed, M6 retired, three measurement fixes (D032); U2 300 s late, U5 measured by vat time spent on ingredient mash (D033). Tier 5 is gated by cash rather than research, because stock counts in Operation Value.
+**The stock line:** with v0.6a's 30 items it wrapped to six lines over the button. It's now capped at three lines, most important first. Still crowded (W15, for the visual pass).
 
-Checks: `bash run_tests.sh` passes all ten suites (button, core, factory, full run, offline, pacing 39 criteria, prestige, tech, ui, upgrades); the headless boot is clean.
+Checks: `bash run_tests.sh` passes all ten suites; the headless boot is clean; Settings and the stock line looked at with `capture_ui.gd`. **Not checked:** how the click sounds and the buzz feels on a real phone (W16).
 
 ## Open decisions
 
 - **Prestige's numbers (D030):** credits formula, room prices, G16 at Level 8, G19's caps. Change any freely.
-- **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
-- **The v0.6 split (D028)** and **E6's narrowing**: low stakes.
+- **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later. The crowded stock line (W15) joins it.
 
 ## Next
 
-1. Merge #11.
-2. Then, recommended: **W2, sound and haptics** (nothing blocks it; it's the cheapest lift to how it feels on a phone).
-3. Then v0.6b part 2 (W12: Standard Operating Procedures; Tier 6 needs its recipes, G17), or the Shift Roster's rules with placeholder art (v0.7).
+1. Merge this PR, then try the Web build on your phone for the click and buzz (W16).
+2. Then v0.6b part 2 (W12: Standard Operating Procedures; Tier 6 needs recipes for Moruga Scorpion and Pepper X, G17), or the Shift Roster's rules with placeholder art (v0.7), or W8 once you've sent references.
 
-Touches: data (tuned prices and costs), the slot upgrade rule (D031), the pacing player (layouts, research order), pacing and offline tests (U criteria, U9), docs. Stubbed or open: W2–W9, W12, G1, G12–G19.
+Touches: the screen (click, buzz, Settings card, stock line), `style.gd` (feel constants), three item short names, ui tests (K1–K5), the capture tool, docs. Stubbed or open: W3–W6, W8–W9, W12, W15–W16, G1, G12–G19.

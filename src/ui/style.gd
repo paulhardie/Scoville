@@ -38,6 +38,9 @@ const BLANK_BUTTON_SIZE := 280.0
 ## Its side once compressed into the upper viewport (Stage 2).
 const BLANK_BUTTON_COMPACT := 150.0
 const STATUS_BAR_HEIGHT := 84.0
+## The stock line under the status bar wraps to at most this many lines, so it
+## never runs into the Blank Button.
+const STOCK_LINES := 3
 ## Sell Batch, beside the compact button.
 const SELL_BATCH_WIDTH := 140.0
 const SELL_BATCH_HEIGHT := 72.0
@@ -62,3 +65,14 @@ const PRESS_SQUASH := 0.12
 const FADE_IN := 0.6
 const SLIDE_IN := 0.45
 const COMPRESS := 0.5
+
+# --- Feel: the Blank Button's click and buzz (docs/FEEL.md) --------------------
+## The click: a decaying tone of this pitch and length, at this volume.
+const CLICK_HZ := 700.0
+const CLICK_SECONDS := 0.045
+const CLICK_VOLUME_DB := -8.0
+## Random pitch spread either way, and the rise at full Heat.
+const CLICK_PITCH_SPREAD := 0.08
+const CLICK_HEAT_PITCH := 0.2
+## A finger press's vibration, in milliseconds.
+const HAPTIC_MS := 15

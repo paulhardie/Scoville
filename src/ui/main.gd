@@ -17,6 +17,16 @@ const KEEP_STEP := 10
 
 ## Where the game saves. Tests clear it so nothing is read or written.
 var save_path := "user://save.json"
+## Sound and vibration switches (docs/FEEL.md), kept apart from the game save.
+## Tests clear the path too.
+var settings_path := "user://settings.json"
+var settings := {"sound": true, "vibration": true}
+## Clicks played and vibrations asked for, and the last click's pitch, for tests.
+var clicks_played := 0
+var vibrations := 0
+var last_pitch := 1.0
+var _click: AudioStreamPlayer
+var _settings_buttons := {}
 ## Wall-clock time (D021). Tests set their own before the screen is added.
 var clock = RealClock.new()
 var game: Game
@@ -83,6 +93,7 @@ class WebLines extends Control:
 func _ready() -> void:
 	game = Game.new({}, int(clock.now()))
 	_load()
+	_load_settings()
 	_build()
 	if _saved_at > 0.0:
 		_return_from(clock.now() - _saved_at)
@@ -193,6 +204,7 @@ func _build_deck() -> void:
 	_proc_box.add_theme_constant_override("separation", 12)
 	_farms_col.add_child(_proc_box)
 	_build_processing(_proc_box)
+	_build_settings(_farms_col)
 
 	_processing_col = _page_column(holder, "processing")
 	_build_tech(holder)
@@ -313,6 +325,85 @@ func _room_text(id: String, lv: int) -> String:
 		"credits": return "%d%% more Franchise Credits." % pct
 		"offline_hours": return "Time away counts %d hours longer." % roundi(v)
 	return ""
+
+
+## Settings (docs/FEEL.md): the Sound and Vibration switches, at the foot of
+## Farms.
+func _build_settings(parent: VBoxContainer) -> void:
+	var card := _card(parent, "SettingsCard", "Settings")
+	card.bar.visible = false
+	card.info.visible = false
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", 8)
+	card.col.add_child(row)
+	for key in ["sound", "vibration"]:
+		var b := _small_button("", func() -> void:
+			settings[key] = not settings[key]
+			_save_settings())
+		b.name = "Setting_" + key
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		row.add_child(b)
+		_settings_buttons[key] = b
+
+
+## The click and the buzz of a finger press; Grip and the Piston press
+## through the game, not here, so they stay silent.
+func _feel_press() -> void:
+	if settings.sound:
+		if _click == null:
+			_click = AudioStreamPlayer.new()
+			_click.stream = _click_sound()
+			_click.volume_db = S.CLICK_VOLUME_DB
+			_click.max_polyphony = 4
+			add_child(_click)
+		last_pitch = (1.0 + randf_range(-S.CLICK_PITCH_SPREAD, S.CLICK_PITCH_SPREAD)) * (1.0 + S.CLICK_HEAT_PITCH * game.heat / T.HEAT_MAX)
+		_click.pitch_scale = last_pitch
+		_click.play()
+		clicks_played += 1
+	if settings.vibration:
+		Input.vibrate_handheld(S.HAPTIC_MS)
+		vibrations += 1
+
+
+## A short click made in code: a tone that dies away fast, with a little
+## noise at its start for the edge of the press.
+static func _click_sound() -> AudioStreamWAV:
+	var rate := 22050
+	var n := int(rate * S.CLICK_SECONDS)
+	var data := PackedByteArray()
+	data.resize(n * 2)
+	for i in n:
+		var t := float(i) / rate
+		var decay := exp(-t / (S.CLICK_SECONDS * 0.25))
+		var tone := sin(TAU * S.CLICK_HZ * t)
+		var edge := (randf() * 2.0 - 1.0) * exp(-t / 0.003)
+		var v := clampf((tone * 0.8 + edge * 0.3) * decay, -1.0, 1.0)
+		data.encode_s16(i * 2, int(v * 32000.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = rate
+	wav.stereo = false
+	wav.data = data
+	return wav
+
+
+func _load_settings() -> void:
+	if settings_path == "" or not FileAccess.file_exists(settings_path):
+		return
+	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(settings_path))
+	if typeof(parsed) == TYPE_DICTIONARY:
+		for key in settings:
+			if typeof(parsed.get(key)) == TYPE_BOOL:
+				settings[key] = parsed[key]
+
+
+func _save_settings() -> void:
+	if settings_path == "":
+		return
+	var f := FileAccess.open(settings_path, FileAccess.WRITE)
+	if f != null:
+		f.store_string(JSON.stringify(settings))
+		f.close()
 
 
 func _build_processing(parent: VBoxContainer) -> void:
@@ -584,6 +675,7 @@ func _build_upper() -> void:
 	_counter.name = "Counter"
 	_counter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_counter.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	_counter.max_lines_visible = S.STOCK_LINES
 	_counter.add_theme_font_size_override("font_size", S.SIZE_BODY)
 	_counter.add_theme_color_override("font_color", S.TEXT)
 	_counter.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
@@ -797,6 +889,7 @@ func _place_blank(compact: bool) -> void:
 
 func _on_blank_pressed() -> void:
 	game.press()
+	_feel_press()
 	var squash := create_tween()
 	squash.tween_property(_blank, "scale", Vector2.ONE * 0.92, S.PRESS_SQUASH * 0.4)
 	squash.tween_property(_blank, "scale", Vector2.ONE, S.PRESS_SQUASH * 0.6).set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
@@ -850,6 +943,8 @@ func _refresh(animate: bool) -> void:
 		_pages[tab].visible = tab == _page
 	for crop in _plot_cards:
 		_refresh_plot(crop)
+	for key in _settings_buttons:
+		_settings_buttons[key].text = "%s: %s" % [key.capitalize(), "On" if settings[key] else "Off"]
 	_refresh_processing()
 	if _page == "tech":
 		_refresh_tech()
@@ -897,9 +992,15 @@ func _stock_text() -> String:
 		for p in parts:
 			long.append("%s: %d" % [game.data.items[p[0]].plural, p[1]])
 		return "   ".join(long)
+	# A crowded factory (v0.6a has 30 items): Bell Peppers, then what's in
+	# stock, bottles first, then mash, then crops. The label shows at most
+	# STOCK_LINES lines, so the least important fall off the end.
 	var short := []
-	for p in parts:
-		short.append("%s %s" % [game.data.items[p[0]].short, _count(p[1])])
+	for kind in ["bottle", "mash", "crop"]:
+		for p in parts:
+			if p[0] != "bell" and p[1] > 0 and game.data.items[p[0]].kind == kind:
+				short.append("%s %s" % [game.data.items[p[0]].short, _count(p[1])])
+	short.push_front("%s %s" % [game.data.items.bell.short, _count(game.stock.bell)])
 	return "  ·  ".join(short)
 
 

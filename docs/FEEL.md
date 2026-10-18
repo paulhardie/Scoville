@@ -1,0 +1,31 @@
+# Feel: sound and haptics (W2)
+
+The Blank Button should feel like a physical button on a phone: a click you hear and a tap you feel. This is screen-only: nothing in the simulation changes, and nothing is saved in the game save.
+
+Status: **built.** All criteria PASS (`tests/ui_tests.gd`, K1–K5); looked at with `capture_ui.gd` (`w2_settings.png`). Not yet heard or felt on a real phone: that's the next phone test.
+
+## Rules
+
+- **A finger press clicks.** The click is a short, decaying tone made in code (no audio files), played once per press of the Blank Button by the player. Presses from Ergonomic Grip, the Automated Piston and Double-Tap don't click, so holding the button or leaving the Piston running doesn't drone.
+- **The pitch moves.** Each click's pitch varies at random by up to ±8%, so fast tapping doesn't sound like one note, and rises with Heat by up to +20% at full Heat, so building Heat sounds like it.
+- **A finger press buzzes.** On phones that support it (Android, including the Web build in Chrome; not iPhone Safari), each finger press asks for a 15 ms vibration.
+- **Both can be switched off.** A Settings card at the foot of the Farms page has Sound and Vibration switches. The choice is kept in its own small file (`user://settings.json`), not in the game save, so selling the franchise or an unreadable save never touches it.
+
+## Criteria
+
+| Id | Criterion |
+| --- | --- |
+| K1 | Each finger press of the Blank Button plays exactly one click; Grip and Piston presses play none. |
+| K2 | Over 200 presses at no Heat, the pitch stays within 0.92–1.08 and isn't one value; at full Heat it's 1.2× higher on average. |
+| K3 | Each finger press asks for one 15 ms vibration; Grip and Piston presses ask for none. |
+| K4 | With Sound off there's no click, and with Vibration off no vibration; the switches survive closing and reopening the app. |
+| K5 | Stage 0 still shows no text (O1), and the Settings card only appears with the deck. |
+
+## Also fixed: the stock line
+
+With v0.6a's 30 items, the stock line under the status bar wrapped to six lines and ran over the Blank Button (seen in the capture). It now shows at most three lines: Bell Peppers, then bottles, mash and crops that are in stock, so the least important fall off the end. Three short names that clashed were made distinct (Ancho Mash, Smoky Ancho, Serrano Fire). The line is still crowded; the visual pass (W8) should replace it.
+
+## Assumed
+
+- The click's sound, 15 ms and the pitch ranges are defaults (UI polish); say if you want different.
+- Only the Blank Button makes a sound for now. Purchases and research stay silent until the visual pass (W8) sets the overall feel.

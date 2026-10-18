@@ -22,12 +22,12 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 
 | Id | What | Status | Needs |
 | --- | --- | --- | --- |
-| W2 | Sound and haptics for the button press | Not started | Nothing |
 | W3 | Tight margins: E3 (casual) 96 s of 100, N6 91 s of 120, X3 at 1:40 1.82% of 2%, X7 2.56× of 3× (D027) | Watch | CI runs the pacing and offline tests on every push |
 | W4 | The pacing player buys the cheapest upgrade, not the bottleneck; a smarter player would progress faster, so the criteria are measured against a fairly naive one | Open | A second, bottleneck-aware player if pacing needs a range rather than one figure |
 | W5 | Shift Roster threshold: £10,000 is reached at 42:18, a little before the 45–60 minute target. £14,000 would land at 50:00 | Open | Settle in v0.7, when the tab is built |
 | W6 | Tier 2 oversupply: by 30:00 the pacing player has 249 Jalapeños and 41 Verde Mash waiting, because Pickled Brine (Vinegar) is the bottleneck and the player's cheapest-first upgrades don't see that | Watch | Raw Overflow Valve (v0.4) gives the surplus a use; W4 would buy for the bottleneck |
-| W7 | (Settled by v0.6a's U1 and U8; delete once #11 merges.) The run is ahead of the 3-hour curve: £100k at 1:24 (target 1:50), £454k at 1:50. One night away from 1:40 adds £3.6M, past the £1M Prestige line. The criteria are only deadlines, so nothing fails | Criteria set (U1, U8) | Built with v0.6a |
 | W8 | Visual pass: on a phone it "looks like a 2010 web game rather than a mobile app in 2026" (owner, after W1). Today's look is placeholder panels, flat colours and the default font | Open | Owner: reference games and a mood, and whether art will come later |
 | W12 | v0.6b part 2: Standard Operating Procedures (auto-research on repeat runs) and Tier 6 after the first sale (Moruga Scorpion, Carolina Reaper, Pepper X; needs G17's Tier 6 recipes) | Not started | G17 for Tier 6 |
+| W15 | The stock line under the status bar is crowded with v0.6a's items (capped at three lines, FEEL.md) | Open | The visual pass (W8) |
+| W16 | Hear and feel the click and buzz on a real phone (Android Chrome for vibration; iPhone Safari has none) | Open | The owner's next phone test |
 | W9 | The pacing player never sets Bistro Verde's Auto-Sell back to 100% after Smart Stockpiling, so Bistro piles up in late runs. A measuring quirk, not a game fault | Open | Fix with W4's smarter player |

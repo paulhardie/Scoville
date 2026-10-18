@@ -1,5 +1,5 @@
 {
 	"_source": "Vat and line slot prices in buying order. `base_cap` slots can be bought in run 1; Slot Expansion (tech.json) opens the rest (G15, D010). GUESSES.",
-	"vat": {"base_cap": 3, "prices": [15.0, 100.0, 120.0, 300.0, 500.0]},
-	"line": {"base_cap": 2, "prices": [10.0, 120.0, 400.0, 1200.0]}
+	"vat": {"base_cap": 3, "prices": [15.0, 100.0, 120.0, 300.0, 500.0, 3000.0, 40000.0]},
+	"line": {"base_cap": 2, "prices": [10.0, 120.0, 400.0, 1200.0, 5000.0, 50000.0]}
 }

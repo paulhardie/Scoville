@@ -19,7 +19,7 @@ Costs are GUESSES tuned in the build, paid mostly in Table Mild. Tier 1 bottles 
 | N1 | Calloused Thumbs | North | 00 | 10 Table Mild | +2 Bell Peppers a press (brief §4; [D008](DECISIONS.md)) |
 | E1 | Crop Blueprint: Jalapeño | East | 00 | 3 Table Mild | Jalapeño Plot can be bought |
 | E2 | Culinary Blueprint: Verde Mash | East | E1 | 10 Table Mild | Verde Mash recipe (15 Jalapeño) |
-| E3 | Crop Blueprint: White Vinegar | East | E1 | 10 Table Mild + 5 Sweet Pepper Mash | White Vinegar Plot can be bought |
+| E3 | Crop Blueprint: White Vinegar | East | E1 | 10 Table Mild + 5 Sweet Pepper Mash | The Vinegar Cask can be bought (D024; was the White Vinegar Plot) |
 | E4 | Culinary Blueprint: Pickled Brine | East | E3 | 10 Table Mild + 5 Sweet Pepper Mash | Pickled Brine recipe (10 Vinegar + 5 Bell) |
 | E5 | Culinary Blueprint: Bistro Verde | East | E2, E4 | 20 Table Mild | Bistro Verde recipe (1 Verde Mash + 1 Pickled Brine, £25) |
 | W1 | The Delivery Van | West | 00 | 15 Table Mild | Auto-Sell sliders (below) |
@@ -174,3 +174,40 @@ Two West Wing nodes for offline play. The rules and criteria are in [OFFLINE.md]
 | --- | --- | --- | --- | --- | --- | --- |
 | W5 | Night Shift Protocols I | W1 | 15 Classic Louisiana | Offline cap +2 hours, offline speed +10 points | 0:55 | −2, −1 |
 | W6 | Night Shift Protocols II | W5 | 25 Classic Louisiana | Offline cap +2 hours, offline speed +10 points | 1:20 | −3, −1 |
+
+## N10: Forager's Luck (D025)
+
+Built (save v6, which adds `stats.foraged`). Asked for by the owner, beyond the brief. `forage` in `data/tech.json`; non-pepper crops carry `ingredient: true` in `data/items.json`.
+
+| Id | Node | Needs | Cost | Effect | Expected | Pos |
+| --- | --- | --- | --- | --- | --- | --- |
+| N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.25% chance (was 2.5% until v0.6a moved Garlic earlier) to drop one harvest of the shortest ingredient | 0:35 | 1, −2 |
+
+- **Shortest ingredient:** among owned non-pepper stations (D024) that a researched recipe uses, the one whose stock covers the fewest cycles of that use (stock ÷ the most any one of those recipes takes a cycle). Ties go in data order. With no such station, nothing drops and nothing is drawn.
+- **One harvest:** what that station's next harvest would give, yield upgrades included, without Crop Quality's double.
+- Every press counts, as for the other button perks: Double-Tap, Grip and the Piston, offline included (D019). The chance draws from `Game.rng` (D017).
+- Size (GUESS, the target to measure): 3 presses a second is about 4.5 drops a minute. Against a Vinegar Cask harvesting every 2 s (30 a minute) that's about +15%; the Piston alone about +5%. It shrinks as speed upgrades make the station harvest more often, which is right for a top-up.
+
+### Criteria (N10)
+
+| Id | Criterion |
+| --- | --- |
+| T1 | Over 10,000 presses, 2–3% drop. |
+| T2 | A drop always goes to the shortest ingredient as defined above, and is exactly one harvest of it. |
+| T3 | No drop, and no draw from the random stream, with no ingredient station owned. |
+| T4 | For the pacing player at 0:45, the shortest ingredient's supply over a minute is 10–20% higher than without the node. |
+| T5 | Every existing pacing and offline criterion still passes. |
+
+### Results (N10)
+
+| Id | Target | Measured |
+| --- | --- | --- |
+| T1 | 2–3% of 10,000 presses | PASS (`button_tests.gd`) |
+| T2 | Goes to the shortest, one harvest | PASS, including ties, yield upgrades, unused ingredients and the Piston while away |
+| T3 | No drop or draw without a station | PASS: the random stream ends where it does without the node |
+| T4 | +10–20% at 0:45 | PASS: +13% (Garlic over 10 minutes: 1,520 against 1,344) |
+| T5 | Nothing else moves | PASS, except X7 off CI (below) |
+
+- **T4's window was changed after the first measurement.** Over one minute, as drafted, it measured +9% (FAIL). A minute holds only about five drops, so one minute swings by ±40% with the random stream; ten minutes of the same player gives +13%. The bar (10–20%) is unchanged; only the window grew.
+- **X7 (8 hours away in under 0.5 s) fails on the session container** at 0.85–1.3 s, both before and after this change (measured back to back), so it's the machine, not the node. CI is the judge.
+- The pacing player doesn't research N10, so every other pacing number is unchanged. T4 grants the node to a copy of its 0:45 save.

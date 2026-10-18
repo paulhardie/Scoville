@@ -31,7 +31,7 @@ const TAB_THRESHOLDS := {
 	"hq": 1000000.0,
 }
 ## Tabs that exist yet. The others stay `[ ? ]` whatever the Operation Value.
-const TABS_BUILT := ["farms", "processing", "tech"]
+const TABS_BUILT := ["farms", "processing", "tech", "hq"]
 
 # --- Upgrades (docs/FACTORY.md, GUESSES tuned in v0.2) -------------------------
 # A level's price is base × growth^level × √(the station's price ÷ its kind's
@@ -40,6 +40,10 @@ const TABS_BUILT := ["farms", "processing", "tech"]
 const PLOT_PRICE_REFERENCE := 10.0
 const VAT_PRICE_REFERENCE := 25.0
 const LINE_PRICE_REFERENCE := 35.0
+## D031: slot upgrades also scale by √(the value of what the slot makes ÷ the
+## value of these), Tier 1's mash and bottle.
+const VAT_VALUE_REFERENCE := "sweet_mash"
+const LINE_VALUE_REFERENCE := "table_mild"
 
 ## Plot Harvest Speed: +step a level.
 const PLOT_SPEED_STEP := 0.15
@@ -118,3 +122,18 @@ const OFFLINE_MAX_STEPS := 4000
 ## this shows the "While you were away" card (OFFLINE.md).
 const AWAY_SECONDS := 10.0
 const RETURN_CARD_SECONDS := 60.0
+
+# --- v0.6b: Prestige (docs/PRESTIGE.md) ----------------------------------------
+
+## Operation Value at which the franchise can be sold (brief §6).
+const PRESTIGE_OV := 1000000.0
+## Franchise Credits = ⌊CREDIT_SCALE × log10(OV ÷ CREDIT_BASE_OV)⌋ × the
+## Executive Lounge (GUESS, G8: "scaled logarithmically").
+const CREDIT_SCALE := 10.0
+const CREDIT_BASE_OV := 100000.0
+## Opening the n-th room costs ROOM_OPEN_COST × n credits, and levelling a room
+## from level L costs ROOM_LEVEL_COST × L (GUESSES, G8).
+const ROOM_OPEN_COST := 5
+const ROOM_LEVEL_COST := 2
+## Rooms dealt in a draft (brief §6: a 2-card draft).
+const DRAFT_SIZE := 2

@@ -171,6 +171,7 @@ func run() -> void:
 	screen.queue_free()
 	await process_frame
 	await test_return_card()
+	await test_hq()
 	for failure in failures:
 		printerr("FAIL: ", failure)
 	print("%s: ui tests (%d checks)" % ["PASS" if failures.is_empty() else "FAIL", checks])
@@ -241,4 +242,45 @@ func test_return_card() -> void:
 	check(card2.visible and again.last_return.away >= 7200.0 - 1.0, "X8: reopening 2 hours after saving shows the card")
 	again.queue_free()
 	DirAccess.remove_absolute("user://offline_test_save.json")
+	await process_frame
+
+
+## Q9: the HQ tab sells the franchise on a second tap, and opens rooms through
+## the draft (docs/PRESTIGE.md).
+func test_hq() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	root.add_child(screen)
+	await process_frame
+	var g = screen.game
+	g.revealed = {"counter": true, "status_bar": true, "deck": true}
+	g.stats.cash_earned = 2e6
+	g._note_value()
+	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
+	await process_frame
+	var sell: Button = screen.find_child("SellFranchise", true, false)
+	check(sell.is_visible_in_tree() and not sell.disabled and sell.text == "Sell (+13 credits)", "Q9: HQ offers the sale: %s" % sell.text)
+	sell.pressed.emit()
+	await process_frame
+	check(g.account.prestiges == 0 and sell.text == "Tap again to sell", "Q9: the first tap only asks again")
+	sell.pressed.emit()
+	await process_frame
+	check(g.account.prestiges == 1 and g.account.credits == 13, "Q9: the second tap sells")
+	check(sell.disabled, "Q9: and the new run can't sell yet")
+	var open: Button = screen.find_child("OpenRoom", true, false)
+	open.pressed.emit()
+	await process_frame
+	var picks: Array = g.account.draft
+	check(picks.size() == 2 and not open.visible, "Q9: opening a room deals two cards")
+	var card: Button = screen.find_child("Draft_" + picks[0], true, false)
+	check(card != null and card.is_visible_in_tree(), "Q9: both show as cards")
+	card.pressed.emit()
+	await process_frame
+	check(g.account.rooms.has(picks[0]), "Q9: tapping one opens it")
+	var up: Button = screen.find_child("LevelRoom_" + picks[0], true, false)
+	check(up != null and up.text == "Lv 2: 2" and not up.disabled, "Q9: its row offers Level 2 for 2 credits: %s" % (up.text if up else "none"))
+	up.pressed.emit()
+	await process_frame
+	check(g.account.rooms[picks[0]] == 2 and g.account.credits == 6, "Q9: and levels it")
+	screen.queue_free()
 	await process_frame

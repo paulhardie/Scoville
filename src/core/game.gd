@@ -5,16 +5,17 @@ extends RefCounted
 ## time only moves through tick(), and every chance draws from one seeded stream
 ## whose state is saved (D017).
 ##
-## The run (everything a Prestige will reset) is kept apart from the account
-## (what survives it): `account` holds only the best Operation Value so far,
-## which is what opens tabs.
+## The run (everything a Prestige resets) is kept apart from the account (what
+## survives it): `account` holds the best Operation Value so far (which opens
+## tabs), Franchise Credits, the HQ rooms, the draft waiting to be picked, and
+## how many times the franchise has been sold (docs/PRESTIGE.md).
 
 const T = preload("res://src/core/tuning.gd")
 const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 5
+const SAVE_VERSION := 7
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
@@ -47,7 +48,7 @@ var stats := {}
 var rng := RandomNumberGenerator.new()
 
 # --- The account ---
-var account := {"best_ov": 0.0}
+var account := {"best_ov": 0.0, "credits": 0, "prestiges": 0, "rooms": {}, "draft": []}
 
 ## What research adds up to, worked out when research changes (_refresh_fx).
 var fx := {}
@@ -56,22 +57,43 @@ var fx := {}
 func _init(game_data: Dictionary = {}, seed_value: int = 0) -> void:
 	data = game_data if not game_data.is_empty() else DataLoader.default_data()
 	rng.seed = seed_value
+	_reset_run()
+
+
+## A fresh run: everything a sale of the franchise resets (brief §6). The
+## reveals and the account stay; cash starts at Seed Capital's amount.
+func _reset_run() -> void:
+	stock = {}
 	for item in data.items:
 		stock[item] = 0
+	plots = {}
 	for crop in data.plots:
 		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "quality": 0, "progress": 0.0}
+	vats = []
+	lines = []
+	autosell = {}
+	autosell_acc = {}
 	for item in data.items:
 		if data.items[item].kind == "bottle":
 			autosell[item] = 100
 			autosell_acc[item] = 0
 	research = {"kitchen_table": true}
+	heat = 0.0
+	holding = false
+	press_acc = {"grip": 0.0, "piston": 0.0}
+	overdrive = {"until": 0, "ready": 0}
+	keep = {}
+	pin = ""
+	ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
+	byproduct_ready = 0
 	stats = _new_stats()
+	cash = start_cash()
 	_refresh_fx()
 
 
 func _new_stats() -> Dictionary:
 	var s := {"presses": 0, "doubles": 0, "bell_picked": 0, "cash_earned": 0.0, "ticks": 0, "researched": 0,
-		"free_levels": 0, "spikes": 0, "harvested": {}, "made": {}, "sold": {}, "consumed": {}}
+		"free_levels": 0, "spikes": 0, "foraged": 0, "harvested": {}, "made": {}, "sold": {}, "consumed": {}}
 	for item in data.items:
 		for k in ["harvested", "made", "sold", "consumed"]:
 			s[k][item] = 0
@@ -81,9 +103,9 @@ func _new_stats() -> Dictionary:
 ## Sums every researched node's effects (D010). Called whenever research changes.
 func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
-		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
+		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "plot_yield": {}, "concentrate": {}, "reserve": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
 		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
-		"byproduct": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
+		"byproduct": 0.0, "forage": 0.0, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
 	for node in research:
 		for e in data.tech[node].effects:
 			var kind: String = e.keys()[0]
@@ -100,6 +122,9 @@ func _refresh_fx() -> void:
 				"overclock": fx.overclock = maxf(fx.overclock, v)
 				"piston": fx.piston = maxf(fx.piston, v)
 				"plot_speed": fx.plot_speed[v.crop] = fx.plot_speed.get(v.crop, 1.0) * v.mult
+				"plot_yield": fx.plot_yield[v.crop] = fx.plot_yield.get(v.crop, 1.0) * v.mult
+				"concentrate": fx.concentrate[v.item] = maxf(fx.concentrate.get(v.item, 0.0), v.share)
+				"reserve": fx.reserve[v.item] = fx.reserve.get(v.item, 0.0) + v.bonus
 				"slot_cap":
 					for st in v:
 						fx.slot_cap[st] += int(v[st])
@@ -110,15 +135,32 @@ func _refresh_fx() -> void:
 				"smart_stockpiling": fx.stockpile = true
 				"market_ticker": fx.ticker = true
 				"byproduct_recycling": fx.byproduct = maxf(fx.byproduct, v)
+				"forage": fx.forage = maxf(fx.forage, v)
 				"stock_value_bonus": fx.stock_bonus += v
 				"offline":
 					fx.offline_hours += v.hours
 					fx.offline_speed += v.speed
+	# HQ rooms (docs/PRESTIGE.md), folded in with research.
+	fx.hq = {}
+	for id in account.rooms:
+		var room: Dictionary = data.rooms[id]
+		if room.effect != "start_cash":
+			fx.hq[room.effect] = fx.hq.get(room.effect, 0.0) + room.base + room.step * (account.rooms[id] - 1)
 	# Worked out once per research change: recipe inputs after Zero-Waste
 	# Piping, and the valve's default keep amounts.
 	fx.inputs = {}
 	for id in data.recipes:
 		fx.inputs[id] = _inputs_after_reduction(id)
+	# Reserve (D026): each sauce's sale bonus from the mashes its recipe takes.
+	fx.sale_bonus = {}
+	for id in data.recipes:
+		var r: Dictionary = data.recipes[id]
+		if r.station == "line":
+			var bonus := 0.0
+			for item in r.inputs:
+				bonus += fx.reserve.get(item, 0.0)
+			if bonus > 0.0:
+				fx.sale_bonus[r.output] = bonus
 	fx.default_keep = {}
 	for item in data.items:
 		var n := 0
@@ -126,6 +168,14 @@ func _refresh_fx() -> void:
 			if recipe_unlocked(id):
 				n += fx.inputs[id].get(item, 0) * T.OVERFLOW_KEEP_CYCLES
 		fx.default_keep[item] = n
+	# Forager's Luck (D025): the most any researched recipe takes of each
+	# ingredient a cycle; an ingredient no researched recipe uses isn't short.
+	fx.ingredient_need = {}
+	for item in data.items:
+		if data.items[item].ingredient:
+			for id in data.recipes:
+				if recipe_unlocked(id) and fx.inputs[id].has(item):
+					fx.ingredient_need[item] = maxi(fx.ingredient_need.get(item, 0), fx.inputs[id][item])
 
 
 # --- Reading: value and reveals ------------------------------------------------
@@ -140,15 +190,16 @@ func value(item: String) -> float:
 func appraisal(item: String) -> float:
 	var v := value(item)
 	if data.items[item].kind == "bottle":
-		v *= fx.packaging
+		v *= fx.packaging * (1.0 + fx.hq.get("bottle_value", 0.0))
 	return v * (1.0 + fx.stock_bonus)
 
 
-## What an item sells for before Heat: bottles with packaging and any spike.
+## What an item sells for before Heat: bottles with packaging, Reserve (D026)
+## and any spike.
 func sale_price(item: String) -> float:
 	var v := value(item)
 	if data.items[item].kind == "bottle":
-		v *= fx.packaging
+		v *= fx.packaging * (1.0 + fx.sale_bonus.get(item, 0.0)) * (1.0 + fx.hq.get("bottle_value", 0.0))
 		if ticker.sauce == item:
 			v *= ticker.mult
 	return v
@@ -197,7 +248,7 @@ func _ticks(seconds: float) -> int:
 
 ## Bell Peppers a press picks: the base plus the North Wing's bonuses.
 func tap_yield() -> int:
-	return T.BUTTON_BASE_YIELD + fx.tap_bonus
+	return roundi((T.BUTTON_BASE_YIELD + fx.tap_bonus) * (1.0 + fx.hq.get("button_yield", 0.0)))
 
 
 # --- Reading: plots ------------------------------------------------------------
@@ -215,11 +266,11 @@ func plot_price(crop: String) -> float:
 
 
 func plot_cycle(crop: String) -> float:
-	return data.plots[crop].seconds / (1.0 + T.PLOT_SPEED_STEP * plots[crop].speed) / fx.plot_speed.get(crop, 1.0)
+	return data.plots[crop].seconds / (1.0 + T.PLOT_SPEED_STEP * plots[crop].speed) / fx.plot_speed.get(crop, 1.0) / (1.0 + fx.hq.get("plot_speed", 0.0))
 
 
 func plot_yield(crop: String) -> int:
-	return data.plots[crop]["yield"] + plots[crop]["yield"]
+	return roundi((data.plots[crop]["yield"] + plots[crop]["yield"]) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_yield", 0.0)))
 
 
 ## The chance a harvest gives double (Crop Quality, D016).
@@ -283,6 +334,12 @@ func can_buy_slot(station: String) -> bool:
 func slot_upgrade_cost(station: String, index: int) -> float:
 	var ref := T.VAT_PRICE_REFERENCE if station == "vat" else T.LINE_PRICE_REFERENCE
 	var scale := sqrt(maxf(data.slots[station].prices[index], ref) / ref)
+	# D031: a slot's upgrades are also priced by what it makes, so a slot
+	# bottling Phantom Smokehouse upgrades at Phantom prices; whichever is dearer.
+	var recipe: String = slots(station)[index].recipe
+	if recipe != "":
+		var ref_item: String = T.VAT_VALUE_REFERENCE if station == "vat" else T.LINE_VALUE_REFERENCE
+		scale = maxf(scale, sqrt(value(data.recipes[recipe].output) / value(ref_item)))
 	var lv: int = slots(station)[index].speed
 	if station == "vat":
 		return T.VAT_SPEED_COST * scale * pow(T.VAT_SPEED_GROWTH, lv)
@@ -314,13 +371,24 @@ func recipe_inputs(recipe: String) -> Dictionary:
 
 func _inputs_after_reduction(recipe: String) -> Dictionary:
 	var r: Dictionary = data.recipes[recipe]
-	if r.station != "vat" or fx.reduction <= 0.0:
+	var crop_cut: float = fx.hq.get("crop_input", 0.0)
+	var mash_cut: float = fx.hq.get("mash_input", 0.0)
+	if r.station == "vat" and fx.reduction <= 0.0 and fx.concentrate.is_empty() and crop_cut <= 0.0:
 		return r.inputs
+	if r.station == "line" and mash_cut <= 0.0:
+		return r.inputs
+	# Discounts multiply, rounded down, at least 1 (brief §6's anti-exploit rule).
 	var out := {}
 	for item in r.inputs:
 		var n: int = r.inputs[item]
-		if data.items[item].kind == "crop":
-			n = maxi(1, floori(n * (1.0 - fx.reduction) + 1e-9))
+		var kind: String = data.items[item].kind
+		var keep_share := 1.0
+		if r.station == "vat" and kind == "crop":
+			keep_share = (1.0 - fx.reduction) * (1.0 - fx.concentrate.get(item, 0.0)) * (1.0 - crop_cut)
+		elif r.station == "line" and kind == "mash":
+			keep_share = 1.0 - mash_cut
+		if keep_share < 1.0:
+			n = maxi(1, floori(n * keep_share + 1e-9))
 		out[item] = n
 	return out
 
@@ -343,7 +411,8 @@ func slot_cycle(station: String, index: int) -> float:
 		return INF
 	var step := T.VAT_SPEED_STEP if station == "vat" else T.LINE_SPEED_STEP
 	var crate := T.STARTER_CRATE_SPEED if station == "line" and s.crate > 0 else 1.0
-	return data.recipes[s.recipe].seconds / (1.0 + step * s.speed) / crate / factory_speed()
+	var hq: float = fx.hq.get("vat_speed" if station == "vat" else "line_speed", 0.0)
+	return data.recipes[s.recipe].seconds / (1.0 + step * s.speed) / crate / factory_speed() / (1.0 + hq)
 
 
 func overdrive_active() -> bool:
@@ -367,11 +436,34 @@ func research_reachable(node: String) -> bool:
 	for need in data.tech[node].needs:
 		if not is_researched(need):
 			return false
-	return true
+	return not fork_taken(node)
+
+
+## The other side of a fork already researched (D026), "" if none: then this
+## node is locked for the run.
+func fork_taken(node: String) -> String:
+	for other in data.tech[node].excludes:
+		if is_researched(other):
+			return other
+	return ""
+
+
+## A node's cost after the Test Kitchen: max(1, round(base × (1 − discount)))
+## per item (brief §6's anti-exploit formula; the Tech and Manager discounts
+## join it when they exist).
+func tech_cost(node: String) -> Dictionary:
+	var cut: float = fx.hq.get("tech_cost", 0.0)
+	var base: Dictionary = data.tech[node].cost
+	if cut <= 0.0:
+		return base
+	var out := {}
+	for item in base:
+		out[item] = maxi(1, roundi(base[item] * (1.0 - cut)))
+	return out
 
 
 func can_research(node: String) -> bool:
-	return research_reachable(node) and has_items(data.tech[node].cost)
+	return research_reachable(node) and has_items(tech_cost(node))
 
 
 func has_items(cost: Dictionary) -> bool:
@@ -385,7 +477,7 @@ func has_items(cost: Dictionary) -> bool:
 func pinned_need(item: String) -> int:
 	if pin == "" or is_researched(pin):
 		return 0
-	return data.tech[pin].cost.get(item, 0)
+	return tech_cost(pin).get(item, 0)
 
 
 ## The valve's keep amount for a crop or mash (D014): the player's, or 5 cycles
@@ -527,7 +619,7 @@ func assign(station: String, index: int, recipe: String) -> bool:
 func research_node(node: String) -> bool:
 	if not can_research(node):
 		return false
-	var cost: Dictionary = data.tech[node].cost
+	var cost: Dictionary = tech_cost(node)
 	for item in cost:
 		stock[item] -= cost[item]
 		stats.consumed[item] += cost[item]
@@ -562,7 +654,7 @@ func set_keep(item: String, amount: int) -> bool:
 
 ## How much time away counts, in seconds, and the speed it runs at (D018).
 func offline_cap() -> float:
-	return (T.OFFLINE_HOURS + fx.offline_hours) * 3600.0
+	return (T.OFFLINE_HOURS + fx.offline_hours + fx.hq.get("offline_hours", 0.0)) * 3600.0
 
 
 func offline_speed() -> float:
@@ -664,6 +756,95 @@ func _step(k: int) -> void:
 	_note_value()
 
 
+# --- Prestige (docs/PRESTIGE.md) ----------------------------------------------
+
+func can_prestige() -> bool:
+	return operation_value() >= T.PRESTIGE_OV - EPSILON
+
+
+## Franchise Credits a sale would pay now.
+func prestige_credits() -> int:
+	var ov := operation_value()
+	if ov < T.PRESTIGE_OV - EPSILON:
+		return 0
+	return maxi(0, floori(T.CREDIT_SCALE * log(ov / T.CREDIT_BASE_OV) / log(10.0) * (1.0 + fx.hq.get("credits", 0.0)) + 1e-9))
+
+
+## Sells the franchise: pays the credits and starts a fresh run (brief §6).
+func prestige() -> bool:
+	if not can_prestige():
+		return false
+	_note_value()
+	account.credits += prestige_credits()
+	account.prestiges += 1
+	_reset_run()
+	return true
+
+
+## Starting cash from the Seed Capital Office.
+func start_cash() -> float:
+	for id in account.rooms:
+		var room: Dictionary = data.rooms[id]
+		if room.effect == "start_cash":
+			var lv: int = account.rooms[id]
+			var amounts: Array = room.amounts
+			if lv <= amounts.size():
+				return amounts[lv - 1]
+			return amounts[-1] * pow(room.growth, lv - amounts.size())
+	return 0.0
+
+
+func room_open_cost() -> int:
+	return T.ROOM_OPEN_COST * (account.rooms.size() + 1)
+
+
+func can_open_room() -> bool:
+	return account.draft.is_empty() and account.rooms.size() < data.rooms.size() and account.credits >= room_open_cost()
+
+
+## Pays for a new room and deals the draft from the rooms not yet owned.
+func open_room() -> bool:
+	if not can_open_room():
+		return false
+	account.credits -= room_open_cost()
+	var pool: Array = []
+	for id in data.rooms:
+		if not account.rooms.has(id):
+			pool.append(id)
+	var draft: Array = []
+	while draft.size() < T.DRAFT_SIZE and not pool.is_empty():
+		draft.append(pool.pop_at(rng.randi_range(0, pool.size() - 1)))
+	account.draft = draft
+	return true
+
+
+## Picks a room from the draft; it opens at Level 1.
+func choose_room(id: String) -> bool:
+	if not account.draft.has(id):
+		return false
+	account.rooms[id] = 1
+	account.draft = []
+	_refresh_fx()
+	return true
+
+
+func room_level_cost(id: String) -> int:
+	return T.ROOM_LEVEL_COST * int(account.rooms.get(id, 0))
+
+
+func can_level_room(id: String) -> bool:
+	return account.rooms.has(id) and account.rooms[id] < data.rooms[id].cap and account.credits >= room_level_cost(id)
+
+
+func level_room(id: String) -> bool:
+	if not can_level_room(id):
+		return false
+	account.credits -= room_level_cost(id)
+	account.rooms[id] += 1
+	_refresh_fx()
+	return true
+
+
 func advance(ticks: int) -> void:
 	for i in ticks:
 		tick()
@@ -688,6 +869,10 @@ func _press() -> int:
 					var s: Dictionary = slots(station)[j]
 					if s.running:
 						s.progress = minf(s.progress + fx.overclock, slot_cycle(station, j))
+	if fx.forage > 0.0:
+		for i in n:
+			if _shortest_ingredient() != "" and rng.randf() < fx.forage:
+				_forage_drop()
 	stock.bell += picked
 	stats.bell_picked += picked
 	revealed.counter = true
@@ -701,14 +886,7 @@ func _press() -> int:
 func _press_batch(n: int) -> void:
 	if n <= 0:
 		return
-	var doubles := 0
-	if fx.double > 0.0:
-		if n < 12:
-			for i in n:
-				if rng.randf() < fx.double:
-					doubles += 1
-		else:
-			doubles = clampi(roundi(rng.randfn(n * fx.double, sqrt(n * fx.double * (1.0 - fx.double)))), 0, n)
+	var doubles := _binomial(n, fx.double) if fx.double > 0.0 else 0
 	var presses := n + doubles
 	stats.doubles += doubles
 	stats.presses += presses
@@ -723,6 +901,46 @@ func _press_batch(n: int) -> void:
 				var s: Dictionary = slots(station)[j]
 				if s.running:
 					s.progress = minf(s.progress + fx.overclock * presses, slot_cycle(station, j))
+	if fx.forage > 0.0 and _shortest_ingredient() != "":
+		for i in _binomial(presses, fx.forage):
+			_forage_drop()
+
+
+## Forager's Luck (D025): of the owned ingredient stations that a researched
+## recipe uses, the one whose stock covers the fewest cycles of that use (ties
+## in data order); "" when there is none.
+func _shortest_ingredient() -> String:
+	var best := ""
+	var best_cycles := INF
+	for crop in fx.ingredient_need:
+		if plots.has(crop) and plots[crop].owned:
+			var cycles: float = stock[crop] / float(fx.ingredient_need[crop])
+			if cycles < best_cycles:
+				best = crop
+				best_cycles = cycles
+	return best
+
+
+## One harvest of the shortest ingredient, yield upgrades included and without
+## Crop Quality's double.
+func _forage_drop() -> void:
+	var crop := _shortest_ingredient()
+	var n := plot_yield(crop)
+	stock[crop] += n
+	stats.harvested[crop] += n
+	stats.foraged += 1
+
+
+## How many of n draws at chance p come up: drawn one by one when few, by the
+## binomial's normal approximation once there are enough (the catch-up, D020).
+func _binomial(n: int, p: float) -> int:
+	if n < 12:
+		var hits := 0
+		for i in n:
+			if rng.randf() < p:
+				hits += 1
+		return hits
+	return clampi(roundi(rng.randfn(n * p, sqrt(n * p * (1.0 - p)))), 0, n)
 
 
 ## A long step's harvests at once (the catch-up, D020): every whole cycle in the
@@ -735,15 +953,8 @@ func _harvest_batch(crop: String) -> void:
 	if n <= 0:
 		return
 	p.progress -= n * cycle
-	var doubled := 0
 	var chance := quality_chance(crop)
-	if chance > 0.0:
-		if n < 12:
-			for i in n:
-				if rng.randf() < chance:
-					doubled += 1
-		else:
-			doubled = clampi(roundi(rng.randfn(n * chance, sqrt(n * chance * (1.0 - chance)))), 0, n)
+	var doubled := _binomial(n, chance) if chance > 0.0 else 0
 	var got := (n + doubled) * plot_yield(crop)
 	stock[crop] += got
 	stats.harvested[crop] += got
@@ -1033,7 +1244,7 @@ func to_state() -> Dictionary:
 			"rng": {"seed": str(rng.seed), "state": str(rng.state)},
 			"stats": stats.duplicate(true),
 		},
-		"account": account.duplicate(),
+		"account": account.duplicate(true),
 	}
 
 
@@ -1066,7 +1277,9 @@ func load_state(s: Variant) -> String:
 		return problem
 	if version == 3:
 		s = _migrate_3_to_4(s)
-	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md).
+	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
+	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
+	# v7 only adds the account's Prestige fields, read below with defaults.
 	var run: Dictionary = s.run
 	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "revealed": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
 		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,
@@ -1111,6 +1324,20 @@ func load_state(s: Variant) -> String:
 			for item in slot.get("taken", {}):
 				if not data.items.has(item):
 					return "save's %s slot took unknown item %s" % [station, item]
+
+	# v7 adds credits, sales, rooms and the draft to the account; a v6 save
+	# has none of them, which is an account that has never sold.
+	var acc: Dictionary = s.account
+	var rooms: Variant = acc.get("rooms", {})
+	var draft: Variant = acc.get("draft", [])
+	if typeof(rooms) != TYPE_DICTIONARY or typeof(draft) != TYPE_ARRAY:
+		return "save's HQ rooms or draft are the wrong type"
+	for id in rooms:
+		if not data.rooms.has(id) or int(rooms[id]) < 1 or int(rooms[id]) > data.rooms[id].cap:
+			return "save has a bad HQ room " + str(id)
+	for id in draft:
+		if not data.rooms.has(id) or rooms.has(id):
+			return "save's draft holds a bad room " + str(id)
 
 	# Everything checked: now load.
 	cash = float(run.cash)
@@ -1157,7 +1384,7 @@ func load_state(s: Variant) -> String:
 	rng.seed = String(run.rng.get("seed", "0")).to_int()
 	rng.state = String(run.rng.get("state", str(rng.state))).to_int()
 	stats = fresh.stats
-	for k in ["presses", "doubles", "bell_picked", "ticks", "researched", "free_levels", "spikes"]:
+	for k in ["presses", "doubles", "bell_picked", "ticks", "researched", "free_levels", "spikes", "foraged"]:
 		stats[k] = int(run.stats.get(k, 0))
 	stats.cash_earned = float(run.stats.get("cash_earned", 0.0))
 	for k in ["harvested", "made", "sold", "consumed"]:
@@ -1166,7 +1393,12 @@ func load_state(s: Variant) -> String:
 			for item in saved:
 				if stats[k].has(item):
 					stats[k][item] = int(saved[item])
-	account = {"best_ov": float(s.account.get("best_ov", 0.0))}
+	account = {"best_ov": float(acc.get("best_ov", 0.0)), "credits": int(acc.get("credits", 0)), "prestiges": int(acc.get("prestiges", 0)),
+		"rooms": {}, "draft": []}
+	for id in rooms:
+		account.rooms[id] = int(rooms[id])
+	for id in draft:
+		account.draft.append(str(id))
 	_refresh_fx()
 	_note_value()
 	return ""

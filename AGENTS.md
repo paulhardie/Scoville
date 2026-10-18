@@ -26,7 +26,7 @@ Out of scope for v1.0 (brief): servers, accounts, cloud saves. Everything runs o
 
 - **Pure simulation, separate from UI.** `src/core/game.gd` (RefCounted, no nodes) owns all state and rules and advances by a fixed tick. Screens only present and report. A rule implemented twice is a bug.
 - **Deterministic.** A fixed tick (`Tuning.TICK_SECONDS`) and no wall clock inside the simulation. Real time comes in only through `real_clock.gd`, read by the screen, which hands time away to `Game.catch_up()` (OFFLINE.md). `tick()` is `_step(1)`; the catch-up runs the same `_step` with longer steps. Every chance draws from the game's one seeded stream (`Game.rng`), whose state is saved (D017). Tests pass a seed to `Game.new(data, seed)`.
-- **Numbers in one place.** Items, recipes, plots, slots and tech nodes live in `data/*.json`, loaded and checked only by `src/core/data_loader.gd`; bad data fails at load naming the file and row. Other tuning numbers live in `src/core/tuning.gd`. Each cites its brief section or decision, or is marked GUESS.
+- **Numbers in one place.** Items, recipes, plots, slots, tech nodes and HQ rooms live in `data/*.json`, loaded and checked only by `src/core/data_loader.gd`; bad data fails at load naming the file and row. Other tuning numbers live in `src/core/tuning.gd`. Each cites its brief section or decision, or is marked GUESS.
 - **Money is GBP** and shown as `£0.00`.
 - Colours and type sizes live only in `src/ui/style.gd`.
 - Scripts reference each other with `preload` constants, not `class_name`, so a stale `.godot` class cache can't break a headless run.
@@ -54,15 +54,15 @@ bash tools/serve_web.sh                              # export, then serve it on 
 | Path | What |
 | --- | --- |
 | `src/core/` | Simulation: `game.gd` (state, rules, time, saves, the offline catch-up; the run apart from the account), `data_loader.gd` (reads and checks `data/`), `tuning.gd` (every tuning number that isn't data, with its source), `real_clock.gd` (the one place wall-clock time enters) |
-| `data/` | Game data: `items`, `recipes`, `plots`, `slots`, `tech` (JSON). Only `data_loader.gd` reads it |
+| `data/` | Game data: `items`, `recipes`, `plots`, `slots`, `tech`, `rooms` (HQ, JSON). Only `data_loader.gd` reads it |
 | `src/sim/` | Scripted players for measuring: `engaged_player.gd` (the pacing player, [D003](docs/DECISIONS.md); `Player.casual()` is the casual phone player, [D022](docs/DECISIONS.md)) |
 | `src/ui/` | The screen (`main.gd`, built in code) and `style.gd` (palette and sizes) |
 | `scenes/` | `main.tscn`, the entry scene |
-| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 110 minutes against FACTORY.md's F and ECONOMY.md's N and M criteria. `button_tests.gd` (whose `with()` builds a game with chosen research) and `upgrades_tests.gd` cover v0.4's nodes; `offline_tests.gd` covers the catch-up |
+| `tests/` | GDScript suites (`*_tests.gd`), each printing `PASS:` or `FAIL:`. `pacing_tests.gd` measures the first 3:15 against FACTORY.md's F and E, ECONOMY.md's N and M, OFFLINE.md's P and FULL_RUN.md's U criteria (about 2 minutes). `button_tests.gd` (whose `with()` builds a game with chosen research) and `upgrades_tests.gd` cover v0.4's nodes (`button_tests.gd` also Forager's Luck, T1–T3; `pacing_tests.gd` its T4); `offline_tests.gd` covers the catch-up; `full_run_tests.gd` covers v0.6a's rules (V1–V7); `prestige_tests.gd` covers selling, credits and HQ rooms (Q1–Q8) |
 | `tools/` | `capture_ui.gd`, `export_web.sh`, `serve_web.sh`/`.py` (phone build), `install_godot_linux.sh` |
-| `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`, `ECONOMY.md`, `TECH_TREE.md`, `OFFLINE.md`, `INGREDIENTS.md`) |
+| `docs/` | The brief, roadmap, handover, backlog, decisions, one design doc per system (`ONBOARDING.md`, `FACTORY.md`, `ECONOMY.md`, `TECH_TREE.md`, `OFFLINE.md`, `INGREDIENTS.md`, `FULL_RUN.md`, `PRESTIGE.md`) |
 
 ## Sources of truth
 
-- What the game should do: my explicit instructions, then decisions in `docs/DECISIONS.md`, then the brief (`docs/BRIEF.md`), then each system's design doc (`docs/ONBOARDING.md`, `docs/FACTORY.md`, `docs/ECONOMY.md` for values, Operation Value and the run's pacing, `docs/INGREDIENTS.md` for the pepper ladder, `docs/TECH_TREE.md`), which owns that system's criteria and assumptions.
+- What the game should do: my explicit instructions, then decisions in `docs/DECISIONS.md`, then the brief (`docs/BRIEF.md`), then each system's design doc (`docs/ONBOARDING.md`, `docs/FACTORY.md`, `docs/ECONOMY.md` for values, Operation Value and the run's pacing, `docs/INGREDIENTS.md` for the pepper ladder, `docs/FULL_RUN.md` for v0.6a's content and curve, `docs/PRESTIGE.md` for selling the franchise and HQ, `docs/TECH_TREE.md`), which owns that system's criteria and assumptions.
 - What comes next: `docs/ROADMAP.md` (versions) and `docs/BACKLOG.md` (gaps and work). Where we are: `docs/HANDOVER.md`.

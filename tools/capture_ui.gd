@@ -100,6 +100,19 @@ func run() -> void:
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_locked_hint.png"), 0.1)
 
+	# HQ (v0.6b): a run worth £2M, then after a sale with two rooms and a draft.
+	g.stats.cash_earned = 2e6
+	g._note_value()
+	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("v06b_hq_sell.png"), 0.2)
+	g.prestige()
+	g.account.credits = 40
+	g.account.rooms = {"seed_vault": 3, "tasting_room": 1}
+	g._refresh_fx()
+	g.open_room()
+	screen._refresh(false)
+	await _shot(out.path_join("v06b_hq_draft.png"), 0.2)
+
 	print("PASS: captured to ", out)
 	quit()
 

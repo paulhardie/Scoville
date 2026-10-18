@@ -3,7 +3,9 @@ extends RefCounted
 ## Bad data is reported with the file and row, never half-loaded
 ## (docs/FACTORY.md S6).
 
-const FILES := ["items", "recipes", "plots", "slots", "tech"]
+const FILES := ["items", "recipes", "plots", "slots", "tech", "rooms"]
+## What an HQ room can change (docs/PRESTIGE.md).
+const ROOM_EFFECTS := ["plot_speed", "plot_yield", "vat_speed", "line_speed", "crop_input", "mash_input", "tech_cost", "button_yield", "start_cash", "bottle_value", "credits", "offline_hours"]
 const KINDS := ["crop", "mash", "bottle"]
 const STATIONS := {"vat": "mash", "line": "bottle"}
 
@@ -44,7 +46,7 @@ static func load_dir(dir: String = "res://data") -> Dictionary:
 ## items, recipes, plots (by id), slots, tech (by id), tech_order (ids in file order).
 static func check(raw: Dictionary) -> Dictionary:
 	var errors: Array[String] = []
-	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": []}
+	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": [], "rooms": {}}
 
 	var rows := _rows(raw, "items", "items", errors)
 	for i in rows.size():
@@ -59,7 +61,9 @@ static func check(raw: Dictionary) -> Dictionary:
 		elif r.value <= 0.0:
 			errors.append(where + ": value must be above 0")
 		else:
-			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value)}
+			if r.get("ingredient", false) and r.kind != "crop":
+				errors.append(where + ": only a crop can be an ingredient")
+			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value), "ingredient": bool(r.get("ingredient", false))}
 
 	rows = _rows(raw, "recipes", "recipes", errors)
 	for i in rows.size():
@@ -109,7 +113,7 @@ static func check(raw: Dictionary) -> Dictionary:
 		elif r.price <= 0.0 or r.seconds <= 0.0 or r["yield"] < 1.0:
 			errors.append(where + ": price and seconds must be above 0, and yield at least 1")
 		else:
-			data.plots[r.crop] = {"crop": r.crop, "price": float(r.price), "seconds": float(r.seconds), "yield": int(r["yield"]), "unlocked": bool(r.get("unlocked", false))}
+			data.plots[r.crop] = {"crop": r.crop, "name": str(r.get("name", data.items[r.crop].name + " Plot")), "price": float(r.price), "seconds": float(r.seconds), "yield": int(r["yield"]), "unlocked": bool(r.get("unlocked", false))}
 	if not data.plots.has("bell"):
 		errors.append("plots.json: no bell plot (onboarding needs one)")
 
@@ -176,7 +180,7 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0:
 						errors.append(where + ": tap_yield needs a whole number of at least 1")
 						ok = false
-				"double_tap", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
+				"double_tap", "forage", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0 or e[kind] >= 1.0:
 						errors.append(where + ": %s needs a share between 0 and 1" % kind)
 						ok = false
@@ -184,10 +188,20 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0:
 						errors.append(where + ": %s needs a number above 0" % kind)
 						ok = false
-				"plot_speed":
+				"plot_speed", "plot_yield":
 					var v: Variant = e[kind]
 					if typeof(v) != TYPE_DICTIONARY or not data.plots.has(v.get("crop")) or typeof(v.get("mult")) != TYPE_FLOAT or v.mult <= 1.0:
-						errors.append(where + ": plot_speed needs {crop, mult above 1}")
+						errors.append(where + ": %s needs {crop, mult above 1}" % kind)
+						ok = false
+				"concentrate":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or not data.items.has(v.get("item")) or data.items[v.item].kind != "crop" or typeof(v.get("share")) != TYPE_FLOAT or v.share <= 0.0 or v.share >= 1.0:
+						errors.append(where + ": concentrate needs {item: a crop, share between 0 and 1}")
+						ok = false
+				"reserve":
+					var v: Variant = e[kind]
+					if typeof(v) != TYPE_DICTIONARY or not data.items.has(v.get("item")) or data.items[v.item].kind != "mash" or typeof(v.get("bonus")) != TYPE_FLOAT or v.bonus <= 0.0:
+						errors.append(where + ": reserve needs {item: a mash, bonus above 0}")
 						ok = false
 				"offline":
 					var v: Variant = e[kind]
@@ -212,8 +226,43 @@ static func check(raw: Dictionary) -> Dictionary:
 			errors.append(where + ": pos is [x, y]")
 			ok = false
 		if ok:
-			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1])}
+			var excludes: Variant = r.get("excludes", [])
+			if typeof(excludes) != TYPE_ARRAY:
+				errors.append(where + ": excludes is a list of node ids")
+				excludes = []
+			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1]), "excludes": excludes.duplicate()}
 			data.tech_order.append(r.id)
+	# A fork (D026) names the nodes it locks; each side has to name the other.
+	for id in data.tech:
+		for other in data.tech[id].excludes:
+			if not data.tech.has(other):
+				errors.append("tech.json (%s): excludes unknown node %s" % [id, str(other)])
+			elif not data.tech[other].excludes.has(id):
+				errors.append("tech.json (%s): excludes %s, which doesn't exclude it back" % [id, other])
+	rows = _rows(raw, "rooms", "rooms", errors)
+	for i in rows.size():
+		var r: Variant = rows[i]
+		var where := _where("rooms", i, r)
+		if not _fields(r, {"id": TYPE_STRING, "name": TYPE_STRING, "effect": TYPE_STRING, "cap": TYPE_FLOAT}, where, errors):
+			continue
+		if data.rooms.has(r.id):
+			errors.append(where + ": duplicate id")
+		elif not r.effect in ROOM_EFFECTS:
+			errors.append(where + ": effect must be one of " + str(ROOM_EFFECTS))
+		elif r.cap < 1.0:
+			errors.append(where + ": cap must be at least 1")
+		elif r.effect == "start_cash" and (typeof(r.get("amounts")) != TYPE_ARRAY or r.amounts.is_empty() or typeof(r.get("growth")) != TYPE_FLOAT):
+			errors.append(where + ": start_cash needs amounts and growth")
+		elif r.effect != "start_cash" and (typeof(r.get("base")) != TYPE_FLOAT or typeof(r.get("step")) != TYPE_FLOAT or r.base <= 0.0 or r.step < 0.0):
+			errors.append(where + ": needs base above 0 and step at least 0")
+		else:
+			var room := {"id": r.id, "name": r.name, "effect": r.effect, "cap": int(r.cap)}
+			for k in ["base", "step", "growth"]:
+				if r.has(k):
+					room[k] = float(r[k])
+			if r.has("amounts"):
+				room.amounts = r.amounts.map(func(a): return float(a))
+			data.rooms[r.id] = room
 	if not data.tech.has("kitchen_table"):
 		errors.append("tech.json: no kitchen_table root")
 	for station in data.slots:

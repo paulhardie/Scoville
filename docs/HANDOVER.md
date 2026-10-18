@@ -2,37 +2,27 @@
 
 ## Where it's at
 
-Built: v0.1–v0.5 (PRs #1–#8, waiting to merge), and now **v0.5.1, the early-game pass** ([FACTORY.md](FACTORY.md#v051-the-early-game-pass)).
+Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). **Open: PR #11, every suite passing**, waiting on the owner to merge. It holds:
 
-**The phone test (W1, done).** The Web build plays fine on the owner's phone, and the "While you were away" card works. Two findings:
-- **The start felt "incredibly slow".** That's fixed here.
-- **It "looks like a 2010 web game rather than a mobile app in 2026".** That's W8, the visual pass.
+- **Forager's Luck** (N10, D025): a 2.25% chance a press to drop a harvest of the shortest ingredient.
+- **X7 machine-relative** (D027).
+- **v0.6a, the full run** ([FULL_RUN.md](FULL_RUN.md), D028–D033), **built**. A ten-rung sauce ladder from Table Mild to Phantom Smokehouse; the pepper ladder's new peppers through Tier 5; the Pantry branch with Bulk or Reserve forks; Slot Expansion III–IV; Artisan Decanters; two GMO boosters. A pacing player that plays all of it. Every criterion passes: £1M at 2:51, every rung on time, the forks worth up to 21%, the catch-up accurate and fast at 2:30.
+- **v0.6b part 1, Prestige** ([PRESTIGE.md](PRESTIGE.md), D030), **built**: selling the franchise at £1M, Franchise Credits, the 12 HQ rooms with a saved 2-card draft and levels, the brief's cost formula, the HQ tab, save v7.
 
-**What v0.5.1 changes:**
-- **A casual phone player for the first 20 minutes (D022),** beside the tireless pacing player.
-- **New early-game criteria, E1–E6,** with "never longer than … without something new" gaps as well as deadlines.
-- **Cheaper, stronger first stations:** a £5 plot giving a pepper a second, a £15 vat and a £10 line. Upgrade prices are unchanged.
-- **Results for the casual player:** the line at 3:16 (was 10:40), the longest wait 96 s (was 450 s), and the Tech Tree at 13:10.
+Tuning decisions this round: slot upgrades priced by what the slot makes (D031); U8 from 1:20, U4 narrowed, M6 retired, three measurement fixes (D032); U2 300 s late, U5 measured by vat time spent on ingredient mash (D033). Tier 5 is gated by cash rather than research, because stock counts in Operation Value.
 
-All criteria pass: E1–E6, F, N, M, X, P (31 pacing and offline criteria, 553 rule and screen checks).
-
-Knock-ons, each fixed or noted in [FACTORY.md](FACTORY.md#what-moved):
-- two catch-up faults that a bigger factory exposed, fixed;
-- P2's measurement, fixed;
-- the run now gets ahead of the 3-hour curve a little sooner (W7).
-
-**Also in design: the pepper ladder ([INGREDIENTS.md](INGREDIENTS.md), D023, proposed).** 13 real peppers by Scoville, Bell to Pepper X, then 6 fictional up to 16 billion SHU, each with a value. The brief's six peppers keep their values, so nothing built changes. Not in `data/` yet (W10).
+Checks: `bash run_tests.sh` passes all ten suites (button, core, factory, full run, offline, pacing 39 criteria, prestige, tech, ui, upgrades); the headless boot is clean.
 
 ## Open decisions
 
+- **Prestige's numbers (D030):** credits formula, room prices, G16 at Level 8, G19's caps. Change any freely.
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
-- **W7, the whole curve:** for v0.6, as agreed.
-- **E6 was narrowed** to the casual player after measuring, because the pacing player leaves only 3 mash for the Starter Crate. Say if you'd rather the eager player saw a bigger crate moment too, which would mean a pricier line.
-- **The pepper ladder (D023):** accept the list and values, or rename and swap peppers.
-- **G17, how the new peppers are used:** recommend one mash and one sauce per new pepper (Idle Planet Miner's ore→bar), built with v0.6. The cheaper option, any pepper of a tier filling that tier's mash, adds no recipes but makes them interchangeable.
+- **The v0.6 split (D028)** and **E6's narrowing**: low stakes.
 
 ## Next
 
-1. W8, once you've sent references; otherwise G8, G16 and G17 for v0.6 Prestige, with the pepper ladder (W10).
+1. Merge #11.
+2. Then, recommended: **W2, sound and haptics** (nothing blocks it; it's the cheapest lift to how it feels on a phone).
+3. Then v0.6b part 2 (W12: Standard Operating Procedures; Tier 6 needs its recipes, G17), or the Shift Roster's rules with placeholder art (v0.7).
 
-Touches: data (first stations), tuning (reference prices), the pacing player (casual mode), pacing tests (E1–E6), the catch-up (shared inputs, Piston batching), and docs. Stubbed or open: W3–W10, G16, G17. Next: W8 or G8/G16/G17, your call.
+Touches: data (tuned prices and costs), the slot upgrade rule (D031), the pacing player (layouts, research order), pacing and offline tests (U criteria, U9), docs. Stubbed or open: W2–W9, W12, G1, G12–G19.

@@ -50,7 +50,7 @@ Numbered, newest last. Status is Accepted unless it says otherwise.
 
 **Why:** Without it, Tier 2's income dwarfed a one-pepper tap. Tapping added 6% at 30:00 (N8 wanted 10%) and 22% at 15:00 (F8 wanted 25%), so the build missed the brief's "the button never becomes obsolete". The brief names this node as the button's first step, and with it N8 measures +17% and F8 +64%. The other choices were lowering the criteria, or leaving the build failing until v0.4.
 
-## D009: Upgrade prices scale with the square root of a station's price
+## D009: Upgrade prices scale with the square root of a station's price (slots amended by D031)
 
 **Decision:** A plot's or slot's upgrades cost v0.2's curve × √(its price ÷ the first of its kind). The draft used the full ratio.
 
@@ -154,10 +154,70 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** On a phone the start felt "incredibly slow" while every deadline passed. A tireless player and deadline-only criteria can't see a dead stretch.
 
-## D023: The pepper ladder (proposed)
+## D023: The pepper ladder
 
-**Status:** Proposed, waiting on the owner.
+**Status:** Accepted by the owner (with D029).
 
 **Decision:** The game's crops become a ladder of 13 real peppers ordered by Scoville, Bell Pepper (0) to Pepper X (2.69M), then 6 fictional ones up to 16 billion ([INGREDIENTS.md](INGREDIENTS.md)). The brief's six peppers keep their D004 values as anchors; each new real pepper sits on the geometric line between its neighbours; past the Carolina Reaper each rung is ×2.15, Idle Planet Miner's ore step. How the new peppers are used in recipes is G17.
 
 **Why:** The owner asked for real hot sauce peppers from Bell to Pepper X and fictional ones beyond, valued with Idle Planet Miner as the reference. Keeping the brief's values as anchors means the brief's bottles and the built, tuned Tiers 1–3 don't move.
+
+## D024: Hot sauce ingredients are stations, unlocked by blueprints
+
+**Decision:** Non-pepper ingredients come from their own stations, bought with cash once their East Wing Crop Blueprint is researched, and run on the same rules as a pepper plot (cycle, yield, upgrades, offline). It's how White Vinegar already works. Grown ingredients (Garlic, Cane Sugar) are shown as plots; made ones get a station of their own on screen (White Vinegar → Vinegar Cask, Smoked Oak → Oak Smokehouse). Only the name and art differ, not the rules. The button is not a source, and cash never buys ingredients (brief §3). **Accepted by the owner.**
+
+**Why:** Idle Planet Miner gets every raw input from the same mining loop. A button source can't feed a factory, stops while away (D019), and would make tapping a chore rather than the bonus the brief wants.
+
+## D025: Forager's Luck, the button's ingredient top-up
+
+**Decision:** A North Wing node, N10 Forager's Luck ([TECH_TREE.md](TECH_TREE.md#n10-foragers-luck-d025)): each press has a 2.5% chance to drop one harvest of whichever ingredient the factory is shortest of. Every press counts (Double-Tap, Grip, the Piston), so it keeps working while away through the Piston. **Asked for by the owner;** the numbers are GUESSES until measured.
+
+**Why:** It rewards active play where the factory actually hurts, without the factory depending on it. At 3 presses a second it adds about 15% to an early ingredient station; the Piston alone adds about 5%.
+
+## D026: The Pantry branch, with either/or forks
+
+**Decision:** Non-pepper ingredients are made a deliberate bottleneck ([INGREDIENTS.md](INGREDIENTS.md#ingredients-as-the-bottleneck-g18-proposed)): hotter recipes take more of the base, and relief comes from one Pantry branch in the East Wing, a short track per ingredient (a yield booster, then a "concentrate" node). Each track ends in a fork where only one side can be researched in a run (for example Aged, its mash worth 1.5×, or Bulk, its station yielding 2×). The other side stays locked until Prestige resets the tree. **Accepted by the owner.** Node numbers and costs are set with v0.6 (G18).
+
+**Why:** Every other node is a question of when, not whether. Forks give real choices without a tree per ingredient, which the brief's single web argues against.
+
+## D027: X7 is measured against the machine it runs on
+
+**Decision:** X7 compares the catch-up with the same machine: working out 8 hours away may take at most 3× as long as ticking 10 minutes from the same save, best of 3 each ([OFFLINE.md](OFFLINE.md)). It replaces "under 0.5 s on the development Mac". **Chosen by the owner** (machine-relative); the 3× is the agent's.
+
+**Why:** 0.5 s held only on the Mac. CI's runner takes 0.73–0.75 s, so main was red from PR #9 on with nothing wrong. A ratio means the same anywhere and still fails if the catch-up gets slower relative to play. **The bar is a little looser than before:** today's ratio is 2.38–2.56×, so 3× leaves about 20% for noise; on the Mac it's roughly 0.56 s rather than 0.5 s (estimated, assuming the Mac's ratio matches). A bar at the old 0.5 s equivalent (about 2.7×) would leave 5% over the worst run measured, too little for shared machines. The phone itself is still W1.
+
+## D028: v0.6 is built in two halves
+
+**Decision:** v0.6a, the full run ([FULL_RUN.md](FULL_RUN.md)): Tiers 4–5, the ladder's extra peppers through Tier 5, the Pantry branch, the last boosters and slots, and the whole curve to £1M with bounds both ways. Then v0.6b, Prestige: Franchise Credits, HQ rooms with the draft, the anti-exploit cost formula, Standard Operating Procedures and Tier 6. **Proposed;** the owner can merge them back into one.
+
+**Why:** v0.6 as written was the biggest version yet, by far. v0.6b needs G8 and G16 from the owner and a run that reaches £1M to test on; v0.6a needs neither, so it can start now.
+
+## D029: Each new pepper gets an in-between sauce (G17)
+
+**Decision:** Every pepper the ladder adds through Tier 5 (Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina) gets a single-pepper mash and one sauce priced between the brief's sauces, so ten sauces climb about ×2.2 a rung ([FULL_RUN.md](FULL_RUN.md#the-sauce-ladder-g17-as-assumed-d029)). The new sauces take 0–3 Pickled Brine and some take lower-tier mash or bottles. **Accepted by the owner, with D023.**
+
+**Why:** It's the recommendation the owner was given for G17 (Idle Planet Miner's ore → bar). Pricing each new sauce between its neighbours makes every pepper the best line until the next one, rather than a sideways copy, and smooths the climb into Idle Planet Miner's ×2-ish steps.
+
+## D030: Prestige's numbers (G8, G16, G19, assumed)
+
+**Decision:** Franchise Credits = ⌊10 × log₁₀(Operation Value ÷ £100,000)⌋, so 10 at £1M and 20 at £10M, × the Executive Lounge. Opening the n-th HQ room costs 5n credits and deals a 2-room draft; levelling costs 2 × the current level. Room steps after Level 1 repeat Level 1's (the speed rooms +10% a level after +15%), and Night Watchman's Desk stops at Level 8 (+8 hours). Full table in [PRESTIGE.md](PRESTIGE.md). **Assumed to build v0.6b; the owner can change any of it.**
+
+**Why:** The brief says "scaled logarithmically" and gives each room's first level and cap, but no prices. With these, the first sale (10 credits) buys a room and a level. Opening all 12 costs 390 credits, roughly 20–30 sales at 10–20 credits each, so the full HQ is a long-term goal while each sale still buys something. G16's contradiction (+1 hour a level, cap Level 15, max +8 hours) is settled on the stated maximum.
+
+## D031: A slot's upgrades are priced by what it makes
+
+**Decision:** A vat's or line's speed upgrades cost v0.2's curve × the larger of √(its slot price ÷ the first slot's) (D009) and √(the value of what it makes ÷ Sweet Pepper Mash's or Table Mild's). A line bottling Phantom Smokehouse upgrades at about 32× Table Mild prices. **Chosen by the owner.**
+
+**Why:** Priced by the slot alone, a slot bought for Table Mild upgraded at Table Mild prices while making the top sauce, so every late slot was maxed for pocket change and the run reached £1M at 2:25. It's Idle Planet Miner's model, and early slots are unchanged (their price ratio is the larger).
+
+## D032: v0.6a's criteria and how they're measured
+
+**Decision (chosen by the owner):** U8 is measured from 1:20, not 1:40; U4 asks for Classic Louisiana and Pickled Brine (not Table Mild and Verde Mash) at 2:30–2:40; M6 is retired, as U4 checks the same thing for the full run. **Measurement fixes (the agent's, said here):** "tapping adds X%" (F7, F8, N8, M5, U7, and P2's tapping minute) now sells the saved backlog before the minute starts and starts the idle minute at Heat 0; U6 swaps each of the four forks and takes the biggest swing, as its wording ("in some track") says.
+
+**Why:** From 1:40 a night is worth about £1M by the curve's own maths, so U8 couldn't pass alongside U1. Nothing late takes Table Mild or Verde Mash. The tapping minute was dominated by selling a stockpile at the saved Heat in both runs, and the idle run kept the tapping run's Heat for most of the minute.
+
+## D033: U2 and U5 for the late run
+
+**Decision (chosen by the owner):** U2 allows waits of up to 300 s between purchases from 1:50 to 3:00 (M4 keeps 150 s to 1:50). U5 measures the ingredient bottleneck by what it costs in slots: from 2:00 to 3:00 at least 30% of vat time runs an ingredient's mash (Pickled Brine, Garlic Paste, Caramelized Glaze, Liquid Smoke), and no slot waits on one for more than 5 minutes from 1:00 to 3:00.
+
+**Why:** Late purchases are big and few once slot upgrades cost what their sauce is worth (D031), and nothing cheap fills the gaps. A player answers the Brine squeeze with more Brine vats, as D026 intended, so slots rarely wait; the bottleneck shows as vats given to ingredients (65% measured).

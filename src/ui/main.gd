@@ -67,6 +67,8 @@ var _web: WebLines
 var _web_nodes := {}                # node id → Button
 var _selected := "kitchen_table"
 var _detail := {}
+var _hq := {}                       # the HQ page's nodes (docs/PRESTIGE.md)
+var _sell_armed := false            # the first tap on Sell the Franchise
 
 
 ## The Tech Tree's connecting lines, drawn under the node buttons.
@@ -194,6 +196,7 @@ func _build_deck() -> void:
 
 	_processing_col = _page_column(holder, "processing")
 	_build_tech(holder)
+	_build_hq(_page_column(holder, "hq"))
 
 
 func _page_column(holder: Control, tab: String) -> VBoxContainer:
@@ -209,6 +212,107 @@ func _page_column(holder: Control, tab: String) -> VBoxContainer:
 	scroll.add_child(col)
 	col.add_child(_label(TAB_NAMES[tab].to_upper(), S.SIZE_SMALL, S.DIM))
 	return col
+
+
+## HQ (brief §6, docs/PRESTIGE.md): selling the franchise, the credits, the
+## room draft and the rooms.
+func _build_hq(col: VBoxContainer) -> void:
+	var sell := _card(col, "SellCard", "Sell the Franchise")
+	sell.bar.visible = false
+	sell.button = _control_button("", func() -> void:
+		if _sell_armed:
+			_sell_armed = false
+			game.prestige()
+		else:
+			_sell_armed = true)
+	sell.button.name = "SellFranchise"
+	sell.col.add_child(sell.button)
+	var rooms := _card(col, "RoomsCard", "HQ Facilities")
+	rooms.bar.visible = false
+	rooms.open = _control_button("", func() -> void: game.open_room())
+	rooms.open.name = "OpenRoom"
+	rooms.col.add_child(rooms.open)
+	rooms.draft = HBoxContainer.new()
+	rooms.draft.add_theme_constant_override("separation", 8)
+	rooms.col.add_child(rooms.draft)
+	rooms.list = VBoxContainer.new()
+	rooms.list.add_theme_constant_override("separation", 6)
+	rooms.col.add_child(rooms.list)
+	_hq = {"sell": sell, "rooms": rooms, "draft_shown": [], "rows": {}}
+
+
+func _refresh_hq() -> void:
+	var sell: Dictionary = _hq.sell
+	var credits := game.prestige_credits()
+	if game.can_prestige():
+		sell.info.text = "Operation Value %s. Selling resets the run and pays %d Franchise Credits. HQ rooms, credits and your open tabs stay." % [_money(game.operation_value()), credits]
+	else:
+		sell.info.text = "Opens at %s Operation Value this run (now %s)." % [_money(T.PRESTIGE_OV), _money(game.operation_value())]
+	sell.button.disabled = not game.can_prestige()
+	sell.button.text = "Tap again to sell" if _sell_armed else ("Sell (+%d credits)" % credits if game.can_prestige() else "Sell")
+	var sold: int = game.account.prestiges
+	sell.status.text = "" if sold == 0 else ("Sold once before." if sold == 1 else "Sold %d times before." % sold)
+
+	var rooms: Dictionary = _hq.rooms
+	rooms.info.text = "Franchise Credits: %d" % game.account.credits
+	var all_open: bool = game.account.rooms.size() >= game.data.rooms.size()
+	rooms.open.visible = game.account.draft.is_empty() and not all_open
+	rooms.open.text = "Open a new room (%d credits)" % game.room_open_cost()
+	rooms.open.disabled = not game.can_open_room()
+	rooms.status.text = "Pick one:" if not game.account.draft.is_empty() else ""
+	if _hq.draft_shown != game.account.draft:
+		for child in rooms.draft.get_children():
+			child.queue_free()
+		for id in game.account.draft:
+			var b := _control_button("%s\n%s" % [game.data.rooms[id].name, _room_text(id, 1)], func() -> void: game.choose_room(id))
+			b.name = "Draft_" + id
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			rooms.draft.add_child(b)
+		_hq.draft_shown = game.account.draft.duplicate()
+	for id in game.account.rooms:
+		if not _hq.rows.has(id):
+			var row := HBoxContainer.new()
+			row.add_theme_constant_override("separation", 6)
+			rooms.list.add_child(row)
+			var l := _label("", S.SIZE_SMALL, S.DIM)
+			l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+			row.add_child(l)
+			var up := _small_button("", func() -> void: game.level_room(id))
+			up.name = "LevelRoom_" + id
+			row.add_child(up)
+			_hq.rows[id] = {"label": l, "button": up}
+		var r: Dictionary = _hq.rows[id]
+		var lv: int = game.account.rooms[id]
+		r.label.text = "%s  Lv %d\n%s" % [game.data.rooms[id].name, lv, _room_text(id, lv)]
+		var at_cap: bool = lv >= game.data.rooms[id].cap
+		r.button.text = "Max" if at_cap else "Lv %d: %d" % [lv + 1, game.room_level_cost(id)]
+		r.button.disabled = not game.can_level_room(id)
+
+
+## What a room does at a level, in words.
+func _room_text(id: String, lv: int) -> String:
+	var room: Dictionary = game.data.rooms[id]
+	if room.effect == "start_cash":
+		var amounts: Array = room.amounts
+		var amount: float = amounts[lv - 1] if lv <= amounts.size() else amounts[-1] * pow(room.growth, lv - amounts.size())
+		return "Start each run with %s." % _money(amount)
+	var v: float = room.base + room.step * (lv - 1)
+	var pct := roundi(v * 100.0)
+	match room.effect:
+		"plot_speed": return "Plots harvest %d%% faster." % pct
+		"plot_yield": return "Plots yield %d%% more." % pct
+		"vat_speed": return "Vats run %d%% faster." % pct
+		"line_speed": return "Lines run %d%% faster." % pct
+		"crop_input": return "Vats need %d%% fewer raw crops." % pct
+		"mash_input": return "Lines need %d%% less mash." % pct
+		"tech_cost": return "Tech Tree costs %d%% less." % pct
+		"button_yield": return "The button picks %d%% more." % pct
+		"bottle_value": return "Bottles are worth %d%% more." % pct
+		"credits": return "%d%% more Franchise Credits." % pct
+		"offline_hours": return "Time away counts %d hours longer." % roundi(v)
+	return ""
 
 
 func _build_processing(parent: VBoxContainer) -> void:
@@ -607,7 +711,7 @@ static func _duration(seconds: float) -> String:
 
 ## A plot's card: what it grows, a cycle bar, then its buy button or upgrades.
 func _plot_card(parent: Container, crop: String) -> Dictionary:
-	var nodes := _card(parent, "Card_plot_" + crop, "%s Plot" % game.data.items[crop].name)
+	var nodes := _card(parent, "Card_plot_" + crop, game.data.plots[crop].name)
 	nodes.buy = _control_button("", func() -> void: game.buy_plot(crop))
 	nodes.buy.name = "Buy_plot_" + crop
 	nodes.col.add_child(nodes.buy)
@@ -749,6 +853,10 @@ func _refresh(animate: bool) -> void:
 	_refresh_processing()
 	if _page == "tech":
 		_refresh_tech()
+	if _page == "hq":
+		_refresh_hq()
+	else:
+		_sell_armed = false
 	for tab in _tab_buttons:
 		var b: Button = _tab_buttons[tab]
 		var open := game.tab_open(tab)
@@ -949,10 +1057,14 @@ func _refresh_tech() -> void:
 	_detail.title.text = "%s  %s" % [node.label, node.name]
 	_detail.effect.text = _effect_text(node)
 	var costs := []
-	for item in node.cost:
-		costs.append("%d %s (have %d)" % [node.cost[item], game.data.items[item].plural, game.stock[item]])
+	var cost := game.tech_cost(_selected)
+	for item in cost:
+		costs.append("%d %s (have %d)" % [cost[item], game.data.items[item].plural, game.stock[item]])
+	var fork := game.fork_taken(_selected)
 	if game.is_researched(_selected):
 		_detail.cost.text = "Researched."
+	elif fork != "":
+		_detail.cost.text = "Chose %s instead: locked for this run." % game.data.tech[fork].name.get_slice(": ", 1)
 	elif costs.is_empty():
 		_detail.cost.text = "Free."
 	else:
@@ -986,7 +1098,7 @@ func _effect_text(node: Dictionary) -> String:
 	var out := []
 	for e in node.effects:
 		if e.has("unlock_plot"):
-			out.append("The %s Plot can be bought." % game.data.items[e.unlock_plot].name)
+			out.append("The %s can be bought." % game.data.plots[e.unlock_plot].name)
 		elif e.has("unlock_recipe"):
 			var r: Dictionary = game.data.recipes[e.unlock_recipe]
 			out.append("Vats and lines can make %s." % game.data.items[r.output].name if r.station == "vat" else "Lines can bottle %s." % game.data.items[r.output].name)
@@ -1007,7 +1119,13 @@ func _effect_text(node: Dictionary) -> String:
 		elif e.has("piston"):
 			out.append("Presses the button once a second, always, with every button perk.")
 		elif e.has("plot_speed"):
-			out.append("The %s Plot runs %d× faster." % [game.data.items[e.plot_speed.crop].name, int(e.plot_speed.mult)])
+			out.append("The %s runs %d× faster." % [game.data.plots[e.plot_speed.crop].name, int(e.plot_speed.mult)])
+		elif e.has("plot_yield"):
+			out.append("The %s yields %d× a harvest." % [game.data.plots[e.plot_yield.crop].name, int(e.plot_yield.mult)])
+		elif e.has("concentrate"):
+			out.append("Vats need %d%% less %s." % [roundi(e.concentrate.share * 100.0), game.data.items[e.concentrate.item].name])
+		elif e.has("reserve"):
+			out.append("Every sauce made with %s sells for +%d%%." % [game.data.items[e.reserve.item].name, roundi(e.reserve.bonus * 100.0)])
 		elif e.has("slot_cap"):
 			out.append("One more vat slot and one more line slot.")
 		elif e.has("packaging"):
@@ -1022,12 +1140,16 @@ func _effect_text(node: Dictionary) -> String:
 			out.append("Pin a node to hold back the bottles, mash and crops it needs.")
 		elif e.has("market_ticker"):
 			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
+		elif e.has("forage"):
+			out.append("Each press has a %.1f%% chance to drop a harvest of the ingredient you're shortest of." % (e.forage * 100.0))
 		elif e.has("byproduct_recycling"):
 			out.append("Vat cycles can give your lowest-level plot a free level, up to one a minute.")
 		elif e.has("offline"):
 			out.append("Time away counts %d hours longer, and runs %d points faster." % [int(e.offline.hours), roundi(e.offline.speed * 100.0)])
 		elif e.has("stock_value_bonus"):
 			out.append("Stock counts %d%% more in Operation Value." % roundi(e.stock_value_bonus * 100.0))
+	for other in node.excludes:
+		out.append("Either/or: it locks %s for this run." % game.data.tech[other].name)
 	return " ".join(out)
 
 

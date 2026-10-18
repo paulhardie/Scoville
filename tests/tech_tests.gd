@@ -56,8 +56,10 @@ func test_tabs_open_at_thresholds() -> void:
 	check(not g.tab_open("tech"), "O9: no Tech Tree at £749")
 	g.account.best_ov = 750.0
 	check(g.tab_open("tech"), "O9: the Tech Tree opens at £750")
+	g.account.best_ov = 999999.0
+	check(not g.tab_open("hq"), "O9: no HQ below £1,000,000")
 	g.account.best_ov = 5e6
-	check(not g.tab_open("roster") and not g.tab_open("hq"), "O9: Shift Roster and HQ stay locked in v0.3")
+	check(not g.tab_open("roster") and g.tab_open("hq"), "O9: HQ opens at £1,000,000 (v0.6b); the Shift Roster stays locked")
 
 
 func test_tabs_follow_the_best_value() -> void:

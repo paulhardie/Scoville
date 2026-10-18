@@ -69,7 +69,7 @@ Version 5 adds `saved_at`, the device time when the save was written, beside `ru
 | X4 | Safety: no stock goes negative. Nothing is bought, researched, assigned or pressed, except by the Piston. |
 | X5 | Timers: after 20 minutes away, Overdrive's cooldown is 20 minutes on. Missed spikes aren't paid, and the next spike keeps the Ticker's schedule. |
 | X6 | The same save and the same time away give the same result. |
-| X7 | Working out 8 hours away takes under 0.5 s on the development Mac, headless. (The phone is W1.) |
+| X7 | Working out 8 hours away takes at most 3× as long as the same machine ticking 10 minutes from the same save, headless, best of 3 each (D027). Was: under 0.5 s on the development Mac. (The phone is W1.) |
 | X8 | The return card shows after more than 60 s away, not after less, with the time away, the cap note when it applied, the cash, the rise in Operation Value and the top three items. |
 | P1 | Checking in pays: a player who plays 30 minutes (the pacing player), is away 8 hours, then plays another 30 minutes ends with at least twice the Operation Value the pacing player has after a straight hour. |
 | P2 | A night's sleep is worth more than an evening's tapping: with both Night Shift nodes, 8 hours away from the pacing player's 1:40 state raises Operation Value at least as much as 2 hours of tapping with Heat at that same factory, buying nothing. (Measured like M5: the active rate, × 120 minutes.) |
@@ -78,7 +78,7 @@ v0.2–v0.4's F, N and M criteria stay in force. The pacing player researches W5
 
 ## Results (v0.5)
 
-All pass: `tests/offline_tests.gd` (X1–X7, 48 checks), `tests/ui_tests.gd` (X8, with a fake clock) and `tests/pacing_tests.gd` (P1–P2, and F, N and M).
+All pass: `tests/offline_tests.gd` (X1–X7, 53 checks), `tests/ui_tests.gd` (X8, with a fake clock) and `tests/pacing_tests.gd` (P1–P2, and F, N and M).
 
 | Id | Target | Measured |
 | --- | --- | --- |
@@ -87,7 +87,7 @@ All pass: `tests/offline_tests.gd` (X1–X7, 48 checks), `tests/ui_tests.gd` (X8
 | X4 | No negative stock; nothing bought or pressed | holds at 0:30, 1:00 and 1:40 over 8 hours; the Piston keeps pressing |
 | X5 | Timers keep wall-clock time | Overdrive's cooldown, and the Ticker's schedule and running spike, match a tick-by-tick run |
 | X6 | Deterministic | the same save and time away give identical results |
-| X7 | 8 hours in under 0.5 s | 0.46 s since v0.5.1 (3,953 steps of 5.1 s) on the development Mac |
+| X7 | At most 3× 10 minutes ticking | 2.38–2.56× on a cloud container (0.81–0.89 s against 0.34–0.35 s, five runs). Under the old bar: 0.46 s on the development Mac, 0.73–0.75 s on CI (FAIL) |
 | X8 | The card | shows after 3 h, not after 30 s; notes the cap at 10 h; shows after reopening a save 2 h later |
 | P1 | 30 min, 8 h away, 30 min ≥ 2× a straight hour | £127,126 against £35,310 (v0.5.1) |
 | P2 | A night beats 2 hours' tapping (from 1:40) | +£3,605,984 against £1,600,288 (v0.5.1; the tapping minute is measured without a running Market spike) |

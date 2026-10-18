@@ -221,3 +221,60 @@ func test_heat_steady_states() -> void:
 				check(low >= 90.0, "H3: %s holds Heat (from %d%%, lowest %.0f%%)" % [c[0], start, low])
 			else:
 				check(g.heat < 10.0, "H3: %s can't hold Heat (from %d%%, ends %.0f%%)" % [c[0], start, g.heat])
+
+
+## A Forager's Luck game owning these ingredient stations, with their recipes.
+static func forager(crops: Array, nodes: Array, seed_value: int = 1) -> Game:
+	var g := with(["foragers_luck"] + nodes, seed_value)
+	for crop in crops:
+		g.plots[crop].owned = true
+	return g
+
+
+func test_forage_rate() -> void:
+	var g := forager(["vinegar"], ["brine_blueprint"])
+	g.stock.vinegar = 1000000   # always the shortest (the only one); stock doesn't change the chance
+	for i in 10000:
+		g.press()
+	var share: float = float(g.stats.foraged) / g.stats.presses
+	check(share >= 0.02 and share <= 0.03, "T1: %.2f%% of presses forage (want 2–3%%)" % (share * 100.0))
+	check(g.stats.harvested.vinegar == g.stats.foraged * g.plot_yield("vinegar"), "T1: each drop is one harvest of the Vinegar Cask")
+
+
+func test_forage_goes_to_the_shortest() -> void:
+	var g := forager(["vinegar", "garlic"], ["brine_blueprint", "paste_blueprint"])
+	g.plots.garlic["yield"] = 2   # yield upgrades count
+	g.stock.vinegar = 50   # 5 cycles of Pickled Brine (10)
+	g.stock.garlic = 40    # 2 cycles of Garlic Paste (20)
+	check(g._shortest_ingredient() == "garlic", "T2: Garlic (2 cycles) is shorter than Vinegar (5)")
+	while g.stats.foraged == 0:
+		g.press()
+	check(g.stock.garlic == 40 + g.plot_yield("garlic") and g.plot_yield("garlic") == 6, "T2: the drop is one Garlic harvest, upgrades included (got %d)" % (g.stock.garlic - 40))
+	check(g.stock.vinegar == 50, "T2: and nothing else")
+	g.stock.garlic = 50
+	g.stock.vinegar = 20
+	check(g._shortest_ingredient() == "vinegar", "T2: Vinegar (2 cycles) is shorter than Garlic (2.5)")
+	g.stock.vinegar = 25
+	check(g._shortest_ingredient() == "vinegar", "T2: ties go in data order")
+	var unused := forager(["vinegar", "garlic"], ["brine_blueprint"])
+	unused.stock.vinegar = 1000
+	check(unused._shortest_ingredient() == "vinegar", "T2: an ingredient no researched recipe uses is never the shortest")
+	check(forager(["jalapeno"], ["brine_blueprint"])._shortest_ingredient() == "", "T2: peppers aren't ingredients")
+
+
+func test_forage_needs_a_station() -> void:
+	var a := with(["foragers_luck", "brine_blueprint"], 7)
+	var b := with(["double_tap", "brine_blueprint"], 7)
+	for i in 1000:
+		a.press()
+		b.press()
+	check(a.stats.foraged == 0, "T3: nothing drops with no ingredient station")
+	check(a.rng.state == b.rng.state, "T3: and nothing is drawn from the random stream")
+
+
+func test_forage_while_away() -> void:
+	var g := forager(["vinegar"], ["brine_blueprint", "automated_piston"])
+	g.catch_up(3600.0)
+	var expected: float = 3600.0 * g.offline_speed() * 1.1 * 0.025
+	check(g.stats.foraged > expected * 0.6 and g.stats.foraged < expected * 1.4, "T2: the Piston forages while away (%d drops, about %d expected)" % [g.stats.foraged, roundi(expected)])
+	check(g.stats.harvested.vinegar >= g.stats.foraged * g.plot_yield("vinegar"), "T2: and the drops count as harvested")

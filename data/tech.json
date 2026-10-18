@@ -93,6 +93,6 @@
 		{"id": "widowmaker_blueprint", "label": "E44", "name": "Culinary Blueprint: Widowmaker Reserve", "wing": "east", "needs": ["reaper_mash_blueprint"], "cost": {"scorpion_sting": 30}, "effects": [{"unlock_recipe": "widowmaker"}], "pos": [20, 2], "after_sale": true},
 		{"id": "pepper_x_blueprint", "label": "E45", "name": "Crop Blueprint: Pepper X", "wing": "east", "needs": ["widowmaker_blueprint"], "cost": {"widowmaker": 20}, "effects": [{"unlock_plot": "pepper_x"}], "pos": [21, 2], "after_sale": true},
 		{"id": "pepper_x_mash_blueprint", "label": "E46", "name": "Culinary Blueprint: Pepper X Mash", "wing": "east", "needs": ["pepper_x_blueprint"], "cost": {"widowmaker": 20, "reaper_mash": 10}, "effects": [{"unlock_recipe": "pepper_x_mash"}], "pos": [22, 2], "after_sale": true},
-		{"id": "event_horizon_blueprint", "label": "E47", "name": "Culinary Blueprint: Event Horizon", "wing": "east", "needs": ["pepper_x_mash_blueprint"], "cost": {"widowmaker": 30}, "effects": [{"unlock_recipe": "event_horizon"}], "pos": [23, 2], "after_sale": true}
+		{"id": "extinction_event_blueprint", "label": "E47", "name": "Culinary Blueprint: Extinction Event", "wing": "east", "needs": ["pepper_x_mash_blueprint"], "cost": {"widowmaker": 30}, "effects": [{"unlock_recipe": "extinction_event"}], "pos": [23, 2], "after_sale": true}
 	]
 }

@@ -101,7 +101,7 @@ static func _mash_of(g: Game, crop: String) -> String:
 
 func test_tier6() -> void:
 	var g := Game.new()
-	var top := ["phantom", "scorpion_sting", "widowmaker", "event_horizon"]
+	var top := ["phantom", "scorpion_sting", "widowmaker", "extinction_event"]
 	for i in range(1, top.size()):
 		var step: float = g.value(top[i]) / g.value(top[i - 1])
 		check(step >= 1.6 and step <= 3.0, "Q11: %s is ×1.6–3.0 the rung below (×%.2f)" % [top[i], step])

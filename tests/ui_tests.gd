@@ -3,6 +3,7 @@ extends SceneTree
 
 const Main = preload("res://scenes/main.tscn")
 const T = preload("res://src/core/tuning.gd")
+const Helpers = preload("res://tests/button_tests.gd")
 
 var failures: Array[String] = []
 var checks := 0
@@ -33,6 +34,7 @@ func visible_text(node: Node) -> Array[String]:
 func run() -> void:
 	var screen := Main.instantiate()
 	screen.save_path = ""
+	screen.settings_path = ""
 	root.add_child(screen)
 	await process_frame
 
@@ -138,7 +140,10 @@ func run() -> void:
 	g.heat = 0.0
 	blank.pressed.emit()
 	await process_frame
-	check((screen.find_child("HeatLabel", true, false) as Label).text.contains("+2"), "a press shows its Heat bonus: %s" % (screen.find_child("HeatLabel", true, false) as Label).text)
+	# The screen's game is seeded from the clock, so a press may count twice
+	# (Double-Tap): check the label against the Heat the game has.
+	var bonus := "+%d%%" % roundi((g.heat_mult() - 1.0) * 100.0)
+	check(g.heat > 0.0 and (screen.find_child("HeatLabel", true, false) as Label).text.contains(bonus), "a press shows its Heat bonus (%s): %s" % [bonus, (screen.find_child("HeatLabel", true, false) as Label).text])
 	var presses: int = g.stats.presses
 	blank.button_down.emit()
 	await create_timer(1.1).timeout
@@ -172,6 +177,7 @@ func run() -> void:
 	await process_frame
 	await test_return_card()
 	await test_hq()
+	await test_feel()
 	for failure in failures:
 		printerr("FAIL: ", failure)
 	print("%s: ui tests (%d checks)" % ["PASS" if failures.is_empty() else "FAIL", checks])
@@ -191,6 +197,7 @@ func test_return_card() -> void:
 	var fake := FakeClock.new()
 	var screen := Main.instantiate()
 	screen.save_path = ""
+	screen.settings_path = ""
 	screen.clock = fake
 	root.add_child(screen)
 	await process_frame
@@ -250,6 +257,7 @@ func test_return_card() -> void:
 func test_hq() -> void:
 	var screen := Main.instantiate()
 	screen.save_path = ""
+	screen.settings_path = ""
 	root.add_child(screen)
 	await process_frame
 	var g = screen.game
@@ -283,4 +291,70 @@ func test_hq() -> void:
 	await process_frame
 	check(g.account.rooms[picks[0]] == 2 and g.account.credits == 6, "Q9: and levels it")
 	screen.queue_free()
+	await process_frame
+
+
+## K1–K5: the Blank Button's click and buzz (docs/FEEL.md).
+func test_feel() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	root.add_child(screen)
+	await process_frame
+	check(visible_text(screen).is_empty(), "K5: Stage 0 still shows no text")
+	check(not (screen.find_child("SettingsCard", true, false) as Control).is_visible_in_tree(), "K5: no Settings card before the deck")
+	var g = screen.game
+	var blank: Button = screen.find_child("BlankButton", true, false)
+	blank.pressed.emit()
+	check(screen.clicks_played == 1 and screen.vibrations == 1, "K1/K3: a finger press clicks once and buzzes once")
+	# Grip and the Piston press through the game: silent and still.
+	g.revealed = {"counter": true, "status_bar": true, "deck": true}
+	g.account.best_ov = 1e9
+	for item in g.stock:
+		g.stock[item] = 100000
+	for node in ["ergonomic_grip", "automated_piston"]:
+		Helpers.research_with_parents(g, node)
+	g.set_holding(true)
+	g.advance(100)
+	g.set_holding(false)
+	check(g.stats.presses > 20 and screen.clicks_played == 1 and screen.vibrations == 1, "K1/K3: Grip and Piston presses (%d) make no click and no buzz" % (g.stats.presses - 1))
+	var pitches := {}
+	var low := INF
+	var high := -INF
+	for i in 200:
+		g.heat = 0.0
+		screen._feel_press()
+		pitches[snappedf(screen.last_pitch, 0.001)] = true
+		low = minf(low, screen.last_pitch)
+		high = maxf(high, screen.last_pitch)
+	check(low >= 0.92 - 1e-6 and high <= 1.08 + 1e-6 and pitches.size() > 20, "K2: pitch at no Heat stays within 0.92–1.08 and varies (%.3f–%.3f, %d values)" % [low, high, pitches.size()])
+	var sum := 0.0
+	for i in 200:
+		g.heat = T.HEAT_MAX
+		screen._feel_press()
+		sum += screen.last_pitch
+	check(absf(sum / 200.0 - 1.2) < 0.02, "K2: at full Heat it's 1.2× on average (%.3f)" % (sum / 200.0))
+	await process_frame
+	check((screen.find_child("SettingsCard", true, false) as Control).is_visible_in_tree(), "K5: the Settings card shows with the deck")
+	var sound: Button = screen.find_child("Setting_sound", true, false)
+	var buzz: Button = screen.find_child("Setting_vibration", true, false)
+	check(sound.text == "Sound: On" and buzz.text == "Vibration: On", "K4: both switches start on")
+	screen.settings_path = "user://settings_test.json"
+	sound.pressed.emit()
+	buzz.pressed.emit()
+	await process_frame
+	var clicks: int = screen.clicks_played
+	var buzzes: int = screen.vibrations
+	blank.pressed.emit()
+	check(screen.clicks_played == clicks and screen.vibrations == buzzes and sound.text == "Sound: Off", "K4: with both off, a press is silent and still")
+	screen.queue_free()
+	await process_frame
+	var again := Main.instantiate()
+	again.save_path = ""
+	again.settings_path = "user://settings_test.json"
+	root.add_child(again)
+	await process_frame
+	check(not again.settings.sound and not again.settings.vibration, "K4: the switches survive reopening")
+	again.queue_free()
+	DirAccess.remove_absolute("user://settings_test.json")
 	await process_frame

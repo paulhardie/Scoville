@@ -111,7 +111,7 @@ func decide(g) -> void:
 	if target != "" and g.research_node(target):
 		_note(now, "research " + target)
 		target = next_research(g)
-	var need: Dictionary = g.data.tech[target].cost if target != "" and g.research_reachable(target) else {}
+	var need: Dictionary = g.tech_cost(target) if target != "" and g.research_reachable(target) else {}
 
 	# Hold back what the next research needs: pin it once Smart Stockpiling
 	# allows, otherwise turn Auto-Sell down and raise the valve's keep amounts.

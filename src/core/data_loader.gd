@@ -3,7 +3,9 @@ extends RefCounted
 ## Bad data is reported with the file and row, never half-loaded
 ## (docs/FACTORY.md S6).
 
-const FILES := ["items", "recipes", "plots", "slots", "tech"]
+const FILES := ["items", "recipes", "plots", "slots", "tech", "rooms"]
+## What an HQ room can change (docs/PRESTIGE.md).
+const ROOM_EFFECTS := ["plot_speed", "plot_yield", "vat_speed", "line_speed", "crop_input", "mash_input", "tech_cost", "button_yield", "start_cash", "bottle_value", "credits", "offline_hours"]
 const KINDS := ["crop", "mash", "bottle"]
 const STATIONS := {"vat": "mash", "line": "bottle"}
 
@@ -44,7 +46,7 @@ static func load_dir(dir: String = "res://data") -> Dictionary:
 ## items, recipes, plots (by id), slots, tech (by id), tech_order (ids in file order).
 static func check(raw: Dictionary) -> Dictionary:
 	var errors: Array[String] = []
-	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": []}
+	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": [], "rooms": {}}
 
 	var rows := _rows(raw, "items", "items", errors)
 	for i in rows.size():
@@ -237,6 +239,30 @@ static func check(raw: Dictionary) -> Dictionary:
 				errors.append("tech.json (%s): excludes unknown node %s" % [id, str(other)])
 			elif not data.tech[other].excludes.has(id):
 				errors.append("tech.json (%s): excludes %s, which doesn't exclude it back" % [id, other])
+	rows = _rows(raw, "rooms", "rooms", errors)
+	for i in rows.size():
+		var r: Variant = rows[i]
+		var where := _where("rooms", i, r)
+		if not _fields(r, {"id": TYPE_STRING, "name": TYPE_STRING, "effect": TYPE_STRING, "cap": TYPE_FLOAT}, where, errors):
+			continue
+		if data.rooms.has(r.id):
+			errors.append(where + ": duplicate id")
+		elif not r.effect in ROOM_EFFECTS:
+			errors.append(where + ": effect must be one of " + str(ROOM_EFFECTS))
+		elif r.cap < 1.0:
+			errors.append(where + ": cap must be at least 1")
+		elif r.effect == "start_cash" and (typeof(r.get("amounts")) != TYPE_ARRAY or r.amounts.is_empty() or typeof(r.get("growth")) != TYPE_FLOAT):
+			errors.append(where + ": start_cash needs amounts and growth")
+		elif r.effect != "start_cash" and (typeof(r.get("base")) != TYPE_FLOAT or typeof(r.get("step")) != TYPE_FLOAT or r.base <= 0.0 or r.step < 0.0):
+			errors.append(where + ": needs base above 0 and step at least 0")
+		else:
+			var room := {"id": r.id, "name": r.name, "effect": r.effect, "cap": int(r.cap)}
+			for k in ["base", "step", "growth"]:
+				if r.has(k):
+					room[k] = float(r[k])
+			if r.has("amounts"):
+				room.amounts = r.amounts.map(func(a): return float(a))
+			data.rooms[r.id] = room
 	if not data.tech.has("kitchen_table"):
 		errors.append("tech.json: no kitchen_table root")
 	for station in data.slots:

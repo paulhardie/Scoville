@@ -39,7 +39,7 @@ Assumed where the brief is open (the owner can overrule):
 | Id | Criterion | Result |
 | --- | --- | --- |
 | O8 | The nav bar appears at £400 Operation Value, not before, with Farms and Processing open and three `[ ? ]` tabs. | PASS (`tech_tests.gd`, `ui_tests.gd`) |
-| O9 | The Tech Tree tab opens at £750 and not before. Shift Roster and HQ stay locked in v0.3. | PASS |
+| O9 | The Tech Tree tab opens at £750 and not before. Shift Roster and HQ stay locked in v0.3; from v0.6b HQ opens at £1,000,000 (PRESTIGE.md). | PASS |
 | O10 | Opened tabs stay open after a save and reload, and are kept outside the run's state so a Prestige can't reset them. | PASS: the save holds `account.best_ov` beside `run` |
 
 On screen, the stock line in the upper viewport switches to short names (`Bell 53 · Jalapeño 249 · …`) once more than three items are in play.

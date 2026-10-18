@@ -197,3 +197,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision:** Every pepper the ladder adds through Tier 5 (Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina) gets a single-pepper mash and one sauce priced between the brief's sauces, so ten sauces climb about ×2.2 a rung ([FULL_RUN.md](FULL_RUN.md#the-sauce-ladder-g17-as-assumed-d029)). The new sauces take 0–3 Pickled Brine and some take lower-tier mash or bottles. **Accepted by the owner, with D023.**
 
 **Why:** It's the recommendation the owner was given for G17 (Idle Planet Miner's ore → bar). Pricing each new sauce between its neighbours makes every pepper the best line until the next one, rather than a sideways copy, and smooths the climb into Idle Planet Miner's ×2-ish steps.
+
+## D030: Prestige's numbers (G8, G16, G19, assumed)
+
+**Decision:** Franchise Credits = ⌊10 × log₁₀(Operation Value ÷ £100,000)⌋, so 10 at £1M and 20 at £10M, × the Executive Lounge. Opening the n-th HQ room costs 5n credits and deals a 2-room draft; levelling costs 2 × the current level. Room steps after Level 1 repeat Level 1's (the speed rooms +10% a level after +15%), and Night Watchman's Desk stops at Level 8 (+8 hours). Full table in [PRESTIGE.md](PRESTIGE.md). **Assumed to build v0.6b; the owner can change any of it.**
+
+**Why:** The brief says "scaled logarithmically" and gives each room's first level and cap, but no prices. With these, the first sale (10 credits) buys a room and a level. Opening all 12 costs 390 credits, roughly 20–30 sales at 10–20 credits each, so the full HQ is a long-term goal while each sale still buys something. G16's contradiction (+1 hour a level, cap Level 15, max +8 hours) is settled on the stated maximum.

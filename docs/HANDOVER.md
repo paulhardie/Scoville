@@ -2,27 +2,31 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). Open: PR #11 (green): Forager's Luck, D024–D027, the v0.6a design and v0.6a stage 1. **Not pushed:** v0.6a stage 2 (the pacing player and tuning), committed locally because its pacing criteria fail while tuning and would turn #11 red.
+Merged: v0.1–v0.5.1 (PRs #1–#9) and the pepper ladder design (PR #10). **Open: PR #11, red on v0.6a's pacing criteria** (known, mid-tuning). It holds Forager's Luck, D024–D027, v0.6a (design, stage 1, stage 2 in progress) and now **v0.6b part 1, Prestige, built**.
 
-**v0.6a, the full run ([FULL_RUN.md](FULL_RUN.md)), is being built.** Stage 1 (data, the fork rule, the Pantry's effects, V1–V7) is in. Stage 2: the pacing player plays the whole ladder; tuning has three open questions (FULL_RUN.md's build log). v0.6 is split in two (D028): v0.6a takes the first run to £1M in about 3 hours; v0.6b is Prestige.
-- **A ten-rung sauce ladder** climbing about ×2.2 a rung, from Table Mild £5 to Phantom Smokehouse £5,200. The ladder's new peppers each get a mash and an in-between sauce (D029, G17 assumed): Smoky Ancho £10.50, Serrano Fire £60, Cajun Red £280, Island Heat £500, Savina Gold £2,000.
-- **Pickled Brine as the base that grows with heat,** and the Pantry branch: booster, concentrate, then a Bulk or Reserve fork per ingredient (G18 assumed).
-- **9 stations, 46 nodes,** Slot Expansion III–IV, Artisan Decanters, two GMO boosters.
-- **Criteria U1–U9,** including the first "not before" bounds on the curve (£100k between 1:35 and 1:55, £1M between 2:45 and 3:15) and "a night at 1:40 doesn't reach £1M" (W7).
+**Prestige ([PRESTIGE.md](PRESTIGE.md), D030), built.** All criteria pass: Q1–Q8 in `prestige_tests.gd` (50 checks), and Q9 on screen in `ui_tests.gd`.
+- **Sell the franchise** at £1M Operation Value, on the HQ tab, with a second tap to confirm. It pays Franchise Credits: 10 × log₁₀(OV ÷ £100k), so 10 at £1M and 20 at £10M.
+- **What resets:** the run (cash, plots, slots, stock, the Tech Tree, Heat, timers, statistics).
+- **What stays:** the account (credits, rooms, best Operation Value, sales) and the reveals.
+- **The 12 HQ rooms** from the brief's table, each wired in. Opening the n-th costs 5n credits and deals a 2-card draft, which is saved so it can't be re-dealt. Levels cost 2 × level, up to each room's cap.
+- **The brief's anti-exploit cost formula** applies to Tech Tree costs, and discounted recipe inputs multiply, rounded down, at least 1.
+- **Save v7:** v6 saves load as an account that has never sold.
+- Assumed: G8, G16, G19 (D030), listed in PRESTIGE.md.
 
-Checks: every rule suite passes; the pacing suite fails as listed in the build log.
+**v0.6a, the full run ([FULL_RUN.md](FULL_RUN.md)).** Stage 1 is in: data, forks, Bulk, Concentrate and Reserve (V1–V7). Stage 2: the pacing player plays the whole ladder, every rung is made on time (U3), and the forks matter (U6). Tuning is waiting on three answers (below); until then the pacing suite fails U1, U2, U4, U5, U7, U8, M2, M4, M6, M7 and P2.
+
+Checks: every rule suite passes (button, core, factory, full run, offline, prestige, tech, ui, upgrades); the headless boot is clean; HQ looked at with `capture_ui.gd`. The pacing suite fails as above, unchanged by Prestige.
 
 ## Open decisions
 
-- **v0.6a tuning (FULL_RUN.md build log):** (1) slot upgrades priced by what the slot makes, changing D009; (2) move U8 to "from 1:20"; (3) narrow U4 to Classic Louisiana and Pickled Brine, retiring M6.
-- **The v0.6 split (D028):** fine as two halves?
-- **G8 and G16, for v0.6b:** Franchise Credits, HQ room costs, the draft, and Night Watchman's Desk.
+- **v0.6a tuning (FULL_RUN.md build log):** (1) price slot upgrades by what the slot makes, changing D009; (2) move U8 to "from 1:20"; (3) narrow U4 to Classic Louisiana and Pickled Brine, retiring M6.
+- **Prestige's numbers (D030):** credits formula, room prices, G16 at Level 8, G19's caps. Change any freely.
 - **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later.
-- **E6 was narrowed** to the casual player after measuring. Say if you'd rather the eager player saw a bigger crate moment too.
+- **The v0.6 split (D028)** and **E6's narrowing**: still open, low stakes.
 
 ## Next
 
-1. Answer the three tuning questions, then tune v0.6a against U1–U9 and the earlier criteria (W10).
-2. Then G8 and G16 for v0.6b, or W8 if references arrive first.
+1. The three tuning answers, then tune v0.6a (W10) until the pacing suite is green, so #11 can merge.
+2. Without them: W2 (sound and haptics), v0.6b part 2 (W12: Standard Operating Procedures; Tier 6 needs its recipes, G17), or the Shift Roster's rules with placeholder art (v0.7, G12 numbers assumed).
 
-Touches: data (v0.6a content, repriced blueprints), the rules (forks, Bulk, Concentrate, Reserve), the UI text, the pacing player, pacing tests (to 3:15, U1–U8), full_run_tests (V1–V7), docs. Stubbed or open: W3–W10, G8, G16–G18.
+Touches: data (`rooms.json`), the rules (prestige, rooms, the cost formula, save v7), the HQ tab, tests (`prestige_tests.gd`, ui Q9), the capture tool, docs. Stubbed or open: W3–W12, G16–G19.

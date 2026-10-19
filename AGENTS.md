@@ -27,7 +27,7 @@ Out of scope for v1.0 (brief): servers, accounts, cloud saves. Everything runs o
 - **Pure simulation, separate from UI.** `src/core/game.gd` (RefCounted, no nodes) owns all state and rules and advances by a fixed tick. Screens only present and report. A rule implemented twice is a bug.
 - **Deterministic.** A fixed tick (`Tuning.TICK_SECONDS`) and no wall clock inside the simulation. Real time comes in only through `real_clock.gd`, read by the screen, which hands time away to `Game.catch_up()` (OFFLINE.md). `tick()` is `_step(1)`; the catch-up runs the same `_step` with longer steps. Every chance draws from the game's one seeded stream (`Game.rng`), whose state is saved (D017). Tests pass a seed to `Game.new(data, seed)`.
 - **Numbers in one place.** Items, recipes, plots, slots, tech nodes and HQ rooms live in `data/*.json`, loaded and checked only by `src/core/data_loader.gd`; bad data fails at load naming the file and row. Other tuning numbers live in `src/core/tuning.gd`. Each cites its brief section or decision, or is marked GUESS.
-- **Money is GBP** and shown as `£0.00`.
+- **Money is US dollars** and shown as `$0.00` (D035; it was GBP until then, so older docs and decisions say £).
 - Colours and type sizes live only in `src/ui/style.gd`.
 - Scripts reference each other with `preload` constants, not `class_name`, so a stale `.godot` class cache can't break a headless run.
 

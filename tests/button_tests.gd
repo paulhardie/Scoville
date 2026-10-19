@@ -161,14 +161,15 @@ func test_heat_on_sales() -> void:
 	check(close(g.heat_mult(), mult), "H2: 60%% Heat is ×%.2f" % mult)
 	g.stock.table_mild = 10
 	var ov := g.operation_value()
-	check(close(ov, g.stats.cash_earned + 50.0), "H2: stock is valued as normal")
+	var batch: float = 10 * g.value("table_mild")
+	check(close(ov, g.stats.cash_earned + batch), "H2: stock is valued as normal")
 	var before: float = g.cash
 	g.sell_batch()
-	check(close(g.cash - before, 50.0 * mult), "H2: Sell Batch gets the bonus")
+	check(close(g.cash - before, batch * mult), "H2: Sell Batch gets the bonus")
 	g.stock.bell = 100
 	before = g.cash
 	g.sell_raw()
-	check(close(g.cash - before, 10.0 * mult), "H2: so do raw peppers")
+	check(close(g.cash - before, 100 * g.value("bell") * mult), "H2: so do raw peppers")
 	g.cash = 1e6
 	g.buy_plot("bell")
 	g.buy_slot("vat")
@@ -181,7 +182,7 @@ func test_heat_on_sales() -> void:
 	g.heat = 100.0
 	g.advance(seconds(8.0))
 	check(g.stats.sold.table_mild - sold_before == 1, "an Auto-Sold bottle")
-	check(g.stats.cash_earned - before > 5.0, "H2: Auto-Sell gets the bonus: £%.2f for a £5 bottle" % (g.stats.cash_earned - before))
+	check(g.stats.cash_earned - before > g.value("table_mild"), "H2: Auto-Sell gets the bonus: $%.2f for a $%.2f bottle" % [g.stats.cash_earned - before, g.value("table_mild")])
 	var v := with(["heat_meter", "overflow_valve"])
 	v.set_keep("bell", 0)
 	v.stock.bell = 50
@@ -191,7 +192,7 @@ func test_heat_on_sales() -> void:
 		v.tick()
 		if v.stock.bell == 0:
 			break
-	check(v.stock.bell == 0 and close(v.stats.cash_earned - before, 50 * 0.10 * v.heat_mult()), "H2: so do valve sales")
+	check(v.stock.bell == 0 and close(v.stats.cash_earned - before, 50 * v.value("bell") * v.heat_mult()), "H2: so do valve sales")
 
 
 func test_heat_steady_states() -> void:

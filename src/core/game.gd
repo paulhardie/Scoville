@@ -15,7 +15,7 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 7
+const SAVE_VERSION := 8
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
@@ -281,7 +281,7 @@ func quality_chance(crop: String) -> float:
 
 ## "speed", "yield" or "quality".
 func plot_upgrade_cost(crop: String, upgrade: String) -> float:
-	var scale := sqrt(maxf(plot_price(crop), T.PLOT_PRICE_REFERENCE) / T.PLOT_PRICE_REFERENCE)
+	var scale := pow(maxf(plot_price(crop), T.PLOT_PRICE_REFERENCE) / T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER)
 	var lv: int = plots[crop][upgrade]
 	match upgrade:
 		"speed":
@@ -334,13 +334,13 @@ func can_buy_slot(station: String) -> bool:
 
 func slot_upgrade_cost(station: String, index: int) -> float:
 	var ref := T.VAT_PRICE_REFERENCE if station == "vat" else T.LINE_PRICE_REFERENCE
-	var scale := sqrt(maxf(data.slots[station].prices[index], ref) / ref)
+	var scale := pow(maxf(data.slots[station].prices[index], ref) / ref, T.COST_SCALE_POWER)
 	# D031: a slot's upgrades are also priced by what it makes, so a slot
 	# bottling Phantom Smokehouse upgrades at Phantom prices; whichever is dearer.
 	var recipe: String = slots(station)[index].recipe
 	if recipe != "":
 		var ref_item: String = T.VAT_VALUE_REFERENCE if station == "vat" else T.LINE_VALUE_REFERENCE
-		scale = maxf(scale, sqrt(value(data.recipes[recipe].output) / value(ref_item)))
+		scale = maxf(scale, pow(value(data.recipes[recipe].output) / value(ref_item), T.COST_SCALE_POWER))
 	var lv: int = slots(station)[index].speed
 	if station == "vat":
 		return T.VAT_SPEED_COST * scale * pow(T.VAT_SPEED_GROWTH, lv)
@@ -811,7 +811,25 @@ func prestige_credits() -> int:
 	var ov := operation_value()
 	if ov < T.PRESTIGE_OV - EPSILON:
 		return 0
-	return maxi(0, floori(T.CREDIT_SCALE * log(ov / T.CREDIT_BASE_OV) / log(10.0) * (1.0 + fx.hq.get("credits", 0.0)) + 1e-9))
+	# Idle Planet Miner's table: straight from one decade's credits to the next.
+	var decade := floori(log(ov / T.PRESTIGE_OV) / log(10.0) + 1e-9)
+	var low: float = T.PRESTIGE_OV * pow(10.0, decade)
+	var share := clampf((ov - low) / (9.0 * low), 0.0, 1.0)
+	var credits := _credits_at(decade) + share * (_credits_at(decade + 1) - _credits_at(decade))
+	return roundi(credits * (1.0 + fx.hq.get("credits", 0.0)))
+
+
+## Credits at PRESTIGE_OV × 10^decade (Idle Planet Miner's table, D035).
+func _credits_at(decade: int) -> float:
+	var table: Array = T.CREDIT_TABLE
+	if decade < table.size():
+		return table[decade]
+	var c: float = table[-1]
+	var step: float = table[-1] - table[-2]
+	for i in decade - table.size() + 1:
+		step += 10.0
+		c += step
+	return c
 
 
 ## Sells the franchise: pays the credits and starts a fresh run (brief §6).
@@ -1301,10 +1319,14 @@ func load_state(s: Variant) -> String:
 	if version < 1 or version > SAVE_VERSION:
 		return "unknown save version %s" % str(s.get("version"))
 	var problem := ""
+	# Money moves to dollars once, before any migration reads it (D035).
+	var dollars := version >= 8
 	if version == 1:
 		problem = _check(s, {"cash": TYPE_FLOAT, "bell": TYPE_FLOAT, "revealed": TYPE_DICTIONARY, "stats": TYPE_DICTIONARY})
 		if problem != "":
 			return problem
+		s = _to_dollars(s, 1)
+		dollars = true
 		s = _migrate_1_to_2(s)
 		version = 2
 	if version == 2:
@@ -1314,6 +1336,9 @@ func load_state(s: Variant) -> String:
 				problem = "save's station %s is not an object" % k
 		if problem != "":
 			return problem
+		if not dollars:
+			s = _to_dollars(s, 2)
+			dollars = true
 		s = _migrate_2_to_3(s)
 		version = 3
 	problem = _check(s, {"run": TYPE_DICTIONARY, "account": TYPE_DICTIONARY})
@@ -1321,6 +1346,13 @@ func load_state(s: Variant) -> String:
 		return problem
 	if version == 3:
 		s = _migrate_3_to_4(s)
+	if not dollars:
+		problem = _check(s.run, {"cash": TYPE_FLOAT, "stats": TYPE_DICTIONARY})
+		if problem != "":
+			return problem
+		s = _to_dollars(s, 3)
+	if int(s.get("version", version)) < 8:
+		s = _migrate_7_to_8(s)
 	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
 	# v7 only adds the account's Prestige fields, read below with defaults.
@@ -1446,6 +1478,28 @@ func load_state(s: Variant) -> String:
 	_refresh_fx()
 	_note_value()
 	return ""
+
+
+## v8 (D035): the Tier 6 sauce Event Horizon became Extinction Event (the name
+## is the last fictional pepper's).
+func _migrate_7_to_8(s: Dictionary) -> Dictionary:
+	var out: Dictionary = JSON.parse_string(JSON.stringify(s).replace("event_horizon", "extinction_event"))
+	out.version = 8
+	return out
+
+
+## A pre-v8 save's money in Idle Planet Miner's dollars (D035): about ×10 at
+## Tier 1, so cash, cash earned and the best Operation Value are ×10; items keep
+## their counts and are simply worth more. v1–v2 keep them at the top level.
+func _to_dollars(s: Dictionary, layout: int) -> Dictionary:
+	var out := s.duplicate(true)
+	var run: Dictionary = out if layout <= 2 else out.run
+	run.cash = float(run.cash) * T.SAVE_V8_MONEY
+	if typeof(run.get("stats")) == TYPE_DICTIONARY and run.stats.has("cash_earned"):
+		run.stats.cash_earned = float(run.stats.cash_earned) * T.SAVE_V8_MONEY
+	if layout > 2:
+		out.account.best_ov = float(out.account.get("best_ov", 0.0)) * T.SAVE_V8_MONEY
+	return out
 
 
 ## v1 (onboarding only) had a top-level `bell` and no stations.

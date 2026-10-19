@@ -69,9 +69,10 @@ func test_sell_raw() -> void:
 	check(not early.sell_raw() and early.stock.bell == 5, "can't sell before the status bar appears")
 	var g := pressed(37)
 	check(g.sell_raw(), "O5: selling works with peppers held")
-	check(close(g.cash, 3.70) and g.stock.bell == 0, "O5: 37 peppers sell for £3.70: £%.2f" % g.cash)
-	check(not g.sell_raw() and close(g.cash, 3.70), "O5: selling with none does nothing")
-	check(close(g.stats.cash_earned, 3.70), "earned cash is counted")
+	var worth: float = 37 * g.value("bell")
+	check(close(g.cash, worth) and g.stock.bell == 0, "O5: 37 peppers sell for $%.2f: $%.2f" % [worth, g.cash])
+	check(not g.sell_raw() and close(g.cash, worth), "O5: selling with none does nothing")
+	check(close(g.stats.cash_earned, worth), "earned cash is counted")
 
 
 func test_reveals_stay() -> void:

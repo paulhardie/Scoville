@@ -4,6 +4,38 @@ The pepper ladder: every crop the game will grow, ordered by real heat, with its
 
 Status: **design only.** Nothing here is in `data/` yet. The six peppers the brief already names keep their current values, so Tiers 1–3 as built don't change.
 
+## Since D035: each pepper is an Idle Planet Miner ore
+
+The owner asked for each pepper to map to an ore and copy its value, in dollars. Peppers take the ores in order of heat, at the wiki's sell prices; the value rule and £ values below are the history before D035.
+
+| # | Pepper | Ore | Value |
+| --- | --- | --- | --- |
+| 1 | Bell Pepper | Copper | $1 |
+| 2 | Poblano | Iron | $2 |
+| 3 | Jalapeño | Lead | $4 |
+| 4 | Serrano | Silicon | $8 |
+| 5 | Cayenne | Aluminium | $17 |
+| 6 | Tabasco | Silver | $36 |
+| 7 | Scotch Bonnet | Gold | $75 |
+| 8 | Habanero | Diamond | $160 |
+| 9 | Red Savina | Platinum | $340 |
+| 10 | Ghost Pepper | Titanium | $730 |
+| 11 | Trinidad Moruga Scorpion | Iridium | $1,600 |
+| 12 | Carolina Reaper | Palladium | $3,500 |
+| 13 | Pepper X | Osmium | $7,800 |
+| 14 | *Lava Lantern* | Rhodium | $17,500 |
+| 15 | *Solar Flare* | Inerton | $40,000 |
+| 16 | *Capsaicin Crystal* | Quadium | $92,000 |
+| 17 | *Brimstone Jolokia* | Scrith | $215,000 |
+| 18 | *Supernova Scorpion* | Uru | $510,000 |
+| 19 | *Event Horizon* | Vibranium | $1,250,000 |
+
+Eight ores are left for later fictional peppers (Aether $3.2M, Viterium $9M, Xynium $28M, Quolium $90M, Luterium $300M, Wraith $1.1B, Aqualite $4.3B, Opalite $18B). The wiki now lists 27 ores, two more than the 25 counted below.
+
+**Assumed:** the ingredients take the ore of the pepper nearest them in value before D035: White Vinegar Iron ($2), Garlic Aluminium ($17), Cane Sugar Gold ($75), Smoked Oak Titanium ($730).
+
+Source: [Idle Planet Miner wiki, Ores](https://idle-planet-miner.fandom.com/wiki/Ores), read 2026-10-18.
+
 ## The value rule
 
 1. **The brief's peppers are anchors.** Bell, Jalapeño, Cayenne, Habanero, Ghost and Reaper keep the values D004 already derives from the brief's bottle prices ([ECONOMY.md](ECONOMY.md#item-values-g6-d004)). Changing them would mean changing the brief's bottles or recipes, and re-pacing Tiers 1–3.

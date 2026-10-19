@@ -1362,12 +1362,12 @@ static func _count(n: int) -> String:
 	return str(n) if n < 10000 else "%.1fk" % (n / 1000.0)
 
 
-## Pounds with thousands separators: £1,234.50.
+## Dollars with thousands separators: $1,234.50 (D035).
 static func _money(amount: float) -> String:
-	var pence := roundi(amount * 100.0)
-	var whole := str(pence / 100)
+	var cents := roundi(amount * 100.0)
+	var whole := str(cents / 100)
 	var grouped := ""
 	while whole.length() > 3:
 		grouped = "," + whole.right(3) + grouped
 		whole = whole.left(whole.length() - 3)
-	return "£%s%s.%02d" % [whole, grouped, pence % 100]
+	return "$%s%s.%02d" % [whole, grouped, cents % 100]

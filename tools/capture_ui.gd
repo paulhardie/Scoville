@@ -106,8 +106,8 @@ func run() -> void:
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_locked_hint.png"), 0.1)
 
-	# HQ (v0.6b): a run worth £2M, then after a sale with two rooms and a draft.
-	g.stats.cash_earned = 2e6
+	# HQ (v0.6b): a run worth $20M, then after a sale with two rooms and a draft.
+	g.stats.cash_earned = 2e7
 	g._note_value()
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v06b_hq_sell.png"), 0.2)

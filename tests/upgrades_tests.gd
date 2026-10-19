@@ -70,10 +70,11 @@ func test_packaging() -> void:
 		g.stock.table_mild = 4
 		g.stock.bistro_verde = 2
 		g.stock.bell = 10
-		check(close(g.operation_value() - g.stats.cash_earned, (4 * 5.0 + 2 * 25.0) * c[1] + 1.0), "R10: bottles in Operation Value × the tier; crops not")
+		var bottles: float = 4 * g.value("table_mild") + 2 * g.value("bistro_verde")
+		check(close(g.operation_value() - g.stats.cash_earned, bottles * c[1] + 10 * g.value("bell")), "R10: bottles in Operation Value × the tier; crops not")
 		var before: float = g.cash
 		g.sell_batch()
-		check(close(g.cash - before, (4 * 5.0 + 2 * 25.0) * c[1]), "R10: and on sale")
+		check(close(g.cash - before, bottles * c[1]), "R10: and on sale")
 	var lines := with(["flint_glass", "slot_expansion_1", "bistro_blueprint", "delivery_van"])
 	lines.cash = 1e6
 	lines.buy_slot("vat")
@@ -87,7 +88,7 @@ func test_packaging() -> void:
 	lines._start_cycles()
 	var before: float = lines.stats.cash_earned
 	lines.advance(seconds(10.0))
-	check(close(lines.stats.cash_earned - before, (5.0 + 25.0) * 1.5), "R10: every line's bottles get it: £%.2f" % (lines.stats.cash_earned - before))
+	check(close(lines.stats.cash_earned - before, (lines.value("table_mild") + lines.value("bistro_verde")) * 1.5), "R10: every line's bottles get it: $%.2f" % (lines.stats.cash_earned - before))
 
 
 func test_zero_waste() -> void:
@@ -100,7 +101,7 @@ func test_zero_waste() -> void:
 	var two := with(["zero_waste_2", "cayenne_mash_blueprint", "paste_blueprint", "louisiana_blueprint"])
 	check(two.recipe_inputs("sweet_mash") == {"bell": 8} and two.recipe_inputs("garlic_paste") == {"garlic": 16}, "R11: × 0.8")
 	check(two.recipe_inputs("classic_louisiana") == {"cayenne_mash": 1, "garlic_paste": 1}, "R11: line inputs unchanged")
-	check(close(two.value("cayenne_mash"), 38.0), "R11: values unchanged")
+	check(close(two.value("cayenne_mash"), Game.new().value("cayenne_mash")), "R11: values unchanged")
 	var tiny := with([])
 	tiny.data = tiny.data.duplicate(true)
 	tiny.data.recipes.sweet_mash.inputs = {"bell": 1}
@@ -140,7 +141,7 @@ func test_overflow_valve() -> void:
 	g.stock.verde_mash = 3
 	g.advance(10)
 	check(g.stock.bell == 75 and g.stock.verde_mash == 3, "R13: sells only what's above the keep amount")
-	check(close(g.stats.cash_earned, 25 * 0.10), "R13: at its value")
+	check(close(g.stats.cash_earned, 25 * g.value("bell")), "R13: at its value")
 	g.set_keep("verde_mash", -1)
 	g.stock.verde_mash = 500
 	g.advance(10)
@@ -256,11 +257,12 @@ func test_franchise_auditors() -> void:
 	var g := with(["franchise_auditors"])
 	g.stock.bistro_verde = 10
 	g.stock.bell = 100
-	var stock_value := 10 * 25.0 * 1.5 + 100 * 0.10
+	var bottle: float = g.value("bistro_verde")
+	var stock_value: float = 10 * bottle * 1.5 + 100 * g.value("bell")
 	check(close(g.operation_value() - g.stats.cash_earned, stock_value * 1.2), "R17: stock counts 20% more (with Flint Glass on bottles)")
 	var before: float = g.cash
 	g.sell_batch()
-	check(close(g.cash - before, 10 * 25.0 * 1.5), "R17: sales unchanged")
+	check(close(g.cash - before, 10 * bottle * 1.5), "R17: sales unchanged")
 
 
 func test_hydroponic_bell() -> void:
@@ -290,7 +292,7 @@ func test_tier_3() -> void:
 	g.advance(seconds(12.0))
 	check(g.stats.made.garlic_paste == 1 and g.stats.made.cayenne_mash == 1, "S7: one Paste and one Cayenne Mash in 12 s")
 	g.advance(seconds(12.0))
-	check(g.stock.classic_louisiana == 1 and close(g.value("classic_louisiana"), 140.0), "S7: then one £140 Classic Louisiana")
+	check(g.stock.classic_louisiana == 1 and close(g.value("classic_louisiana"), 3950.0), "S7: then one $3,950 Classic Louisiana")
 	check(g.plot_offered("cayenne") and g.plot_offered("garlic"), "the Tier 3 plots are offered")
 	g.buy_plot("cayenne")
 	g.buy_plot("garlic")
@@ -301,7 +303,7 @@ func test_crop_quality() -> void:
 	var g := with([], 11)
 	g.cash = 1e9
 	g.buy_plot("bell")
-	check(close(g.plot_upgrade_cost("bell", "quality"), T.CROP_QUALITY_COST), "the first level costs £30 on the Bell plot")
+	check(close(g.plot_upgrade_cost("bell", "quality"), T.CROP_QUALITY_COST), "the first level costs $%.0f on the Bell plot" % T.CROP_QUALITY_COST)
 	for i in 12:
 		g.upgrade_plot("bell", "quality")
 	check(g.plots.bell.quality == T.CROP_QUALITY_MAX and close(g.quality_chance("bell"), 0.30), "S8: capped at 10 levels, 30%")

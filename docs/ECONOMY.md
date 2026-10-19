@@ -2,6 +2,45 @@
 
 What things are worth, what Operation Value counts, how long a first run should take, and when the tabs open. It settles G5, G6 and G7 ([D004–D006](DECISIONS.md)), and owns the run's pacing criteria.
 
+## v0.6c: Idle Planet Miner's values in dollars (D035)
+
+**Superseded below:** the £ values and thresholds in the sections after this one are the history up to v0.6b. Since D035:
+
+- **Money is US dollars.**
+- **Every crop copies an Idle Planet Miner ore's sell price** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder)): Bell Pepper is Copper ($1), up to Pepper X as Osmium ($7,800). D004's multiples stay: a mash is worth 2× its inputs, a bottle 5× the raw value inside it. So bottles follow from the crops instead of the brief: Table Mild $50, Bistro Verde $425, Classic Louisiana $3,950, Sweet Heat Reserve $58,150, Phantom Smokehouse $330,250, Widowmaker Reserve $3.34M. The ladder climbs ×2.1–3.3 a sauce (V2 is now ×2.0–3.4).
+- **Prices follow what pays for them.** Each plot and slot costs its v0.6a price × the value change of the sauce whose sales buy it, then tuned (`data/plots.json`, `data/slots.json`). Upgrade bases and references are ×10 (Tier 1's change), and a station's upgrade scale is (price or value ratio)^0.6 instead of √, so upgrades keep pace with the steeper values.
+- **The first sale is Idle Planet Miner's:** $10M Operation Value for 10 Franchise Credits, then its credit table (30 at $100M, 60 at $1B…, [PRESTIGE.md](PRESTIGE.md)).
+- **The run keeps v0.6a's pace in time** (the owner's choice): every sauce on time, and the $10M sale arrives at about 2:00–2:15, with pushing on to Phantom paying more credits. It was £1M at about 3:00; the brief's "3 hours to Prestige" (D005) now means 3 hours to the end of the first run's ladder, not to the first chance to sell.
+- **Thresholds:** Stage 2 at $100 earned; tabs at $4,000 (Processing), $7,500 (Tech Tree), $150,000 (Shift Roster, provisional) and $10M (HQ, with the sale).
+- **Saves (v8):** a v7 or older save's cash, cash earned and best Operation Value are ×10, converted once before any older migration; items keep their counts and are worth more.
+
+### Criteria (v0.6c)
+
+Every v0.2–v0.6b criterion stands on time; money bars convert by the value change of the top sauce at that point, set before measuring:
+
+| Bar | Was | Now |
+| --- | --- | --- |
+| F7, the factory alone at 15:00 | £18 a minute | $180 a minute |
+| N1, N2 (tabs) | £400, £750 | $4,000, $7,500 |
+| N5 and U1's second band, by 50:00 | £10,000 | $200,000 (×20, Serrano Fire) |
+| M3 and U1's third band, by 1:50 | £100,000 | $4,000,000 (×40) |
+| U1's first band, 0:12–0:18 | £1,000 | $10,000 |
+| U1's last band | £1,000,000 between 2:45 and 3:15 | **the $10M sale between 2:00 and 2:30** (owner's choice) |
+| U8, a night doesn't hand over the sale | from 1:20, under £1M | **from 1:00**, under $10M (owner's choice: the sale comes earlier) |
+
+**Measurement fix (D035):** a night (P1, P2, U8) now starts with the slots set the way the player runs them, as the tapping minute always did. Before, a night started with whatever the player had lent to research at that tick: at 1:40 two Island Heat lines sat empty all night.
+
+### Results (v0.6c)
+
+36 of 39 PASS. Every sauce is on time (U3), the curve's bands hold (U1: $10k 15:27, $200k 53:20, $4M 1:44:42, $10M 2:07:58), a night from 1:40 beats two hours' tapping ($114M against $67M) and a night from 1:00 stays under the sale ($9.4M).
+
+**FAIL:**
+- **N5:** $200,000 at 53:20, not by 50:00 ($162,583 at 50:00). The bar's ×20 was too high: at 50:00 most money still comes from Bistro Verde (×17) and Table Mild (×10). Recommend $150,000, which it passes (W18).
+- **M2:** the first Classic Louisiana at 55:51, 51 s after 55:00. Its line is bought at 50:40; the 5 minutes after are the Brine and Paste chain filling, not cash. U3 (the same sauce within 20 minutes of 50:00) passes (W19).
+- **U5:** one slot waited 402 s (at most 300) on an ingredient: the pacing player lends a line to Sweet Heat for research at 2:45 with no Glaze vat in its Savina Gold layout. The ingredient share holds (65% of vat time) (W20).
+
+**Not bounded:** after Phantom arrives (2:52) the run grows fast: $110M at 3:00, $723M at 3:15 (30 and 51 credits). Nothing caps late growth now that U1 ends at the sale (W21).
+
 ## Item values (G6, D004)
 
 **A bottle is worth 5× the raw value inside it.** The brief's Tier 1 already works this way: 10 Bell Peppers sell raw for £1.00, and bottled for £5.00. Any lower-tier bottle used as an input counts at its full sale value. Applied to the brief's recipes and bottle values, that fixes every raw crop's price:

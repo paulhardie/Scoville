@@ -6,6 +6,8 @@ Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedu
 
 Status: **built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. **Built: every criterion passes** (U1–U9, and every earlier F, N, M, E, P and T criterion; M6 retired by D032). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
 
+Since D035 the values here are history: money is dollars at Idle Planet Miner's values, and U1's last band and U8 moved ([ECONOMY.md](ECONOMY.md#v06c-idle-planet-miners-values-in-dollars-d035)).
+
 ## The sauce ladder (G17, as assumed: D029)
 
 Every new pepper gets a single-pepper mash and **one sauce that sits between the brief's sauces in value**, so the ladder of sauces climbs about ×2.2 a rung, close to Idle Planet Miner's ore step. Each new sauce is the best thing a line can make until the next one. Values follow D004: a mash is worth 2× its inputs, and a bottle is 5× the raw value inside it, rounded the way the brief's are.

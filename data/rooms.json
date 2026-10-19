@@ -9,7 +9,7 @@
 		{"id": "glassworks", "name": "Glassworks", "effect": "mash_input", "base": 0.05, "step": 0.05, "cap": 11},
 		{"id": "test_kitchen", "name": "Test Kitchen", "effect": "tech_cost", "base": 0.04, "step": 0.04, "cap": 11},
 		{"id": "ergonomics_lab", "name": "Ergonomics Lab", "effect": "button_yield", "base": 0.25, "step": 0.25, "cap": 30},
-		{"id": "seed_capital", "name": "Seed Capital Office", "effect": "start_cash", "amounts": [100.0, 500.0, 2500.0, 50000.0], "growth": 5.0, "cap": 10},
+		{"id": "seed_capital", "name": "Seed Capital Office", "effect": "start_cash", "amounts": [1000.0, 5000.0, 25000.0, 500000.0], "growth": 5.0, "cap": 10},
 		{"id": "tasting_room", "name": "Tasting Room", "effect": "bottle_value", "base": 0.1, "step": 0.1, "cap": 50},
 		{"id": "executive_lounge", "name": "Executive Lounge", "effect": "credits", "base": 0.08, "step": 0.08, "cap": 30},
 		{"id": "night_watchman", "name": "Night Watchman's Desk", "effect": "offline_hours", "base": 1.0, "step": 1.0, "cap": 8}

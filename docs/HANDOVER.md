@@ -2,37 +2,35 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6a and v0.6b part 1 (PRs #1–#12): the full first run to £1M in about 3 hours, Prestige with the 12 HQ rooms, and the click and buzz. This branch adds **v0.6b part 2 (W12), built** ([PRESTIGE.md](PRESTIGE.md#part-2-standard-operating-procedures-and-tier-6), D034): what's new on a run after the first sale.
+Merged: v0.1–v0.6b (PRs #1–#13): the full first run, Prestige with the 12 HQ rooms, Standard Operating Procedures and Tier 6, and the click and buzz. This branch is **v0.6c (D035): Idle Planet Miner's numbers in dollars** ([ECONOMY.md](ECONOMY.md#v06c-idle-planet-miners-values-in-dollars-d035)).
 
-**Standard Operating Procedures** (W7, West Wing, 10 Table Mild, after the first sale):
-- Once researched, any node you could research whose cost is worth under 1% of an hour of your running lines' bottles researches itself, free, checked every second.
-- Either/or (Pantry) nodes are never taken for you.
-- It works during time away too.
+- **Every pepper copies an ore:** Bell Pepper is Copper $1, up to Pepper X as Osmium $7,800 ([INGREDIENTS.md](INGREDIENTS.md)). Ingredients take the ore of their nearest pepper (assumed). Bottles follow D004: Table Mild $50, Classic Louisiana $3,950, Phantom $330,250.
+- **Money is dollars** on screen and in the rules (AGENTS.md updated).
+- **Prices re-tuned by tier** so the run keeps v0.6a's pace: every sauce arrives on time.
+- **The first sale is Idle Planet Miner's:** $10M for 10 credits, then its credit table (30 at $100M). It arrives at about 2:08; by 3:00 a run is worth about $110M (30 credits).
+- **The Tier 6 sauce Event Horizon is now Extinction Event** (the last fictional pepper is called Event Horizon).
+- **Save v8:** older saves' money ×10, converted once. Two migration bugs found and fixed on the way (a v2 save's stock counted twice; a v1 save losing its deck).
 
-**Tier 6** (after the first sale, E39–E47 east of Phantom):
+Checks: every rule suite passes; pacing is **36 of 39**, with three FAILs (below); the headless boot is clean; dollars and the HQ sale looked at with `capture_ui.gd`. A night now starts with slots set up the way the player runs them (a measurement fix: it used to start with lines lent away).
 
-| Pepper | Mash | Sauce |
-| --- | --- | --- |
-| Trinidad Moruga Scorpion (£150k plot) | Moruga Mash | Scorpion Sting £14,920 (Moruga Mash + Savina Gold) |
-| Carolina Reaper (£400k plot) | Reaper Mash | Widowmaker Reserve £40,000 (D006's recipe) |
-| Pepper X (£1.5M plot) | Pepper X Mash | Event Horizon £100,000 (Pepper X Mash + Scorpion Sting) |
+**FAIL:**
+- **N5:** $200k at 53:20, not by 50:00. My conversion of the old £10k bar (×20) was too high; $150k would pass (W18).
+- **M2:** the first Classic Louisiana 51 s late (55:51); U3 for the same sauce passes (W19).
+- **U5:** one 402 s wait on Glaze, a pacing-player lending quirk (W20).
 
-Before a sale, these ten nodes show on the web, muted, with "Opens after your first franchise sale."
-
-Checks: `bash run_tests.sh` passes all ten suites (Q10–Q14 new); the headless boot is clean; the two new Tech Tree states looked at with `capture_ui.gd`. **Not checked:** how a second run actually plays. Nothing measures a run after a sale yet (W17), so Tier 6's plot prices and SOP's 1% bar are untested against real play.
-
-**Phone build:** a private test link of `main` (as of PR #12) is at https://claude.ai/artifact/8W6iHzT2vHiSLEREpT9tmu. It's the Web export with the engine gzipped to fit; it doesn't include this branch. `bash tools/serve_web.sh` still serves the full build on the LAN.
+**Not bounded:** after Phantom the run grows fast ($723M at 3:15, 51 credits). Nothing caps it now that U1 stops at the sale (W21).
 
 ## Open decisions
 
-- **D034's assumptions:** SOP's bar (1% of an hour of bottles, free), Tier 6's sauces, prices and plot costs. Change any freely.
-- **Prestige's numbers (D030):** credits formula, room prices, G16 at Level 8, G19's caps.
-- **W8, the visual pass:** needs your direction: a few reference games, a mood, and whether art comes later. The crowded stock line (W15) joins it.
+- **N5's bar:** accept $150,000 (recommended), or tune Tier 2 faster.
+- **Late growth (W21):** is $700M by 3:15 fine (push on for big credits, as in Idle Planet Miner), or should Phantom-era growth be capped? Recommend deciding with W17, a pacing player that sells and replays.
+- **D034's and D030's assumptions** still stand (SOP's bar, Tier 6, Prestige rooms).
+- **W8, the visual pass:** needs your reference games.
 
 ## Next
 
-1. Try the phone link for the click and buzz (W16).
-2. Merge this PR.
-3. Then W17 (a pacing player that sells and replays, to measure run 2 and tune Tier 6), the Shift Roster's rules with placeholder art (v0.7), or W8 once you've sent references.
+1. Merge this PR once you're happy with the three FAILs' explanations, then try the phone build (W16).
+2. Give each finished bottle a visible moment (a popped bottle and its value, a sound): suggested after the "is making a bottle enjoyable?" question; small, and doesn't need W8.
+3. W17 (second-run pacing), then v0.7 Shift Roster.
 
-Touches: data (items, plots, recipes, tech), `data_loader.gd` (`after_sale`, the `sop` effect), `game.gd` (the after-sale gate, `_sop`, `bottle_rate`, `tech_cost_value`, research split into `_grant`), `tuning.gd` (SOP constants), the Tech Tree's text, tests, the capture tool, docs. Stubbed or open: W3–W6, W8–W9, W15–W17, G1, G12–G19.
+Touches: data (values, prices, rooms' Seed Capital ×10, the rename), `tuning.gd` (thresholds, upgrade bases, COST_SCALE_POWER, PRESTIGE_OV, CREDIT_TABLE, SAVE_V8_MONEY), `game.gd` (credits, cost scale, save v8), the money display, every test suite, the capture tool, docs. Stubbed or open: W3–W6, W8–W9, W15–W21, G1, G12–G19.

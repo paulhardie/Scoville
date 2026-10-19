@@ -9,6 +9,10 @@ const TICK_SECONDS := 0.1
 ## Seconds between autosaves (GUESS).
 const AUTOSAVE_SECONDS := 3.0
 
+## A v7 save's money × this on loading as v8 (D035): Tier 1's change from
+## pounds to Idle Planet Miner's dollars.
+const SAVE_V8_MONEY := 10.0
+
 # --- Onboarding (docs/ONBOARDING.md, docs/ECONOMY.md) -------------------------
 
 ## Bell Peppers one press of the Blank Button picks (brief §4: Calloused Thumbs
@@ -19,46 +23,51 @@ const BUTTON_BASE_YIELD := 1
 ## Stage 1).
 const STAGE_1_PEPPERS := 20
 
-## Cash earned that reveals the Operation Deck (brief §2, Stage 2).
-const STAGE_2_CASH := 10.0
+## Cash earned that reveals the Operation Deck (brief §2, Stage 2; ×10 for
+## Idle Planet Miner's values, D035).
+const STAGE_2_CASH := 100.0
 
-## Operation Value that opens each tab (D005). Stage 3's nav bar comes with
-## Processing. HQ is the brief's (§2).
+## Operation Value that opens each tab (D005, ×10 for D035's values). Stage
+## 3's nav bar comes with Processing. HQ opens with the first sale (D035).
 const TAB_THRESHOLDS := {
-	"processing": 400.0,
-	"tech": 750.0,
-	"roster": 10000.0,
-	"hq": 1000000.0,
+	"processing": 4000.0,
+	"tech": 7500.0,
+	"roster": 150000.0,
+	"hq": 10000000.0,
 }
 ## Tabs that exist yet. The others stay `[ ? ]` whatever the Operation Value.
 const TABS_BUILT := ["farms", "processing", "tech", "hq"]
 
 # --- Upgrades (docs/FACTORY.md, GUESSES tuned in v0.2) -------------------------
-# A level's price is base × growth^level × √(the station's price ÷ its kind's
-# reference price), never below × 1. The references are v0.2's first prices,
-# so cheaper first stations (v0.5.1) leave every upgrade's price alone.
-const PLOT_PRICE_REFERENCE := 10.0
-const VAT_PRICE_REFERENCE := 25.0
-const LINE_PRICE_REFERENCE := 35.0
-## D031: slot upgrades also scale by √(the value of what the slot makes ÷ the
-## value of these), Tier 1's mash and bottle.
+# A level's price is base × growth^level × (the station's price ÷ its kind's
+# reference price)^COST_SCALE_POWER, never below × 1. The references are
+# v0.2's first prices (×10 for D035), so cheaper first stations (v0.5.1) leave
+# every upgrade's price alone.
+const PLOT_PRICE_REFERENCE := 100.0
+const VAT_PRICE_REFERENCE := 250.0
+const LINE_PRICE_REFERENCE := 350.0
+## D035: 0.6, not v0.2's √, so upgrades keep pace with Idle Planet Miner's
+## steeper values (×2.1 a pepper rather than ×1.65).
+const COST_SCALE_POWER := 0.6
+## D031: slot upgrades also scale by (the value of what the slot makes ÷ the
+## value of these)^COST_SCALE_POWER, Tier 1's mash and bottle.
 const VAT_VALUE_REFERENCE := "sweet_mash"
 const LINE_VALUE_REFERENCE := "table_mild"
 
 ## Plot Harvest Speed: +step a level.
 const PLOT_SPEED_STEP := 0.15
-const PLOT_SPEED_COST := 15.0
+const PLOT_SPEED_COST := 150.0
 const PLOT_SPEED_GROWTH := 2.0
 ## Plot Yield per Cycle: +1 a level.
-const PLOT_YIELD_COST := 40.0
+const PLOT_YIELD_COST := 400.0
 const PLOT_YIELD_GROWTH := 2.0
 ## Vat slot speed.
 const VAT_SPEED_STEP := 0.25
-const VAT_SPEED_COST := 30.0
+const VAT_SPEED_COST := 300.0
 const VAT_SPEED_GROWTH := 1.45
 ## Line slot speed.
 const LINE_SPEED_STEP := 0.25
-const LINE_SPEED_COST := 45.0
+const LINE_SPEED_COST := 450.0
 const LINE_SPEED_GROWTH := 1.5
 
 ## Starter Crate (brief §3: 50 bottles, with the first line; the speed is a
@@ -103,7 +112,7 @@ const BYPRODUCT_COOLDOWN := 60.0
 ## Crop Quality (D016): chance a level, its cap in levels, and its price curve.
 const CROP_QUALITY_STEP := 0.03
 const CROP_QUALITY_MAX := 10
-const CROP_QUALITY_COST := 30.0
+const CROP_QUALITY_COST := 300.0
 const CROP_QUALITY_GROWTH := 2.0
 
 # --- v0.5: offline (docs/OFFLINE.md) -------------------------------------------
@@ -125,12 +134,13 @@ const RETURN_CARD_SECONDS := 60.0
 
 # --- v0.6b: Prestige (docs/PRESTIGE.md) ----------------------------------------
 
-## Operation Value at which the franchise can be sold (brief §6).
-const PRESTIGE_OV := 1000000.0
-## Franchise Credits = ⌊CREDIT_SCALE × log10(OV ÷ CREDIT_BASE_OV)⌋ × the
-## Executive Lounge (GUESS, G8: "scaled logarithmically").
-const CREDIT_SCALE := 10.0
-const CREDIT_BASE_OV := 100000.0
+## Operation Value at which the franchise can be sold: Idle Planet Miner's
+## first galaxy sale (D035; the brief's £1M before).
+const PRESTIGE_OV := 10000000.0
+## Franchise Credits at PRESTIGE_OV × 10^n: Idle Planet Miner's credit table
+## (D035), straight lines between, rounded, × the Executive Lounge. Past the
+## table each decade adds 10 more than the last step did.
+const CREDIT_TABLE := [10, 30, 60, 101, 150, 210, 285, 367, 459]
 ## Opening the n-th room costs ROOM_OPEN_COST × n credits, and levelling a room
 ## from level L costs ROOM_LEVEL_COST × L (GUESSES, G8).
 const ROOM_OPEN_COST := 5

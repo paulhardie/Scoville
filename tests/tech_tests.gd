@@ -38,7 +38,7 @@ func run() -> void:
 func open_tree() -> Game:
 	var g := Game.new()
 	g.revealed.deck = true
-	g.account.best_ov = 800.0
+	g.account.best_ov = T.TAB_THRESHOLDS.tech
 	g.stock.table_mild = 500
 	g.stock.sweet_mash = 50
 	return g
@@ -47,19 +47,20 @@ func open_tree() -> Game:
 func test_tabs_open_at_thresholds() -> void:
 	var g := Game.new()
 	g.revealed.deck = true
-	g.account.best_ov = 399.0
-	check(g.tab_open("farms") and not g.nav_shown() and not g.tab_open("processing"), "O8: no nav bar at £399")
-	g.account.best_ov = 400.0
-	check(g.nav_shown() and g.tab_open("processing"), "O8: the nav bar and Processing at £400")
+	var at: Dictionary = T.TAB_THRESHOLDS
+	g.account.best_ov = at.processing - 1.0
+	check(g.tab_open("farms") and not g.nav_shown() and not g.tab_open("processing"), "O8: no nav bar at $%.0f" % g.account.best_ov)
+	g.account.best_ov = at.processing
+	check(g.nav_shown() and g.tab_open("processing"), "O8: the nav bar and Processing at $%.0f" % at.processing)
 	check(not g.tab_open("tech") and not g.tab_open("roster") and not g.tab_open("hq"), "O8: three tabs still locked")
-	g.account.best_ov = 749.0
-	check(not g.tab_open("tech"), "O9: no Tech Tree at £749")
-	g.account.best_ov = 750.0
-	check(g.tab_open("tech"), "O9: the Tech Tree opens at £750")
-	g.account.best_ov = 999999.0
-	check(not g.tab_open("hq"), "O9: no HQ below £1,000,000")
-	g.account.best_ov = 5e6
-	check(not g.tab_open("roster") and g.tab_open("hq"), "O9: HQ opens at £1,000,000 (v0.6b); the Shift Roster stays locked")
+	g.account.best_ov = at.tech - 1.0
+	check(not g.tab_open("tech"), "O9: no Tech Tree at $%.0f" % g.account.best_ov)
+	g.account.best_ov = at.tech
+	check(g.tab_open("tech"), "O9: the Tech Tree opens at $%.0f" % at.tech)
+	g.account.best_ov = at.hq - 1.0
+	check(not g.tab_open("hq"), "O9: no HQ below $%.0f" % at.hq)
+	g.account.best_ov = at.hq * 5.0
+	check(not g.tab_open("roster") and g.tab_open("hq"), "O9: HQ opens at $%.0f (v0.6b); the Shift Roster stays locked" % at.hq)
 
 
 func test_tabs_follow_the_best_value() -> void:
@@ -67,7 +68,9 @@ func test_tabs_follow_the_best_value() -> void:
 	g.revealed.deck = true
 	g.stock.table_mild = 100
 	g.tick()
-	check(close(g.account.best_ov, 500.0) and g.tab_open("processing"), "100 Table Mild in stock is £500 of Operation Value")
+	var worth: float = 100 * g.value("table_mild")
+	check(worth >= T.TAB_THRESHOLDS.processing, "100 Table Mild are worth enough to open Processing")
+	check(close(g.account.best_ov, worth) and g.tab_open("processing"), "100 Table Mild in stock is $%.0f of Operation Value" % worth)
 	g.stock.table_mild = 0
 	g.tick()
 	check(g.tab_open("processing"), "O10: losing the stock doesn't close the tab")
@@ -166,7 +169,7 @@ func test_delivery_van_autosell() -> void:
 	var by_hand := factory_run(false, 0)
 	var full := factory_run(true, 100)
 	check(full.made == by_hand.made, "the Van doesn't change production")
-	check(close(full.earned, by_hand.earned, 1e-12), "R4: 100%% Auto-Sell earns what Sell Batch does: £%.2f vs £%.2f" % [full.earned, by_hand.earned])
+	check(close(full.earned, by_hand.earned, 1e-12), "R4: 100%% Auto-Sell earns what Sell Batch does: $%.2f vs $%.2f" % [full.earned, by_hand.earned])
 	check(full.stock == 0 and full.auto == full.made, "R4: at 100% nothing reaches stock")
 	var none := factory_run(true, 0)
 	check(none.auto == 0 and none.stock == none.made, "R4: at 0% everything goes to stock")

@@ -61,7 +61,9 @@ const LAYOUTS := [
 	# line is what two Glaze vats and two Paste vats keep fed.
 	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "habanero_mash", "garlic_paste"],
 		"line": ["table_mild", "sweet_heat", "table_mild"], "lend": [6, 1]},
-	{"when": "savina_gold", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "cayenne_mash"],
+	# Three Louisiana lines take a Paste and a Cayenne Mash each: two Paste
+	# vats, or the Louisiana lines starve on Paste (D035).
+	{"when": "savina_gold", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "garlic_paste"],
 		"line": ["classic_louisiana", "savina_gold", "savina_gold", "classic_louisiana", "savina_gold", "classic_louisiana"], "lend": [6, 2]},
 	{"when": "phantom", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "ghost_mash", "liquid_smoke"],
 		"line": ["classic_louisiana", "phantom", "phantom", "classic_louisiana", "savina_gold", "phantom"], "lend": [2, 1]},

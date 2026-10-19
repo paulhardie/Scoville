@@ -22,7 +22,7 @@ Every v0.2–v0.6b criterion stands on time; money bars convert by the value cha
 | --- | --- | --- |
 | F7, the factory alone at 15:00 | £18 a minute | $180 a minute |
 | N1, N2 (tabs) | £400, £750 | $4,000, $7,500 |
-| N5 and U1's second band, by 50:00 | £10,000 | $200,000 (×20, Serrano Fire) |
+| N5 and U1's second band, by 50:00 | £10,000 | $150,000 (D036; first set at $200,000, ×20) |
 | M3 and U1's third band, by 1:50 | £100,000 | $4,000,000 (×40) |
 | U1's first band, 0:12–0:18 | £1,000 | $10,000 |
 | U1's last band | £1,000,000 between 2:45 and 3:15 | **the $10M sale between 2:00 and 2:30** (owner's choice) |
@@ -32,14 +32,14 @@ Every v0.2–v0.6b criterion stands on time; money bars convert by the value cha
 
 ### Results (v0.6c)
 
-36 of 39 PASS. Every sauce is on time (U3), the curve's bands hold (U1: $10k 15:27, $200k 53:20, $4M 1:44:42, $10M 2:07:58), a night from 1:40 beats two hours' tapping ($114M against $67M) and a night from 1:00 stays under the sale ($9.4M).
+**All PASS** (38 criteria, after D036). Every sauce is on time (U3); the curve's bands hold (U1: $10k 15:27, $150k 49:06, $4M 1:44:42, the $10M sale 2:07:58); a night from 1:40 beats two hours' tapping ($114M against $67M) and a night from 1:00 stays under the sale ($9.4M); the longest wait on an ingredient is 209 s (U5).
 
-**FAIL:**
-- **N5:** $200,000 at 53:20, not by 50:00 ($162,583 at 50:00). The bar's ×20 was too high: at 50:00 most money still comes from Bistro Verde (×17) and Table Mild (×10). Recommend $150,000, which it passes (W18).
-- **M2:** the first Classic Louisiana at 55:51, 51 s after 55:00. Its line is bought at 50:40; the 5 minutes after are the Brine and Paste chain filling, not cash. U3 (the same sauce within 20 minutes of 50:00) passes (W19).
-- **U5:** one slot waited 402 s (at most 300) on an ingredient: the pacing player lends a line to Sweet Heat for research at 2:45 with no Glaze vat in its Savina Gold layout. The ingredient share holds (65% of vat time) (W20).
+As first merged (PR #14) three failed, settled by D036:
+- **N5:** $200,000 at 53:20. The bar's ×20 was too high (Bistro Verde ×17 and Table Mild ×10 at that point); it's now $150,000, reached at 49:06.
+- **M2:** the first Classic Louisiana 51 s after 55:00. Retired; U3 holds the same sauce to its time.
+- **U5:** a 402 s wait, a Louisiana line starved of Garlic Paste in the pacing player's Savina Gold layout (one Paste vat for three Louisiana lines). The layout now has two.
 
-**Not bounded:** after Phantom arrives (2:52) the run grows fast: $110M at 3:00, $723M at 3:15 (30 and 51 credits). Nothing caps late growth now that U1 ends at the sale (W21).
+**Not bounded:** after Phantom arrives (2:52) the run grows fast: $117M at 3:00 and $757M at 3:15 (31 and 51 credits). Nothing caps late growth now that U1 ends at the sale (W21).
 
 ## Item values (G6, D004)
 
@@ -159,7 +159,7 @@ Measured by the pacing player over the first 110 minutes. v0.2's F1–F8 and v0.
 | Id | Criterion |
 | --- | --- |
 | M1 | The first Tier 3 blueprint by 0:48. |
-| M2 | The first Classic Louisiana by 0:55. |
+| M2 | The first Classic Louisiana by 0:55. Retired by D036: U3 holds it to its time. |
 | M3 | Operation Value £100,000 by 1:50 (the 3-hour curve's checkpoint). |
 | M4 | From 0:50 to 1:50, never more than 150 s without a purchase or a research. |
 | M5 | At 1:30, tapping (with Heat) adds at least 30% to a minute's earnings. |

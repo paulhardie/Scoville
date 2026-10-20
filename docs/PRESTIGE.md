@@ -77,7 +77,7 @@ A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 
 ### Rules
 
 - **After the first sale.** Tier 6's nine nodes and Standard Operating Procedures open only once the franchise has been sold at least once (`account.prestiges`, saved since v7). Before that they show on the web, muted, saying "Opens after your first franchise sale."
-- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it **free** if its cost is worth less than 5% of an hour's output (1% until D038). Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
+- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it if its cost is worth less than 5% of an hour's output (1% until D038), **paying the cost's worth in cash** (D039; free until then). With too little cash, it waits. Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
   - **A cost's worth** is its items at their base values (D004), after the Test Kitchen.
   - **An hour's output** is 3,600 × the value a second of the bottles from lines that are running: each running line's sauce value ÷ its cycle. So 5% is 3 minutes of bottles.
   - **Forks are never taken**: either/or is the player's choice (D026).
@@ -100,7 +100,7 @@ Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's patt
 | --- | --- |
 | Q10 | Before any sale, no Tier 6 node and not Standard Operating Procedures can be researched, even with every parent and the full cost in stock; after one sale they can. |
 | Q11 | Tier 6's mashes are worth 2× their inputs and its sauces 5× the raw value inside (V1, which covers every recipe); Phantom Smokehouse → Scorpion Sting → Widowmaker Reserve → Extinction Event each climb ×1.6–3.0 (×2.0–3.4 since D035); each Tier 6 plot feeds one vat at base (V3). |
-| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under the bar (5% of an hour's bottles, D038) is researched, and its cost stays in stock; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
+| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under the bar (5% of an hour's bottles, D038) is researched, its cost's worth taken from cash and its items left in stock (D039); with less cash than that it waits; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
 | Q13 | After time away (the catch-up), every node under the bar with its parents done has been researched, as in play. |
 | Q14 | On screen: a Tier 6 node before the first sale says it opens after the first sale; Standard Operating Procedures says what it does. |
 
@@ -113,7 +113,7 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 ### Assumed (part 2)
 
 - **G17:** Tier 6's recipes, values, plot prices and timings above. Plot prices and line times are GUESSES; no pacing measures a second run yet (W17).
-- **Standard Operating Procedures:** the brief's "1% of current production throughput" read as a share of an hour of the bottles running lines make, now 5% (D038), valued at base; research it grants is free; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
+- **Standard Operating Procedures:** the brief's "1% of current production throughput" read as a share of an hour of the bottles running lines make, now 5% (D038), valued at base; it pays in cash what the items are worth (D039), since Auto-Sell leaves little in stock to pay with; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
 - Tier 6 opens with the first sale, not with an HQ room.
 
 ## The second run (W17)

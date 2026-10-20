@@ -251,3 +251,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision (the owner's, on the agent's recommendation):** a node researches itself under SOP when its cost is worth less than 5% of an hour of the bottles running lines make (3 minutes of bottles), not 1%. This departs from the brief's "less than 1% of current production throughput" as D034 read it.
 
 **Why:** measured on a second run (W17, Y2), at 1% SOP did nothing for its first 16½ minutes: the player had already researched every node that cheap, and the next (Double-Tap, $6,375) was over a bar of about $700. SOP's point is to take the early clicking away on repeat runs. The trade-off: it also takes mid-game nodes free sooner.
+
+## D039: Standard Operating Procedures pays for what it researches
+
+**Decision (the owner's, on the agent's recommendation):** a node SOP researches costs its items' worth at base values, taken from cash; if cash is short, SOP waits. It no longer researches for free. Paying in cash, not items, is the agent's assumption.
+
+**Why:** free research made run 2 reach the sale in 57 minutes, 44% of run 1 (W24): SOP was saving most of the run's research costs, not just its taps. Paying keeps SOP an automation, as the brief's "auto-research" suggests. Cash rather than items because the Delivery Van sells bottles at 100% by default, so there's rarely stock to take; cash is what those bottles would have sold for.

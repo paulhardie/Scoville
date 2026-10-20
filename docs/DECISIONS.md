@@ -245,3 +245,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Decision (the owner's, on the agent's recommendation):** the screen moves from admin tabs towards a factory you watch, in three steps ([LAYOUT.md](LAYOUT.md)): (1) readable numbers, station sheets with ×1/×10/Max, a payoff when a bottle lands, a goal bar, a warehouse drawer and a Market tab; (2) the factory as floors with moving items and the Blank Button at the foot of the screen, once the visual direction is set (W8); (3) chain diagrams, bottleneck highlights and ceremonies. Step 1 is built now.
 
 **Why:** the systems are deep but the screen is lists of forms: by the late game 51 plot upgrade buttons, 13 slot cards, a 30-item stock line and 13 sliders, with unreadable figures ($2,931,411.49) and no goal on screen. Step 1 fixes most of the "2010 web game" feel with no art and doesn't wait on W8. Moving the button to the foot of the screen (step 2) changes the brief's split viewport (§2), so it waits for the owner's say with the visual pass.
+
+## D038: Standard Operating Procedures' bar is 5% of an hour's bottles
+
+**Decision (the owner's, on the agent's recommendation):** a node researches itself under SOP when its cost is worth less than 5% of an hour of the bottles running lines make (3 minutes of bottles), not 1%. This departs from the brief's "less than 1% of current production throughput" as D034 read it.
+
+**Why:** measured on a second run (W17, Y2), at 1% SOP did nothing for its first 16½ minutes: the player had already researched every node that cheap, and the next (Double-Tap, $6,375) was over a bar of about $700. SOP's point is to take the early clicking away on repeat runs. The trade-off: it also takes mid-game nodes free sooner.

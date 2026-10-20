@@ -157,6 +157,6 @@ const DRAFT_SIZE := 2
 ## when its cost is worth under SOP_SHARE of SOP_WINDOW seconds of the bottles
 ## running lines make (the window is a GUESS at "throughput"), looked at every
 ## SOP_EVERY_SECONDS (GUESS).
-const SOP_SHARE := 0.01
+const SOP_SHARE := 0.05
 const SOP_WINDOW := 3600.0
 const SOP_EVERY_SECONDS := 1.0

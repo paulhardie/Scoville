@@ -1,6 +1,6 @@
 extends SceneTree
 ## The second run (docs/PRESTIGE.md Y1–Y4): the pacing player plays run 1 to
-## 3:00, sells and spends its credits, then plays run 2. About 4 minutes.
+## 3:00, sells and spends its credits, then plays run 2. About a minute.
 
 const Game = preload("res://src/core/game.gd")
 const Player = preload("res://src/sim/engaged_player.gd")

@@ -77,9 +77,9 @@ A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 
 ### Rules
 
 - **After the first sale.** Tier 6's nine nodes and Standard Operating Procedures open only once the franchise has been sold at least once (`account.prestiges`, saved since v7). Before that they show on the web, muted, saying "Opens after your first franchise sale."
-- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it **free** if its cost is worth less than 1% of an hour's output. Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
+- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it **free** if its cost is worth less than 5% of an hour's output (1% until D038). Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
   - **A cost's worth** is its items at their base values (D004), after the Test Kitchen.
-  - **An hour's output** is 3,600 × the value a second of the bottles from lines that are running: each running line's sauce value ÷ its cycle. So 1% is 36 seconds of bottles.
+  - **An hour's output** is 3,600 × the value a second of the bottles from lines that are running: each running line's sauce value ÷ its cycle. So 5% is 3 minutes of bottles.
   - **Forks are never taken**: either/or is the player's choice (D026).
   - The same rule runs in the offline catch-up, once a step.
 - **Tier 6** (G17, assumed like D029): three peppers from the ladder ([INGREDIENTS.md](INGREDIENTS.md)), each with its own mash and sauce, values by D004.
@@ -100,7 +100,7 @@ Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's patt
 | --- | --- |
 | Q10 | Before any sale, no Tier 6 node and not Standard Operating Procedures can be researched, even with every parent and the full cost in stock; after one sale they can. |
 | Q11 | Tier 6's mashes are worth 2× their inputs and its sauces 5× the raw value inside (V1, which covers every recipe); Phantom Smokehouse → Scorpion Sting → Widowmaker Reserve → Extinction Event each climb ×1.6–3.0 (×2.0–3.4 since D035); each Tier 6 plot feeds one vat at base (V3). |
-| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under 1% of an hour's bottles is researched, and its cost stays in stock; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
+| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under the bar (5% of an hour's bottles, D038) is researched, and its cost stays in stock; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
 | Q13 | After time away (the catch-up), every node under the bar with its parents done has been researched, as in play. |
 | Q14 | On screen: a Tier 6 node before the first sale says it opens after the first sale; Standard Operating Procedures says what it does. |
 
@@ -113,12 +113,12 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 ### Assumed (part 2)
 
 - **G17:** Tier 6's recipes, values, plot prices and timings above. Plot prices and line times are GUESSES; no pacing measures a second run yet (W17).
-- **Standard Operating Procedures:** "1% of current production throughput" read as 1% of an hour of the bottles running lines make, valued at base; research it grants is free; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
+- **Standard Operating Procedures:** the brief's "1% of current production throughput" read as a share of an hour of the bottles running lines make, now 5% (D038), valued at base; research it grants is free; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
 - Tier 6 opens with the first sale, not with an HQ room.
 
 ## The second run (W17)
 
-Status: **measured: 3 of 4 PASS** (Y2 FAILs, W23). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
+Status: **measured: all PASS** with SOP's bar at 5% (D038; at 1% Y2 failed). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
 
 ### The player's policy (assumed)
 
@@ -141,13 +141,13 @@ Reported, not judged: run 1's credits at 3:00, the rooms bought, and run 2's Ope
 
 Run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operation Value $117M). The player opens Cooperage, Fermentation Cellar and Glassworks (5 + 10 + 15 credits) and has 1 left.
 
-| Id | Result |
-| --- | --- |
-| Y1 | **PASS:** run 2 reaches the sale at 1:33:44, 73% of run 1's time |
-| Y2 | **FAIL:** Standard Operating Procedures, researched at 16:38, researches 32 nodes over the run, but the first only at 33:08, 16½ minutes later (at most 10) |
-| Y3 | **PASS:** the first Scorpion Sting at 2:22:31 |
-| Y4 | **PASS:** the longest wait from 1:50 to 3:00 is 256 s |
+| Id | At SOP 1% (first measured) | At SOP 5% (D038, now) |
+| --- | --- | --- |
+| Y1 | PASS: the sale at 1:33:44, 73% of run 1 | **PASS:** the sale at 56:50, 44% of run 1 |
+| Y2 | FAIL: 32 nodes, the first 16½ minutes after SOP | **PASS:** 67 nodes, the first 19 s after SOP (16:38 → 16:57) |
+| Y3 | PASS: the first Scorpion Sting at 2:22:31 | **PASS:** at 1:23:42 |
+| Y4 | PASS: longest wait 256 s | **PASS:** 89 s |
 
-**Why Y2 fails:** by 16:38 the player has already researched every node cheap enough. The next cheapest (Double-Tap, 15 Bistro Verde, $6,375) is over the bar (36 s of bottles, about $700 then) until the factory grows. So SOP is idle for its first quarter of an hour, then researches 32 nodes. Fixing it means a bigger bar (e.g. 5% of an hour) or SOP later in the order; either changes D034's rule, so it waits for the owner.
+**Why Y2 failed at 1%:** by the time SOP was bought, the player had researched every node cheap enough, and the next (Double-Tap, 15 Bistro Verde, $6,375) was over a bar of about $700.
 
-**Late growth (W21):** run 2 is worth **$662M at 3:00 and $936M at 3:15**, 5.7× run 1 at 3:00, from three rooms. A run-2 sale at 3:00 would pay about 49 credits.
+**What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounded this (Y1 only asks for faster, not how much faster): W24.

@@ -29,6 +29,6 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | W8 | Visual pass: on a phone it "looks like a 2010 web game rather than a mobile app in 2026" (owner, after W1). Today's look is placeholder panels, flat colours and the default font | Open | Owner: reference games and a mood, and whether art will come later |
 | W21 | Late growth is unbounded: $117M at 3:00, $757M at 3:15 once Phantom runs (D035). U1 now ends at the sale | Open | A bound on Operation Value at 3:00, or the credit curve's view of it, with W17 |
 | W17 | Second-run pacing: nothing measures a run after a sale (rooms, SOP, Tier 6's plot prices and the Cook-Off's £100M+ thresholds) | Open | A pacing player that sells and replays |
-| W15 | The stock line under the status bar is crowded with v0.6a's items (capped at three lines, FEEL.md) | Open | The visual pass (W8) |
+| W22 | Layout steps 2–3 (LAYOUT.md, D037): the factory as floors with items moving between them, the Blank Button at the foot of the screen (changes the brief's split viewport, §2), chain diagrams, bottleneck highlights, unlock and sale ceremonies | Open | W8's visual direction; the owner's say on moving the button |
 | W16 | Hear and feel the click and buzz on a real phone (Android Chrome for vibration; iPhone Safari has none) | Open | The owner's next phone test |
 | W9 | The pacing player never sets Bistro Verde's Auto-Sell back to 100% after Smart Stockpiling, so Bistro piles up in late runs. A measuring quirk, not a game fault | Open | Fix with W4's smarter player |

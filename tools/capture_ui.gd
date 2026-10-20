@@ -75,6 +75,7 @@ func run() -> void:
 		late_player.step(late)
 		late.tick()
 	g.load_state(late.to_state())
+	screen._rebase_juice()
 	g.heat = 74.0
 	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v04_farms.png"), 0.3)
@@ -88,6 +89,19 @@ func run() -> void:
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
 	(screen.find_child("Tech_automated_piston", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v04_tech.png"), 0.3)
+
+	# Layout step 1 (LAYOUT.md): a station sheet, the Market tab, the warehouse.
+	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
+	(screen.find_child("Manage_plot_bell", true, false) as Button).pressed.emit()
+	(screen.find_child("Mode_10", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("l1_sheet.png"), 0.3)
+	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
+	screen.settings.buy_mode = "1"
+	(screen.find_child("Tab_market", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("l1_market.png"), 0.3)
+	screen.open_drawer()
+	await _shot(out.path_join("l1_drawer.png"), 0.3)
+	(screen.find_child("Drawer", true, false) as Control).visible = false
 
 	# Back after a night: the "While you were away" card, capped.
 	screen._return_from(9 * 3600.0 + 720.0)

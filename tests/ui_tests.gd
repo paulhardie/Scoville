@@ -3,6 +3,7 @@ extends SceneTree
 
 const Main = preload("res://scenes/main.tscn")
 const T = preload("res://src/core/tuning.gd")
+const S = preload("res://src/ui/style.gd")
 const Helpers = preload("res://tests/button_tests.gd")
 
 var failures: Array[String] = []
@@ -84,8 +85,14 @@ func run() -> void:
 	buy_plot.pressed.emit()
 	await process_frame
 	check(screen.game.plots.bell.owned and not buy_plot.visible, "the buy button buys it and goes")
+	var manage: Button = screen.find_child("Manage_plot_bell", true, false)
+	check(manage.visible and screen.find_child("Upgrade_plot_bell_speed", true, false) == null, "L3: the card shows Manage, not its upgrades")
+	manage.pressed.emit()
+	await process_frame
 	var speed: Button = screen.find_child("Upgrade_plot_bell_speed", true, false)
-	check(speed.visible and speed.text.begins_with("Harvest Speed"), "its upgrades show: %s" % speed.text)
+	check(speed != null and speed.is_visible_in_tree() and speed.text.begins_with("Harvest Speed"), "L3: Manage opens its sheet with the upgrades: %s" % (speed.text if speed else "none"))
+	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
+	await process_frame
 
 	# Stage 3 (O8): the nav bar at $4,000 Operation Value.
 	var nav: Control = screen.find_child("Nav", true, false)
@@ -96,9 +103,9 @@ func run() -> void:
 	await create_timer(0.6).timeout
 	check(nav.visible, "O8: the nav bar shows at $%.0f" % T.TAB_THRESHOLDS.processing)
 	var tabs := []
-	for tab in ["farms", "processing", "tech", "roster", "hq"]:
+	for tab in ["farms", "processing", "tech", "market", "roster", "hq"]:
 		tabs.append((screen.find_child("Tab_" + tab, true, false) as Button).text)
-	check(tabs == ["Farms", "Processing", "[ ? ]", "[ ? ]", "[ ? ]"], "O8: Farms and Processing open, three [ ? ]: %s" % str(tabs))
+	check(tabs == ["Farms", "Processing", "[ ? ]", "[ ? ]", "[ ? ]", "[ ? ]"], "O8: Farms and Processing open, the rest [ ? ] (Market since LAYOUT.md): %s" % str(tabs))
 	check(deck.get_global_rect().end.y <= nav.get_global_rect().position.y + 1.0, "the deck ends above the nav bar")
 	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
 	await process_frame
@@ -156,7 +163,10 @@ func run() -> void:
 	od.pressed.emit()
 	await process_frame
 	check(g.overdrive_active() and od.disabled, "it runs Overdrive, then waits")
-	check((screen.find_child("ValveCard", true, false) as Control).is_visible_in_tree(), "the valve card shows")
+	check(not (screen.find_child("ValveCard", true, false) as Control).is_visible_in_tree(), "L8: the valve isn't on Processing")
+	(screen.find_child("Tab_market", true, false) as Button).pressed.emit()
+	await process_frame
+	check((screen.find_child("ValveCard", true, false) as Control).is_visible_in_tree() and (screen.find_child("VanCard", true, false) as Control).is_visible_in_tree(), "L8: Market holds the valve and Auto-Sell")
 	var toggle: Button = screen.find_child("ValveToggle_bell", true, false)
 	toggle.pressed.emit()
 	await process_frame
@@ -171,13 +181,18 @@ func run() -> void:
 	check(g.pin == "automated_piston" and pin_button.text == "Unpin", "Pin pins it")
 	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
 	await process_frame
+	(screen.find_child("Manage_plot_bell", true, false) as Button).pressed.emit()
+	await process_frame
 	check((screen.find_child("Upgrade_plot_bell_quality", true, false) as Button).text.begins_with("Crop Quality"), "plots offer Crop Quality")
+	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
+	await process_frame
 
 	screen.queue_free()
 	await process_frame
 	await test_return_card()
 	await test_hq()
 	await test_after_sale()
+	await test_layout()
 	await test_feel()
 	for failure in failures:
 		printerr("FAIL: ", failure)
@@ -321,6 +336,127 @@ func test_after_sale() -> void:
 		says = says or t.contains("researches itself, free")
 	check(says, "Q14: Standard Operating Procedures says what it does")
 	screen.queue_free()
+	await process_frame
+
+
+## L3–L7: station sheets, the bottle pop and coin, Cash's count-up, the goal
+## bar and the warehouse (docs/LAYOUT.md).
+func test_layout() -> void:
+	var path := "user://layout_settings_test.json"
+	if FileAccess.file_exists(path):
+		DirAccess.remove_absolute(path)
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = path
+	root.add_child(screen)
+	await settle()
+	var g = screen.game
+	g.revealed = {"counter": true, "status_bar": true, "deck": true}
+	g.cash = 1e9
+	g.buy_plot("bell")
+	g.buy_slot("vat")
+	g.buy_slot("line")
+	await settle()
+
+	# L3: Manage carries "!" exactly when an upgrade is affordable.
+	var manage: Button = screen.find_child("Manage_plot_bell", true, false)
+	check(manage.text.contains("!"), "L3: Manage shows ! with upgrades affordable: %s" % manage.text)
+	g.cash = 0.0
+	await settle()
+	check(not manage.text.contains("!"), "L3: and not without: %s" % manage.text)
+	manage.pressed.emit()
+	await settle()
+	(screen.find_child("Mode_10", true, false) as Button).pressed.emit()
+	var ten: float = g.plot_upgrade_cost_n("bell", "speed", 10)
+	g.cash = ten - 1.0
+	await settle()
+	var speed: Button = screen.find_child("Upgrade_plot_bell_speed", true, false)
+	check(speed.disabled and speed.text.contains("→ 10"), "L3: ×10 is off a dollar short, showing ten levels: %s" % speed.text)
+	g.cash = ten
+	await settle()
+	speed.pressed.emit()
+	await settle()
+	check(g.plots.bell.speed == 10, "L3: ×10 buys ten levels (Lv %d)" % g.plots.bell.speed)
+	(screen.find_child("Mode_max", true, false) as Button).pressed.emit()
+	g.cash = 5e6
+	var can: int = g.plot_levels_affordable("bell", "yield")
+	(screen.find_child("Upgrade_plot_bell_yield", true, false) as Button).pressed.emit()
+	await settle()
+	check(can > 1 and g.plots.bell.yield == can, "L3: Max buys all %d it can (Lv %d)" % [can, g.plots.bell.yield])
+	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
+	var again := Main.instantiate()
+	again.save_path = ""
+	again.settings_path = path
+	root.add_child(again)
+	await settle()
+	check(again.settings.buy_mode == "max", "L3: the buy mode survives a restart (%s)" % again.settings.buy_mode)
+	again.queue_free()
+
+	# L4: pops and coins, held to their rates however fast bottles come.
+	var pops: int = screen.pops_shown
+	var coins: int = screen.coins_flown
+	var t0 := Time.get_ticks_msec()
+	for i in 40:
+		g.stats.made.table_mild += 3
+		g.stats.cash_earned += 50.0
+		await settle()
+	var secs := (Time.get_ticks_msec() - t0) / 1000.0
+	var p: int = screen.pops_shown - pops
+	var c: int = screen.coins_flown - coins
+	check(p >= 1 and p <= ceili(secs * S.POPS_PER_SECOND) + 1, "L4: %d pops in %.2f s (at most %.0f a second)" % [p, secs, S.POPS_PER_SECOND])
+	check(c >= 1 and c <= ceili(secs * S.COINS_PER_SECOND) + 1, "L4: %d coins in %.2f s (at most %.0f a second)" % [c, secs, S.COINS_PER_SECOND])
+
+	# L5: Cash counts up to a sale, then shows it exactly.
+	g.cash = 1000.0
+	await settle()
+	await settle()
+	g.cash += 5000.0
+	await settle()
+	var mid: float = screen._shown_cash
+	check(mid > 1000.0 and mid < 6000.0, "L5: Cash is counting up two frames after a $5,000 sale: $%.2f" % mid)
+	await create_timer(S.COUNT_UP + 0.15).timeout
+	check(screen._cash.text == "Cash: $6,000.00", "L5: and shows it all after %.2f s: %s" % [S.COUNT_UP, screen._cash.text])
+
+	# L6: the goal bar.
+	var goal: Label = screen.find_child("Goal", true, false)
+	g.account.best_ov = T.TAB_THRESHOLDS.processing
+	await settle()
+	check(goal.visible and goal.text.begins_with("Tech Tree at"), "L6: before the Tech Tree, it shows the way there: %s" % goal.text)
+	g.account.best_ov = T.TAB_THRESHOLDS.tech
+	await settle()
+	check(goal.text.begins_with("Next: ") and goal.text.contains("/"), "L6: then the next node and its scarcest item: %s" % goal.text)
+	g.stats.cash_earned = T.PRESTIGE_OV * 0.64
+	await settle()
+	check(goal.text.contains("Sale 6"), "L6: and the sale from half way: %s" % goal.text)
+
+	# L7: the stock strip and the warehouse.
+	g.stock.sweet_mash = 7
+	g.stock.table_mild = 4
+	g.stock.bistro_verde = 2
+	g.stats.made.bistro_verde = 2
+	await settle()
+	var strip: Label = screen.find_child("Counter", true, false)
+	check(strip.max_lines_visible == 1 and not strip.text.contains("Sweet") and strip.text.contains("Table Mild"), "L7: one line of Bell Peppers and bottles: %s" % strip.text)
+	var tap := InputEventMouseButton.new()
+	tap.pressed = true
+	tap.button_index = MOUSE_BUTTON_LEFT
+	strip.gui_input.emit(tap)
+	await settle()
+	var drawer: Control = screen.find_child("Drawer", true, false)
+	var listed := visible_text(drawer)
+	var has_mash := false
+	for t in listed:
+		has_mash = has_mash or t.begins_with("Sweet Pepper Mash")
+	check(drawer.visible and "MASH" in listed and "BOTTLES" in listed and has_mash, "L7: tapping it opens the warehouse by kind: %s" % str(listed))
+	screen.queue_free()
+	await settle()
+	DirAccess.remove_absolute(path)
+
+
+## Two frames: the tree signals a frame before the screen's _process runs,
+## so one isn't enough for the screen to have shown a change.
+func settle() -> void:
+	await process_frame
 	await process_frame
 
 

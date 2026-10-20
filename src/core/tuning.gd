@@ -36,7 +36,7 @@ const TAB_THRESHOLDS := {
 	"hq": 10000000.0,
 }
 ## Tabs that exist yet. The others stay `[ ? ]` whatever the Operation Value.
-const TABS_BUILT := ["farms", "processing", "tech", "hq"]
+const TABS_BUILT := ["farms", "processing", "tech", "market", "hq"]
 
 # --- Upgrades (docs/FACTORY.md, GUESSES tuned in v0.2) -------------------------
 # A level's price is base × growth^level × (the station's price ÷ its kind's
@@ -74,6 +74,11 @@ const LINE_SPEED_GROWTH := 1.5
 ## GUESS at "rapidly").
 const STARTER_CRATE_BOTTLES := 50
 const STARTER_CRATE_SPEED := 10.0
+
+## Buying several upgrade levels at once (LAYOUT.md): the ×10 step, and the
+## most levels Max looks ahead (a guard, never reached in play).
+const BULK_LEVELS := 10
+const BULK_MAX := 1000
 
 ## Delivery Van Auto-Sell slider step, in percent (GUESS).
 const AUTOSELL_STEP := 10

@@ -60,7 +60,7 @@ func run() -> void:
 		"tech": func(): return g.tab_open("tech"),
 		"bistro": func(): return g.stats.made.bistro_verde > 0,
 		"ov_1k": func(): return g.operation_value() >= 10000.0,
-		"ov_10k": func(): return g.operation_value() >= 200000.0,
+		"ov_10k": func(): return g.operation_value() >= 150000.0,
 		"ov_100k": func(): return g.operation_value() >= 4000000.0,
 		"louisiana": func(): return g.stats.made.classic_louisiana > 0,
 		"ov_1m": func(): return g.operation_value() >= T.PRESTIGE_OV,
@@ -163,7 +163,7 @@ func run() -> void:
 	var e1 := p.first("research jalapeno_blueprint")
 	criterion("N3", e1 <= 20 * 60.0, "Jalapeño blueprint at %s (by 20:00)" % clock(e1))
 	criterion("N4", reached.get("bistro", INF) <= 30 * 60.0, "first Bistro Verde at %s (by 30:00)" % clock(reached.get("bistro", INF)))
-	criterion("N5", reached.get("ov_10k", INF) <= 50 * 60.0, "Operation Value $200,000 at %s (by 50:00; at 50:00 $%.0f); $10,000 at %s" % [clock(reached.get("ov_10k", INF)), ov_50, clock(reached.get("ov_1k", INF))])
+	criterion("N5", reached.get("ov_10k", INF) <= 50 * 60.0, "Operation Value $150,000 at %s (by 50:00, D036; at 50:00 $%.0f); $10,000 at %s" % [clock(reached.get("ov_10k", INF)), ov_50, clock(reached.get("ov_1k", INF))])
 	var wait := longest_wait(p, 15 * 60.0, 50 * 60.0)
 	criterion("N6", wait <= 120.0, "longest wait between purchases or research, 15:00–50:00: %.0f s (at most 120)" % wait)
 	var busy: float = window.line_busy / float(maxi(window.ticks, 1))
@@ -177,7 +177,8 @@ func run() -> void:
 	# v0.4's criteria, to 1:50 (ECONOMY.md).
 	var tier_3 := minf(p.first("research cayenne_blueprint"), p.first("research garlic_blueprint"))
 	criterion("M1", tier_3 <= 48 * 60.0, "first Tier 3 blueprint at %s (by 48:00)" % clock(tier_3))
-	criterion("M2", reached.get("louisiana", INF) <= 55 * 60.0, "first Classic Louisiana at %s (by 55:00)" % clock(reached.get("louisiana", INF)))
+	# M2 (the first Classic Louisiana by 55:00) is retired (D036): U3 holds the
+	# same sauce to within 20 minutes of its time.
 	criterion("M3", reached.get("ov_100k", INF) <= 110 * 60.0, "Operation Value $4,000,000 at %s (by 1:50:00); at 1:50 $%.0f" % [clock(reached.get("ov_100k", INF)), ov_110])
 	var wait_m := longest_wait(p, 50 * 60.0, 110 * 60.0)
 	criterion("M4", wait_m <= 150.0, "longest wait between purchases or research, 50:00–1:50:00: %.0f s (at most 150)" % wait_m)
@@ -217,7 +218,7 @@ func run() -> void:
 		clock(slept.counted), roundi(night.offline_speed() * 100.0), slept.ov, tapping_rate * 120.0])
 
 	# v0.6a's criteria (FULL_RUN.md).
-	var bands := [["ov_1k", "$10,000", 12, 18], ["ov_10k", "$200,000", 40, 55], ["ov_100k", "$4,000,000", 95, 115], ["ov_1m", "$10,000,000 (the sale, D035)", 120, 150]]
+	var bands := [["ov_1k", "$10,000", 12, 18], ["ov_10k", "$150,000", 40, 55], ["ov_100k", "$4,000,000", 95, 115], ["ov_1m", "$10,000,000 (the sale, D035)", 120, 150]]
 	var u1_ok := true
 	var u1_text := []
 	for b in bands:

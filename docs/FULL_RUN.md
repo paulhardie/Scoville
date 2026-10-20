@@ -4,7 +4,7 @@ Everything a first run needs to reach the £1,000,000 Prestige line in about 3 h
 
 Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedures) is v0.6b ([D028](DECISIONS.md)). It needs G8 and G16 from the owner, and a run that actually reaches £1M to test it on.
 
-Status: **built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. **Built: every criterion passes** (U1–U9, and every earlier F, N, M, E, P and T criterion; M6 retired by D032). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
+Status: **built.** The ladder and its sauces are accepted (D023, D029). Stage 1 is in: the data, the fork rule and the Pantry's effects, against V1–V7 below. **Built: every criterion passes** (U1–U9, and every earlier F, N, M, E, P and T criterion; M6 retired by D032) as built in v0.6a. Since then D035 moved money to dollars, U1's last band and U8, and D036 retired M2 and moved N5's bar: the current record is [ECONOMY.md](ECONOMY.md#results-v06c) (38 criteria, all PASS). Numbers marked GUESS get tuned against those; recipes and the brief's bottle values don't.
 
 Since D035 the values here are history: money is dollars at Idle Planet Miner's values, and U1's last band and U8 moved ([ECONOMY.md](ECONOMY.md#v06c-idle-planet-miners-values-in-dollars-d035)).
 
@@ -168,7 +168,7 @@ W4 (the player buys the cheapest upgrade, not the bottleneck) is a risk here: wi
 
 ### Results (v0.6a)
 
-**All pass:** `pacing_tests.gd` (39 criteria) and `offline_tests.gd` (U9). F1–F8, N1–N8, M1–M5 and M7, E1–E6, P1–P2 and T4 all still pass.
+**All pass** as of v0.6a (history; current record in [ECONOMY.md](ECONOMY.md#results-v06c)): `pacing_tests.gd` (39 criteria) and `offline_tests.gd` (U9). F1–F8, N1–N8, M1–M5 and M7, E1–E6, P1–P2 and T4 all still passed then.
 
 | Id | Result |
 | --- | --- |

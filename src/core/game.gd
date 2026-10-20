@@ -748,8 +748,9 @@ func scarcest_cost(node: String) -> Array:
 
 
 ## Standard Operating Procedures (D034): nodes the player could research whose
-## cost is under the bar research themselves, free, in file order. Forks are
-## the player's choice.
+## cost is under the bar research themselves in file order, paying the cost's
+## worth from cash (D039); short of cash, a node waits. Forks are the player's
+## choice.
 func _sop() -> void:
 	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * bottle_rate()
 	var due := []
@@ -757,10 +758,13 @@ func _sop() -> void:
 		if data.tech[node].excludes.is_empty() and research_reachable(node) and tech_cost_value(node) < bar:
 			due.append(node)
 	for node in due:
-		_grant(node)
+		var price := tech_cost_value(node)
+		if cash + EPSILON >= price:
+			cash = maxf(0.0, cash - price)
+			_grant(node)
 
 
-## Marks a node researched and applies it; the caller has paid, or SOP waived it.
+## Marks a node researched and applies it; the caller has paid.
 func _grant(node: String) -> void:
 	research[node] = true
 	stats.researched += 1

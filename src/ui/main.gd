@@ -1308,7 +1308,7 @@ func _effect_text(node: Dictionary) -> String:
 		elif e.has("smart_stockpiling"):
 			out.append("Pin a node to hold back the bottles, mash and crops it needs.")
 		elif e.has("sop"):
-			out.append("Any node costing under 5% of an hour's bottles researches itself, free. Either/or nodes stay your choice.")
+			out.append("Any node costing under 5% of an hour's bottles researches itself, paid from cash at what its cost is worth. Either/or nodes stay your choice.")
 		elif e.has("market_ticker"):
 			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
 		elif e.has("forage"):

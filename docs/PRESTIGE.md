@@ -118,7 +118,7 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 
 ## The second run (W17)
 
-Status: **measured: all PASS** with SOP's bar at 5% (D038; at 1% Y2 failed). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
+Status: **measured three ways** (below). Now, with SOP paying cash (D039): **2 of 4 PASS** (Y2 and Y4 FAIL, W25). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
 
 ### The player's policy (assumed)
 
@@ -141,13 +141,16 @@ Reported, not judged: run 1's credits at 3:00, the rooms bought, and run 2's Ope
 
 Run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operation Value $117M). The player opens Cooperage, Fermentation Cellar and Glassworks (5 + 10 + 15 credits) and has 1 left.
 
-| Id | At SOP 1% (first measured) | At SOP 5% (D038, now) |
-| --- | --- | --- |
-| Y1 | PASS: the sale at 1:33:44, 73% of run 1 | **PASS:** the sale at 56:50, 44% of run 1 |
-| Y2 | FAIL: 32 nodes, the first 16½ minutes after SOP | **PASS:** 67 nodes, the first 19 s after SOP (16:38 → 16:57) |
-| Y3 | PASS: the first Scorpion Sting at 2:22:31 | **PASS:** at 1:23:42 |
-| Y4 | PASS: longest wait 256 s | **PASS:** 89 s |
+| Id | SOP 1%, free (first) | SOP 5%, free (D038) | SOP 5%, paying cash (D039, now) |
+| --- | --- | --- | --- |
+| Y1 | PASS: the sale at 1:33:44, 73% of run 1 | PASS: 56:50, 44% | **PASS:** 1:47:35, 84% |
+| Y2 | FAIL: 32 nodes, the first 16½ min after SOP | PASS: 67 nodes, the first 19 s after | **FAIL:** 22 nodes, the first 17 min after (33:41) |
+| Y3 | PASS: the first Scorpion Sting at 2:22:31 | PASS: 1:23:42 | **PASS:** 2:40:40 |
+| Y4 | PASS: longest wait 256 s | PASS: 89 s | **FAIL:** 328 s |
+| Run 2 at 3:00 | $662M | $1.69B | $345M |
 
 **Why Y2 failed at 1%:** by the time SOP was bought, the player had researched every node cheap enough, and the next (Double-Tap, 15 Bistro Verde, $6,375) was over a bar of about $700.
 
 **What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounded this (Y1 only asks for faster, not how much faster): W24.
+
+**Why paying cash fails Y2 and Y4:** the pacing player spends all its cash on stations and upgrades the moment it can, so SOP almost never finds cash to pay with; it researches less than at 1% free, and later. A real player spends much the same way. Paying in items instead fails the same way through Auto-Sell (W25).

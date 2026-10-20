@@ -60,6 +60,27 @@ const SIZE_WEB := 13
 const WEB_LINE := Color("#ffffff30")
 const WEB_LINE_DONE := Color("#10b981")
 
+# --- Layout step 1 (docs/LAYOUT.md) ------------------------------------------
+## A bottle's pop over Sell Batch: at most this many a second, how far it rises
+## and how long it shows.
+const POPS_PER_SECOND := 4.0
+const POP_RISE := 36.0
+const POP_SECONDS := 0.9
+## A sale's coin, flying from Sell Batch to Cash.
+const COINS_PER_SECOND := 3.0
+const COIN_SECONDS := 0.45
+const COIN_SIZE := 14.0
+const COIN := Color("#fbbf24")
+## Cash counts up to a rise of at least COUNT_UP_FROM over COUNT_UP seconds;
+## smaller rises show at once.
+const COUNT_UP := 0.35
+const COUNT_UP_FROM := 100.0
+## The goal bar and the one-line stock strip under the status bar.
+const GOAL_TOP := 8.0
+const STRIP_TOP := 36.0
+## The station sheet and the warehouse drawer, over the bottom of the screen.
+const SHEET_FRACTION := 0.55
+
 ## Motion, in seconds.
 const PRESS_SQUASH := 0.12
 const FADE_IN := 0.6

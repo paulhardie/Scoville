@@ -21,7 +21,7 @@ const SAVE_VERSION := 8
 ## as 0.8 s despite float rounding.
 const EPSILON := 1e-6
 
-const TABS := ["farms", "processing", "tech", "roster", "hq"]
+const TABS := ["farms", "processing", "tech", "market", "roster", "hq"]
 const PLOT_UPGRADES := ["speed", "yield", "quality"]
 
 var data: Dictionary
@@ -228,6 +228,9 @@ func nav_shown() -> bool:
 func tab_open(tab: String) -> bool:
 	if tab == "farms":
 		return revealed.deck
+	# Market holds the Delivery Van's levers, so it opens with the Van (LAYOUT.md).
+	if tab == "market":
+		return revealed.deck and has_van()
 	if not tab in T.TABS_BUILT:
 		return false
 	return account.best_ov >= T.TAB_THRESHOLDS[tab] - EPSILON
@@ -280,9 +283,11 @@ func quality_chance(crop: String) -> float:
 
 
 ## "speed", "yield" or "quality".
-func plot_upgrade_cost(crop: String, upgrade: String) -> float:
+## A plot upgrade's price, `ahead` levels past its current one (for buying
+## several at once, LAYOUT.md).
+func plot_upgrade_cost(crop: String, upgrade: String, ahead: int = 0) -> float:
 	var scale := pow(maxf(plot_price(crop), T.PLOT_PRICE_REFERENCE) / T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER)
-	var lv: int = plots[crop][upgrade]
+	var lv: int = plots[crop][upgrade] + ahead
 	match upgrade:
 		"speed":
 			return T.PLOT_SPEED_COST * scale * pow(T.PLOT_SPEED_GROWTH, lv)
@@ -332,7 +337,7 @@ func can_buy_slot(station: String) -> bool:
 	return slot_offered(station) and cash >= slot_price(station)
 
 
-func slot_upgrade_cost(station: String, index: int) -> float:
+func slot_upgrade_cost(station: String, index: int, ahead: int = 0) -> float:
 	var ref := T.VAT_PRICE_REFERENCE if station == "vat" else T.LINE_PRICE_REFERENCE
 	var scale := pow(maxf(data.slots[station].prices[index], ref) / ref, T.COST_SCALE_POWER)
 	# D031: a slot's upgrades are also priced by what it makes, so a slot
@@ -341,7 +346,7 @@ func slot_upgrade_cost(station: String, index: int) -> float:
 	if recipe != "":
 		var ref_item: String = T.VAT_VALUE_REFERENCE if station == "vat" else T.LINE_VALUE_REFERENCE
 		scale = maxf(scale, pow(value(data.recipes[recipe].output) / value(ref_item), T.COST_SCALE_POWER))
-	var lv: int = slots(station)[index].speed
+	var lv: int = slots(station)[index].speed + ahead
 	if station == "vat":
 		return T.VAT_SPEED_COST * scale * pow(T.VAT_SPEED_GROWTH, lv)
 	return T.LINE_SPEED_COST * scale * pow(T.LINE_SPEED_GROWTH, lv)
@@ -349,6 +354,50 @@ func slot_upgrade_cost(station: String, index: int) -> float:
 
 func can_upgrade_slot(station: String, index: int) -> bool:
 	return index >= 0 and index < slots(station).size() and cash >= slot_upgrade_cost(station, index)
+
+
+# --- Reading: buying several levels at once (LAYOUT.md L2) ---------------------
+
+## The price of the next `n` levels of a plot upgrade together (INF past a cap).
+func plot_upgrade_cost_n(crop: String, upgrade: String, n: int) -> float:
+	var total := 0.0
+	for i in n:
+		total += plot_upgrade_cost(crop, upgrade, i)
+	return total
+
+
+func slot_upgrade_cost_n(station: String, index: int, n: int) -> float:
+	var total := 0.0
+	for i in n:
+		total += slot_upgrade_cost(station, index, i)
+	return total
+
+
+## How many levels of a plot upgrade cash covers now (Max), up to BULK_MAX.
+func plot_levels_affordable(crop: String, upgrade: String) -> int:
+	if not plots.has(crop) or not plots[crop].owned:
+		return 0
+	var n := 0
+	var total := 0.0
+	while n < T.BULK_MAX:
+		total += plot_upgrade_cost(crop, upgrade, n)
+		if total > cash + EPSILON:
+			break
+		n += 1
+	return n
+
+
+func slot_levels_affordable(station: String, index: int) -> int:
+	if index < 0 or index >= slots(station).size():
+		return 0
+	var n := 0
+	var total := 0.0
+	while n < T.BULK_MAX:
+		total += slot_upgrade_cost(station, index, n)
+		if total > cash + EPSILON:
+			break
+		n += 1
+	return n
 
 
 func recipe_unlocked(recipe: String) -> bool:
@@ -575,6 +624,17 @@ func upgrade_plot(crop: String, upgrade: String) -> bool:
 	return true
 
 
+## Buys `n` levels at once, or none if cash doesn't cover all of them. Returns
+## the levels bought.
+func upgrade_plot_n(crop: String, upgrade: String, n: int) -> int:
+	if n < 1 or n > plot_levels_affordable(crop, upgrade):
+		return 0
+	# One payment for all of them, so rounding can't stop the last level.
+	cash = maxf(0.0, cash - plot_upgrade_cost_n(crop, upgrade, n))
+	plots[crop][upgrade] += n
+	return n
+
+
 ## Buys the next vat or line slot. It starts on the station's first recipe
 ## (Sweet Pepper Mash, Table Mild); the first line comes with the Starter Crate.
 func buy_slot(station: String) -> bool:
@@ -595,6 +655,14 @@ func upgrade_slot(station: String, index: int) -> bool:
 	cash -= slot_upgrade_cost(station, index)
 	slots(station)[index].speed += 1
 	return true
+
+
+func upgrade_slot_n(station: String, index: int, n: int) -> int:
+	if n < 1 or n > slot_levels_affordable(station, index):
+		return 0
+	cash = maxf(0.0, cash - slot_upgrade_cost_n(station, index, n))
+	slots(station)[index].speed += n
+	return n
 
 
 ## Sets a slot's recipe, or "" to switch it off. Inputs already taken for the
@@ -648,6 +716,35 @@ func tech_cost_value(node: String) -> float:
 	for item in cost:
 		v += cost[item] * value(item)
 	return v
+
+
+## The goal bar's node (LAYOUT.md): the pinned one, or else the reachable node
+## whose cost is worth least; "" when nothing is reachable.
+func goal_node() -> String:
+	if pin != "" and research_reachable(pin):
+		return pin
+	var best := ""
+	var best_value := INF
+	for node in data.tech_order:
+		if research_reachable(node):
+			var v := tech_cost_value(node)
+			if v < best_value:
+				best = node
+				best_value = v
+	return best
+
+
+## The cost item a node is furthest from: [item, have, need], or [] if it's free.
+func scarcest_cost(node: String) -> Array:
+	var cost: Dictionary = tech_cost(node)
+	var out := []
+	var share := INF
+	for item in cost:
+		var s: float = float(stock[item]) / cost[item]
+		if s < share:
+			share = s
+			out = [item, stock[item], cost[item]]
+	return out
 
 
 ## Standard Operating Procedures (D034): nodes the player could research whose

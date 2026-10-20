@@ -9,7 +9,9 @@ const RealClock = preload("res://src/core/real_clock.gd")
 const T = preload("res://src/core/tuning.gd")
 const S = preload("res://src/ui/style.gd")
 
-const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "roster": "Shift Roster", "hq": "HQ"}
+const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "market": "Market", "roster": "Shift Roster", "hq": "HQ"}
+const MONEY_SUFFIXES := ["K", "M", "B", "T", "Qa", "Qi"]
+const BUY_MODES := ["1", "10", "max"]
 const STATION_NAMES := {"vat": "Vat", "line": "Line"}
 const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "quality": "Crop Quality"}
 ## Steps for the valve's keep amounts.
@@ -20,7 +22,7 @@ var save_path := "user://save.json"
 ## Sound and vibration switches (docs/FEEL.md), kept apart from the game save.
 ## Tests clear the path too.
 var settings_path := "user://settings.json"
-var settings := {"sound": true, "vibration": true}
+var settings := {"sound": true, "vibration": true, "buy_mode": "1"}
 ## Clicks played and vibrations asked for, and the last click's pitch, for tests.
 var clicks_played := 0
 var vibrations := 0
@@ -79,6 +81,27 @@ var _selected := "kitchen_table"
 var _detail := {}
 var _hq := {}                       # the HQ page's nodes (docs/PRESTIGE.md)
 var _sell_armed := false            # the first tap on Sell the Franchise
+# Layout step 1 (docs/LAYOUT.md).
+var _goal: Label
+var _shown_cash := 0.0
+var _countup := {"from": 0.0, "to": 0.0, "t": 1.0}   # Cash's count-up
+var _frame_delta := 0.0
+var _sheet: Control
+var _sheet_box: VBoxContainer
+var _sheet_of := {}                  # {kind: "plot"/"slot", crop / station, index}
+var _sheet_buttons := {}             # upgrade → Button
+var _mode_buttons := {}              # buy mode → Button
+var _drawer: Control
+var _drawer_box: VBoxContainer
+var _market_col: VBoxContainer
+var _demand: Label
+var _made_seen := {}                 # bottle → made, at the last look
+var _earned_seen := -1.0
+var _pending_pop := {}               # bottle → made since the last pop
+var _pop_wait := 0.0
+var _coin_wait := 0.0
+var pops_shown := 0
+var coins_flown := 0
 
 
 ## The Tech Tree's connecting lines, drawn under the node buttons.
@@ -94,6 +117,8 @@ func _ready() -> void:
 	game = Game.new({}, int(clock.now()))
 	_load()
 	_load_settings()
+	_shown_cash = game.cash
+	_countup = {"from": game.cash, "to": game.cash, "t": 1.0}
 	_build()
 	if _saved_at > 0.0:
 		_return_from(clock.now() - _saved_at)
@@ -116,7 +141,10 @@ func _process(delta: float) -> void:
 	_since_save += delta
 	if _since_save >= T.AUTOSAVE_SECONDS:
 		_save()
+	_frame_delta = delta
+	_juice(delta)
 	_refresh(true)
+	_frame_delta = 0.0
 
 
 func _notification(what: int) -> void:
@@ -129,6 +157,8 @@ func _return_from(seconds: float) -> void:
 	if seconds <= 0.0:
 		return
 	var report := game.catch_up(seconds)
+	# What was made while away is on the card, not in a pop.
+	_rebase_juice()
 	if seconds > T.RETURN_CARD_SECONDS:
 		last_return = report
 		_show_card(report)
@@ -174,6 +204,10 @@ func _build() -> void:
 	_build_nav()
 	_build_upper()
 	_build_status_bar()
+	_sheet = _build_overlay("Sheet")
+	_sheet_box = _sheet.get_meta("box")
+	_drawer = _build_overlay("Drawer")
+	_drawer_box = _drawer.get_meta("box")
 	_build_card()
 
 
@@ -208,6 +242,8 @@ func _build_deck() -> void:
 
 	_processing_col = _page_column(holder, "processing")
 	_build_tech(holder)
+	_market_col = _page_column(holder, "market")
+	_build_market(_market_col)
 	_build_hq(_page_column(holder, "hq"))
 
 
@@ -393,8 +429,10 @@ func _load_settings() -> void:
 	var parsed: Variant = JSON.parse_string(FileAccess.get_file_as_string(settings_path))
 	if typeof(parsed) == TYPE_DICTIONARY:
 		for key in settings:
-			if typeof(parsed.get(key)) == TYPE_BOOL:
+			if typeof(parsed.get(key)) == typeof(settings[key]):
 				settings[key] = parsed[key]
+		if not settings.buy_mode in BUY_MODES:
+			settings.buy_mode = "1"
 
 
 func _save_settings() -> void:
@@ -426,6 +464,24 @@ func _build_processing(parent: VBoxContainer) -> void:
 	od_row.add_child(od_button)
 	_overdrive = {"card": od, "status": od_status, "button": od_button}
 
+	for station in ["vat", "line"]:
+		var list := VBoxContainer.new()
+		list.add_theme_constant_override("separation", 12)
+		parent.add_child(list)
+		_slot_lists[station] = list
+		var b := _control_button("", func() -> void: game.buy_slot(station))
+		b.name = "BuySlot_" + station
+		parent.add_child(b)
+		_buy_slot[station] = b
+
+
+## The Market tab (LAYOUT.md): every money lever in one place: demand spikes,
+## the Delivery Van's Auto-Sell and the Raw Overflow Valve.
+func _build_market(parent: VBoxContainer) -> void:
+	var demand := _card(parent, "DemandCard", "Demand")
+	demand.bar.visible = false
+	demand.info.text = "Market Ticker spikes show here."
+	_demand = demand.info
 	# The Raw Overflow Valve's keep amounts, one row per crop and mash (D014).
 	_valve_card = PanelContainer.new()
 	_valve_card.name = "ValveCard"
@@ -484,19 +540,9 @@ func _build_processing(parent: VBoxContainer) -> void:
 		slider.value_changed.connect(func(v: float) -> void: game.set_autosell(item, int(v)))
 		row.add_child(slider)
 		_van_rows[item] = {"row": row, "slider": slider, "label": l}
+	# Auto-Sell comes before the valve: it's the lever used most.
+	parent.move_child(_van_card, _valve_card.get_index())
 
-	for station in ["vat", "line"]:
-		var list := VBoxContainer.new()
-		list.add_theme_constant_override("separation", 12)
-		parent.add_child(list)
-		_slot_lists[station] = list
-		var b := _control_button("", func() -> void: game.buy_slot(station))
-		b.name = "BuySlot_" + station
-		parent.add_child(b)
-		_buy_slot[station] = b
-	# The vats and lines come first; the Van's sliders and the valve after them.
-	parent.move_child(_van_card, -1)
-	parent.move_child(_valve_card, -1)
 
 
 ## The Tech Tree page: the web pans in both directions above a fixed panel for
@@ -683,7 +729,24 @@ func _build_upper() -> void:
 	_counter.offset_right = -S.GUTTER
 	_counter.offset_top = S.STATUS_BAR_HEIGHT + 14
 	_counter.offset_bottom = _counter.offset_top + 64
+	# Once the nav bar is out, tapping the stock opens the warehouse drawer.
+	_counter.mouse_filter = Control.MOUSE_FILTER_STOP
+	_counter.gui_input.connect(func(e: InputEvent) -> void:
+		if game.nav_shown() and (e is InputEventMouseButton or e is InputEventScreenTouch) and e.pressed:
+			open_drawer())
 	add_child(_counter)
+
+	# The goal bar (LAYOUT.md): what the run is working towards, from Stage 3.
+	_goal = _label("", S.SIZE_TINY, S.ORANGE)
+	_goal.name = "Goal"
+	_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_goal.clip_text = true
+	_goal.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
+	_goal.offset_left = S.GUTTER
+	_goal.offset_right = -S.GUTTER
+	_goal.offset_top = S.STATUS_BAR_HEIGHT + S.GOAL_TOP
+	_goal.offset_bottom = _goal.offset_top + 24
+	add_child(_goal)
 
 
 func _build_status_bar() -> void:
@@ -801,18 +864,16 @@ static func _duration(seconds: float) -> String:
 	return "%d s" % s
 
 
-## A plot's card: what it grows, a cycle bar, then its buy button or upgrades.
+## A plot's card: what it grows, a cycle bar, then its buy button, or Manage
+## for its upgrades (the station sheet, LAYOUT.md).
 func _plot_card(parent: Container, crop: String) -> Dictionary:
 	var nodes := _card(parent, "Card_plot_" + crop, game.data.plots[crop].name)
 	nodes.buy = _control_button("", func() -> void: game.buy_plot(crop))
 	nodes.buy.name = "Buy_plot_" + crop
 	nodes.col.add_child(nodes.buy)
-	for upgrade in UPGRADE_NAMES:
-		var b := _control_button("", func() -> void: game.upgrade_plot(crop, upgrade))
-		b.name = "Upgrade_plot_%s_%s" % [crop, upgrade]
-		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
-		nodes.col.add_child(b)
-		nodes[upgrade] = b
+	nodes.manage = _control_button("Manage", func() -> void: open_sheet({"kind": "plot", "crop": crop}))
+	nodes.manage.name = "Manage_plot_" + crop
+	nodes.col.add_child(nodes.manage)
 	return nodes
 
 
@@ -830,10 +891,9 @@ func _slot_card(station: String, index: int) -> Dictionary:
 	nodes.col.move_child(picker, 1)
 	nodes.picker = picker
 	nodes.recipes = []
-	nodes.speed = _control_button("", func() -> void: game.upgrade_slot(station, index))
-	nodes.speed.name = "Upgrade_%s_%d" % [station, index]
-	nodes.speed.alignment = HORIZONTAL_ALIGNMENT_LEFT
-	nodes.col.add_child(nodes.speed)
+	nodes.manage = _control_button("Manage", func() -> void: open_sheet({"kind": "slot", "station": station, "index": index}))
+	nodes.manage.name = "Manage_%s_%d" % [station, index]
+	nodes.col.add_child(nodes.manage)
 	return nodes
 
 
@@ -904,7 +964,7 @@ func _on_tab(tab: String) -> void:
 			_centre_web.call_deferred()
 	else:
 		var at: float = T.TAB_THRESHOLDS.get(tab, INF)
-		_hint.text = "Opens at %s Operation Value%s" % [_money(at), "" if tab in T.TABS_BUILT else ", in a later version"]
+		_hint.text = "Opens with The Delivery Van (Tech Tree)" if tab == "market" else "Opens at %s Operation Value%s" % [_money(at), "" if tab in T.TABS_BUILT else ", in a later version"]
 		_hint.modulate.a = 1.0
 		create_tween().tween_property(_hint, "modulate:a", 0.0, 0.6).set_delay(1.6)
 	_refresh(true)
@@ -916,13 +976,21 @@ func _on_tab(tab: String) -> void:
 func _refresh(animate: bool) -> void:
 	_counter.text = _stock_text()
 	_counter.add_theme_font_size_override("font_size", S.SIZE_TINY if game.nav_shown() else S.SIZE_BODY)
-	_cash.text = "Cash: " + _money(game.cash)
+	# From Stage 3 the stock is one line under the goal bar.
+	_counter.max_lines_visible = 1 if game.nav_shown() else S.STOCK_LINES
+	_counter.offset_top = S.STATUS_BAR_HEIGHT + (S.STRIP_TOP if game.nav_shown() else 14.0)
+	_goal.visible = game.nav_shown()
+	_goal.text = _goal_text()
+	_count_cash()
+	_cash.text = "Cash: " + _money(_shown_cash)
 	_ov.visible = game.nav_shown()
 	_ov.text = "Operation Value " + _money(game.operation_value())
 	_spike.visible = game.ticker.sauce != ""
 	if _spike.visible:
 		var left: float = (game.ticker.ends - game.stats.ticks) * T.TICK_SECONDS
 		_spike.text = "%s ×%d · %d min left" % [game.data.items[game.ticker.sauce].short, int(game.ticker.mult), ceili(left / 60.0)]
+	_demand.text = ("%s sells for ×%d now." % [game.data.items[game.ticker.sauce].name, int(game.ticker.mult)]) if _spike.visible \
+		else ("Calm: no spike now. Spikes come about once an hour." if game.fx.ticker else "The Market Ticker (Tech Tree) brings demand spikes.")
 	var heat_on: bool = game.fx.heat and game.revealed.deck
 	_heat_bar.visible = heat_on
 	_heat_label.visible = heat_on
@@ -952,6 +1020,10 @@ func _refresh(animate: bool) -> void:
 		_refresh_hq()
 	else:
 		_sell_armed = false
+	if _sheet.visible:
+		_refresh_sheet()
+	if _drawer.visible:
+		_refresh_drawer()
 	for tab in _tab_buttons:
 		var b: Button = _tab_buttons[tab]
 		var open := game.tab_open(tab)
@@ -992,14 +1064,12 @@ func _stock_text() -> String:
 		for p in parts:
 			long.append("%s: %d" % [game.data.items[p[0]].plural, p[1]])
 		return "   ".join(long)
-	# A crowded factory (v0.6a has 30 items): Bell Peppers, then what's in
-	# stock, bottles first, then mash, then crops. The label shows at most
-	# STOCK_LINES lines, so the least important fall off the end.
+	# A crowded factory: Bell Peppers and the bottles in stock, on one line;
+	# everything else is in the warehouse drawer (LAYOUT.md).
 	var short := []
-	for kind in ["bottle", "mash", "crop"]:
-		for p in parts:
-			if p[0] != "bell" and p[1] > 0 and game.data.items[p[0]].kind == kind:
-				short.append("%s %s" % [game.data.items[p[0]].short, _count(p[1])])
+	for p in parts:
+		if p[1] > 0 and game.data.items[p[0]].kind == "bottle":
+			short.append("%s %s" % [game.data.items[p[0]].short, _count(p[1])])
 	short.push_front("%s %s" % [game.data.items.bell.short, _count(game.stock.bell)])
 	return "  ·  ".join(short)
 
@@ -1021,14 +1091,11 @@ func _refresh_plot(crop: String) -> void:
 	nodes.buy.visible = not p.owned
 	nodes.buy.text = "Buy   %s" % _money(game.plot_price(crop))
 	nodes.buy.disabled = not game.can_buy_plot(crop)
+	nodes.manage.visible = p.owned
+	var ready := false
 	for upgrade in UPGRADE_NAMES:
-		var b: Button = nodes[upgrade]
-		b.visible = p.owned
-		var cost := game.plot_upgrade_cost(crop, upgrade)
-		b.text = "%s   Lv %d   %s" % [UPGRADE_NAMES[upgrade], p[upgrade], _money(cost) if cost < INF else "max"]
-		if upgrade == "quality" and p.quality > 0:
-			b.text += "   (%d%% double)" % roundi(game.quality_chance(crop) * 100.0)
-		b.disabled = not game.can_upgrade_plot(crop, upgrade)
+		ready = ready or game.can_upgrade_plot(crop, upgrade)
+	nodes.manage.text = "Manage   !" if ready else "Manage"
 
 
 func _refresh_processing() -> void:
@@ -1119,8 +1186,7 @@ func _refresh_slot(station: String, i: int) -> void:
 		status = "Starter Crate: %d bottles left at %d× speed" % [s.crate, int(T.STARTER_CRATE_SPEED)]
 	nodes.status.text = status
 	nodes.status.visible = status != ""
-	nodes.speed.text = "Speed   Lv %d   %s" % [s.speed, _money(game.slot_upgrade_cost(station, i))]
-	nodes.speed.disabled = not game.can_upgrade_slot(station, i)
+	nodes.manage.text = "Manage   !" if game.can_upgrade_slot(station, i) else "Manage"
 
 
 func _refresh_tech() -> void:
@@ -1289,6 +1355,286 @@ func _reveal(key: String, node: Control, on: bool, animate: bool, entrance: Call
 	_shown[key] = on
 
 
+# --- Layout step 1 (docs/LAYOUT.md) ------------------------------------------
+
+## The goal bar: the next tab before the Tech Tree, then the next node; the
+## sale's progress from half way.
+func _goal_text() -> String:
+	var parts := []
+	if not game.tab_open("tech"):
+		var at: float = T.TAB_THRESHOLDS.tech
+		parts.append("Tech Tree at %s: %d%%" % [_money(at), floori(minf(game.account.best_ov / at, 1.0) * 100.0)])
+	else:
+		var node := game.goal_node()
+		if node != "":
+			var scarce := game.scarcest_cost(node)
+			var name: String = _short_name(game.data.tech[node].name)
+			if scarce.is_empty():
+				parts.append("Next: %s, free" % name)
+			else:
+				parts.append("Next: %s, %s/%s %s" % [name, _count(mini(scarce[1], scarce[2])), _count(scarce[2]), game.data.items[scarce[0]].short])
+	var sale := game.operation_value() / T.PRESTIGE_OV
+	if sale >= 1.0:
+		parts.append("Sale ready")
+	elif sale >= 0.5:
+		parts.append("Sale %d%%" % floori(sale * 100.0))
+	return "  ·  ".join(parts)
+
+
+## Cash on screen counts up to a rise of COUNT_UP_FROM or more over COUNT_UP
+## seconds; a smaller rise, or any fall (spending), shows at once.
+func _count_cash() -> void:
+	var real: float = game.cash
+	if real < _shown_cash or real - _countup.to < S.COUNT_UP_FROM and _countup.t >= 1.0:
+		_shown_cash = real
+		_countup = {"from": real, "to": real, "t": 1.0}
+		return
+	if real > _countup.to:
+		_countup = {"from": _shown_cash, "to": real, "t": 0.0}
+	_countup.t = minf(1.0, _countup.t + _frame_delta / S.COUNT_UP)
+	_shown_cash = minf(real, lerpf(_countup.from, _countup.to, _countup.t))
+	if _countup.t >= 1.0:
+		_shown_cash = real
+
+
+## A shaded overlay with a panel over the bottom of the screen, closed by a tap
+## outside it. The panel's column is the overlay's "box" meta.
+func _build_overlay(name: String) -> Control:
+	var shade := ColorRect.new()
+	shade.name = name
+	shade.color = S.SHADE
+	shade.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	shade.mouse_filter = Control.MOUSE_FILTER_STOP
+	shade.visible = false
+	shade.gui_input.connect(func(e: InputEvent) -> void:
+		if (e is InputEventMouseButton or e is InputEventScreenTouch) and e.pressed:
+			shade.visible = false)
+	add_child(shade)
+	var panel := PanelContainer.new()
+	var box := _box(S.PANEL, S.RADIUS)
+	box.set_content_margin_all(S.GUTTER)
+	box.border_color = S.LINE
+	box.border_width_top = 1
+	panel.add_theme_stylebox_override("panel", box)
+	panel.anchor_right = 1.0
+	panel.anchor_top = 1.0 - S.SHEET_FRACTION
+	panel.anchor_bottom = 1.0
+	shade.add_child(panel)
+	var scroll := ScrollContainer.new()
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	panel.add_child(scroll)
+	var col := VBoxContainer.new()
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.add_theme_constant_override("separation", 10)
+	scroll.add_child(col)
+	shade.set_meta("box", col)
+	return shade
+
+
+## Opens a station's sheet: its upgrades, bought ×1, ×10 or Max.
+func open_sheet(of: Dictionary) -> void:
+	_sheet_of = of
+	# Out of the tree at once, so the new buttons keep their names.
+	for c in _sheet_box.get_children():
+		_sheet_box.remove_child(c)
+		c.queue_free()
+	_sheet_buttons = {}
+	_mode_buttons = {}
+	var title: String = game.data.plots[of.crop].name if of.kind == "plot" else "%s %d" % [STATION_NAMES[of.station], of.index + 1]
+	_sheet_box.add_child(_label(title, S.SIZE_BODY, S.TEXT))
+	var modes := HBoxContainer.new()
+	modes.add_theme_constant_override("separation", 8)
+	_sheet_box.add_child(modes)
+	for mode in BUY_MODES:
+		var b := _small_button("Max" if mode == "max" else "×" + mode, func() -> void:
+			settings.buy_mode = mode
+			_save_settings())
+		b.name = "Mode_" + mode
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		modes.add_child(b)
+		_mode_buttons[mode] = b
+	var upgrades: Array = UPGRADE_NAMES.keys() if of.kind == "plot" else ["speed"]
+	for upgrade in upgrades:
+		var b := _control_button("", func() -> void: _buy_levels(upgrade))
+		b.name = "Upgrade_%s_%s" % ["plot_" + of.crop if of.kind == "plot" else "%s_%d" % [of.station, of.index], upgrade]
+		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
+		_sheet_box.add_child(b)
+		_sheet_buttons[upgrade] = b
+	var done := _control_button("Done", func() -> void: _sheet.visible = false)
+	done.name = "SheetDone"
+	_sheet_box.add_child(done)
+	_sheet.visible = true
+	_sheet.move_to_front()
+	_refresh_sheet()
+
+
+## Levels the buy mode would buy of an upgrade now: 1, BULK_LEVELS, or as many
+## as cash covers; 0 when that many aren't affordable.
+func _levels(upgrade: String) -> int:
+	var can: int = game.plot_levels_affordable(_sheet_of.crop, upgrade) if _sheet_of.kind == "plot" else game.slot_levels_affordable(_sheet_of.station, _sheet_of.index)
+	match settings.buy_mode:
+		"10":
+			return T.BULK_LEVELS if can >= T.BULK_LEVELS else 0
+		"max":
+			return can
+	return 1 if can >= 1 else 0
+
+
+func _buy_levels(upgrade: String) -> void:
+	var n := _levels(upgrade)
+	if _sheet_of.kind == "plot":
+		game.upgrade_plot_n(_sheet_of.crop, upgrade, n)
+	else:
+		game.upgrade_slot_n(_sheet_of.station, _sheet_of.index, n)
+
+
+func _refresh_sheet() -> void:
+	# A sale can take the station away under an open sheet.
+	if _sheet_of.kind == "slot" and _sheet_of.index >= game.slots(_sheet_of.station).size() \
+			or _sheet_of.kind == "plot" and not game.plots[_sheet_of.crop].owned:
+		_sheet.visible = false
+		return
+	for mode in _mode_buttons:
+		_mode_buttons[mode].add_theme_color_override("font_color", S.ORANGE if mode == settings.buy_mode else S.TEXT)
+	for upgrade in _sheet_buttons:
+		var b: Button = _sheet_buttons[upgrade]
+		var n := _levels(upgrade)
+		var shown := n if n > 0 else (T.BULK_LEVELS if settings.buy_mode == "10" else 1)
+		var lv: int
+		var cost: float
+		var name: String
+		if _sheet_of.kind == "plot":
+			lv = game.plots[_sheet_of.crop][upgrade]
+			cost = game.plot_upgrade_cost_n(_sheet_of.crop, upgrade, shown)
+			name = UPGRADE_NAMES[upgrade]
+		else:
+			lv = game.slots(_sheet_of.station)[_sheet_of.index].speed
+			cost = game.slot_upgrade_cost_n(_sheet_of.station, _sheet_of.index, shown)
+			name = "Speed"
+		if cost < INF:
+			b.text = "%s   Lv %d → %d   %s" % [name, lv, lv + shown, _money(cost)]
+		elif upgrade == "quality" and lv < T.CROP_QUALITY_MAX:
+			b.text = "%s   Lv %d   only %d left" % [name, lv, T.CROP_QUALITY_MAX - lv]
+		else:
+			b.text = "%s   Lv %d   max" % [name, lv]
+		if upgrade == "quality" and lv > 0:
+			b.text += "   (%d%% double)" % roundi(game.quality_chance(_sheet_of.crop) * 100.0)
+		b.disabled = n == 0
+
+
+## The warehouse: everything the run has had, by kind, with counts and worth.
+func open_drawer() -> void:
+	_drawer.visible = true
+	_drawer.move_to_front()
+	_refresh_drawer()
+
+
+func _refresh_drawer() -> void:
+	var lines := []
+	for kind in ["bottle", "mash", "crop"]:
+		var rows := []
+		for item in game.data.items:
+			var seen: bool = game.stock[item] > 0 or game.stats.made[item] > 0 or game.stats.harvested[item] > 0
+			if game.data.items[item].kind == kind and seen:
+				rows.append("%s   %s   %s" % [game.data.items[item].plural, _count(game.stock[item]), _money(game.stock[item] * game.appraisal(item))])
+		if not rows.is_empty():
+			lines.append({"head": {"bottle": "Bottles", "mash": "Mash", "crop": "Crops"}[kind], "rows": rows})
+	var want := ["Warehouse"]
+	for l in lines:
+		want.append(l.head)
+		want.append_array(l.rows)
+	# Rebuilt only when what it lists changes, so a tap doesn't land on a moving row.
+	if _drawer_box.get_meta("rows", []) == want:
+		return
+	_drawer_box.set_meta("rows", want)
+	for c in _drawer_box.get_children():
+		_drawer_box.remove_child(c)
+		c.queue_free()
+	_drawer_box.add_child(_label("Warehouse", S.SIZE_BODY, S.TEXT))
+	for l in lines:
+		_drawer_box.add_child(_label(l.head.to_upper(), S.SIZE_TINY, S.DIM))
+		for r in l.rows:
+			var row := _label(r, S.SIZE_SMALL, S.TEXT)
+			row.name = "Ware_" + str(_drawer_box.get_child_count())
+			_drawer_box.add_child(row)
+
+
+## Counts from now on: nothing made or earned before this pops or flies.
+func _rebase_juice() -> void:
+	_made_seen = {}
+	_pending_pop = {}
+	_earned_seen = -1.0
+
+
+## A bottle lands: a pop over Sell Batch for bottles made, and a coin to Cash
+## for money from a sale, each held to its rate.
+func _juice(delta: float) -> void:
+	_pop_wait = maxf(0.0, _pop_wait - delta)
+	_coin_wait = maxf(0.0, _coin_wait - delta)
+	for item in game.data.items:
+		if game.data.items[item].kind != "bottle":
+			continue
+		var made: int = game.stats.made[item]
+		var before: int = _made_seen.get(item, made)
+		if made > before:
+			_pending_pop[item] = _pending_pop.get(item, 0) + made - before
+		_made_seen[item] = made
+	if not _pending_pop.is_empty() and _pop_wait <= 0.0 and _sell_batch.visible:
+		_pop(_pending_pop)
+		_pending_pop = {}
+		_pop_wait = 1.0 / S.POPS_PER_SECOND
+	var earned: float = game.stats.cash_earned
+	if _earned_seen >= 0.0 and earned > _earned_seen + EPS_MONEY and _coin_wait <= 0.0 and _sell_batch.visible:
+		_coin()
+		_coin_wait = 1.0 / S.COINS_PER_SECOND
+	_earned_seen = earned
+
+
+const EPS_MONEY := 0.001
+
+
+func _pop(made: Dictionary) -> void:
+	# The most valuable sauce names the pop; the rest add to its value.
+	var best := ""
+	var total := 0.0
+	var count := 0
+	for item in made:
+		total += made[item] * game.value(item)
+		count += made[item]
+		if best == "" or game.value(item) > game.value(best):
+			best = item
+	var text: String = "+%d %s  %s" % [count, game.data.items[best].short, _money(total)] if made.size() == 1 else "+%d bottles  %s" % [count, _money(total)]
+	var l := _label(text, S.SIZE_SMALL, S.COIN)
+	l.name = "Pop"
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(l)
+	l.size = Vector2(S.SELL_BATCH_WIDTH * 1.6, 28)
+	var start := _sell_batch.position + Vector2((_sell_batch.size.x - l.size.x) / 2.0, -l.size.y)
+	start.x = clampf(start.x, S.GUTTER, size.x - S.GUTTER - l.size.x)
+	l.position = start
+	var t := create_tween().set_parallel()
+	t.tween_property(l, "position:y", start.y - S.POP_RISE, S.POP_SECONDS).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
+	t.tween_property(l, "modulate:a", 0.0, S.POP_SECONDS).set_ease(Tween.EASE_IN)
+	t.chain().tween_callback(l.queue_free)
+	pops_shown += 1
+
+
+func _coin() -> void:
+	var c := Panel.new()
+	c.name = "Coin"
+	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	c.add_theme_stylebox_override("panel", _box(S.COIN, 999))
+	c.size = Vector2.ONE * S.COIN_SIZE
+	add_child(c)
+	c.position = _sell_batch.position + _sell_batch.size / 2.0
+	var to := _cash.global_position + Vector2(_cash.size.x * 0.3, _cash.size.y / 2.0)
+	var t := create_tween()
+	t.tween_property(c, "position", to, S.COIN_SECONDS).set_trans(Tween.TRANS_QUAD).set_ease(Tween.EASE_IN)
+	t.tween_callback(c.queue_free)
+	coins_flown += 1
+
+
 # --- Pieces ----------------------------------------------------------------
 
 func _label(text: String, font_size: int, color: Color) -> Label:
@@ -1357,13 +1703,29 @@ static func _short_name(name: String) -> String:
 	return short.trim_prefix("The ")
 
 
-## Counts past 9,999 in thousands: 12.3k.
+## Counts past 9,999 to three figures: 12.3K, 4.50M (LAYOUT.md).
 static func _count(n: int) -> String:
-	return str(n) if n < 10000 else "%.1fk" % (n / 1000.0)
+	return str(n) if n < 10000 else _short(float(n))
 
 
-## Dollars with thousands separators: $1,234.50 (D035).
+## Three significant figures and a suffix: 12.3K, 2.93M, 757M, 1.20B.
+static func _short(x: float) -> String:
+	var k := 0
+	var v := x / 1000.0
+	while true:
+		v = x / pow(1000.0, k + 1)
+		var shown := "%.0f" % v if v >= 100.0 else ("%.1f" % v if v >= 10.0 else "%.2f" % v)
+		if float(shown) < 1000.0 or k + 1 >= MONEY_SUFFIXES.size():
+			return shown + MONEY_SUFFIXES[k]
+		k += 1
+	return ""
+
+
+## Dollars (D035): with cents under $10,000 ($1,234.50), then three figures
+## and a suffix ($12.3K, $2.93M; LAYOUT.md).
 static func _money(amount: float) -> String:
+	if absf(amount) >= 10000.0:
+		return ("-$" if amount < 0.0 else "$") + _short(absf(amount))
 	var cents := roundi(amount * 100.0)
 	var whole := str(cents / 100)
 	var grouped := ""

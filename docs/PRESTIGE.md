@@ -118,7 +118,7 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 
 ## The second run (W17)
 
-Status: **criteria written, being measured.** Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
+Status: **measured: 3 of 4 PASS** (Y2 FAILs, W23). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
 
 ### The player's policy (assumed)
 
@@ -136,3 +136,18 @@ Status: **criteria written, being measured.** Nothing measured a run after a sal
 | Y4 | From 1:50 to 3:00 of run 2, never more than 300 s without a purchase or research (as U2). |
 
 Reported, not judged: run 1's credits at 3:00, the rooms bought, and run 2's Operation Value at 3:00 and 3:15 (for W21).
+
+### Results
+
+Run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operation Value $117M). The player opens Cooperage, Fermentation Cellar and Glassworks (5 + 10 + 15 credits) and has 1 left.
+
+| Id | Result |
+| --- | --- |
+| Y1 | **PASS:** run 2 reaches the sale at 1:33:44, 73% of run 1's time |
+| Y2 | **FAIL:** Standard Operating Procedures, researched at 16:38, researches 32 nodes over the run, but the first only at 33:08, 16½ minutes later (at most 10) |
+| Y3 | **PASS:** the first Scorpion Sting at 2:22:31 |
+| Y4 | **PASS:** the longest wait from 1:50 to 3:00 is 256 s |
+
+**Why Y2 fails:** by 16:38 the player has already researched every node cheap enough. The next cheapest (Double-Tap, 15 Bistro Verde, $6,375) is over the bar (36 s of bottles, about $700 then) until the factory grows. So SOP is idle for its first quarter of an hour, then researches 32 nodes. Fixing it means a bigger bar (e.g. 5% of an hour) or SOP later in the order; either changes D034's rule, so it waits for the owner.
+
+**Late growth (W21):** run 2 is worth **$662M at 3:00 and $936M at 3:15**, 5.7× run 1 at 3:00, from three rooms. A run-2 sale at 3:00 would pay about 49 credits.

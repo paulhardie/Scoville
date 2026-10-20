@@ -2,26 +2,25 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6c and D036 (PRs #1–#15): the full first run, Prestige, Tier 6 and Standard Operating Procedures, Idle Planet Miner's values in dollars, and a green pacing suite. This branch is **layout step 1** ([LAYOUT.md](LAYOUT.md), D037), the first of three steps from the layout plan:
+Merged: v0.1–v0.6c, D036 and layout step 1 (PRs #1–#16). This branch is **W17: the second run measured** ([PRESTIGE.md](PRESTIGE.md#the-second-run-w17)). `tests/second_run_tests.gd` plays the pacing player through run 1 to 3:00, sells (31 credits), opens three rooms (Cooperage, Fermentation Cellar, Glassworks) and plays run 2.
 
-- **Readable numbers:** $2.93M, 12.3K. Cents only under $10,000.
-- **Station sheets:** each plot, vat and line card shows a Manage button (with "!" when an upgrade is affordable). It opens a sheet with its upgrades and a ×1 / ×10 / Max switch, remembered between sessions.
-- **A bottle lands:** "+1 Table Mild $50.00" pops over Sell Batch, at most 4 a second; a coin flies to Cash on sales, at most 3 a second. Cash counts up to rises of $100 or more.
-- **Goal bar** under the status bar: the way to the Tech Tree, then the next node with its scarcest item ("Next: Habanero, 5/20 Island"), then the sale from 50%.
-- **Warehouse:** the stock line is Bell Peppers and bottles only; tapping it opens every item by kind with its worth. (W15, the crowded stock line, is done.)
-- **Market tab** (opens with the Delivery Van): demand spikes, Auto-Sell and the valve, moved off Processing.
+- **Y1 PASS:** run 2 reaches the $10M sale at 1:34, 73% of run 1's 2:08.
+- **Y2 FAIL:** Standard Operating Procedures researches 32 nodes in run 2, but its first only 16½ minutes after it's bought (W23).
+- **Y3 PASS:** Tier 6's first Scorpion Sting at 2:23.
+- **Y4 PASS:** no wait over 256 s from 1:50 to 3:00.
+- **Late growth:** run 2 is worth $662M at 3:00 and $936M at 3:15 (W21).
 
-Checks: all eleven suites pass (L1–L9 new; a rounding bug in buying ten levels found and fixed); the headless boot is clean; every screen looked at with `capture_ui.gd`. **Not checked:** how the motion feels on a phone.
+The player learnt to sell and spend (`sell_and_spend`), skips after-sale nodes before a sale (so run 1 and the pacing suite are unchanged), and has a Scorpion Sting layout. Checks: all suites run; the second-run suite FAILs on Y2 only; pacing still 38/38; no screen change.
 
 ## Open decisions
 
-- **Moving the Blank Button to the foot of the screen** (step 2) changes the brief's split viewport (§2). Recommend yes, with the visual pass.
-- **W8:** step 2 needs your reference games and mood.
-- **Late growth (W21)**, and D030/D034's assumptions, as before.
+- **W23, SOP's slow start:** a bigger bar (5% of an hour of bottles instead of 1%, so Double-Tap-sized nodes fall under it early), or accept that SOP only kicks in once the factory grows. Recommend 5%: SOP's point is to take the early clicking away on repeat runs, and at 1% it doesn't touch the early tree.
+- **W21, late growth:** run 2 hits $936M by 3:15. Fine as "the reward for pushing", or cap it? Recommend leaving it until the Cook-Off (v0.8) gives big numbers somewhere to go.
+- W8 and moving the button (layout step 2), as before.
 
 ## Next
 
-1. Merge this PR, then try the phone build: the link is republished with this branch's build.
-2. W17 (a pacing player that sells and replays), or the Shift Roster (v0.7), or step 2 once W8's direction is in.
+1. Settle W23 (and so turn CI green), then merge.
+2. v0.7 Shift Roster, or layout step 2 once W8's direction is in.
 
-Touches: `main.gd` (sheets, drawer, goal bar, pops, count-up, Market page, number formats), `style.gd` (layout constants), `game.gd` (several levels at once, goal node, the Market tab's rule), `tuning.gd` (BULK_LEVELS, TABS_BUILT), tests (`layout_tests.gd` new, `ui_tests.gd`), the capture tool, docs. Stubbed or open: W3–W6, W8–W9, W16–W17, W21–W22, G1, G12–G19.
+Touches: `src/sim/engaged_player.gd` (selling, rooms, Tier 6 research and layout, after-sale skip), `tests/second_run_tests.gd` (new), docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W23, G1, G12–G19.

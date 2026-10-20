@@ -23,7 +23,7 @@ const RAW_SELL_ABOVE := 50
 ## (`forks` swaps them, for U6).
 const RESEARCH := [
 	"jalapeno_blueprint", "poblano_blueprint", "ancho_blueprint", "smoky_ancho_blueprint", "calloused_thumbs",
-	"verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint", "delivery_van", "double_tap",
+	"verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint", "delivery_van", "standard_operating_procedures", "double_tap",
 	"slot_expansion_1", "serrano_blueprint", "serrano_mash_blueprint", "serrano_fire_blueprint",
 	"cayenne_blueprint", "garlic_blueprint", "paste_blueprint", "cayenne_mash_blueprint", "slot_expansion_2",
 	"louisiana_blueprint", "ergonomic_grip", "heat_meter", "night_shift_1", "overflow_valve", "overclock_1",
@@ -38,7 +38,14 @@ const RESEARCH := [
 	"smoke_blueprint", "ghost_blueprint", "ghost_mash_blueprint", "phantom_blueprint", "artisan_decanters", "pantry_sugar_reserve",
 	"hydroponic_jalapeno", "overdrive_turbines", "pantry_oak_booster", "pantry_oak_concentrate", "pantry_oak_reserve",
 	"hydroponic_cayenne",
+	# After a sale (PRESTIGE.md, the second run): Tier 6. Skipped before one.
+	"moruga_blueprint", "moruga_mash_blueprint", "scorpion_sting_blueprint",
+	"reaper_blueprint", "reaper_mash_blueprint", "widowmaker_blueprint",
+	"pepper_x_blueprint", "pepper_x_mash_blueprint", "extinction_event_blueprint",
 ]
+## Rooms it takes from a draft, best first (PRESTIGE.md, the second run).
+const ROOM_ORDER := ["fermentation_cellar", "high_speed_cannery", "seed_vault", "tasting_room", "seed_capital",
+	"hydroponics_bay", "cooperage", "glassworks", "test_kitchen", "ergonomics_lab", "executive_lounge", "night_watchman"]
 ## What its slots run, by the best sauce researched so far: the last layout
 ## whose sauce is unlocked wins. Slot i runs entry i; entries past the cap
 ## wait for Slot Expansion. Each list is in buying order. `lend` is the order
@@ -67,6 +74,10 @@ const LAYOUTS := [
 		"line": ["classic_louisiana", "savina_gold", "savina_gold", "classic_louisiana", "savina_gold", "classic_louisiana"], "lend": [6, 2]},
 	{"when": "phantom", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "ghost_mash", "liquid_smoke"],
 		"line": ["classic_louisiana", "phantom", "phantom", "classic_louisiana", "savina_gold", "phantom"], "lend": [2, 1]},
+	# Tier 6 (second run): Scorpion Sting takes a Moruga Mash and a Savina Gold,
+	# so Savina Gold lines stay beside it.
+	{"when": "scorpion_sting", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "moruga_mash"],
+		"line": ["classic_louisiana", "savina_gold", "scorpion_sting", "classic_louisiana", "savina_gold", "scorpion_sting"], "lend": [2, 1]},
 ]
 ## Auto-Sell share for a bottle research needs, before Smart Stockpiling.
 const SAVING_AUTOSELL := 50
@@ -348,9 +359,40 @@ func _slot(g, station: String, index: int, recipe: String) -> Dictionary:
 func next_research(g) -> String:
 	for node in RESEARCH:
 		var n: String = forks.get(node, node)
+		# After-sale nodes wait for a sale, so run 1 plays as it always has.
+		if g.data.tech[n].after_sale and g.account.prestiges < 1:
+			continue
 		if not g.is_researched(n):
 			return n
 	return ""
+
+
+## Sells the franchise and spends every credit: rooms from each draft in
+## ROOM_ORDER while one can be opened, then levels on the cheapest room.
+## Returns what it bought, for the report.
+func sell_and_spend(g) -> Array:
+	var bought := []
+	if not g.prestige():
+		return bought
+	while g.can_open_room():
+		g.open_room()
+		var pick: String = g.account.draft[0]
+		for id in ROOM_ORDER:
+			if g.account.draft.has(id):
+				pick = id
+				break
+		g.choose_room(pick)
+		bought.append(pick)
+	while true:
+		var cheapest := ""
+		for id in g.account.rooms:
+			if g.can_level_room(id) and (cheapest == "" or g.room_level_cost(id) < g.room_level_cost(cheapest)):
+				cheapest = id
+		if cheapest == "":
+			break
+		g.level_room(cheapest)
+		bought.append("level " + cheapest)
+	return bought
 
 
 ## Buys the cheapest upgrade it can afford, again and again.

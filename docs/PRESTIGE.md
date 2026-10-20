@@ -115,3 +115,24 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 - **G17:** Tier 6's recipes, values, plot prices and timings above. Plot prices and line times are GUESSES; no pacing measures a second run yet (W17).
 - **Standard Operating Procedures:** "1% of current production throughput" read as 1% of an hour of the bottles running lines make, valued at base; research it grants is free; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
 - Tier 6 opens with the first sale, not with an HQ room.
+
+## The second run (W17)
+
+Status: **criteria written, being measured.** Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
+
+### The player's policy (assumed)
+
+- **It sells at 3:00 of run 1**, the end of the first run's ladder (D035: the sale opens at about 2:08, and pushing on pays more).
+- **It spends every credit:** it opens rooms while it can, taking the first room from each draft in this order: Fermentation Cellar, High-Speed Cannery, Seed Vault, Tasting Room, Seed Capital Office, Hydroponics Bay, Cooperage, Glassworks, Test Kitchen, Ergonomics Lab, Executive Lounge, Night Watchman's Desk. Then it levels its cheapest room until the credits run out.
+- **In run 2 it plays as in run 1**, with Standard Operating Procedures researched right after The Delivery Van, the Tier 6 blueprints after the last v0.6a node, and a Scorpion Sting layout once that sauce is open. After-sale nodes are skipped in run 1, so run 1 plays exactly as the pacing suite's.
+
+### Criteria
+
+| Id | Criterion |
+| --- | --- |
+| Y1 | Run 2 reaches the $10M sale in at most 85% of the time run 1 took. |
+| Y2 | In run 2, Standard Operating Procedures researches at least 15 nodes by itself, the first within 10 minutes of being researched. |
+| Y3 | Run 2 makes its first Scorpion Sting (Tier 6) by 3:15. |
+| Y4 | From 1:50 to 3:00 of run 2, never more than 300 s without a purchase or research (as U2). |
+
+Reported, not judged: run 1's credits at 3:00, the rooms bought, and run 2's Operation Value at 3:00 and 3:15 (for W21).

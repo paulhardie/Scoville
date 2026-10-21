@@ -2,7 +2,7 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6c, D036, layout step 1 and W17's second run (PRs #1–#17). PR #18 is still open. It carries D040 (Standard Operating Procedures free at 1%, which turns `main` green again) and now also **D041, Idle Planet Miner's early flow**:
+Merged: v0.1–v0.6c, D036, layout step 1, W17's second run and D040 (Standard Operating Procedures free at 1%; PRs #1–#18). This branch carries **D041, Idle Planet Miner's early flow**, and the D042 pepper-ladder proposal:
 
 - **The Poblano and Jalapeño Plots are on sale from the start** at $800 and $1,900 (each pays back raw in 8–10 minutes, as Idle Planet Miner's first planets do). Blueprints gate crops from White Vinegar on. E1 and E12 are now Cultivation nodes (×1.5 plot speed), with the same ids.
 - **Every crop sells raw** from its plot's card, and the cards list cheapest first.
@@ -23,7 +23,7 @@ Merged: v0.1–v0.6c, D036, layout step 1 and W17's second run (PRs #1–#17). P
 
 ## Next
 
-1. The owner settles W26, then merges PR #18.
-2. Talk through real hot sauce ingredients (vinegar, water, garlic, fruit such as pineapple) with the owner, before building anything.
+1. The owner settles W26, then merges this PR.
+2. The owner's calls on D042 (rung 13: a fictional pepper or keep Reaper and Pepper X) and on the ingredients (pineapple for Cane Sugar; fermentation as its own version); then build what's chosen.
 
 Touches: `data/plots.json`, `data/recipes.json` (Ancho Mash), `data/tech.json` (E1, E12), `tuning.gd`, `game.gd` (upgrade curve, fractional yield, `sell_crop`, Forager's drop, save v9), `main.gd` (Sell on plot cards, order), `engaged_player.gd`, tests (A1–A5, updated upgrade and migration checks), docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W26, G1, G12–G20.

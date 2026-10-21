@@ -295,13 +295,23 @@ func test_sop() -> void:
 	var forks := ["pantry_vinegar_bulk", "pantry_vinegar_reserve"]
 	check(g.tech_cost_value(forks[0]) < bar and g.research_reachable(forks[0]), "Q12: a fork side is reachable and under the bar ($%.0f)" % g.tech_cost_value(forks[0]))
 	check(not due.is_empty() and not later.is_empty(), "Q12: the setup has nodes due now (%d) and children due after (%d)" % [due.size(), later.size()])
+	var cash_0: float = g.cash
+	var earned_0: float = g.stats.cash_earned
+	var consumed_0: Dictionary = g.stats.consumed.duplicate()
 	g.advance(9)
 	var missed := []
 	for id in due:
 		if not g.is_researched(id):
 			missed.append(id)
 	check(missed.is_empty(), "Q12: every node under the bar researched itself within a second: missed %s" % str(missed))
-	check(g.stock.table_mild == 0 and g.stock.bistro_verde == 0, "Q12: free: nothing was in stock to pay with (D040)")
+	# Free (D040): no cash beyond what the factory spent and earned, and no items.
+	var spent: float = cash_0 + (g.stats.cash_earned - earned_0) - g.cash
+	var took := false
+	for id in due:
+		for item in g.data.tech[id].cost:
+			if not item in g.data.recipes.phantom.inputs:
+				took = took or g.stats.consumed[item] != consumed_0[item]
+	check(absf(spent) < 0.01 and not took, "Q12: free (D040): $%.2f spent, items taken: %s" % [spent, took])
 	var over := []
 	for id in waiting:
 		if g.is_researched(id):

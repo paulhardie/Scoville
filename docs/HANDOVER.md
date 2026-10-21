@@ -18,6 +18,7 @@ The owner asked for the game's flow, especially early, to be in line with roughl
 ## Open decisions
 
 - **W21, late growth:** run 2 is worth $662M at 3:00 and $936M at 3:15. Recommend leaving it until the Cook-Off (v0.8).
+- **W24, how much faster a repeat run may be:** nothing bounds it from below; recommend a floor (say 50% of run 1) once runs with more rooms are measured.
 - **Layout step 2** (W22): moving the button and the factory floors wait on W8's visual direction.
 
 ## Next
@@ -25,4 +26,4 @@ The owner asked for the game's flow, especially early, to be in line with roughl
 1. Merge this PR (turns `main` green).
 2. The Idle Planet Miner early-flow comparison and its changes.
 
-Touches: `tuning.gd` (SOP_SHARE 0.01), `game.gd` (SOP free again), the Tech Tree's SOP text, the SOP and second-run tests, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, G1, G12–G19.
+Touches: `tuning.gd` (SOP_SHARE 0.01), `game.gd` (SOP free again), the Tech Tree's SOP text, the SOP and second-run tests, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, G1, G12–G19.

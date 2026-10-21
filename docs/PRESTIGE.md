@@ -148,9 +148,10 @@ Run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operatio
 | Y3 | **PASS:** the first Scorpion Sting at 2:22:31 | PASS: 1:23:42 | **PASS:** 2:40:40 |
 | Y4 | **PASS:** longest wait 256 s | PASS: 89 s | **FAIL:** 328 s |
 | Run 2 at 3:00 | $662M | $1.69B | $345M |
+| Run 2 at 3:15 | $936M | $2.0B | $585M |
 
-**Why Y2 failed at 1%:** by the time SOP was bought, the player had researched every node cheap enough, and the next (Double-Tap, 15 Bistro Verde, $6,375) was over a bar of about $700.
+**Why Y2 first failed at 1%** (before D040 dropped its 10-minute start): by the time SOP was bought, the player had researched every node cheap enough, and the next (Double-Tap, 15 Bistro Verde, $6,375) was over a bar of about $700.
 
-**What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounded this (Y1 only asks for faster, not how much faster): W24.
+**What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounds how much faster run 2 may be (Y1 only asks for faster): W24.
 
-**Why paying cash fails Y2 and Y4:** the pacing player spends all its cash on stations and upgrades the moment it can, so SOP almost never finds cash to pay with; it researches less than at 1% free, and later. A real player spends much the same way. Paying in items instead fails the same way through Auto-Sell (W25).
+**Why paying cash fails Y2 and Y4:** the pacing player spends all its cash on stations and upgrades the moment it can, so SOP almost never finds cash to pay with; it researches less than at 1% free, and later. A real player spends much the same way. Paying in items instead fails the same way through Auto-Sell.

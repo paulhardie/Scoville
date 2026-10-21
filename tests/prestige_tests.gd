@@ -295,13 +295,20 @@ func test_sop() -> void:
 	var forks := ["pantry_vinegar_bulk", "pantry_vinegar_reserve"]
 	check(g.tech_cost_value(forks[0]) < bar and g.research_reachable(forks[0]), "Q12: a fork side is reachable and under the bar ($%.0f)" % g.tech_cost_value(forks[0]))
 	check(not due.is_empty() and not later.is_empty(), "Q12: the setup has nodes due now (%d) and children due after (%d)" % [due.size(), later.size()])
+	var cash_0: float = g.cash
+	var earned_0: float = g.stats.cash_earned
+	var price := 0.0
+	for id in due:
+		price += g.tech_cost_value(id)
 	g.advance(9)
 	var missed := []
 	for id in due:
 		if not g.is_researched(id):
 			missed.append(id)
 	check(missed.is_empty(), "Q12: every node under the bar researched itself within a second: missed %s" % str(missed))
-	check(g.stock.table_mild == 0 and g.stock.bistro_verde == 0, "Q12: free: nothing was in stock to pay with")
+	var spent: float = cash_0 + (g.stats.cash_earned - earned_0) - g.cash
+	check(absf(spent - price) < 0.01 * maxf(1.0, price), "Q12/D039: they cost their worth in cash: $%.2f spent for $%.2f" % [spent, price])
+	check(g.stock.table_mild == 0 and g.stock.bistro_verde == 0, "Q12/D039: and no items: none were in stock")
 	var over := []
 	for id in waiting:
 		if g.is_researched(id):
@@ -319,6 +326,17 @@ func test_sop() -> void:
 		if not g.is_researched(id):
 			late.append(id)
 	check(late.is_empty(), "Q12: and then researches itself: missed %s" % str(late))
+
+	var broke := sold(nodes, "phantom")
+	broke.set_autosell("phantom", 0)
+	broke.cash = 0.0
+	var waiting_for := under_bar(broke)
+	broke.advance(9)
+	var paid := []
+	for id in waiting_for:
+		if broke.is_researched(id):
+			paid.append(id)
+	check(not waiting_for.is_empty() and paid.is_empty(), "Q12/D039: with no cash, nodes under the bar wait: %s" % str(paid))
 
 	var plain := sold(["delivery_van", "pantry_vinegar_concentrate", "phantom_blueprint"], "phantom")
 	var before: int = plain.stats.researched

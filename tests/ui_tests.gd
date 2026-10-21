@@ -333,7 +333,7 @@ func test_after_sale() -> void:
 	check(not "Opens after your first franchise sale." in texts, "Q14: not once the franchise has been sold")
 	var says := false
 	for t in texts:
-		says = says or t.contains("researches itself, free")
+		says = says or t.contains("researches itself, paid from cash")
 	check(says, "Q14: Standard Operating Procedures says what it does")
 	screen.queue_free()
 	await process_frame

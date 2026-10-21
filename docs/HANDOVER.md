@@ -2,26 +2,26 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6c and D036 (PRs #1–#15): the full first run, Prestige, Tier 6 and Standard Operating Procedures, Idle Planet Miner's values in dollars, and a green pacing suite. This branch is **layout step 1** ([LAYOUT.md](LAYOUT.md), D037), the first of three steps from the layout plan:
+Merged: v0.1–v0.6c, D036 and layout step 1 (PRs #1–#16). This branch is **W17: the second run measured** ([PRESTIGE.md](PRESTIGE.md#the-second-run-w17)). `tests/second_run_tests.gd` plays the pacing player through run 1 to 3:00, sells (31 credits), opens three rooms (Cooperage, Fermentation Cellar, Glassworks) and plays run 2.
 
-- **Readable numbers:** $2.93M, 12.3K. Cents only under $10,000.
-- **Station sheets:** each plot, vat and line card shows a Manage button (with "!" when an upgrade is affordable). It opens a sheet with its upgrades and a ×1 / ×10 / Max switch, remembered between sessions.
-- **A bottle lands:** "+1 Table Mild $50.00" pops over Sell Batch, at most 4 a second; a coin flies to Cash on sales, at most 3 a second. Cash counts up to rises of $100 or more.
-- **Goal bar** under the status bar: the way to the Tech Tree, then the next node with its scarcest item ("Next: Habanero, 5/20 Island"), then the sale from 50%.
-- **Warehouse:** the stock line is Bell Peppers and bottles only; tapping it opens every item by kind with its worth. (W15, the crowded stock line, is done.)
-- **Market tab** (opens with the Delivery Van): demand spikes, Auto-Sell and the valve, moved off Processing.
+With Standard Operating Procedures' bar at 5% (D038, your call; 1% failed Y2), every criterion passes:
+- **Y1:** run 2 reaches the $10M sale at 57 minutes, 44% of run 1's 2:08.
+- **Y2:** SOP's first node 19 s after it's bought; 67 over the run.
+- **Y3:** Tier 6's first Scorpion Sting at 1:24.
+- **Y4:** no wait over 89 s from 1:50 to 3:00.
+- **But run 2 is now very fast:** research SOP grants is free, so it skips most research costs. Run 2 is worth $1.69B at 3:00 (14× run 1) (W24, W21).
 
-Checks: all eleven suites pass (L1–L9 new; a rounding bug in buying ten levels found and fixed); the headless boot is clean; every screen looked at with `capture_ui.gd`. **Not checked:** how the motion feels on a phone.
+The player learnt to sell and spend (`sell_and_spend`), skips after-sale nodes before a sale (so run 1 and the pacing suite are unchanged), and has a Scorpion Sting layout. Checks: every suite passes (pacing 38/38, second run 4/4); the headless boot is clean; SOP's text on the Tech Tree says 5%.
 
 ## Open decisions
 
-- **Moving the Blank Button to the foot of the screen** (step 2) changes the brief's split viewport (§2). Recommend yes, with the visual pass.
-- **W8:** step 2 needs your reference games and mood.
-- **Late growth (W21)**, and D030/D034's assumptions, as before.
+- **W24, how much faster run 2 should be:** recommend SOP pays for what it researches (it takes the clicking away, not the cost). Run 2 would then speed up from the rooms alone, as at 1% (73% of run 1), with SOP still busy from the start.
+- **W21, late growth:** run 2 hits $936M by 3:15. Fine as "the reward for pushing", or cap it? Recommend leaving it until the Cook-Off (v0.8) gives big numbers somewhere to go.
+- W8 and moving the button (layout step 2), as before.
 
 ## Next
 
-1. Merge this PR, then try the phone build: the link is republished with this branch's build.
-2. W17 (a pacing player that sells and replays), or the Shift Roster (v0.7), or step 2 once W8's direction is in.
+1. Merge (CI goes green with this push), then decide W24.
+2. v0.7 Shift Roster, or layout step 2 once W8's direction is in.
 
-Touches: `main.gd` (sheets, drawer, goal bar, pops, count-up, Market page, number formats), `style.gd` (layout constants), `game.gd` (several levels at once, goal node, the Market tab's rule), `tuning.gd` (BULK_LEVELS, TABS_BUILT), tests (`layout_tests.gd` new, `ui_tests.gd`), the capture tool, docs. Stubbed or open: W3–W6, W8–W9, W16–W17, W21–W22, G1, G12–G19.
+Touches: `src/sim/engaged_player.gd` (selling, rooms, Tier 6 research and layout, after-sale skip), `tests/second_run_tests.gd` (new), docs. Stubbed or open: W3–W6, W8–W9, W16, W21, W24, G1, G12–G19.

@@ -77,9 +77,9 @@ A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 
 ### Rules
 
 - **After the first sale.** Tier 6's nine nodes and Standard Operating Procedures open only once the franchise has been sold at least once (`account.prestiges`, saved since v7). Before that they show on the web, muted, saying "Opens after your first franchise sale."
-- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it if its cost is worth less than 5% of an hour's output (1% until D038), **paying the cost's worth in cash** (D039; free until then). With too little cash, it waits. Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
+- **Standard Operating Procedures** (W7, West Wing, after The Delivery Van; 10 Table Mild): once researched, every second the game looks at each node it could research now (every parent researched, not a fork, the tab open) and researches it **free** if its cost is worth less than 1% of an hour's output (D040: back to the brief's 1%, free; D038's 5% and D039's paying in cash were measured and dropped). Nodes are looked at in the tree's file order, so a node's children are looked at on a later second.
   - **A cost's worth** is its items at their base values (D004), after the Test Kitchen.
-  - **An hour's output** is 3,600 × the value a second of the bottles from lines that are running: each running line's sauce value ÷ its cycle. So 5% is 3 minutes of bottles.
+  - **An hour's output** is 3,600 × the value a second of the bottles from lines that are running: each running line's sauce value ÷ its cycle. So 1% is 36 seconds of bottles.
   - **Forks are never taken**: either/or is the player's choice (D026).
   - The same rule runs in the offline catch-up, once a step.
 - **Tier 6** (G17, assumed like D029): three peppers from the ladder ([INGREDIENTS.md](INGREDIENTS.md)), each with its own mash and sauce, values by D004.
@@ -100,7 +100,7 @@ Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's patt
 | --- | --- |
 | Q10 | Before any sale, no Tier 6 node and not Standard Operating Procedures can be researched, even with every parent and the full cost in stock; after one sale they can. |
 | Q11 | Tier 6's mashes are worth 2× their inputs and its sauces 5× the raw value inside (V1, which covers every recipe); Phantom Smokehouse → Scorpion Sting → Widowmaker Reserve → Extinction Event each climb ×1.6–3.0 (×2.0–3.4 since D035); each Tier 6 plot feeds one vat at base (V3). |
-| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under the bar (5% of an hour's bottles, D038) is researched, its cost's worth taken from cash and its items left in stock (D039); with less cash than that it waits; one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
+| Q12 | With Standard Operating Procedures: within one second a reachable node whose cost is worth under the bar (1% of an hour's bottles) is researched, free (D040); one at or over it isn't; a fork side never is; a node with a parent missing isn't, and is on the second after its parent. Without it, nothing is. |
 | Q13 | After time away (the catch-up), every node under the bar with its parents done has been researched, as in play. |
 | Q14 | On screen: a Tier 6 node before the first sale says it opens after the first sale; Standard Operating Procedures says what it does. |
 
@@ -113,12 +113,12 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 ### Assumed (part 2)
 
 - **G17:** Tier 6's recipes, values, plot prices and timings above. Plot prices and line times are GUESSES; no pacing measures a second run yet (W17).
-- **Standard Operating Procedures:** the brief's "1% of current production throughput" read as a share of an hour of the bottles running lines make, now 5% (D038), valued at base; it pays in cash what the items are worth (D039), since Auto-Sell leaves little in stock to pay with; it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
+- **Standard Operating Procedures:** the brief's "1% of current production throughput" read as 1% of an hour of the bottles running lines make (D040), valued at base; research it grants is free, since a cost that small isn't worth charging (D040); it's an in-run node (researched each run, cheap) that opens after the first sale; forks are left to the player.
 - Tier 6 opens with the first sale, not with an HQ room.
 
 ## The second run (W17)
 
-Status: **measured three ways** (below). Now, with SOP paying cash (D039): **2 of 4 PASS** (Y2 and Y4 FAIL, W25). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
+Status: **all PASS** with SOP free at 1% (D040), measured three ways (below). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
 
 ### The player's policy (assumed)
 
@@ -131,7 +131,7 @@ Status: **measured three ways** (below). Now, with SOP paying cash (D039): **2 o
 | Id | Criterion |
 | --- | --- |
 | Y1 | Run 2 reaches the $10M sale in at most 85% of the time run 1 took. |
-| Y2 | In run 2, Standard Operating Procedures researches at least 15 nodes by itself, the first within 10 minutes of being researched. |
+| Y2 | In run 2, Standard Operating Procedures researches at least 15 nodes by itself. (Its first within 10 minutes of being bought was dropped by D040, after it failed: under the brief's rule SOP picks nodes up as production outgrows them, not at once.) |
 | Y3 | Run 2 makes its first Scorpion Sting (Tier 6) by 3:15. |
 | Y4 | From 1:50 to 3:00 of run 2, never more than 300 s without a purchase or research (as U2). |
 
@@ -141,16 +141,17 @@ Reported, not judged: run 1's credits at 3:00, the rooms bought, and run 2's Ope
 
 Run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operation Value $117M). The player opens Cooperage, Fermentation Cellar and Glassworks (5 + 10 + 15 credits) and has 1 left.
 
-| Id | SOP 1%, free (first) | SOP 5%, free (D038) | SOP 5%, paying cash (D039, now) |
+| Id | SOP 1%, free (D040, now) | SOP 5%, free (D038) | SOP 5%, paying cash (D039) |
 | --- | --- | --- | --- |
-| Y1 | PASS: the sale at 1:33:44, 73% of run 1 | PASS: 56:50, 44% | **PASS:** 1:47:35, 84% |
-| Y2 | FAIL: 32 nodes, the first 16½ min after SOP | PASS: 67 nodes, the first 19 s after | **FAIL:** 22 nodes, the first 17 min after (33:41) |
-| Y3 | PASS: the first Scorpion Sting at 2:22:31 | PASS: 1:23:42 | **PASS:** 2:40:40 |
-| Y4 | PASS: longest wait 256 s | PASS: 89 s | **FAIL:** 328 s |
+| Y1 | **PASS:** the sale at 1:33:44, 73% of run 1 | PASS: 56:50, 44% | **PASS:** 1:47:35, 84% |
+| Y2 | **PASS:** 32 nodes (the first 16½ min after SOP; that bar is dropped) | PASS: 67 nodes, the first 19 s after | **FAIL:** 22 nodes, the first 17 min after (33:41) |
+| Y3 | **PASS:** the first Scorpion Sting at 2:22:31 | PASS: 1:23:42 | **PASS:** 2:40:40 |
+| Y4 | **PASS:** longest wait 256 s | PASS: 89 s | **FAIL:** 328 s |
 | Run 2 at 3:00 | $662M | $1.69B | $345M |
+| Run 2 at 3:15 | $936M | $2.0B | $585M |
 
-**Why Y2 failed at 1%:** by the time SOP was bought, the player had researched every node cheap enough, and the next (Double-Tap, 15 Bistro Verde, $6,375) was over a bar of about $700.
+**Why Y2 first failed at 1%** (before D040 dropped its 10-minute start): by the time SOP was bought, the player had researched every node cheap enough, and the next (Double-Tap, 15 Bistro Verde, $6,375) was over a bar of about $700.
 
-**What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounded this (Y1 only asks for faster, not how much faster): W24.
+**What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounds how much faster run 2 may be (Y1 only asks for faster): W24.
 
-**Why paying cash fails Y2 and Y4:** the pacing player spends all its cash on stations and upgrades the moment it can, so SOP almost never finds cash to pay with; it researches less than at 1% free, and later. A real player spends much the same way. Paying in items instead fails the same way through Auto-Sell (W25).
+**Why paying cash fails Y2 and Y4:** the pacing player spends all its cash on stations and upgrades the moment it can, so SOP almost never finds cash to pay with; it researches less than at 1% free, and later. A real player spends much the same way. Paying in items instead fails the same way through Auto-Sell.

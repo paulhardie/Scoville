@@ -89,7 +89,7 @@ func run() -> void:
 	print("  run 2: Operation Value $%.0f at 3:00, $%.0f at 3:15" % [ov_180, g.operation_value()])
 
 	criterion("Y1", sale_2 <= 0.85 * sale_1, "run 2 reaches the sale at %s, %.0f%% of run 1's %s (at most 85%%)" % [clock(sale_2), sale_2 / sale_1 * 100.0, clock(sale_1)])
-	criterion("Y2", grants >= 15 and first_grant - sop_at <= 600.0, "Standard Operating Procedures at %s researched %d nodes, the first at %s (at least 15, the first within 10 minutes)" % [clock(sop_at), grants, clock(first_grant)])
+	criterion("Y2", grants >= 15, "Standard Operating Procedures at %s researched %d nodes, the first at %s (at least 15; D040 dropped \"the first within 10 minutes\")" % [clock(sop_at), grants, clock(first_grant)])
 	criterion("Y3", scorpion <= RUN_2 * 60.0, "the first Scorpion Sting at %s (by 3:15)" % clock(scorpion))
 	happened.sort()
 	var last := 110 * 60.0

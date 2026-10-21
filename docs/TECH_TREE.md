@@ -122,7 +122,7 @@ Tier 4–6 blueprints and the other GMO boosters come with v0.6.
 - **Smart Stockpiling:** one node can be pinned at a time. Until stock meets its cost, Auto-Sell doesn't sell the bottles it needs, and the valve doesn't sell the crops and mash it needs (assumed: the brief names only bottles). Once the stock is met, the sliders and keep amounts work as set again. Researching the node unpins it.
 - **Market Ticker (D015):** one spike at a time, ×2 or ×3 (even odds) on a random unlocked sauce for 30 minutes. The first comes 1–5 minutes after research, and later ones 45–75 minutes after the last one started. Shown in the status bar while it runs.
 
-Standard Operating Procedures (needs Prestige) and Night Shift Protocols (needs offline play) wait for v0.6 and v0.5.
+Standard Operating Procedures and Night Shift Protocols came later: Night Shift in v0.5 (OFFLINE.md), SOP in v0.6b after the first sale (PRESTIGE.md, D034, D040).
 
 ### Bridges
 

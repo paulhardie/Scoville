@@ -290,3 +290,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** the owner changed their mind: progression should come from the obvious next step rather than from hiding the screen. The tab thresholds stay because the pacing is measured against them (N1, N2) and they stage the run's content. Keeping them is the agent's assumption. The factory view is drawn in code rather than waiting on W8, so step 2 can ship and be restyled later.
 
+## D045: Bottling gets a sound, a first-bottle buzz and a bottle in the factory view
+
+**Decision (the owner's, on the agent's recommendation):** every bottle pop plays a glass clink made in code, pitched lower for richer tiers. The first bottle of each sauce in a run gives a short buzz. Each pop drops a bottle, tinted by tier, onto the factory view's Bottling floor. The first-bottle ceremony stays in layout step 3. ([FEEL.md](FEEL.md#bottling-a-sound-a-buzz-and-a-bottle-d045))
+
+**Why:** making a bottle is the game's core reward, but it got the same weight as any number changing: a text pop, no sound, no picture, and a $330,000 Phantom felt like a $50 Table Mild. The sound and the bottle need no art, and the visual pass (W8) can restyle them.
+

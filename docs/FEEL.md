@@ -29,3 +29,23 @@ With v0.6a's 30 items, the stock line under the status bar wrapped to six lines 
 
 - The click's sound, 15 ms and the pitch ranges are defaults (UI polish); say if you want different.
 - Only the Blank Button makes a sound for now. Purchases and research stay silent until the visual pass (W8) sets the overall feel.
+
+## Bottling: a sound, a buzz and a bottle (D045)
+
+The owner asked what bottling a sauce looks and feels like. The honest answer was a text pop and nothing else, so it gets a sound and a picture: options 1 and 2 of the three offered. The first-bottle ceremony waits for layout step 3. Screen-only, like the click: nothing in the simulation changes.
+
+### Rules
+
+- **A clink with every bottle pop.** The bottling sound is made in code: a glass clink, two bright partials that ring briefly. It plays with each bottle pop (LAYOUT.md), so it inherits the pop's limit of POPS_PER_SECOND and never drones. Sound off silences it.
+- **Richer sauces sound fuller.** The clink's pitch drops a step for each tier of the sauce in the pop (its most valuable bottle): Tier 1 at 1.0, each tier BOTTLE_TIER_PITCH lower.
+- **The first bottle of a sauce buzzes.** The first bottle of each sauce in a run asks for one short vibration, FIRST_BOTTLE_MS; later bottles don't. Vibration off silences it.
+- **A bottle in the factory view.** Each pop drops a small bottle shape onto the Bottling floor, tinted by the sauce's tier (`style.gd`, TIER_TINTS), which slides right towards Sell Batch and fades. Placeholder shapes, for W8 to restyle.
+
+### Criteria
+
+| Id | Criterion |
+| --- | --- |
+| K6 | Each bottle pop plays exactly one bottling sound with Sound on, and none with Sound off. However fast lines run, there are at most POPS_PER_SECOND a second. |
+| K7 | The bottling sound's pitch is 1.0 for Tier 1 and falls with each tier. |
+| K8 | The first bottle of a sauce in a run asks for one FIRST_BOTTLE_MS vibration with Vibration on; the next bottles of it ask for none, and Vibration off asks for none. |
+| K9 | Each bottle pop adds one bottle to the factory view's Bottling floor, tinted by the sauce's tier, which moves right and is gone within BOTTLE_SECONDS. |

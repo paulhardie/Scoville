@@ -574,3 +574,15 @@ func test_fractional_yield_carries() -> void:
 		g.tick()
 	check(absi(g.stats.harvested.bell - roundi(100.0 * exact)) <= 1, "a fractional yield carries: %d from 100 harvests of %.2f" % [g.stats.harvested.bell, exact])
 
+
+func test_malformed_v8_plot_refused() -> void:
+	var g := opened(0.0)
+	var s: Dictionary = g.to_state()
+	s.version = 8
+	s.run.plots.bell = 5
+	var h := Game.new()
+	var problem := h.load_state(JSON.parse_string(JSON.stringify(s)))
+	check(problem != "", "A5: a v8 save with a broken plot is refused, not crashed on: %s" % problem)
+	s.run.plots.bell = {"owned": true, "speed": "fast"}
+	check(Game.new().load_state(JSON.parse_string(JSON.stringify(s))) == "", "A5: a level that isn't a number reads as 0")
+

@@ -1101,7 +1101,7 @@ func _refresh_plot(crop: String) -> void:
 	nodes.buy.text = "Buy   %s" % _money(game.plot_price(crop))
 	nodes.buy.disabled = not game.can_buy_plot(crop)
 	nodes.sell.visible = p.owned
-	nodes.sell.text = "Sell %s   %s" % [_count(game.stock[crop]), _money(game.stock[crop] * game.value(crop))]
+	nodes.sell.text = "Sell %s   %s" % [_count(game.stock[crop]), _money(game.stock[crop] * game.sale_price(crop) * game.heat_mult())]
 	nodes.sell.disabled = not game.can_sell_crop(crop)
 	nodes.manage.visible = p.owned
 	var ready := false

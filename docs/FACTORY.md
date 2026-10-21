@@ -222,7 +222,7 @@ Otherwise it plays like the pacing player. Both are measured over the first 20 m
 - **Bell Pepper Plot:** £10 → £5, and 1 pepper every 2.0 s → 1.0 s. It now picks about a third of a casual player's peppers, so it matters.
 - **Vat slot 1:** £25 → £15.
 - **Line slot 1:** £35 → £10. The pacing player waits 36 s between them, the casual one 96 s.
-- **Upgrade prices are unchanged.** Upgrades scale against fixed reference prices, v0.2's £10, £25 and £35 (`PLOT_PRICE_REFERENCE` and so on in `tuning.gd`), not against the first station's price. Without that, the cheaper first stations would have raised every Tier 2 and 3 upgrade by up to 40%.
+- **Upgrade prices are unchanged.** (Plot upgrades since D041 cost 5% of the plot's price × 1.3^level instead, [ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041); `PLOT_PRICE_REFERENCE` is gone.) Upgrades scale against fixed reference prices, v0.2's £10, £25 and £35 (`PLOT_PRICE_REFERENCE` and so on in `tuning.gd`), not against the first station's price. Without that, the cheaper first stations would have raised every Tier 2 and 3 upgrade by up to 40%.
 - **Brief numbers untouched:** 1 pepper a tap, £0.10 a pepper, 20 peppers to Stage 1, and £10 to Stage 2.
 
 **Knock-on effects, all still passing:**

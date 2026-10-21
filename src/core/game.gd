@@ -1616,15 +1616,22 @@ func load_state(s: Variant) -> String:
 func _migrate_8_to_9(s: Dictionary) -> Dictionary:
 	var out := s.duplicate(true)
 	for crop in out.run.plots:
-		var p: Dictionary = out.run.plots[crop]
-		if typeof(p) != TYPE_DICTIONARY:
+		# A malformed entry is left for the load's own checks to refuse.
+		if typeof(out.run.plots[crop]) != TYPE_DICTIONARY:
 			continue
-		p.speed = ceili(int(p.get("speed", 0)) * T.V8_PLOT_SPEED_STEP / T.PLOT_SPEED_STEP - EPSILON)
-		p.quality = mini(T.CROP_QUALITY_MAX, ceili(int(p.get("quality", 0)) * T.V8_CROP_QUALITY_STEP / T.CROP_QUALITY_STEP - EPSILON))
+		var p: Dictionary = out.run.plots[crop]
+		p.speed = ceili(_level(p, "speed") * T.V8_PLOT_SPEED_STEP / T.PLOT_SPEED_STEP - EPSILON)
+		p.quality = mini(T.CROP_QUALITY_MAX, ceili(_level(p, "quality") * T.V8_CROP_QUALITY_STEP / T.CROP_QUALITY_STEP - EPSILON))
 		if data.plots.has(crop):
-			p["yield"] = ceili(int(p.get("yield", 0)) / (data.plots[crop]["yield"] * T.PLOT_YIELD_STEP) - EPSILON)
+			p["yield"] = ceili(_level(p, "yield") / (data.plots[crop]["yield"] * T.PLOT_YIELD_STEP) - EPSILON)
 	out.version = 9
 	return out
+
+
+## A saved plot level, 0 if it's missing or not a number.
+static func _level(p: Dictionary, key: String) -> int:
+	var v: Variant = p.get(key, 0)
+	return int(v) if typeof(v) == TYPE_INT or typeof(v) == TYPE_FLOAT else 0
 
 
 ## v8 (D035): the Tier 6 sauce Event Horizon became Extinction Event (the name

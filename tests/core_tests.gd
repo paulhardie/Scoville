@@ -127,7 +127,7 @@ func test_bad_saves_are_refused() -> void:
 	check(g.load_state("nope") != "", "O7: a non-object is refused")
 	check(g.load_state({"version": 99}) != "", "O7: a newer version is refused")
 	var s := g.to_state()
-	s.run.erase("revealed")
+	s.run.erase("stock")
 	check(g.load_state(s) != "", "O7: a save missing a field is refused")
 	s = g.to_state()
 	s.run.stats = 3

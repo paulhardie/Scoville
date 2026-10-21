@@ -226,7 +226,7 @@ func operation_value() -> float:
 	return v
 
 
-## Stage 3: the nav bar comes with the Processing tab.
+## Whether Processing is open (it was Stage 3, when the nav bar appeared, until D044).
 func nav_shown() -> bool:
 	return tab_open("processing")
 
@@ -346,7 +346,7 @@ func slot_cap(station: String) -> int:
 
 
 ## The next slot is offered: the first vat with the deck, the first line once a
-## vat is owned, and more of either once the Processing tab is open (Stage 3).
+## vat is owned, and more of either once the Processing tab is open.
 func slot_offered(station: String) -> bool:
 	var owned := slots(station).size()
 	if owned >= slot_cap(station):
@@ -1579,7 +1579,8 @@ func load_state(s: Variant) -> String:
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
 	# v7 only adds the account's Prestige fields, read below with defaults.
 	var run: Dictionary = s.run
-	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "revealed": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
+	# `revealed` isn't required since D044: nothing reads it.
+	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
 		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,
 		"heat": TYPE_FLOAT, "press_acc": TYPE_DICTIONARY, "overdrive": TYPE_DICTIONARY, "keep": TYPE_DICTIONARY, "pin": TYPE_STRING,
 		"ticker": TYPE_DICTIONARY, "byproduct_ready": TYPE_FLOAT, "rng": TYPE_DICTIONARY, "stats": TYPE_DICTIONARY})

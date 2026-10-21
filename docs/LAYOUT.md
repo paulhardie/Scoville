@@ -73,7 +73,7 @@ The owner changed their mind on progressive disclosure: the game opens on the fu
 | L12 | The factory view has a tile for every owned station on its floor, filling with its cycle; a backed-up plot's tile is orange; an empty floor names what goes there; dots climb when crops reach stock and when mash is made, at most DOTS_PER_SECOND. |
 | L13 | Exactly one next action is shown through the early sequence, ringed on screen and named on the goal line, as `next_action()` gives it: from a fresh game, the button, then Sell Raw Peppers, then the Bell Pepper Plot, and so on to opening the Tech Tree. With the target on another tab, that tab's selector is ringed. |
 | L14 | Once the sequence is done, the goal line is the goal bar (next node, the sale's progress) and nothing is ringed. |
-| L15 | Every earlier criterion still passes, except those D044 retires: O1 (the blank screen), O3's and O4's "not before" (the counter and status bar show from the start), O8's nav bar appearing at a threshold, and L9's "stage 0 shows no text". F1 and F2 now read 0:00. |
+| L15 | Every earlier criterion still passes, except those D044 retires: O1 (the blank screen), O3's and O4's "not before" (the counter and status bar show from the start), O8's nav bar appearing at a threshold, and L9's "stage 0 shows no text". F1, F2 and E1 now read 0:00.1. |
 
 ### Results (step 2)
 

@@ -703,7 +703,7 @@ func _build_tech(holder: Control) -> void:
 	buttons.add_child(_detail.pin)
 
 
-## Stage 3: the bottom navigation bar, one button per tab.
+## The tab selectors, one button per tab, under the upper viewport (D044).
 func _build_nav() -> void:
 	_nav = PanelContainer.new()
 	_nav.name = "Nav"
@@ -1029,8 +1029,7 @@ func _card(parent: Container, name: String, title: String) -> Dictionary:
 	return nodes
 
 
-## Puts the Blank Button in the middle of the screen, or (compact) at the foot
-## of the upper viewport once the deck is open.
+## Puts the Blank Button at the left of the upper viewport (D044: always).
 func _place_blank() -> void:
 	var side := S.BLANK_BUTTON_COMPACT
 	_blank.anchor_left = 0.0
@@ -1069,7 +1068,7 @@ func _on_tab(tab: String) -> void:
 
 # --- Showing ---------------------------------------------------------------
 
-## Shows the state. `animate` plays a reveal's entrance the moment it happens.
+## Shows the state. `animate` is from before D044, when reveals had entrances; nothing reads it now.
 func _refresh(animate: bool) -> void:
 	_counter.text = _stock_text()
 	_goal.text = _goal_text()

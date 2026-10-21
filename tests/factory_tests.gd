@@ -606,3 +606,19 @@ func test_v9_names_migrate() -> void:
 	check(h.stock.cocoa_loco == 3 and h.stock.chocolate == 4 and h.stock.caribbean_red_mash == 5 and h.stock.pineapple == 6, "S: Savina Gold, Red Savina, Habanero Mash and Cane Sugar become Cocoa Loco, Chocolate Habanero, Caribbean Red Mash and Pineapple")
 	check(h.is_researched("thai_chili_blueprint"), "S: research carries over under the new ids")
 
+
+func test_v8_renamed_plot_converts() -> void:
+	# A v8 save's Cane Sugar plot is renamed (D042) before its levels convert (D041).
+	var g := opened(0.0)
+	var s: Dictionary = g.to_state()
+	var text := JSON.stringify(s)
+	for pair in Game.RENAMES_V10:
+		text = text.replace(pair[1], pair[0])
+	var old: Dictionary = JSON.parse_string(text)
+	old.version = 8
+	old.run.plots.sugar = {"owned": true, "speed": 0, "yield": 2, "quality": 0, "progress": 0.0}
+	var h := Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v8 save with a Cane Sugar plot loads")
+	var base: int = h.data.plots.pineapple["yield"]
+	check(h.plots.pineapple.owned and h.plot_yield_exact("pineapple") >= base + 2 - 1e-9, "S: as a Pineapple Grove, its yield levels converted (%.2f a harvest, at least %d)" % [h.plot_yield_exact("pineapple"), base + 2])
+

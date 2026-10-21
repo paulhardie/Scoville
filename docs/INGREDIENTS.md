@@ -2,7 +2,7 @@
 
 The pepper ladder: every crop the game will grow, ordered by real heat, with its value. The owner asked for real hot sauce peppers from the Bell Pepper (0 Scoville) up to Pepper X (the hottest on record), then fictional ones past it, priced with Idle Planet Miner's ore ladder as the reference ([D023](DECISIONS.md), proposed).
 
-Status: **design only.** Nothing here is in `data/` yet. The six peppers the brief already names keep their current values, so Tiers 1–3 as built don't change.
+Status: **built through Tier 6** (D029, D034, D035, D042); the fictional peppers past Pepper Y (rung 14 on) are design only.
 
 ## The ladder since D042
 

@@ -34,3 +34,6 @@ Everything adopted and not done, one row each. Gaps (G) are things the brief lea
 | W16 | Hear and feel the click and buzz on a real phone (Android Chrome for vibration; iPhone Safari has none) | Open | The owner's next phone test |
 | W9 | The pacing player never sets Bistro Verde's Auto-Sell back to 100% after Smart Stockpiling, so Bistro piles up in late runs. A measuring quirk, not a game fault | Open | Fix with W4's smarter player |
 | W27 | Fermentation as a mechanic: mash that ages while away and sells for more, with salt as its ingredient (D042: the owner chose it as its own version later). Ties in with the Fermentation Cellar room | Open | Design when the owner picks it up: criteria first |
+| W28 | The second plot feels a little slow to unlock (the owner, playing on a phone after D041). The pacing player buys the Poblano Plot at about 3:00; a real player is slower | Open | Revisit the starting plots' prices with the next early-game pass |
+| W29 | A4 FAILS by one second since D043: 6:31 against 6:30 (Jalapeño Plot to the Ancho vat). Crop Quality's early levels went, so early cash buys Cargo and the vat lands 4 s later | Open | Owner: the bar flaps on seconds; recommend 7:00, or fold it into W28's early-game pass |
+

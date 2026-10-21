@@ -183,7 +183,7 @@ func run() -> void:
 	await process_frame
 	(screen.find_child("Manage_plot_bell", true, false) as Button).pressed.emit()
 	await process_frame
-	check((screen.find_child("Upgrade_plot_bell_quality", true, false) as Button).text.begins_with("Crop Quality"), "plots offer Crop Quality")
+	check((screen.find_child("Upgrade_plot_bell_cargo", true, false) as Button).text.begins_with("Cargo") and screen.find_child("Upgrade_plot_bell_quality", true, false) == null, "C1: plots offer Cargo, not Crop Quality")
 	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 	await process_frame
 

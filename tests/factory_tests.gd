@@ -96,9 +96,9 @@ func test_plot_harvests() -> void:
 	var cycles := roundi(10.0 / cycle)
 	check(g.stock.bell - before == cycles, "1 pepper every %.1f s: %d in 10 s" % [cycle, g.stock.bell - before])
 	g.plots.bell["yield"] = 50   # 1 × (1 + 50 × 6%): 4 a cycle (D041)
-	before = g.stock.bell
+	before = g.stats.harvested.bell
 	g.advance(seconds(10.0))
-	check(g.stock.bell - before == roundi(g.plot_yield_exact("bell")) * cycles, "yield 50 levels: %d a cycle, %d in 10 s" % [roundi(g.plot_yield_exact("bell")), g.stock.bell - before])
+	check(g.stats.harvested.bell - before == roundi(g.plot_yield_exact("bell")) * cycles, "yield 50 levels: %d a cycle, %d harvested in 10 s" % [roundi(g.plot_yield_exact("bell")), g.stats.harvested.bell - before])
 
 
 func test_vat_takes_ten_and_makes_mash() -> void:
@@ -447,7 +447,7 @@ func test_v3_save_migrates() -> void:
 	check(problem == "", "S9: a v3 save loads: " + problem)
 	check(close(g.cash, 812.5 * T.SAVE_V8_MONEY) and g.stock.jalapeno == 30 and g.autosell.table_mild == 50, "S9: cash, stock and sliders carry over")
 	check(g.vats[0].running and g.vats[0].taken == {"bell": 10}, "S9: a running vat's taken inputs are its recipe's")
-	check(g.heat == 0.0 and g.pin == "" and g.keep.is_empty() and g.plots.bell.quality == 0, "S9: new state starts empty")
+	check(g.heat == 0.0 and g.pin == "" and g.keep.is_empty() and g.plots.bell.cargo == 0 and g.plots.bell.field == 0, "S9: new state starts empty")
 	check(g.has_van() and g.tap_yield() == 3, "S9: research carries over, with its effects")
 	var again := Game.new()
 	again.load_state(v3_save())
@@ -470,13 +470,11 @@ func test_chances_are_deterministic() -> void:
 	# S10: a game with every chance in play, played twice from the same seed,
 	# and saved and reloaded halfway.
 	var Helpers = load("res://tests/button_tests.gd")
-	var a: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip"], 99)
-	var b: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip"], 99)
+	var a: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip", "bumper_crop_1"], 99)
+	var b: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip", "bumper_crop_1"], 99)
 	for g in [a, b]:
 		g.cash = 1e6
 		g.buy_plot("bell")
-		g.upgrade_plot("bell", "quality")
-		g.upgrade_plot("bell", "quality")
 		g.buy_slot("vat")
 		g.set_holding(true)
 		g.advance(seconds(1800.0))
@@ -560,7 +558,7 @@ func test_v8_plots_convert() -> void:
 	var base: Dictionary = h.data.plots.jalapeno
 	check(h.plot_cycle("jalapeno") <= base.seconds / 1.45 + 1e-9, "A5: at least as fast (%.3f s against %.3f)" % [h.plot_cycle("jalapeno"), base.seconds / 1.45])
 	check(h.plot_yield_exact("jalapeno") >= base["yield"] + 2 - 1e-9, "A5: at least as productive (%.2f a harvest against %d)" % [h.plot_yield_exact("jalapeno"), base["yield"] + 2])
-	check(h.quality_chance("jalapeno") >= 0.30 - 1e-9, "A5: as likely to double (%.0f%%)" % (h.quality_chance("jalapeno") * 100.0))
+	check(p.cargo == 30, "A5: its Crop Quality kept, as 30 Cargo levels since D043 (%d)" % p.cargo)
 	check(p.speed <= 3 * 0.15 / T.PLOT_SPEED_STEP + 1 and h.to_state().version == Game.SAVE_VERSION, "A5: no more levels than it takes, saved as v%d" % Game.SAVE_VERSION)
 
 
@@ -621,4 +619,19 @@ func test_v8_renamed_plot_converts() -> void:
 	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v8 save with a Cane Sugar plot loads")
 	var base: int = h.data.plots.pineapple["yield"]
 	check(h.plots.pineapple.owned and h.plot_yield_exact("pineapple") >= base + 2 - 1e-9, "S: as a Pineapple Grove, its yield levels converted (%.2f a harvest, at least %d)" % [h.plot_yield_exact("pineapple"), base + 2])
+
+
+func test_v10_quality_becomes_cargo() -> void:
+	# C5 (D043): a v10 save's Crop Quality levels become Cargo levels.
+	var g := opened(1000.0)
+	g.buy_plot("bell")
+	var s: Dictionary = g.to_state()
+	s.version = 10
+	s.run.plots.bell.erase("cargo")
+	s.run.plots.bell.erase("field")
+	s.run.plots.bell.erase("haul")
+	s.run.plots.bell.quality = 7
+	var h := Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(s))) == "", "C5: a v10 save loads")
+	check(h.plots.bell.cargo == 7 and h.plots.bell.field == 0 and not h.plots.bell.has("quality"), "C5: 7 Crop Quality levels are 7 Cargo levels, the field empty")
 

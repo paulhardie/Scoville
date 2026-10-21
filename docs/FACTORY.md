@@ -165,7 +165,7 @@ Recipes and the £140 bottle are the brief's. The rest is GUESSES tuned against 
 
 ### Crop Quality (D016)
 
-**Since D041:** 1% a level to 30 levels (the same 30% cap), priced like every plot upgrade at 5% of the plot's price × 1.3^level ([ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041)). As first built: a third plot upgrade beside Harvest Speed and Yield. Each level adds a 3% chance that a harvest gives double, capped at 10 levels (30%). Its price is £30 × 2^level × √(price ÷ £10), like the others.
+**Replaced by Cargo since D043** (its double chance is Bumper Crop in the Tech Tree). **Since D041:** 1% a level to 30 levels (the same 30% cap), priced like every plot upgrade at 5% of the plot's price × 1.3^level ([ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041)). As first built: a third plot upgrade beside Harvest Speed and Yield. Each level adds a 3% chance that a harvest gives double, capped at 10 levels (30%). Its price is £30 × 2^level × √(price ÷ £10), like the others.
 
 ### Saves
 
@@ -259,3 +259,23 @@ The owner asked for the plot's third upgrade to be Idle Planet Miner's cargo ins
 | C6 | A long time away carries crops as ticking would: the offline suite's comparisons of the catch-up with ticking still pass, with a plot backed up. |
 | C7 | The mechanic comes into play: the pacing player first buys Cargo, because a plot is backed up, by 30:00. |
 | C8 | Every criterion already set still passes: onboarding, factory, economy, tech tree, offline, full run, prestige, second run, layout and A1–A5. |
+
+### Built (v0.6e)
+
+- **Cargo:** `CARGO_START` 2 (twice the plot's base growth), `CARGO_STEP` 10% of that a level, both GUESSES (`tuning.gd`). The truck's spare capacity carries over while it's busy; when idle it holds at most one base cycle's load, so a fresh harvest goes straight in but nothing banks up. Forager's Luck drops go straight to stock.
+- **Bumper Crop I–III** (E48–E50): I needs Smoky Ancho's blueprint (15 Bistro Verde), II Serrano Fire's and I (20 Classic Louisiana), III Cajun Red's and II (15 Island Heat).
+- **Forager's Luck:** a drop is a harvest, so Bumper Crop can double it too. Without that its share fell to 9% (T4), because Bumper Crop doubled harvests but not drops.
+- **The pacing player** values a plot level by what it adds to what reaches stock (the slower of growing and carrying), so it buys Cargo only when a plot is backed up and stops growing one its truck can't keep up with. It researches each Bumper Crop after its tier's sauce blueprints: straight after Louisiana's, Bumper Crop II's 20 Louisiana held the chain up 10 minutes (Cajun Red 24 minutes late, U3) and III pushed Night Shift II past the 1:40 night (P2).
+
+### Results (v0.6e)
+
+**C1–C7 PASS; C8 FAILS on A4 by one second.**
+
+- **C1:** the sheet offers Harvest Speed, Yield per Cycle and Cargo (UI suite).
+- **C2:** an unupgraded Bell plot carries 2.0 a second against 1.0 grown, and Hydroponics raises both alike. Backed up (Yield 100), the truck carries its rate, the rest waits, harvested = carried + waiting, and the waiting crops count in Operation Value. A bigger truck clears the field.
+- **C3:** Cargo costs 5% of the price, ×1.3, +10% of the base a level.
+- **C4:** 10%, 20% and 30% with Bumper Crop I, II and III; 30% of 10,000 harvests came in double, within 1.5 points.
+- **C5:** a v10 save's 7 Crop Quality levels load as 7 Cargo levels with an empty field. A v8 save's levels go through v9's conversion first.
+- **C6:** a backed-up Bell plot, 2 hours away: the catch-up is within 2% of ticking, in Operation Value and in crops waiting.
+- **C7:** the first Cargo level at 7:56, on the Bell plot.
+- **C8:** every earlier criterion passes except **A4: 6:31 against its 6:30 bar** (6:22 before). Crop Quality's early levels are gone, so early cash goes to Cargo and the Ancho vat lands at 13:40 instead of 13:36. Otherwise the curve holds: the sale at 2:07:07 (was 2:01:56), Phantom at 2:39:22, tapping 40% at 15:00, the second run 4/4.

@@ -13,7 +13,7 @@ const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech 
 const MONEY_SUFFIXES := ["K", "M", "B", "T", "Qa", "Qi"]
 const BUY_MODES := ["1", "10", "max"]
 const STATION_NAMES := {"vat": "Vat", "line": "Line"}
-const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "quality": "Crop Quality"}
+const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "cargo": "Cargo"}
 ## Steps for the valve's keep amounts.
 const KEEP_STEP := 10
 
@@ -1096,7 +1096,15 @@ func _refresh_plot(crop: String) -> void:
 		nodes.info.text = "Harvests %s by itself." % plural
 	nodes.bar.visible = p.owned
 	nodes.bar.value = clampf(p.progress / game.plot_cycle(crop), 0.0, 1.0)
-	nodes.status.visible = false
+	# The truck (Cargo, D043): what it carries, and what's waiting once the
+	# plot has outgrown it.
+	nodes.status.visible = p.owned
+	if p.owned:
+		var backed_up: bool = p.field > 2.0 * game.plot_yield_exact(crop)
+		nodes.status.text = "Truck carries %.1f a second" % game.cargo_rate(crop)
+		if backed_up:
+			nodes.status.text += "   ·   %s waiting" % _count(p.field)
+		nodes.status.add_theme_color_override("font_color", S.ORANGE if backed_up else S.MUTED)
 	nodes.buy.visible = not p.owned
 	nodes.buy.text = "Buy   %s" % _money(game.plot_price(crop))
 	nodes.buy.disabled = not game.can_buy_plot(crop)
@@ -1525,12 +1533,8 @@ func _refresh_sheet() -> void:
 			name = "Speed"
 		if cost < INF:
 			b.text = "%s   Lv %d → %d   %s" % [name, lv, lv + shown, _money(cost)]
-		elif upgrade == "quality" and lv < T.CROP_QUALITY_MAX:
-			b.text = "%s   Lv %d   only %d left" % [name, lv, T.CROP_QUALITY_MAX - lv]
 		else:
 			b.text = "%s   Lv %d   max" % [name, lv]
-		if upgrade == "quality" and lv > 0:
-			b.text += "   (%d%% double)" % roundi(game.quality_chance(_sheet_of.crop) * 100.0)
 		b.disabled = n == 0
 
 

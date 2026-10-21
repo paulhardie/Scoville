@@ -118,10 +118,14 @@ const TICKER_MULTS := [2.0, 3.0]
 ## Byproduct Recycling (D013): seconds between free levels at most.
 const BYPRODUCT_COOLDOWN := 60.0
 
-## Crop Quality (D016): chance a level and its cap in levels; D041 made the
-## steps smaller to the same 30% cap. Its price is the plot curve's.
-const CROP_QUALITY_STEP := 0.01
-const CROP_QUALITY_MAX := 30
+## Cargo (D043): an unupgraded plot's truck carries CARGO_START times its base
+## growth, and each level adds CARGO_STEP of that (GUESS, tuned in v0.6e).
+const CARGO_START := 2.0
+const CARGO_STEP := 0.10
+## v10's Crop Quality (D041), for converting a v8 save's levels on the way to
+## Cargo (D043).
+const V10_CROP_QUALITY_STEP := 0.01
+const V10_CROP_QUALITY_MAX := 30
 
 # --- v0.5: offline (docs/OFFLINE.md) -------------------------------------------
 

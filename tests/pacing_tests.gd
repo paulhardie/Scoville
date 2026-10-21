@@ -174,6 +174,13 @@ func run() -> void:
 			a4_gap = stations[i + 1][0] - at
 			a4_where = "%s to %s" % [stations[i][1], stations[i + 1][1]]
 	criterion("A4", new_plots >= 2 and a4_gap <= 390.0, "first line to 14:00: %d new plots (at least 2); longest wait between new stations %s (at most 6:30, W26; %s)" % [new_plots, clock(a4_gap), a4_where])
+	# v0.6e: Cargo comes into play (FACTORY.md, D043).
+	var cargo_at := INF
+	for entry in p.events:
+		if String(entry[1]).ends_with(".cargo"):
+			cargo_at = entry[0]
+			break
+	criterion("C7", cargo_at <= 30 * 60.0, "the first Cargo level at %s (by 30:00)" % clock(cargo_at))
 
 	# v0.3's criteria, to 50:00 (ECONOMY.md).
 	criterion("N1", reached.get("nav", INF) <= 9 * 60.0, "Stage 3 ($4,000) at %s (by 9:00)" % clock(reached.get("nav", INF)))

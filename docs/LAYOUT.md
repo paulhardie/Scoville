@@ -26,7 +26,7 @@ This doc is step 1. Status: **built**, all criteria PASS.
 | Id | Criterion |
 | --- | --- |
 | L1 | Money and counts follow the number rule above at every boundary: $9,999.99, $10.0K, $999K, $1.00M, $1.23B; 9,999 and 10.0K. |
-| L2 | The ×10 and Max rules are the game's (`game.gd`), not the screen's: buying ten levels costs the sum of the next ten prices; Max buys the most levels cash covers and leaves less than the next level's price; a capped upgrade (Crop Quality at 10) stops at the cap. |
+| L2 | The ×10 and Max rules are the game's (`game.gd`), not the screen's: buying ten levels costs the sum of the next ten prices; Max buys the most levels cash covers and leaves less than the next level's price; a capped upgrade (Crop Quality at 10) stops at the cap (D043 removed Crop Quality, the only capped one, so that check is gone). |
 | L3 | A station card shows no upgrade buttons; Manage opens its sheet; the sheet's ×1, ×10 and Max each buy what they say; "!" shows exactly when an upgrade is affordable; the buy mode survives a restart of the screen. |
 | L4 | Bottles made show a pop from Sell Batch, at most POPS_PER_SECOND a second however fast lines run; a sale flies a coin, at most COINS_PER_SECOND a second. |
 | L5 | After a sale of $X, Cash on screen shows less than the real cash within the first frame, and exactly the real cash after COUNT_UP seconds. |

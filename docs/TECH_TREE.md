@@ -213,3 +213,14 @@ Built (save v6, which adds `stats.foraged`). Asked for by the owner, beyond the 
 - **T4's window was changed after the first measurement.** Over one minute, as drafted, it measured +9% (FAIL). A minute holds only about five drops, so one minute swings by ±40% with the random stream; ten minutes of the same player gives +13%. The bar (10–20%) is unchanged; only the window grew.
 - **X7 (8 hours away in under 0.5 s) fails on the session container** at 0.85–1.3 s, both before and after this change (measured back to back), so it's the machine, not the node. CI is the judge.
 - The pacing player doesn't research N10, so every other pacing number is unchanged. T4 grants the node to a copy of its 0:45 save.
+
+## Bumper Crop I–III (D043)
+
+Crop Quality's chance of a double harvest moved here from the plot's upgrades, for every plot at once ([FACTORY.md](FACTORY.md#v06e-cargo-and-bumper-crop-in-the-tech-tree-d043)).
+
+| Id | Name | Needs | Cost | Effect | Pos |
+| --- | --- | --- | --- | --- | --- |
+| E48 | Bumper Crop I | E14 (Smoky Ancho) | 15 Bistro Verde | Every harvest 10% likely to come in double | 3, −3 |
+| E49 | Bumper Crop II | E48, E17 (Serrano Fire) | 20 Classic Louisiana | 20% | 6, −3 |
+| E50 | Bumper Crop III | E49, E20 (Cajun Red) | 15 Island Heat | 30% (Crop Quality's old cap) | 9, −2 |
+

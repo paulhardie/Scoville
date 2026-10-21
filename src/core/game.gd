@@ -15,14 +15,14 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 10
+const SAVE_VERSION := 11
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
 const EPSILON := 1e-6
 
 const TABS := ["farms", "processing", "tech", "market", "roster", "hq"]
-const PLOT_UPGRADES := ["speed", "yield", "quality"]
+const PLOT_UPGRADES := ["speed", "yield", "cargo"]
 
 var data: Dictionary
 
@@ -30,7 +30,7 @@ var data: Dictionary
 var cash := 0.0
 var stock := {}                 # item id → count
 var revealed := {"counter": false, "status_bar": false, "deck": false}
-var plots := {}                 # crop → {owned, speed, yield, quality, progress}
+var plots := {}                 # crop → {owned, speed, yield, cargo, progress, spare, field, haul}
 var vats: Array = []            # slots in buying order: {recipe, speed, progress, running, taken}
 var lines: Array = []           # the same, plus crate: Starter Crate bottles left
 var research := {}              # node id → true
@@ -68,7 +68,7 @@ func _reset_run() -> void:
 		stock[item] = 0
 	plots = {}
 	for crop in data.plots:
-		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "quality": 0, "progress": 0.0, "spare": 0.0}
+		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "cargo": 0, "progress": 0.0, "spare": 0.0, "field": 0, "haul": 0.0}
 	vats = []
 	lines = []
 	autosell = {}
@@ -105,7 +105,7 @@ func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
 		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "plot_yield": {}, "concentrate": {}, "reserve": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
 		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
-		"byproduct": 0.0, "forage": 0.0, "sop": false, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
+		"byproduct": 0.0, "forage": 0.0, "bumper": 0.0, "sop": false, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
 	for node in research:
 		for e in data.tech[node].effects:
 			var kind: String = e.keys()[0]
@@ -137,6 +137,7 @@ func _refresh_fx() -> void:
 				"sop": fx.sop = true
 				"byproduct_recycling": fx.byproduct = maxf(fx.byproduct, v)
 				"forage": fx.forage = maxf(fx.forage, v)
+				"bumper_crop": fx.bumper += v
 				"stock_value_bonus": fx.stock_bonus += v
 				"offline":
 					fx.offline_hours += v.hours
@@ -217,6 +218,10 @@ func operation_value() -> float:
 	for item in stock:
 		if stock[item] > 0:
 			v += stock[item] * appraisal(item)
+	# Crops waiting in a field for the truck count too (D043).
+	for crop in plots:
+		if plots[crop].field > 0:
+			v += plots[crop].field * appraisal(crop)
 	return v
 
 
@@ -284,12 +289,31 @@ func plot_yield_exact(crop: String) -> float:
 	return data.plots[crop]["yield"] * (1.0 + T.PLOT_YIELD_STEP * plots[crop]["yield"]) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_yield", 0.0))
 
 
-## The chance a harvest gives double (Crop Quality, D016).
-func quality_chance(crop: String) -> float:
-	return T.CROP_QUALITY_STEP * plots[crop].quality
+## The chance a harvest gives double: Bumper Crop's, for every plot (D043; it
+## was each plot's Crop Quality, D016).
+func double_chance() -> float:
+	return fx.bumper
 
 
-## "speed", "yield" or "quality".
+## Research and HQ boosts to a plot's harvests, which raise its truck alike
+## (D043): only Harvest Speed and Yield levels can outgrow it.
+func plot_boost(crop: String) -> float:
+	return fx.plot_speed.get(crop, 1.0) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_speed", 0.0)) * (1.0 + fx.hq.get("plot_yield", 0.0))
+
+
+## Crops a second the plot grows (its harvests, without Bumper Crop's doubles).
+func plot_growth(crop: String) -> float:
+	return plot_yield_exact(crop) / plot_cycle(crop)
+
+
+## Crops a second the plot's truck carries to stock (Cargo, D043): CARGO_START
+## times its base growth, plus CARGO_STEP of that a level, times its boosts.
+func cargo_rate(crop: String) -> float:
+	var base: float = data.plots[crop]["yield"] / data.plots[crop].seconds
+	return T.CARGO_START * base * (1.0 + T.CARGO_STEP * plots[crop].cargo) * plot_boost(crop)
+
+
+## "speed", "yield" or "cargo".
 ## A plot upgrade's price, `ahead` levels past its current one (for buying
 ## several at once, LAYOUT.md).
 ## Every plot upgrade is on Idle Planet Miner's curve (D041): its first level
@@ -298,8 +322,6 @@ func plot_upgrade_cost(crop: String, upgrade: String, ahead: int = 0) -> float:
 	if not upgrade in PLOT_UPGRADES:
 		return INF
 	var lv: int = plots[crop][upgrade] + ahead
-	if upgrade == "quality" and lv >= T.CROP_QUALITY_MAX:
-		return INF
 	return plot_price(crop) * T.PLOT_UPGRADE_SHARE * pow(T.PLOT_UPGRADE_GROWTH, lv)
 
 
@@ -884,12 +906,13 @@ func _step(k: int) -> void:
 		if k == 1:
 			while p.progress >= plot_cycle(crop) - EPSILON:
 				p.progress -= plot_cycle(crop)
-				var harvests := 2 if p.quality > 0 and rng.randf() < quality_chance(crop) else 1
+				var harvests := 2 if fx.bumper > 0.0 and rng.randf() < fx.bumper else 1
 				var n := _harvest(crop, harvests)
-				stock[crop] += n
+				p.field += n
 				stats.harvested[crop] += n
 		else:
 			_harvest_batch(crop)
+		_haul(crop, dt)
 	_start_cycles()
 	for i in vats.size():
 		if k == 1:
@@ -1098,12 +1121,14 @@ func _shortest_ingredient() -> String:
 
 
 ## One harvest of the shortest ingredient at its base cycle: what the plot grows
-## in its base cycle's time, upgrades included, without Crop Quality's double.
+## in its base cycle's time, upgrades included.
 ## Speed levels count too (D041: they're many and cheap now), so the drop keeps
-## its share of the plot (D025).
+## its share of the plot (D025). It goes straight to stock, not the field.
 func _forage_drop() -> void:
 	var crop := _shortest_ingredient()
-	var n := _harvest(crop, data.plots[crop].seconds / plot_cycle(crop))
+	# A drop is a harvest, so Bumper Crop can double it too (D043).
+	var harvests := 2.0 if fx.bumper > 0.0 and rng.randf() < fx.bumper else 1.0
+	var n := _harvest(crop, harvests * data.plots[crop].seconds / plot_cycle(crop))
 	stock[crop] += n
 	stats.harvested[crop] += n
 	stats.foraged += 1
@@ -1140,11 +1165,25 @@ func _harvest_batch(crop: String) -> void:
 	if n <= 0:
 		return
 	p.progress -= n * cycle
-	var chance := quality_chance(crop)
-	var doubled := _binomial(n, chance) if chance > 0.0 else 0
+	var doubled := _binomial(n, fx.bumper) if fx.bumper > 0.0 else 0
 	var got := _harvest(crop, n + doubled)
-	stock[crop] += got
+	p.field += got
 	stats.harvested[crop] += got
+
+
+## The truck carries what it can from the field to stock (D043). Its spare
+## capacity carries over while it's busy; idle, it holds at most a base cycle's
+## load, so a fresh harvest goes straight in but nothing banks up for later.
+func _haul(crop: String, dt: float) -> void:
+	var p: Dictionary = plots[crop]
+	var rate := cargo_rate(crop)
+	p.haul += rate * dt
+	var n := mini(p.field, floori(p.haul + EPSILON))
+	p.field -= n
+	p.haul = maxf(0.0, p.haul - n)
+	stock[crop] += n
+	if p.field == 0:
+		p.haul = minf(p.haul, rate * data.plots[crop].seconds)
 
 
 ## A long step for a vat or line (the catch-up, D020): as many cycles as the
@@ -1248,9 +1287,9 @@ func _free_level() -> bool:
 	var lowest_levels := 1 << 30
 	for crop in plots:
 		var p: Dictionary = plots[crop]
-		if p.owned and p.speed + p["yield"] + p.quality < lowest_levels:
+		if p.owned and p.speed + p["yield"] + p.cargo < lowest_levels:
 			lowest = crop
-			lowest_levels = p.speed + p["yield"] + p.quality
+			lowest_levels = p.speed + p["yield"] + p.cargo
 	if lowest == "":
 		return false
 	var best := ""
@@ -1487,6 +1526,11 @@ func load_state(s: Variant) -> String:
 		if problem != "":
 			return problem
 		s = _migrate_8_to_9(s)
+	if from_version < 11:
+		problem = _check(s.run, {"plots": TYPE_DICTIONARY})
+		if problem != "":
+			return problem
+		s = _migrate_10_to_11(s)
 	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
 	# v7 only adds the account's Prestige fields, read below with defaults.
@@ -1561,7 +1605,8 @@ func load_state(s: Variant) -> String:
 	for crop in run.plots:
 		var p: Dictionary = run.plots[crop]
 		plots[crop] = {"owned": bool(p.get("owned", false)), "speed": int(p.get("speed", 0)), "yield": int(p.get("yield", 0)),
-			"quality": int(p.get("quality", 0)), "progress": float(p.get("progress", 0.0)), "spare": float(p.get("spare", 0.0))}
+			"cargo": int(p.get("cargo", 0)), "progress": float(p.get("progress", 0.0)), "spare": float(p.get("spare", 0.0)),
+			"field": int(p.get("field", 0)), "haul": float(p.get("haul", 0.0))}
 	vats = []
 	lines = []
 	for station in ["vat", "line"]:
@@ -1614,6 +1659,20 @@ func load_state(s: Variant) -> String:
 	return ""
 
 
+## v11 (D043): Crop Quality becomes Cargo, level for level (they cost the
+## same), with an empty field.
+func _migrate_10_to_11(s: Dictionary) -> Dictionary:
+	var out := s.duplicate(true)
+	for crop in out.run.plots:
+		if typeof(out.run.plots[crop]) != TYPE_DICTIONARY:
+			continue
+		var p: Dictionary = out.run.plots[crop]
+		p.cargo = _level(p, "quality")
+		p.erase("quality")
+	out.version = 11
+	return out
+
+
 ## v10 (D042): peppers named by real heat with generic names, and Pineapple
 ## for Cane Sugar. Ids in a save are renamed in this order (Habanero before Red
 ## Savina becomes Chocolate Habanero; Savina Gold before Red Savina).
@@ -1641,7 +1700,7 @@ func _migrate_8_to_9(s: Dictionary) -> Dictionary:
 			continue
 		var p: Dictionary = out.run.plots[crop]
 		p.speed = ceili(_level(p, "speed") * T.V8_PLOT_SPEED_STEP / T.PLOT_SPEED_STEP - EPSILON)
-		p.quality = mini(T.CROP_QUALITY_MAX, ceili(_level(p, "quality") * T.V8_CROP_QUALITY_STEP / T.CROP_QUALITY_STEP - EPSILON))
+		p.quality = mini(T.V10_CROP_QUALITY_MAX, ceili(_level(p, "quality") * T.V8_CROP_QUALITY_STEP / T.V10_CROP_QUALITY_STEP - EPSILON))
 		if data.plots.has(crop):
 			p["yield"] = ceili(_level(p, "yield") / (data.plots[crop]["yield"] * T.PLOT_YIELD_STEP) - EPSILON)
 	out.version = 9

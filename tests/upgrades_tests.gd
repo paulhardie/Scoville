@@ -236,8 +236,8 @@ func test_byproduct_recycling() -> void:
 	for i in range(1, free_times.size()):
 		min_gap = minf(min_gap, free_times[i] - free_times[i - 1])
 	check(min_gap >= 60.0 - 1e-6, "R16: never two within a minute: %.1f s" % min_gap)
-	var bell_levels: int = g.plots.bell.speed + g.plots.bell["yield"] + g.plots.bell.quality
-	var jal_levels: int = g.plots.jalapeno.speed + g.plots.jalapeno["yield"] + g.plots.jalapeno.quality
+	var bell_levels: int = g.plots.bell.speed + g.plots.bell["yield"] + g.plots.bell.cargo
+	var jal_levels: int = g.plots.jalapeno.speed + g.plots.jalapeno["yield"] + g.plots.jalapeno.cargo
 	check(absi(bell_levels - jal_levels) <= 1, "R16: levels go to the lowest plot, so they even out: %d and %d" % [bell_levels, jal_levels])
 	var chance := with(["byproduct_recycling"], 5)
 	chance.cash = 1e6
@@ -300,23 +300,55 @@ func test_tier_3() -> void:
 	check(close(g.plot_cycle("cayenne"), 2.4) and g.plot_yield("cayenne") == 5 and g.plot_yield("garlic") == 4, "Tier 3 plots: 5 Cayenne, 4 Garlic every 2.4 s")
 
 
-func test_crop_quality() -> void:
+func test_cargo() -> void:
+	# C2, C3 (D043): the truck carries twice what an unupgraded plot grows.
 	var g := with([], 11)
 	g.cash = 1e9
 	g.buy_plot("bell")
-	check(close(g.plot_upgrade_cost("bell", "quality"), g.plot_price("bell") * T.PLOT_UPGRADE_SHARE), "the first level costs %.0f%% of the Bell plot's price (D041)" % (T.PLOT_UPGRADE_SHARE * 100.0))
-	for i in T.CROP_QUALITY_MAX + 2:
-		g.upgrade_plot("bell", "quality")
-	check(g.plots.bell.quality == T.CROP_QUALITY_MAX and close(g.quality_chance("bell"), 0.30), "S8: capped at %d levels, 30%%" % T.CROP_QUALITY_MAX)
-	g.plots.bell.quality = 12
+	var first: float = g.plot_price("bell") * T.PLOT_UPGRADE_SHARE
+	check(close(g.plot_upgrade_cost("bell", "cargo"), first) and close(g.plot_upgrade_cost("bell", "cargo", 1), first * T.PLOT_UPGRADE_GROWTH), "C3: Cargo costs 5% of the plot's price, then ×1.3")
+	check(close(g.cargo_rate("bell"), 2.0 * g.plot_growth("bell")), "C2: an unupgraded truck carries twice what the plot grows (%.2f against %.2f)" % [g.cargo_rate("bell"), g.plot_growth("bell")])
+	var base := g.cargo_rate("bell")
+	g.upgrade_plot("bell", "cargo")
+	check(close(g.cargo_rate("bell"), base * (1.0 + T.CARGO_STEP)), "C3: a level adds %d%% of the base" % roundi(T.CARGO_STEP * 100.0))
+	var boosted := with(["hydroponic_bell"], 11)
+	boosted.cash = 1e9
+	boosted.buy_plot("bell")
+	check(close(boosted.cargo_rate("bell"), 2.0 * boosted.plot_growth("bell")), "C2: Hydroponics speeds the truck up alike (%.2f against %.2f)" % [boosted.cargo_rate("bell"), boosted.plot_growth("bell")])
+
+	# Backed up: what the truck can't carry waits, counted, never lost.
+	var b := with([], 12)
+	b.cash = 1e9
+	b.buy_plot("bell")
+	b.plots.bell["yield"] = 100
+	var stock_before: int = b.stock.bell
+	b.advance(seconds(100.0))
+	var carried: int = b.stock.bell - stock_before
+	var waiting: int = b.plots.bell.field
+	check(absf(carried - 100.0 * b.cargo_rate("bell")) <= b.plot_yield_exact("bell") + 2 and waiting > 0, "C2: backed up, the truck carries its rate (%d in 100 s at %.1f a second) and %d wait" % [carried, b.cargo_rate("bell"), waiting])
+	check(b.stats.harvested.bell == carried + waiting, "C2: none are lost (%d harvested, %d carried, %d waiting)" % [b.stats.harvested.bell, carried, waiting])
+	var ov: float = b.operation_value() - b.stats.cash_earned
+	check(close(ov, (b.stock.bell + waiting) * b.appraisal("bell"), 1e-6), "C2: the waiting crops count in Operation Value")
+	b.plots.bell.cargo = 400
+	b.advance(seconds(60.0))
+	check(b.plots.bell.field <= roundi(b.plot_yield_exact("bell")) * 2, "C2: a bigger truck clears the field (%d left)" % b.plots.bell.field)
+
+
+func test_bumper_crop() -> void:
+	# C4 (D043): Bumper Crop I–III, 10% a node.
+	check(close(with([], 11).double_chance(), 0.0), "C4: no doubles without Bumper Crop")
+	check(close(with(["bumper_crop_1"], 11).double_chance(), 0.1) and close(with(["bumper_crop_2"], 11).double_chance(), 0.2), "C4: 10% with I, 20% with II")
+	var g := with(["bumper_crop_3"], 11)
+	check(close(g.double_chance(), 0.3), "C4: 30% with all three")
+	g.cash = 1e9
+	g.buy_plot("bell")
 	var harvests := 10000
 	var base: int = g.plot_yield("bell")
-	var before: int = g.stats.harvested.bell
 	var doubled := 0
 	for i in harvests:
 		g.plots.bell.progress = g.plot_cycle("bell")
-		var b: int = g.stats.harvested.bell
+		var before: int = g.stats.harvested.bell
 		g.tick()
-		if g.stats.harvested.bell - b == 2 * base:
+		if g.stats.harvested.bell - before == 2 * base:
 			doubled += 1
-	check(absf(doubled / float(harvests) - 0.12) <= 0.01, "S8: 12 levels double 12%% of harvests: %.1f%%" % (doubled * 100.0 / harvests))
+	check(absf(doubled / float(harvests) - 0.3) <= 0.015, "C4: 30%% of harvests come in double: %.1f%%" % (doubled * 100.0 / harvests))

@@ -278,3 +278,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** Tabasco duplicated Cayenne's heat and Habanero duplicated Scotch Bonnet's; Moruga and Reaper overlap. TABASCO (McIlhenny, enforced), RED SAVINA HABANERO and PepperX are registered marks, and "Smokin' Ed's Carolina Reaper" is registered with plain "Carolina Reaper" contested. Real names players know are the trade-off; the agent's searches used secondary sources, not the official register, so it isn't legal advice. Pepper Y and Alabama Grim are parodies by design: they nod at the marks without using them. Pineapple: Scotch Bonnet with pineapple or mango is a real Caribbean pairing, and it fits Island Heat and Sweet Heat better than cane sugar. The Trinidad 7 Pot the proposal added is dropped: the two parody peppers fill Tier 6. Fermentation as a mechanic is a later version (W27).
 
+
+## D043: Pixel art is the game's look; trial a ready-made pixel UI skin first
+
+**Decision (the owner's: "I'd like a pixel art style for this game for sure"; the trial is the agent's recommendation):** the game's visual style is pixel art. The first step is a trial of Pixel UI Free (heyheythere, CC BY 4.0, wood theme) over today's screen, drawn at whole-number scales with its bitmap font ([LOOK.md](LOOK.md)). Whether to keep the kit, buy the full pack or commission custom UI art is the owner's call after seeing the trial.
+
+**Why:** W8 asked for a direction; the owner gave one. A skin over the existing screen is the cheapest way to see pixel art on our real content (dense cards, long names, big numbers) before anyone draws art for it. The trade-off: the kit is a generic fantasy-RPG skin, so it shows whether the style works, not what the finished game looks like.

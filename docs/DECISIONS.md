@@ -278,3 +278,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** Tabasco duplicated Cayenne's heat and Habanero duplicated Scotch Bonnet's; Moruga and Reaper overlap. TABASCO (McIlhenny, enforced), RED SAVINA HABANERO and PepperX are registered marks, and "Smokin' Ed's Carolina Reaper" is registered with plain "Carolina Reaper" contested. Real names players know are the trade-off; the agent's searches used secondary sources, not the official register, so it isn't legal advice. Pepper Y and Alabama Grim are parodies by design: they nod at the marks without using them. Pineapple: Scotch Bonnet with pineapple or mango is a real Caribbean pairing, and it fits Island Heat and Sweet Heat better than cane sugar. The Trinidad 7 Pot the proposal added is dropped: the two parody peppers fill Tier 6. Fermentation as a mechanic is a later version (W27).
 
+## D043: Cargo replaces Crop Quality; Bumper Crop in the Tech Tree
+
+**Decision (the owner's, on the agent's recommendation):** a plot's third cash upgrade is Cargo, Idle Planet Miner's: harvests wait in the plot's field and a truck carries them to stock at a cargo rate, twice the plot's base growth at level 0 and raised by every Tech and HQ boost that raises the harvest. The double-crop chance moves to three Tech Tree nodes, Bumper Crop I–III (10% each, 30% in all). Save v11 turns Crop Quality levels into Cargo levels. This changes the brief's plot knobs (§2, "Crop Quality Chance"). ([FACTORY.md](FACTORY.md#v06e-cargo-and-bumper-crop-in-the-tech-tree-d043))
+
+**Why:** Harvest Speed and Yield both mean more crops; Idle Planet Miner's third upgrade is delivery, which makes each plot a balance to keep rather than three ways to grow it. A chance to double is the kind of perk the Tech Tree holds. Boosts raise cargo too so research never backs a plot up by itself; only the player's own levels can outgrow the truck, the moment to rebalance.
+

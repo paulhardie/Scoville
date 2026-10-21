@@ -234,3 +234,28 @@ Otherwise it plays like the pacing player. Both are measured over the first 20 m
   - **Shared Pickled Brine went to the wrong slot.** In a long step every vat ran before any line, so the Cayenne Mash vat took the Brine a waiting Bistro Verde line should have had. A vat's output is now offered to waiting slots at once, as in a tick.
   - **The Piston's presses were slow.** They are now batched in long steps.
 - **P2 measurement fix:** its "2 hours of tapping" is a minute scaled by 120. At 1:40 a ×3 Market spike was running, and it was being counted for all 2 hours though a spike lasts 30 minutes. That minute is now measured without the spike.
+
+## v0.6e: Cargo, and Bumper Crop in the Tech Tree (D043)
+
+The owner asked for the plot's third upgrade to be Idle Planet Miner's cargo instead of Crop Quality: a chance of double crops belongs in a skill tree. In Idle Planet Miner a planet mines ore, but ships only carry cargo × speed away, so the third upgrade is keeping up with production rather than more of it.
+
+### Rules
+
+- **A plot grows, its truck carries.** Harvests land in the plot's field. The truck carries crops from the field to stock at its **cargo rate**, crops a second. Whatever it can't carry yet waits in the field: never lost, counted in Operation Value, shown on the card ("312 waiting").
+- **Cargo rate:** at level 0 twice the plot's base growth (its base yield ÷ its base cycle), so an unupgraded plot never backs up. Each Cargo level adds a share of that base. Tech and HQ boosts that speed up or enlarge a plot's harvests (Hydroponics, the Pantry Boosters, Bulk, the Seed Vault, the Hydroponics Bay) raise the cargo rate by the same factor, so only the player's own Harvest Speed and Yield levels can outgrow the truck.
+- **Cargo costs what the other two do:** 5% of the plot's price, ×1.3 a level (A2).
+- **Bumper Crop I–III** (Tech Tree, East Wing): each gives every harvest a further 10% chance to come in double, 30% with all three, Crop Quality's old cap. Placed by when Crop Quality used to be bought up.
+- **Saves (v11):** Crop Quality levels become Cargo levels one for one (they cost the same), with an empty field.
+
+### Criteria (v0.6e)
+
+| Id | Criterion |
+| --- | --- |
+| C1 | A plot's upgrades are Harvest Speed, Yield and Cargo; nothing sells or offers Crop Quality. |
+| C2 | An unupgraded plot's truck carries twice what it grows, with every Tech and HQ boost applied to both; crops beyond the cargo rate wait in the field, none are lost, they count in Operation Value, and they are carried as the truck frees up. |
+| C3 | Cargo levels cost 5% of the plot's price, ×1.3 a level, and each adds the same share of the base cargo rate. |
+| C4 | Bumper Crop I, II and III give every plot's harvests a 10%, 20% and 30% chance to double. |
+| C5 | A v10 save loads as v11 with each plot's Crop Quality levels as Cargo levels and an empty field. |
+| C6 | A long time away carries crops as ticking would: the offline suite's comparisons of the catch-up with ticking still pass, with a plot backed up. |
+| C7 | The mechanic comes into play: the pacing player first buys Cargo, because a plot is backed up, by 30:00. |
+| C8 | Every criterion already set still passes: onboarding, factory, economy, tech tree, offline, full run, prestige, second run, layout and A1–A5. |

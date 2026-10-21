@@ -15,7 +15,7 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 8
+const SAVE_VERSION := 9
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
@@ -68,7 +68,7 @@ func _reset_run() -> void:
 		stock[item] = 0
 	plots = {}
 	for crop in data.plots:
-		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "quality": 0, "progress": 0.0}
+		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "quality": 0, "progress": 0.0, "spare": 0.0}
 	vats = []
 	lines = []
 	autosell = {}
@@ -273,8 +273,15 @@ func plot_cycle(crop: String) -> float:
 	return data.plots[crop].seconds / (1.0 + T.PLOT_SPEED_STEP * plots[crop].speed) / fx.plot_speed.get(crop, 1.0) / (1.0 + fx.hq.get("plot_speed", 0.0))
 
 
+## A harvest's crops, to the nearest whole one (what the card shows).
 func plot_yield(crop: String) -> int:
-	return roundi((data.plots[crop]["yield"] + plots[crop]["yield"]) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_yield", 0.0)))
+	return roundi(plot_yield_exact(crop))
+
+
+## A harvest's crops with the fraction: each yield level adds a share of the
+## plot's base yield (D041), and the fraction carries to the next harvest.
+func plot_yield_exact(crop: String) -> float:
+	return data.plots[crop]["yield"] * (1.0 + T.PLOT_YIELD_STEP * plots[crop]["yield"]) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_yield", 0.0))
 
 
 ## The chance a harvest gives double (Crop Quality, D016).
@@ -285,17 +292,15 @@ func quality_chance(crop: String) -> float:
 ## "speed", "yield" or "quality".
 ## A plot upgrade's price, `ahead` levels past its current one (for buying
 ## several at once, LAYOUT.md).
+## Every plot upgrade is on Idle Planet Miner's curve (D041): its first level
+## costs a share of the plot's price, each level after it × growth.
 func plot_upgrade_cost(crop: String, upgrade: String, ahead: int = 0) -> float:
-	var scale := pow(maxf(plot_price(crop), T.PLOT_PRICE_REFERENCE) / T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER)
+	if not upgrade in PLOT_UPGRADES:
+		return INF
 	var lv: int = plots[crop][upgrade] + ahead
-	match upgrade:
-		"speed":
-			return T.PLOT_SPEED_COST * scale * pow(T.PLOT_SPEED_GROWTH, lv)
-		"yield":
-			return T.PLOT_YIELD_COST * scale * pow(T.PLOT_YIELD_GROWTH, lv)
-		"quality":
-			return T.CROP_QUALITY_COST * scale * pow(T.CROP_QUALITY_GROWTH, lv) if lv < T.CROP_QUALITY_MAX else INF
-	return INF
+	if upgrade == "quality" and lv >= T.CROP_QUALITY_MAX:
+		return INF
+	return plot_price(crop) * T.PLOT_UPGRADE_SHARE * pow(T.PLOT_UPGRADE_GROWTH, lv)
 
 
 func can_buy_plot(crop: String) -> bool:
@@ -554,7 +559,11 @@ func unlocked_bottles() -> Array:
 
 
 func can_sell_raw() -> bool:
-	return revealed.status_bar and stock.bell > 0
+	return can_sell_crop("bell")
+
+
+func can_sell_crop(crop: String) -> bool:
+	return revealed.status_bar and data.items.has(crop) and data.items[crop].kind == "crop" and stock[crop] > 0
 
 
 func bottles_held() -> int:
@@ -592,7 +601,15 @@ func set_holding(on: bool) -> void:
 func sell_raw() -> bool:
 	if not can_sell_raw():
 		return false
-	_sell("bell", stock.bell)
+	return sell_crop("bell")
+
+
+## Sells every one of a crop held at its value, as ore sells raw (D041).
+## Returns false with none.
+func sell_crop(crop: String) -> bool:
+	if not can_sell_crop(crop):
+		return false
+	_sell(crop, stock[crop])
 	_note_value()
 	return true
 
@@ -867,9 +884,8 @@ func _step(k: int) -> void:
 		if k == 1:
 			while p.progress >= plot_cycle(crop) - EPSILON:
 				p.progress -= plot_cycle(crop)
-				var n := plot_yield(crop)
-				if p.quality > 0 and rng.randf() < quality_chance(crop):
-					n *= 2
+				var harvests := 2 if p.quality > 0 and rng.randf() < quality_chance(crop) else 1
+				var n := _harvest(crop, harvests)
 				stock[crop] += n
 				stats.harvested[crop] += n
 		else:
@@ -1081,11 +1097,13 @@ func _shortest_ingredient() -> String:
 	return best
 
 
-## One harvest of the shortest ingredient, yield upgrades included and without
-## Crop Quality's double.
+## One harvest of the shortest ingredient at its base cycle: what the plot grows
+## in its base cycle's time, upgrades included, without Crop Quality's double.
+## Speed levels count too (D041: they're many and cheap now), so the drop keeps
+## its share of the plot (D025).
 func _forage_drop() -> void:
 	var crop := _shortest_ingredient()
-	var n := plot_yield(crop)
+	var n := _harvest(crop, data.plots[crop].seconds / plot_cycle(crop))
 	stock[crop] += n
 	stats.harvested[crop] += n
 	stats.foraged += 1
@@ -1103,6 +1121,15 @@ func _binomial(n: int, p: float) -> int:
 	return clampi(roundi(rng.randfn(n * p, sqrt(n * p * (1.0 - p)))), 0, n)
 
 
+## The whole crops `harvests` harvests give, carrying the fraction to the next.
+func _harvest(crop: String, harvests: float) -> int:
+	var p: Dictionary = plots[crop]
+	var exact: float = harvests * plot_yield_exact(crop) + p.spare
+	var n := floori(exact + EPSILON)
+	p.spare = maxf(0.0, exact - n)
+	return n
+
+
 ## A long step's harvests at once (the catch-up, D020): every whole cycle in the
 ## step, with one draw for how many come up double (a binomial, by its normal
 ## approximation once there are enough).
@@ -1115,7 +1142,7 @@ func _harvest_batch(crop: String) -> void:
 	p.progress -= n * cycle
 	var chance := quality_chance(crop)
 	var doubled := _binomial(n, chance) if chance > 0.0 else 0
-	var got := (n + doubled) * plot_yield(crop)
+	var got := _harvest(crop, n + doubled)
 	stock[crop] += got
 	stats.harvested[crop] += got
 
@@ -1451,6 +1478,11 @@ func load_state(s: Variant) -> String:
 		s = _to_dollars(s, 3)
 	if int(s.get("version", version)) < 8:
 		s = _migrate_7_to_8(s)
+	if int(s.get("version", version)) < 9:
+		problem = _check(s.run, {"plots": TYPE_DICTIONARY})
+		if problem != "":
+			return problem
+		s = _migrate_8_to_9(s)
 	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
 	# v7 only adds the account's Prestige fields, read below with defaults.
@@ -1525,7 +1557,7 @@ func load_state(s: Variant) -> String:
 	for crop in run.plots:
 		var p: Dictionary = run.plots[crop]
 		plots[crop] = {"owned": bool(p.get("owned", false)), "speed": int(p.get("speed", 0)), "yield": int(p.get("yield", 0)),
-			"quality": int(p.get("quality", 0)), "progress": float(p.get("progress", 0.0))}
+			"quality": int(p.get("quality", 0)), "progress": float(p.get("progress", 0.0)), "spare": float(p.get("spare", 0.0))}
 	vats = []
 	lines = []
 	for station in ["vat", "line"]:
@@ -1576,6 +1608,23 @@ func load_state(s: Variant) -> String:
 	_refresh_fx()
 	_note_value()
 	return ""
+
+
+## v9 (D041): plot upgrades take smaller steps, so each plot's levels become
+## the new levels with at least the same effect: speed and Crop Quality by their
+## step, yield from whole crops to shares of the plot's base yield.
+func _migrate_8_to_9(s: Dictionary) -> Dictionary:
+	var out := s.duplicate(true)
+	for crop in out.run.plots:
+		var p: Dictionary = out.run.plots[crop]
+		if typeof(p) != TYPE_DICTIONARY:
+			continue
+		p.speed = ceili(int(p.get("speed", 0)) * T.V8_PLOT_SPEED_STEP / T.PLOT_SPEED_STEP - EPSILON)
+		p.quality = mini(T.CROP_QUALITY_MAX, ceili(int(p.get("quality", 0)) * T.V8_CROP_QUALITY_STEP / T.CROP_QUALITY_STEP - EPSILON))
+		if data.plots.has(crop):
+			p["yield"] = ceili(int(p.get("yield", 0)) / (data.plots[crop]["yield"] * T.PLOT_YIELD_STEP) - EPSILON)
+	out.version = 9
+	return out
 
 
 ## v8 (D035): the Tier 6 sauce Event Horizon became Extinction Event (the name

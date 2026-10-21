@@ -74,7 +74,7 @@ Costs follow D010: about 2–4 minutes of what a node is paid in, at the time it
 
 | Ids | Nodes | Needs | Expected |
 | --- | --- | --- | --- |
-| E12–E14 | Poblano (crop), Ancho Mash, Smoky Ancho | E1 | 0:17–0:20 |
+| E12–E14 | Poblano (crop; since D041 the plot is on sale from the start and E12 is Poblano Cultivation, ×1.5 speed), Ancho Mash, Smoky Ancho | E1 | 0:17–0:20 |
 | E15–E17 | Serrano, Serrano Mash, Serrano Fire | E5 | 0:30–0:35 |
 | E18–E20 | Tabasco, Tabasco Mash, Cajun Red | E10 | 1:00–1:08 |
 | E21–E22 | Cane Sugar, Caramelized Glaze | E10 | 1:20–1:25 |

@@ -119,9 +119,11 @@ func test_research_costs_and_permanence() -> void:
 func test_blueprints_open_what_they_name() -> void:
 	var g := open_tree()
 	g.cash = 100000.0
-	check(not g.plot_unlocked("jalapeno") and not g.recipe_unlocked("verde_mash"), "nothing open before research")
+	check(not g.plot_unlocked("vinegar") and not g.recipe_unlocked("verde_mash"), "nothing open before research")
+	g.buy_plot("jalapeno")
+	var cycle: float = g.plot_cycle("jalapeno")
 	g.research_node("jalapeno_blueprint")
-	check(g.plot_unlocked("jalapeno") and g.buy_plot("jalapeno"), "R3: E1 opens the Jalapeño Plot")
+	check(close(g.plot_cycle("jalapeno"), cycle / 1.5), "R3: E1 (D041: Jalapeño Cultivation) speeds the Jalapeño Plot up ×1.5")
 	check(not g.plot_unlocked("vinegar") and not g.recipe_unlocked("verde_mash"), "R3: and only that")
 	g.research_node("verde_blueprint")
 	check(g.recipe_unlocked("verde_mash") and not g.recipe_unlocked("pickled_brine"), "R3: E2 opens Verde Mash only")

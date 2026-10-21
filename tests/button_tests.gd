@@ -244,13 +244,15 @@ func test_forage_rate() -> void:
 
 func test_forage_goes_to_the_shortest() -> void:
 	var g := forager(["vinegar", "garlic"], ["brine_blueprint", "paste_blueprint"])
-	g.plots.garlic["yield"] = 2   # yield upgrades count
+	g.plots.garlic["yield"] = 10   # yield and speed upgrades count (D041)
+	g.plots.garlic.speed = 10
 	g.stock.vinegar = 50   # 5 cycles of Pickled Brine (10)
 	g.stock.garlic = 40    # 2 cycles of Garlic Paste (20)
 	check(g._shortest_ingredient() == "garlic", "T2: Garlic (2 cycles) is shorter than Vinegar (5)")
 	while g.stats.foraged == 0:
 		g.press()
-	check(g.stock.garlic == 40 + g.plot_yield("garlic") and g.plot_yield("garlic") == 6, "T2: the drop is one Garlic harvest, upgrades included (got %d)" % (g.stock.garlic - 40))
+	var drop := floori(g.plot_yield_exact("garlic") * g.data.plots.garlic.seconds / g.plot_cycle("garlic"))
+	check(g.stock.garlic == 40 + drop and drop > g.data.plots.garlic["yield"], "T2: the drop is one Garlic harvest at its base cycle, upgrades included (got %d, want %d)" % [g.stock.garlic - 40, drop])
 	check(g.stock.vinegar == 50, "T2: and nothing else")
 	g.stock.garlic = 50
 	g.stock.vinegar = 20

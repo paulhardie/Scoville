@@ -1,6 +1,6 @@
 extends SceneTree
 ## The first 110 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
-## docs/ECONOMY.md's N1–N8 (to 50:00) and M1–M7 (to 1:50), played by the
+## docs/ECONOMY.md's N1–N8 (to 50:00), M1–M7 (to 1:50) and A4 (v0.6d), played by the
 ## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E6,
 ## played by both the eager pacing player and a casual one.
 ## Prints a timeline and each criterion's measurement.
@@ -156,6 +156,24 @@ func run() -> void:
 	criterion("F7", idle_15 >= 180.0, "factory alone earns $%.2f a minute at 15:00 (at least $180, D035)" % idle_15)
 	var lift_15 := (tap_15 - idle_15) / idle_15 if idle_15 > 0.0 else INF
 	criterion("F8", lift_15 >= 0.25, "tapping adds %.0f%% at 15:00 (at least 25%%)" % (lift_15 * 100.0))
+
+	# v0.6d: Idle Planet Miner's early flow (ECONOMY.md, D041).
+	var stations := []
+	var new_plots := 0
+	for entry in p.events:
+		var what := String(entry[1])
+		if what.begins_with("buy plot") or what.begins_with("buy vat") or what.begins_with("buy line"):
+			stations.append(entry)
+			if what.begins_with("buy plot") and what != "buy plot bell" and entry[0] > line_at and entry[0] <= 14 * 60.0:
+				new_plots += 1
+	var a4_gap := 0.0
+	var a4_where := ""
+	for i in range(stations.size() - 1):
+		var at: float = stations[i][0]
+		if at >= line_at and at < 14 * 60.0 and stations[i + 1][0] - at > a4_gap:
+			a4_gap = stations[i + 1][0] - at
+			a4_where = "%s to %s" % [stations[i][1], stations[i + 1][1]]
+	criterion("A4", new_plots >= 2 and a4_gap <= 360.0, "first line to 14:00: %d new plots (at least 2); longest wait between new stations %s (at most 6:00; %s)" % [new_plots, clock(a4_gap), a4_where])
 
 	# v0.3's criteria, to 50:00 (ECONOMY.md).
 	criterion("N1", reached.get("nav", INF) <= 9 * 60.0, "Stage 3 ($4,000) at %s (by 9:00)" % clock(reached.get("nav", INF)))

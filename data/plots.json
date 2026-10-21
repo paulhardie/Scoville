@@ -1,21 +1,21 @@
 {
-	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md); prices are v0.6a's × the value change of the sauce that pays for the plot (D035). `unlocked` plots need no blueprint. `name` is the station's name on screen, by default <crop> Plot; made ingredients get their own (D024).",
+	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md); prices are v0.6a's × the value change of the sauce that pays for the plot (D035). `unlocked` plots need no blueprint: Bell, Poblano and Jalapeño are on sale from the start, priced to pay back from raw sales in 8–10 minutes (D041). Savina and Moruga Scorpion were lowered in D041 ($2.6M to $2.0M, $9.5M to $5M). `name` is the station's name on screen, by default <crop> Plot; made ingredients get their own (D024).",
 	"plots": [
 		{"crop": "bell", "price": 50.0, "seconds": 1.0, "yield": 1, "unlocked": true},
-		{"crop": "jalapeno", "price": 1400.0, "seconds": 2.0, "yield": 3},
+		{"crop": "jalapeno", "price": 1900.0, "seconds": 2.4, "yield": 2, "unlocked": true},
 		{"crop": "vinegar", "name": "Vinegar Cask", "price": 1700.0, "seconds": 2.0, "yield": 2},
 		{"crop": "cayenne", "price": 3200.0, "seconds": 2.4, "yield": 5},
 		{"crop": "garlic", "price": 3500.0, "seconds": 2.4, "yield": 4},
-		{"crop": "poblano", "price": 400.0, "seconds": 1.8, "yield": 3},
+		{"crop": "poblano", "price": 800.0, "seconds": 2.4, "yield": 2, "unlocked": true},
 		{"crop": "serrano", "price": 3000.0, "seconds": 2.2, "yield": 4},
 		{"crop": "tabasco", "price": 23000.0, "seconds": 2.6, "yield": 10},
 		{"crop": "sugar", "price": 42000.0, "seconds": 2.8, "yield": 6},
 		{"crop": "bonnet", "price": 220000.0, "seconds": 2.8, "yield": 8},
 		{"crop": "habanero", "price": 1100000.0, "seconds": 2.8, "yield": 8},
-		{"crop": "savina", "price": 2600000.0, "seconds": 3.0, "yield": 12},
+		{"crop": "savina", "price": 2000000.0, "seconds": 3.0, "yield": 12},
 		{"crop": "oak", "name": "Oak Smokehouse", "price": 2000000.0, "seconds": 3.2, "yield": 5},
 		{"crop": "ghost", "price": 1800000.0, "seconds": 3.2, "yield": 12},
-		{"crop": "moruga", "price": 9500000.0, "seconds": 3.2, "yield": 12},
+		{"crop": "moruga", "price": 5000000.0, "seconds": 3.2, "yield": 12},
 		{"crop": "reaper", "price": 29000000.0, "seconds": 3.6, "yield": 16},
 		{"crop": "pepper_x", "price": 130000000.0, "seconds": 4.0, "yield": 20}
 	]

@@ -9,7 +9,7 @@
 		{"id": "table_mild", "station": "line", "inputs": {"sweet_mash": 1}, "output": "table_mild", "seconds": 8.0, "unlocked": true},
 		{"id": "bistro_verde", "station": "line", "inputs": {"verde_mash": 1, "pickled_brine": 1}, "output": "bistro_verde", "seconds": 10.0},
 		{"id": "classic_louisiana", "station": "line", "inputs": {"cayenne_mash": 1, "garlic_paste": 1}, "output": "classic_louisiana", "seconds": 12.0},
-		{"id": "ancho_mash", "station": "vat", "inputs": {"poblano": 15}, "output": "ancho_mash", "seconds": 9.0},
+		{"id": "ancho_mash", "station": "vat", "inputs": {"poblano": 15}, "output": "ancho_mash", "seconds": 18.0},
 		{"id": "serrano_mash", "station": "vat", "inputs": {"serrano": 20}, "output": "serrano_mash", "seconds": 11.0},
 		{"id": "tabasco_mash", "station": "vat", "inputs": {"tabasco": 50}, "output": "tabasco_mash", "seconds": 13.0},
 		{"id": "bonnet_mash", "station": "vat", "inputs": {"bonnet": 40}, "output": "bonnet_mash", "seconds": 14.0},

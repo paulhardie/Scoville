@@ -26,6 +26,8 @@ The rules are in `src/core/game.gd`, the numbers in `src/core/tuning.gd`, and th
 
 All GUESSES (G4) except the recipes and the £5 bottle (brief §3). They're in `src/core/tuning.gd`.
 
+**Since D041** plot upgrades are on Idle Planet Miner's curve: every level costs 5% of the plot's price × 1.3^level, Harvest Speed adds 3% a level and Yield per Cycle 6% of the plot's base yield a level (fractions carry), see [ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041). The table is v0.2's.
+
 | Station | Price | Base | Speed upgrade | Other |
 | --- | --- | --- | --- | --- |
 | Bell Pepper Plot | £5 since v0.5.1 (was £10) | 1 pepper every 1.0 s since v0.5.1 (was 2.0 s) | +15% a level; £15 × 2.0^lv | Yield per Cycle: +1 pepper a level; £40 × 2.0^lv |
@@ -161,7 +163,7 @@ Recipes and the £140 bottle are the brief's. The rest is GUESSES tuned against 
 
 ### Crop Quality (D016)
 
-A third plot upgrade beside Harvest Speed and Yield. Each level adds a 3% chance that a harvest gives double, capped at 10 levels (30%). Its price is £30 × 2^level × √(price ÷ £10), like the others.
+**Since D041:** 1% a level to 30 levels (the same 30% cap), priced like every plot upgrade at 5% of the plot's price × 1.3^level ([ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041)). As first built: a third plot upgrade beside Harvest Speed and Yield. Each level adds a 3% chance that a harvest gives double, capped at 10 levels (30%). Its price is £30 × 2^level × √(price ÷ £10), like the others.
 
 ### Saves
 

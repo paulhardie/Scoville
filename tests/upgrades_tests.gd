@@ -270,8 +270,9 @@ func test_hydroponic_bell() -> void:
 	g.cash = 1000.0
 	g.buy_plot("bell")
 	check(close(g.plot_cycle("bell"), g.data.plots.bell.seconds / 4.0), "R18: the Bell Pepper Plot's cycle is a quarter: %.2f s" % g.plot_cycle("bell"))
-	g.buy_plot("jalapeno")
-	check(close(g.plot_cycle("jalapeno"), 2.0), "R18: other plots unchanged")
+	g.cash = 1e6
+	g.buy_plot("garlic")
+	check(close(g.plot_cycle("garlic"), g.data.plots.garlic.seconds), "R18: other plots unchanged")
 
 
 func test_tier_3() -> void:
@@ -303,11 +304,11 @@ func test_crop_quality() -> void:
 	var g := with([], 11)
 	g.cash = 1e9
 	g.buy_plot("bell")
-	check(close(g.plot_upgrade_cost("bell", "quality"), T.CROP_QUALITY_COST), "the first level costs $%.0f on the Bell plot" % T.CROP_QUALITY_COST)
-	for i in 12:
+	check(close(g.plot_upgrade_cost("bell", "quality"), g.plot_price("bell") * T.PLOT_UPGRADE_SHARE), "the first level costs %.0f%% of the Bell plot's price (D041)" % (T.PLOT_UPGRADE_SHARE * 100.0))
+	for i in T.CROP_QUALITY_MAX + 2:
 		g.upgrade_plot("bell", "quality")
-	check(g.plots.bell.quality == T.CROP_QUALITY_MAX and close(g.quality_chance("bell"), 0.30), "S8: capped at 10 levels, 30%")
-	g.plots.bell.quality = 4
+	check(g.plots.bell.quality == T.CROP_QUALITY_MAX and close(g.quality_chance("bell"), 0.30), "S8: capped at %d levels, 30%%" % T.CROP_QUALITY_MAX)
+	g.plots.bell.quality = 12
 	var harvests := 10000
 	var base: int = g.plot_yield("bell")
 	var before: int = g.stats.harvested.bell
@@ -318,4 +319,4 @@ func test_crop_quality() -> void:
 		g.tick()
 		if g.stats.harvested.bell - b == 2 * base:
 			doubled += 1
-	check(absf(doubled / float(harvests) - 0.12) <= 0.01, "S8: 4 levels double 12%% of harvests: %.1f%%" % (doubled * 100.0 / harvests))
+	check(absf(doubled / float(harvests) - 0.12) <= 0.01, "S8: 12 levels double 12%% of harvests: %.1f%%" % (doubled * 100.0 / harvests))

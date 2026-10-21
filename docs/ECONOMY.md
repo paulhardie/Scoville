@@ -1,6 +1,62 @@
 # Economy
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 What things are worth, what Operation Value counts, how long a first run should take, and when the tabs open. It settles G5, G6 and G7 ([D004–D006](DECISIONS.md)), and owns the run's pacing criteria.
+
+## v0.6d: Idle Planet Miner's early flow (D041)
+
+The owner asked for the early game to flow roughly as Idle Planet Miner's does. There, planets 1–4 are on sale from the start at about ×2 each, ore sells raw and is the main early income, telescopes reveal later planets, and every planet upgrade costs (planet price ÷ 20) × 1.3^(level − 1), with small gains a level. Here, until now, the bell plot was the only one until the Tech Tree opened: nothing new to buy between the first line (1:36) and the Poblano Plot (14:13), and plot upgrades cost ×2 a level.
+
+**Changes (D041):**
+
+- **Poblano and Jalapeño Plots are on sale from the start** (once the deck shows), with Bell. Blueprints gate crops from White Vinegar on, as telescopes gate planets. The two old blueprints keep their places in the tree and their ids (so saves load) but become cultivation nodes: E1 and E12 speed their plot up instead of unlocking it.
+- **Every crop sells raw** at its value, from its plot's card, as ore does. Sell Raw Peppers stays for the Bell Pepper and the onboarding.
+- **Plot upgrades on Idle Planet Miner's curve:** every plot upgrade's first level costs 5% of the plot's price, and each level after it ×1.3. Gains a level are smaller to match. Yield grows by a share of the plot's base yield (a fraction carries to the next harvest); Crop Quality takes more, smaller steps to the same 30% cap.
+- **Kept from the brief:** the Blank Button start, the early vat and line (Tier 1's spine), and bottles worth 5× their raw value.
+- **Saves (v9):** a v8 save's plot levels convert to the number of new levels with the same effect (rounded up), so no progress is lost.
+
+### Criteria (v0.6d)
+
+| Id | Criterion |
+| --- | --- |
+| A1 | The Bell, Poblano and Jalapeño Plots are on sale as soon as the deck shows, with no research; every other crop still needs its blueprint. Their prices rise in that order, and the Poblano and Jalapeño Plots each pay for themselves from raw sales, unupgraded, in 5–10 minutes (the Bell Plot is the onboarding's and keeps its price). Idle Planet Miner's ladder keeps payback roughly even as prices climb. **Bar moved after a result, said here:** first set at 1–4 minutes, my guess; Idle Planet Miner's own first planets pay back in about 7–8 minutes (Planet 2: $200 for 0.25 iron a second at $2), and at 1–4 minutes the two plots tripled the early income (the $10,000 band at 9:24, F8 at 16%). |
+| A2 | Every plot upgrade's first level costs 5% of the plot's price, and each next level 1.3× the one before, for all three upgrades and every plot. |
+| A3 | Every crop sells raw at its value from its plot's card whenever any is held; selling one crop leaves the others alone. |
+| A4 | Between the first line and 14:00 the pacing player buys at least two new plots, and the longest wait between new stations (a plot or a slot) in that time is at most 6:30 (was 12:37, 1:36 to 14:13). **Bar moved after a result, by the owner's choice (W26):** first set at 6:00; measured 6:22, the Ancho vat waiting on the Tech Tree. |
+| A5 | A v8 save loads as v9 with every plot at least as fast, as productive and as likely to double as before. |
+| A6 | Every criterion already set still passes: onboarding, factory, economy, tech tree, offline, full run, prestige, second run and layout. |
+
+
+### Built (v0.6d)
+
+As built, after measuring (each change's reason in D041):
+
+- **The starting plots:** Poblano $800 and Jalapeño $1,900, each 2 crops every 2.4 s, so each pays back raw in 8 and 9½ minutes. At v0.6a's rates (3 every 1.8–2.0 s) they added $9 a second at base and halved tapping's share at 15:00 (F8 10–16%). Every planet in Idle Planet Miner starts at the same base rate too. **Ancho Mash takes 18 s, not 9,** so one base Poblano Plot still feeds one vat (V3); its value is unchanged.
+- **Plot upgrades:** 5% of the price, ×1.3 a level (A2). Harvest Speed +3% a level; Yield per Cycle +6% of the base yield a level; Crop Quality 1% a level to 30 levels (`tuning.gd`). Tried and rejected: 5%/5% and 4%/8% (the run 10 minutes fast), 3%/3% (Phantom never made).
+- **Forager's Luck drops what the plot grows in one base cycle,** speed levels included. Cheap speed levels meant many small harvests, and its share of the shortest ingredient swung from 6% to 37% between runs; now it holds its 2.25% chance and D025's share (T4: 19%).
+- **Savina Pepper Plot $2.0M (was $2.6M) and Moruga Scorpion Plot $5M (was $9.5M):** the run reaches them with less income than before, and saving for them left 379 s (U2) and 511 s (Y4) with nothing bought.
+- **Plot cards list cheapest first,** as Idle Planet Miner lists planets, each with a Sell button.
+- **The pacing player** ([`engaged_player.gd`](../src/sim/engaged_player.gd)) learned what the new curve needs. Each is a GUESS at an engaged player, not a game rule:
+  - It sells raw what its vats don't take.
+  - It saves for a starting plot once its raw payback is under 10 minutes, still spending up to 30% of its cash on upgrades meanwhile.
+  - On each plot it buys the level that pays back soonest, skipping levels that take over 10 minutes (30 while its vats are short of that crop). Before, it bought the cheapest level forever, and at ×1.3 that wasted the late game on Bell Pepper levels.
+  - It keeps the old layout until the new one's plots are bought, and a slot past the layout still waits when research needs its input. Before, the Sweet Heat layout's spare Louisiana line ate the Cayenne Mash research was saving, a stall of over an hour.
+  - Its Phantom layout runs two Phantom lines, not three (one Liquid Smoke vat), and lends its Brine vats first, not the Smoke vat.
+  - It researches Artisan Decanters after the Oak nodes, not straight after Phantom's blueprint.
+
+### Results (v0.6d)
+
+**All PASS** (A4 against its 6:30 bar, the owner's choice; it failed the first bar of 6:00). Every suite passes: 39 pacing criteria, second run 4/4.
+
+- **A1:** Poblano $800 pays back in 8:00, Jalapeño $1,900 in 9:30; no blueprint needed; every other crop still needs one. PASS.
+- **A2:** every plot and every upgrade: 5%, then ×1.3. PASS.
+- **A3:** every crop sells from its card, at its value, alone. PASS (factory and UI suites).
+- **A4: PASS at 6:30** (FAIL at the first bar of 6:00). Two new plots by 14:00 (Poblano 3:15, Jalapeño 7:14), then 6:22 from the Jalapeño Plot to the Ancho vat at 13:36 (was 12:37). The vat waits on the Tech Tree (Ancho's blueprint). Priced at $1,000 and $2,000 the gap is 5:15, but E3 then fails (87 s with nothing new, against 75) and T4 (22%, against 20%).
+- **A5:** a v8 plot with speed 3, yield 2 and quality 10 loads at least as fast and productive, and as likely to double. PASS.
+- **A6:** every earlier criterion passes. The curve's bands: $10k at 12:45, $150k at 45:21, $4M at 1:37:36, the sale at 2:01:56, just inside its 2:00 floor. The ladder is on time (U3), from Smoky Ancho at 15:03 to Phantom at 2:38:37, about 14 minutes earlier than before. Tapping adds 27% at 15:00 (F8, was 53%) and 11% at 30:00 (N8, at least 10).
+
+**Thin margins:** the sale (1:56 from its floor), E3 (74 s against 75), N6 (118 s against 120), U5 (276 s against 300). A small change to the early or middle game can tip them.
 
 ## v0.6c: Idle Planet Miner's values in dollars (D035)
 

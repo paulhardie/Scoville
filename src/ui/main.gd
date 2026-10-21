@@ -232,7 +232,10 @@ func _build_deck() -> void:
 	_deck.add_child(holder)
 
 	_farms_col = _page_column(holder, "farms")
-	for crop in game.data.plots:
+	# Cheapest first, as Idle Planet Miner lists its planets (D041).
+	var crops: Array = game.data.plots.keys()
+	crops.sort_custom(func(a: String, b: String) -> bool: return game.plot_price(a) < game.plot_price(b))
+	for crop in crops:
 		_plot_cards[crop] = _plot_card(_farms_col, crop)
 	_proc_box = VBoxContainer.new()
 	_proc_box.add_theme_constant_override("separation", 12)
@@ -871,6 +874,10 @@ func _plot_card(parent: Container, crop: String) -> Dictionary:
 	nodes.buy = _control_button("", func() -> void: game.buy_plot(crop))
 	nodes.buy.name = "Buy_plot_" + crop
 	nodes.col.add_child(nodes.buy)
+	# Every crop sells raw, as ore does (D041).
+	nodes.sell = _control_button("", func() -> void: game.sell_crop(crop))
+	nodes.sell.name = "Sell_plot_" + crop
+	nodes.col.add_child(nodes.sell)
 	nodes.manage = _control_button("Manage", func() -> void: open_sheet({"kind": "plot", "crop": crop}))
 	nodes.manage.name = "Manage_plot_" + crop
 	nodes.col.add_child(nodes.manage)
@@ -1081,8 +1088,10 @@ func _refresh_plot(crop: String) -> void:
 	var plural: String = game.data.items[crop].plural
 	nodes.card.visible = game.plot_offered(crop)
 	if p.owned:
-		var n := game.plot_yield(crop)
-		nodes.info.text = "%d %s every %.1f s" % [n, name if n == 1 else plural, game.plot_cycle(crop)]
+		# Yield levels add fractions (D041): one decimal once it isn't whole.
+		var n := game.plot_yield_exact(crop)
+		var amount := "%d" % roundi(n) if absf(n - roundf(n)) < 0.05 else "%.1f" % n
+		nodes.info.text = "%s %s every %.1f s" % [amount, name if amount == "1" else plural, game.plot_cycle(crop)]
 	else:
 		nodes.info.text = "Harvests %s by itself." % plural
 	nodes.bar.visible = p.owned
@@ -1091,6 +1100,9 @@ func _refresh_plot(crop: String) -> void:
 	nodes.buy.visible = not p.owned
 	nodes.buy.text = "Buy   %s" % _money(game.plot_price(crop))
 	nodes.buy.disabled = not game.can_buy_plot(crop)
+	nodes.sell.visible = p.owned
+	nodes.sell.text = "Sell %s   %s" % [_count(game.stock[crop]), _money(game.stock[crop] * game.sale_price(crop) * game.heat_mult())]
+	nodes.sell.disabled = not game.can_sell_crop(crop)
 	nodes.manage.visible = p.owned
 	var ready := false
 	for upgrade in UPGRADE_NAMES:

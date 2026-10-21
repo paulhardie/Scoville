@@ -9,7 +9,7 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 const Helpers = preload("res://tests/button_tests.gd")
 
 const LADDER := ["table_mild", "smoky_ancho", "bistro_verde", "serrano_fire", "classic_louisiana", "cajun_red",
-	"island_heat", "sweet_heat", "savina_gold", "phantom"]
+	"island_heat", "sweet_heat", "cocoa_loco", "phantom"]
 
 var failures: Array[String] = []
 var checks := 0
@@ -84,7 +84,7 @@ func test_ladder_climbs() -> void:
 
 func test_stations_feed_one_vat() -> void:
 	var g := Game.new()
-	for crop in ["poblano", "serrano", "tabasco", "sugar", "bonnet", "habanero", "savina", "oak", "ghost"]:
+	for crop in ["poblano", "serrano", "thai_chili", "pineapple", "bonnet", "caribbean_red", "chocolate", "oak", "ghost"]:
 		var p: Dictionary = g.data.plots[crop]
 		var r: Dictionary = g.data.recipes[maker(g, crop + "_mash") if maker(g, crop + "_mash") != "" else _mash_of(g, crop)]
 		var supply: float = p["yield"] / p.seconds
@@ -105,7 +105,7 @@ func test_tier6() -> void:
 	for i in range(1, top.size()):
 		var step: float = g.value(top[i]) / g.value(top[i - 1])
 		check(step >= 2.0 and step <= 3.4, "Q11/D035: %s is ×2.0–3.4 the rung below (×%.2f)" % [top[i], step])
-	for crop in ["moruga", "reaper", "pepper_x"]:
+	for crop in ["moruga", "grim", "pepper_y"]:
 		var p: Dictionary = g.data.plots[crop]
 		var r: Dictionary = g.data.recipes[crop + "_mash"]
 		var supply: float = p["yield"] / p.seconds
@@ -126,7 +126,7 @@ func test_booster_concentrate_bulk() -> void:
 func test_reserve() -> void:
 	var plain: Game = Helpers.with(["pantry_vinegar_concentrate"])
 	var g: Game = Helpers.with(["pantry_vinegar_reserve"])
-	for bottle in ["bistro_verde", "serrano_fire", "cajun_red", "island_heat", "savina_gold"]:
+	for bottle in ["bistro_verde", "serrano_fire", "cajun_red", "island_heat", "cocoa_loco"]:
 		check(close(g.sale_price(bottle), plain.sale_price(bottle) * 1.25), "V5: Reserve on Vinegar sells %s for +25%%" % bottle)
 	for bottle in ["classic_louisiana", "phantom", "table_mild"]:
 		check(close(g.sale_price(bottle), plain.sale_price(bottle)), "V5: but not %s, which takes Brine only through a mash, or none" % bottle)

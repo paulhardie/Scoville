@@ -193,6 +193,7 @@ func run() -> void:
 	await test_hq()
 	await test_after_sale()
 	await test_layout()
+	await test_raw_sales()
 	await test_feel()
 	for failure in failures:
 		printerr("FAIL: ", failure)
@@ -451,6 +452,33 @@ func test_layout() -> void:
 	screen.queue_free()
 	await settle()
 	DirAccess.remove_absolute(path)
+
+
+## A3 (ECONOMY.md, D041): every crop sells raw from its plot's card.
+func test_raw_sales() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	root.add_child(screen)
+	await settle()
+	var g = screen.game
+	g.revealed = {"counter": true, "status_bar": true, "deck": true}
+	g.cash = 1e6
+	await settle()
+	check((screen.find_child("Card_plot_poblano", true, false) as Control).visible, "A1: the Poblano Plot is on Farms with the deck")
+	g.buy_plot("poblano")
+	g.stock.poblano = 12
+	g.stock.bell = 5
+	await settle()
+	var sell: Button = screen.find_child("Sell_plot_poblano", true, false)
+	check(sell.visible and not sell.disabled and sell.text.contains("12"), "A3: the card offers its 12 Poblano Peppers: %s" % sell.text)
+	var cash: float = g.cash
+	sell.pressed.emit()
+	await settle()
+	check(g.stock.poblano == 0 and is_equal_approx(g.cash - cash, 12 * g.value("poblano")) and g.stock.bell == 5, "A3: they sell at their value, and nothing else does")
+	check(sell.disabled, "A3: with none left the button is off")
+	screen.queue_free()
+	await settle()
 
 
 ## Two frames: the tree signals a frame before the screen's _process runs,

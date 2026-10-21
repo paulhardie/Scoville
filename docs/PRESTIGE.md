@@ -1,5 +1,7 @@
 # Prestige (v0.6b)
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Brief §6: once a run's Operation Value reaches £1,000,000, the player can **sell the franchise**. That resets the run and pays **Franchise Credits**, spent on **HQ Facility rooms** that last across runs. A new room comes from a **2-card draft**. This first part builds the loop itself: selling, credits, the 12 rooms with their draft and levels, and the brief's anti-exploit cost formula. The second part adds what changes on repeat runs: Standard Operating Procedures and Tier 6 ([below](#part-2-standard-operating-procedures-and-tier-6)).
 
 Status: **built** (rules, save v7, the HQ tab), all criteria PASS. It doesn't depend on v0.6a's tuning: the rules are checked with games set up directly, at any Operation Value.
@@ -90,7 +92,7 @@ A sale buys HQ rooms, but the run that follows is the same ladder again. Part 2 
 | Carolina Reaper | £24.40 | £400,000; 16 every 3.6 s | Reaper Mash: 80 Reaper, 18 s, £3,904 | **Widowmaker Reserve** £40,000: 1 Reaper Mash + 1 Phantom Smokehouse + 1 Sweet Heat Reserve (D006) | 22 s |
 | Pepper X | £52 | £1,500,000; 20 every 4.0 s | Pepper X Mash: 100 Pepper X, 20 s, £10,400 | **Extinction Event** £100,000: 1 Pepper X Mash + 1 Scorpion Sting (named Event Horizon until D035; that's the last fictional pepper's name) | 24 s |
 
-Since D035 these are in dollars at Idle Planet Miner's values: Moruga $1,600, Reaper $3,500, Pepper X $7,800; Scorpion Sting $1.09M, Widowmaker Reserve $3.34M, Extinction Event $9.35M; plots $9.5M, $29M and $130M.
+Since D035 these are in dollars at Idle Planet Miner's values: Moruga $1,600, Reaper $3,500, Pepper X $7,800; Scorpion Sting $1.09M, Widowmaker Reserve $3.34M, Extinction Event $9.35M; plots $9.5M, $29M and $130M (Moruga $5M since D041).
 
 Each plot feeds one vat at base, as in v0.6a. The blueprints follow v0.6a's pattern (D010): each rung's three nodes are paid in the rung below's sauce: Moruga in Phantom Smokehouse (20, 20 + 10 Ghost Mash, 30), Reaper in Scorpion Sting, Pepper X in Widowmaker Reserve. They run on east from Phantom Smokehouse (E39–E47).
 
@@ -118,7 +120,7 @@ Q11's bound is ×1.6–3.0, not v0.6a's ×1.6–2.7: Phantom (£5,200, the brief
 
 ## The second run (W17)
 
-Status: **all PASS** with SOP free at 1% (D040), measured three ways (below). Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
+Status: **all PASS** with SOP free at 1% (D040), measured three ways (below), and again after D041. Nothing measured a run after a sale until now: rooms, Standard Operating Procedures, Tier 6's prices and late growth (W21) were all unchecked. `tests/second_run_tests.gd` plays the pacing player through run 1, sells, spends the credits, and plays run 2.
 
 ### The player's policy (assumed)
 
@@ -139,7 +141,9 @@ Reported, not judged: run 1's credits at 3:00, the rooms bought, and run 2's Ope
 
 ### Results
 
-Run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operation Value $117M). The player opens Cooperage, Fermentation Cellar and Glassworks (5 + 10 + 15 credits) and has 1 left.
+**Since D041 (Idle Planet Miner's early flow), all PASS:** run 1 reaches the sale at 2:01:56 and sells at 3:00 for 30 credits (Operation Value $101M); the player opens Test Kitchen, Ergonomics Lab and Hydroponics Bay. Run 2 reaches the sale at 1:18:33, **64% of run 1** (Y1); SOP, bought at 16:17, researches 38 nodes, the first at 21:43 (Y2); the first Scorpion Sting at 2:01:09 (Y3); the longest wait 270 s (Y4). Run 2 is worth $659M at 3:00 and $846M at 3:15. Y4 first failed at 511 s, saving for the $9.5M Moruga Scorpion Plot, which run 2 now reaches with less income; it costs $5M since.
+
+As measured for D040, before D041: run 1 reaches the sale at 2:07:58 and sells at 3:00 for **31 credits** (Operation Value $117M). The player opens Cooperage, Fermentation Cellar and Glassworks (5 + 10 + 15 credits) and has 1 left.
 
 | Id | SOP 1%, free (D040, now) | SOP 5%, free (D038) | SOP 5%, paying cash (D039) |
 | --- | --- | --- | --- |

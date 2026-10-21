@@ -1,5 +1,7 @@
 # Factory (v0.2 Operation Deck)
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Brief §2 Stage 2 and §3 Tier 1: at £10 the button moves into the upper 35% of the screen and the Farms deck slides up from below. There the player buys the Tier 1 spine: a Bell Pepper Plot, a Sweet Pepper Mash vat and a Table Mild bottling line.
 
 The rules are in `src/core/game.gd`, the numbers in `src/core/tuning.gd`, and the screen in `src/ui/main.gd`. The pacing criteria are measured by `tests/pacing_tests.gd`.
@@ -25,6 +27,8 @@ The rules are in `src/core/game.gd`, the numbers in `src/core/tuning.gd`, and th
 ## Numbers (draft for review)
 
 All GUESSES (G4) except the recipes and the £5 bottle (brief §3). They're in `src/core/tuning.gd`.
+
+**Since D041** plot upgrades are on Idle Planet Miner's curve: every level costs 5% of the plot's price × 1.3^level, Harvest Speed adds 3% a level and Yield per Cycle 6% of the plot's base yield a level (fractions carry), see [ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041). The table is v0.2's.
 
 | Station | Price | Base | Speed upgrade | Other |
 | --- | --- | --- | --- | --- |
@@ -161,7 +165,7 @@ Recipes and the £140 bottle are the brief's. The rest is GUESSES tuned against 
 
 ### Crop Quality (D016)
 
-A third plot upgrade beside Harvest Speed and Yield. Each level adds a 3% chance that a harvest gives double, capped at 10 levels (30%). Its price is £30 × 2^level × √(price ÷ £10), like the others.
+**Since D041:** 1% a level to 30 levels (the same 30% cap), priced like every plot upgrade at 5% of the plot's price × 1.3^level ([ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041)). As first built: a third plot upgrade beside Harvest Speed and Yield. Each level adds a 3% chance that a harvest gives double, capped at 10 levels (30%). Its price is £30 × 2^level × √(price ÷ £10), like the others.
 
 ### Saves
 
@@ -220,7 +224,7 @@ Otherwise it plays like the pacing player. Both are measured over the first 20 m
 - **Bell Pepper Plot:** £10 → £5, and 1 pepper every 2.0 s → 1.0 s. It now picks about a third of a casual player's peppers, so it matters.
 - **Vat slot 1:** £25 → £15.
 - **Line slot 1:** £35 → £10. The pacing player waits 36 s between them, the casual one 96 s.
-- **Upgrade prices are unchanged.** Upgrades scale against fixed reference prices, v0.2's £10, £25 and £35 (`PLOT_PRICE_REFERENCE` and so on in `tuning.gd`), not against the first station's price. Without that, the cheaper first stations would have raised every Tier 2 and 3 upgrade by up to 40%.
+- **Upgrade prices are unchanged.** (Plot upgrades since D041 cost 5% of the plot's price × 1.3^level instead, [ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041); `PLOT_PRICE_REFERENCE` is gone.) Upgrades scale against fixed reference prices, v0.2's £10, £25 and £35 (`PLOT_PRICE_REFERENCE` and so on in `tuning.gd`), not against the first station's price. Without that, the cheaper first stations would have raised every Tier 2 and 3 upgrade by up to 40%.
 - **Brief numbers untouched:** 1 pepper a tap, £0.10 a pepper, 20 peppers to Stage 1, and £10 to Stage 2.
 
 **Knock-on effects, all still passing:**

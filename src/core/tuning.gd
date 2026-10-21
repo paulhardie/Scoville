@@ -43,7 +43,6 @@ const TABS_BUILT := ["farms", "processing", "tech", "market", "hq"]
 # reference price)^COST_SCALE_POWER, never below × 1. The references are
 # v0.2's first prices (×10 for D035), so cheaper first stations (v0.5.1) leave
 # every upgrade's price alone.
-const PLOT_PRICE_REFERENCE := 100.0
 const VAT_PRICE_REFERENCE := 250.0
 const LINE_PRICE_REFERENCE := 350.0
 ## D035: 0.6, not v0.2's √, so upgrades keep pace with Idle Planet Miner's
@@ -54,13 +53,18 @@ const COST_SCALE_POWER := 0.6
 const VAT_VALUE_REFERENCE := "sweet_mash"
 const LINE_VALUE_REFERENCE := "table_mild"
 
-## Plot Harvest Speed: +step a level.
-const PLOT_SPEED_STEP := 0.15
-const PLOT_SPEED_COST := 150.0
-const PLOT_SPEED_GROWTH := 2.0
-## Plot Yield per Cycle: +1 a level.
-const PLOT_YIELD_COST := 400.0
-const PLOT_YIELD_GROWTH := 2.0
+## Plot upgrades (D041, Idle Planet Miner's curve): every plot upgrade's first
+## level costs this share of the plot's price, each level after it × growth.
+const PLOT_UPGRADE_SHARE := 0.05
+const PLOT_UPGRADE_GROWTH := 1.3
+## Plot Harvest Speed: +step a level (GUESS, tuned in v0.6d).
+const PLOT_SPEED_STEP := 0.03
+## Plot Yield per Cycle: + this share of the plot's base yield a level (GUESS,
+## tuned in v0.6d); a fraction carries to the next harvest.
+const PLOT_YIELD_STEP := 0.06
+## v8's steps, for converting a v8 save's levels (D041).
+const V8_PLOT_SPEED_STEP := 0.15
+const V8_CROP_QUALITY_STEP := 0.03
 ## Vat slot speed.
 const VAT_SPEED_STEP := 0.25
 const VAT_SPEED_COST := 300.0
@@ -114,11 +118,10 @@ const TICKER_MULTS := [2.0, 3.0]
 ## Byproduct Recycling (D013): seconds between free levels at most.
 const BYPRODUCT_COOLDOWN := 60.0
 
-## Crop Quality (D016): chance a level, its cap in levels, and its price curve.
-const CROP_QUALITY_STEP := 0.03
-const CROP_QUALITY_MAX := 10
-const CROP_QUALITY_COST := 300.0
-const CROP_QUALITY_GROWTH := 2.0
+## Crop Quality (D016): chance a level and its cap in levels; D041 made the
+## steps smaller to the same 30% cap. Its price is the plot curve's.
+const CROP_QUALITY_STEP := 0.01
+const CROP_QUALITY_MAX := 30
 
 # --- v0.5: offline (docs/OFFLINE.md) -------------------------------------------
 

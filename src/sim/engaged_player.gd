@@ -19,7 +19,7 @@ var decide_every := 1.0
 const RAW_SELL_ABOVE := 50
 ## Research in this order, saving for each in turn. v0.6a's ladder, Pantry
 ## and slots are slotted in near their expected times (docs/FULL_RUN.md); the
-## forks are Bulk on Vinegar and Garlic, Reserve on Cane Sugar and Smoked Oak
+## forks are Bulk on Vinegar and Garlic, Reserve on Pineapple and Smoked Oak
 ## (`forks` swaps them, for U6).
 const RESEARCH := [
 	"jalapeno_blueprint", "poblano_blueprint", "ancho_blueprint", "smoky_ancho_blueprint", "calloused_thumbs",
@@ -27,21 +27,21 @@ const RESEARCH := [
 	"slot_expansion_1", "serrano_blueprint", "serrano_mash_blueprint", "serrano_fire_blueprint",
 	"cayenne_blueprint", "garlic_blueprint", "paste_blueprint", "cayenne_mash_blueprint", "slot_expansion_2",
 	"louisiana_blueprint", "ergonomic_grip", "heat_meter", "night_shift_1", "overflow_valve", "overclock_1",
-	"smart_stockpiling", "pantry_vinegar_booster", "tabasco_blueprint", "tabasco_mash_blueprint", "cajun_red_blueprint",
+	"smart_stockpiling", "pantry_vinegar_booster", "thai_chili_blueprint", "thai_chili_mash_blueprint", "cajun_red_blueprint",
 	"flint_glass", "slot_expansion_3", "zero_waste_1", "pantry_garlic_booster", "pantry_vinegar_concentrate",
-	"sugar_blueprint", "glaze_blueprint", "bonnet_blueprint", "bonnet_mash_blueprint", "island_heat_blueprint",
+	"pineapple_blueprint", "glaze_blueprint", "bonnet_blueprint", "bonnet_mash_blueprint", "island_heat_blueprint",
 	"overclock_2", "slow_burn", "overclock_3", "automated_piston", "night_shift_2", "market_ticker", "pantry_vinegar_bulk", "pantry_garlic_concentrate",
-	"habanero_blueprint", "habanero_mash_blueprint", "sweet_heat_blueprint", "byproduct_recycling",
-	"franchise_auditors", "zero_waste_2", "slot_expansion_4", "pantry_sugar_booster", "pantry_garlic_bulk",
-	"foil_wraps", "savina_blueprint", "savina_mash_blueprint",
-	"savina_gold_blueprint", "hydroponic_bell", "pantry_sugar_concentrate", "oak_blueprint",
-	"smoke_blueprint", "ghost_blueprint", "ghost_mash_blueprint", "phantom_blueprint", "artisan_decanters", "pantry_sugar_reserve",
-	"hydroponic_jalapeno", "overdrive_turbines", "pantry_oak_booster", "pantry_oak_concentrate", "pantry_oak_reserve",
+	"caribbean_red_blueprint", "caribbean_red_mash_blueprint", "sweet_heat_blueprint", "byproduct_recycling",
+	"franchise_auditors", "zero_waste_2", "slot_expansion_4", "pantry_pineapple_booster", "pantry_garlic_bulk",
+	"foil_wraps", "chocolate_blueprint", "chocolate_mash_blueprint",
+	"cocoa_loco_blueprint", "hydroponic_bell", "pantry_pineapple_concentrate", "oak_blueprint",
+	"smoke_blueprint", "ghost_blueprint", "ghost_mash_blueprint", "phantom_blueprint", "pantry_pineapple_reserve",
+	"hydroponic_jalapeno", "overdrive_turbines", "pantry_oak_booster", "pantry_oak_concentrate", "pantry_oak_reserve", "artisan_decanters",
 	"hydroponic_cayenne",
 	# After a sale (PRESTIGE.md, the second run): Tier 6. Skipped before one.
 	"moruga_blueprint", "moruga_mash_blueprint", "scorpion_sting_blueprint",
-	"reaper_blueprint", "reaper_mash_blueprint", "widowmaker_blueprint",
-	"pepper_x_blueprint", "pepper_x_mash_blueprint", "extinction_event_blueprint",
+	"grim_blueprint", "grim_mash_blueprint", "widowmaker_blueprint",
+	"pepper_y_blueprint", "pepper_y_mash_blueprint", "extinction_event_blueprint",
 ]
 ## Rooms it takes from a draft, best first (PRESTIGE.md, the second run).
 const ROOM_ORDER := ["fermentation_cellar", "high_speed_cannery", "seed_vault", "tasting_room", "seed_capital",
@@ -60,25 +60,40 @@ const LAYOUTS := [
 		"line": ["table_mild", "bistro_verde", "classic_louisiana", "classic_louisiana", "serrano_fire"], "lend": [5, 1]},
 	# From Cajun Red on, slots move to the best sauce they can supply, keeping
 	# their index where they can, and Pickled Brine gets more vats.
-	{"when": "cajun_red", "vat": ["sweet_mash", "pickled_brine", "tabasco_mash", "garlic_paste", "cayenne_mash", "pickled_brine", "verde_mash"],
+	{"when": "cajun_red", "vat": ["sweet_mash", "pickled_brine", "thai_chili_mash", "garlic_paste", "cayenne_mash", "pickled_brine", "verde_mash"],
 		"line": ["table_mild", "cajun_red", "classic_louisiana", "classic_louisiana", "cajun_red", "bistro_verde"], "lend": [0, 6, 5]},
 	{"when": "island_heat", "vat": ["sweet_mash", "pickled_brine", "pickled_brine", "garlic_paste", "glaze", "bonnet_mash", "cayenne_mash"],
 		"line": ["table_mild", "island_heat", "island_heat", "classic_louisiana", "classic_louisiana", "island_heat"], "lend": [0, 6]},
 	# Sweet Heat takes 2 Glaze a bottle, and each Glaze 1 Garlic Paste: one
 	# line is what two Glaze vats and two Paste vats keep fed.
-	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "habanero_mash", "garlic_paste"],
+	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "caribbean_red_mash", "garlic_paste"],
 		"line": ["table_mild", "sweet_heat", "table_mild"], "lend": [6, 1]},
 	# Three Louisiana lines take a Paste and a Cayenne Mash each: two Paste
 	# vats, or the Louisiana lines starve on Paste (D035).
-	{"when": "savina_gold", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "garlic_paste"],
-		"line": ["classic_louisiana", "savina_gold", "savina_gold", "classic_louisiana", "savina_gold", "classic_louisiana"], "lend": [6, 2]},
+	{"when": "cocoa_loco", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "chocolate_mash", "garlic_paste"],
+		"line": ["classic_louisiana", "cocoa_loco", "cocoa_loco", "classic_louisiana", "cocoa_loco", "classic_louisiana"], "lend": [6, 2]},
+	# One Liquid Smoke vat keeps two Phantom lines fed, not three, and the
+	# Brine vats are lent before it (D041).
 	{"when": "phantom", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "ghost_mash", "liquid_smoke"],
-		"line": ["classic_louisiana", "phantom", "phantom", "classic_louisiana", "savina_gold", "phantom"], "lend": [2, 1]},
-	# Tier 6 (second run): Scorpion Sting takes a Moruga Mash and a Savina Gold,
-	# so Savina Gold lines stay beside it.
-	{"when": "scorpion_sting", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "moruga_mash"],
-		"line": ["classic_louisiana", "savina_gold", "scorpion_sting", "classic_louisiana", "savina_gold", "scorpion_sting"], "lend": [2, 1]},
+		"line": ["classic_louisiana", "phantom", "classic_louisiana", "classic_louisiana", "cocoa_loco", "phantom"], "lend": [2, 1, 0]},
+	# Tier 6 (second run): Scorpion Sting takes a Moruga Mash and a Cocoa Loco,
+	# so Cocoa Loco lines stay beside it.
+	{"when": "scorpion_sting", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "chocolate_mash", "moruga_mash"],
+		"line": ["classic_louisiana", "cocoa_loco", "scorpion_sting", "classic_louisiana", "cocoa_loco", "scorpion_sting"], "lend": [2, 1]},
 ]
+## Seconds a plot level may take to pay for itself before it skips it (GUESS,
+## D041: with ×1.3 a level, buying the cheapest forever wastes cash).
+const PAYBACK_MAX := 600.0
+## How many times PAYBACK_MAX a level may take when its vats are short of the
+## crop (GUESS).
+const SHORT_PAYBACK := 3.0
+## A bottle is worth 5× the raw crops in it (D004).
+const BOTTLE_MULTIPLE := 5.0
+## Plots it buys like upgrades, to sell raw (D041).
+const STARTER_PLOTS := ["poblano", "jalapeno"]
+## While saving for one, the share of its cash it still spends on an upgrade
+## (GUESS).
+const SAVING_SHARE := 0.3
 ## Auto-Sell share for a bottle research needs, before Smart Stockpiling.
 const SAVING_AUTOSELL := 50
 
@@ -145,8 +160,8 @@ func decide(g) -> void:
 				elif g.keep.has(item):
 					g.clear_keep(item)
 	# Bottles a running recipe takes (Table Mild for Sweet Heat, Classic
-	# Louisiana for Savina Gold and Phantom) stay in stock for the lines.
-	var layout := current_layout(g)
+	# Louisiana for Cocoa Loco and Phantom) stay in stock for the lines.
+	var layout := current_layout(g, true)
 	var wanted_items := _wanted(g, layout, need)
 	var lent := _slots_for_research(g, layout, wanted_items)
 	var inputs := _bottle_inputs(g, lent.line)
@@ -162,12 +177,20 @@ func decide(g) -> void:
 			_note(now, "sell_batch")
 	if not g.fx.valve and (g.vats.is_empty() or g.stock.bell > RAW_SELL_ABOVE):
 		g.sell_raw()
+	# Crops no vat of its takes sell raw, as ore does (D041).
+	var fed := _fed_crops(g, layout)
+	for crop in g.plots:
+		if crop != "bell" and g.plots[crop].owned and not fed.has(crop) and g.stock[crop] > 0:
+			g.sell_crop(crop)
 	# A slot that would eat what research is short of waits, unless research
 	# is also short of what it makes, or of something made from it (Cayenne
 	# Mash for Classic Louisiana).
 	for station in ["vat", "line"]:
 		for i in g.slots(station).size():
 			var recipe: String = lent[station][i]
+			# A slot past the layout keeps what it runs, but still waits.
+			if recipe == "":
+				recipe = g.slots(station)[i].recipe
 			if recipe == "" or not g.recipe_unlocked(recipe):
 				continue
 			var out: String = g.data.recipes[recipe].output
@@ -315,13 +338,23 @@ func _maker(g, item: String, station: String) -> String:
 	return ""
 
 
-## The layout for what's researched: the last whose sauce is unlocked.
-func current_layout(g) -> Dictionary:
+## The layout for what's researched: the last whose sauce is unlocked. With
+## `running`, the last of those whose plots it owns: the slots keep the old
+## layout until the new one's crops grow.
+func current_layout(g, running := false) -> Dictionary:
 	var best: Dictionary = LAYOUTS[0]
 	for l in LAYOUTS:
-		if l.when == "" or g.recipe_unlocked(l.when):
+		if (l.when == "" or g.recipe_unlocked(l.when)) and (not running or _plots_owned(g, l)):
 			best = l
 	return best
+
+
+func _plots_owned(g, layout: Dictionary) -> bool:
+	for recipe in layout.vat:
+		for item in g.data.recipes[recipe].inputs:
+			if g.data.items[item].kind == "crop" and not g.plots[item].owned:
+				return false
+	return true
 
 
 ## Whether the vats so far make every mash a line recipe takes.
@@ -395,39 +428,89 @@ func sell_and_spend(g) -> Array:
 	return bought
 
 
-## Buys the cheapest upgrade it can afford, again and again.
+## Buys the cheapest upgrade it can afford, again and again. While a plot on
+## sale from the start pays back in time, it saves for that plot, buying only
+## upgrades under SAVING_SHARE of its cash meanwhile (D041), as an Idle Planet
+## Miner player saves for the next planet.
 func _buy_upgrades(g, now: float) -> void:
 	while true:
+		var goal := ""
+		for crop in STARTER_PLOTS:
+			var rate: float = g.data.plots[crop]["yield"] / g.data.plots[crop].seconds * g.value(crop)
+			if not g.plots[crop].owned and g.plot_offered(crop) and g.plot_price(crop) <= PAYBACK_MAX * rate:
+				goal = crop
+				break
+		if goal != "" and g.buy_plot(goal):
+			_note(now, "buy plot " + goal)
+			continue
+		var budget: float = SAVING_SHARE * g.cash if goal != "" else INF
 		var best := {}
 		var best_cost := INF
-		var used := _used_crops(g)
+		# Every owned plot: what no vat takes sells raw (D041). A raw level
+		# that would take too long to pay back is skipped.
+		var fed := _fed_crops(g, current_layout(g, true))
+		# Each plot offers its level that pays back soonest.
 		for crop in g.plots:
-			if g.plots[crop].owned and used.has(crop):
-				for upgrade in g.PLOT_UPGRADES:
-					var c: float = g.plot_upgrade_cost(crop, upgrade)
-					if c < best_cost:
-						best_cost = c
-						best = {"name": "upgrade %s.%s" % [crop, upgrade], "buy": g.upgrade_plot.bind(crop, upgrade)}
+			if not g.plots[crop].owned:
+				continue
+			# A plot its vats are short of may take longer to pay back.
+			var bottled: bool = fed.has(crop) and _short(g, crop)
+			var pick := ""
+			var pick_payback := PAYBACK_MAX * (SHORT_PAYBACK if bottled else 1.0)
+			for upgrade in g.PLOT_UPGRADES:
+				var gain := _plot_gain(g, crop, upgrade, bottled)
+				var payback: float = g.plot_upgrade_cost(crop, upgrade) / gain if gain > 0.0 else INF
+				if payback <= pick_payback:
+					pick = upgrade
+					pick_payback = payback
+			if pick != "" and g.plot_upgrade_cost(crop, pick) < best_cost:
+				best_cost = g.plot_upgrade_cost(crop, pick)
+				best = {"name": "upgrade %s.%s" % [crop, pick], "buy": g.upgrade_plot.bind(crop, pick)}
 		for station in ["vat", "line"]:
 			for i in g.slots(station).size():
 				var c: float = g.slot_upgrade_cost(station, i)
 				if c < best_cost:
 					best_cost = c
 					best = {"name": "upgrade %s %d" % [station, i + 1], "buy": g.upgrade_slot.bind(station, i)}
-		if best.is_empty() or not best.buy.call():
+		if best.is_empty() or best_cost > budget or not best.buy.call():
 			return
 		_note(now, best.name)
 
 
-## Crops the slots' current recipes take: only their plots get upgraded.
-func _used_crops(g) -> Dictionary:
+## Dollars a second a plot level adds: the plot's harvest worth raw, or as
+## bottles (BOTTLE_MULTIPLE, D004) while its vats are short of it, × the
+## level's share.
+func _plot_gain(g, crop: String, upgrade: String, fed: bool) -> float:
+	var p: Dictionary = g.plots[crop]
+	var rate: float = g.plot_yield_exact(crop) / g.plot_cycle(crop) * g.value(crop) * (BOTTLE_MULTIPLE if fed else 1.0)
+	match upgrade:
+		"speed":
+			return rate * T.PLOT_SPEED_STEP / (1.0 + T.PLOT_SPEED_STEP * p.speed)
+		"yield":
+			return rate * T.PLOT_YIELD_STEP / (1.0 + T.PLOT_YIELD_STEP * p["yield"])
+		"quality":
+			return rate * T.CROP_QUALITY_STEP / (1.0 + T.CROP_QUALITY_STEP * p.quality)
+	return 0.0
+
+
+## Whether its vats could take more of a crop than its plot grows.
+func _short(g, crop: String) -> bool:
+	var demand := 0.0
+	for i in g.vats.size():
+		var recipe: String = g.vats[i].recipe
+		if recipe != "" and g.recipe_inputs(recipe).has(crop):
+			demand += g.recipe_inputs(recipe)[crop] / g.slot_cycle("vat", i)
+	return g.plot_yield_exact(crop) / g.plot_cycle(crop) < demand
+
+
+## Crops its vats take, as the layout and research loans assign them.
+func _fed_crops(g, layout: Dictionary) -> Dictionary:
 	var out := {}
-	for station in ["vat", "line"]:
-		for s in g.slots(station):
-			if s.recipe != "":
-				for item in g.data.recipes[s.recipe].inputs:
-					if g.data.items[item].kind == "crop":
-						out[item] = true
+	for recipe in layout.vat + _lent:
+		if recipe != "":
+			for item in g.data.recipes[recipe].inputs:
+				if g.data.items[item].kind == "crop":
+					out[item] = true
 	return out
 
 

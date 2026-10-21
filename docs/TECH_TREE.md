@@ -1,5 +1,7 @@
 # Tech Tree
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Brief §4: a web of projects radiating from `[00] Kitchen Table`, researched instantly by turning in crops, mashes and bottles from stock. v0.3 builds the slice Tier 2 needs ([D007](DECISIONS.md)): the root, the East Wing's Tier 2 blueprints, the West Wing's Delivery Van, and the North Wing's first node ([D008](DECISIONS.md)). The rest of the five wings comes in v0.4 and later (G9).
 
 ## Rules
@@ -17,7 +19,7 @@ Costs are GUESSES tuned in the build, paid mostly in Table Mild. Tier 1 bottles 
 | --- | --- | --- | --- | --- | --- |
 | 00 | Kitchen Table | Centre | — | free | The root |
 | N1 | Calloused Thumbs | North | 00 | 10 Table Mild | +2 Bell Peppers a press (brief §4; [D008](DECISIONS.md)) |
-| E1 | Crop Blueprint: Jalapeño | East | 00 | 3 Table Mild | Jalapeño Plot can be bought |
+| E1 | Jalapeño Cultivation (was Crop Blueprint: Jalapeño until D041) | East | 00 | 3 Table Mild | The Jalapeño Plot ×1.5 faster (D041: the plot is on sale from the start) |
 | E2 | Culinary Blueprint: Verde Mash | East | E1 | 10 Table Mild | Verde Mash recipe (15 Jalapeño) |
 | E3 | Crop Blueprint: White Vinegar | East | E1 | 10 Table Mild + 5 Sweet Pepper Mash | The Vinegar Cask can be bought (D024; was the White Vinegar Plot) |
 | E4 | Culinary Blueprint: Pickled Brine | East | E3 | 10 Table Mild + 5 Sweet Pepper Mash | Pickled Brine recipe (10 Vinegar + 5 Bell) |
@@ -181,7 +183,7 @@ Built (save v6, which adds `stats.foraged`). Asked for by the owner, beyond the 
 
 | Id | Node | Needs | Cost | Effect | Expected | Pos |
 | --- | --- | --- | --- | --- | --- | --- |
-| N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.25% chance (was 2.5% until v0.6a moved Garlic earlier) to drop one harvest of the shortest ingredient | 0:35 | 1, −2 |
+| N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.25% chance (was 2.5% until v0.6a moved Garlic earlier) to drop one harvest of the shortest ingredient (D041: what its plot grows in one base cycle, speed levels included) | 0:35 | 1, −2 |
 
 - **Shortest ingredient:** among owned non-pepper stations (D024) that a researched recipe uses, the one whose stock covers the fewest cycles of that use (stock ÷ the most any one of those recipes takes a cycle). Ties go in data order. With no such station, nothing drops and nothing is drawn.
 - **One harvest:** what that station's next harvest would give, yield upgrades included, without Crop Quality's double.
@@ -193,7 +195,7 @@ Built (save v6, which adds `stats.foraged`). Asked for by the owner, beyond the 
 | Id | Criterion |
 | --- | --- |
 | T1 | Over 10,000 presses, 2–3% drop. |
-| T2 | A drop always goes to the shortest ingredient as defined above, and is exactly one harvest of it. |
+| T2 | A drop always goes to the shortest ingredient as defined above, and is exactly one harvest of it (since D041, at its base cycle: what the plot grows in its base cycle time, upgrades included). |
 | T3 | No drop, and no draw from the random stream, with no ingredient station owned. |
 | T4 | For the pacing player at 0:45, the shortest ingredient's supply over a minute is 10–20% higher than without the node. |
 | T5 | Every existing pacing and offline criterion still passes. |

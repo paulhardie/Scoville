@@ -82,7 +82,7 @@ func test_tier_1_offered_in_order() -> void:
 	check(g.buy_slot("vat") and g.slot_offered("line"), "buying a vat offers the line")
 	check(not g.slot_offered("vat"), "no second vat before Stage 3")
 	check(close(g.cash, 1000.0 - g.data.slots.vat.prices[0]), "vat slot 1 costs its listed price")
-	check(not g.plot_offered("jalapeno") and not g.buy_plot("jalapeno"), "no Jalapeño Plot without its blueprint")
+	check(not g.plot_offered("vinegar") and not g.buy_plot("vinegar"), "no Vinegar Cask without its blueprint")
 
 
 func test_plot_harvests() -> void:
@@ -95,10 +95,10 @@ func test_plot_harvests() -> void:
 	g.advance(seconds(10.0))
 	var cycles := roundi(10.0 / cycle)
 	check(g.stock.bell - before == cycles, "1 pepper every %.1f s: %d in 10 s" % [cycle, g.stock.bell - before])
-	g.plots.bell["yield"] = 2
+	g.plots.bell["yield"] = 50   # 1 × (1 + 50 × 6%): 4 a cycle (D041)
 	before = g.stock.bell
 	g.advance(seconds(10.0))
-	check(g.stock.bell - before == 3 * cycles, "yield 2 levels: 3 a cycle, %d in 10 s" % (g.stock.bell - before))
+	check(g.stock.bell - before == roundi(g.plot_yield_exact("bell")) * cycles, "yield 50 levels: %d a cycle, %d in 10 s" % [roundi(g.plot_yield_exact("bell")), g.stock.bell - before])
 
 
 func test_vat_takes_ten_and_makes_mash() -> void:
@@ -146,9 +146,10 @@ func test_upgrades() -> void:
 	var g := opened(10000.0)
 	check(not g.upgrade_plot("bell", "speed"), "can't upgrade a plot not owned")
 	g.buy_plot("bell")
-	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST), "first speed level at base cost")
+	var first: float = g.plot_price("bell") * T.PLOT_UPGRADE_SHARE
+	check(close(g.plot_upgrade_cost("bell", "speed"), first), "first speed level at %.0f%% of the plot's price" % (T.PLOT_UPGRADE_SHARE * 100.0))
 	check(g.upgrade_plot("bell", "speed") and g.plots.bell.speed == 1, "buys a speed level")
-	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST * T.PLOT_SPEED_GROWTH), "the next costs more")
+	check(close(g.plot_upgrade_cost("bell", "speed"), first * T.PLOT_UPGRADE_GROWTH), "the next costs more")
 	check(close(g.plot_cycle("bell"), g.data.plots.bell.seconds / (1.0 + T.PLOT_SPEED_STEP)), "and the cycle is shorter")
 	check(not g.upgrade_plot("bell", "colour"), "unknown upgrades don't buy")
 	g.buy_slot("vat")
@@ -160,9 +161,6 @@ func test_upgrades() -> void:
 func test_upgrades_scale_with_price() -> void:
 	var g := tier_2()
 	check(g.buy_plot("jalapeno"), "buys the Jalapeño Plot")
-	var plot_scale := pow(g.plot_price("jalapeno") / T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER)
-	check(close(g.plot_upgrade_cost("jalapeno", "speed"), T.PLOT_SPEED_COST * plot_scale), "its upgrades cost the Bell curve × (price ÷ the $%.0f reference)^%.1f" % [T.PLOT_PRICE_REFERENCE, T.COST_SCALE_POWER])
-	check(close(g.plot_upgrade_cost("bell", "speed"), T.PLOT_SPEED_COST), "a plot cheaper than the reference isn't scaled down")
 	g.buy_slot("vat")
 	g.buy_slot("vat")
 	var prices: Array = g.data.slots.vat.prices
@@ -372,7 +370,8 @@ func test_v2_save_migrates() -> void:
 	var problem := g.load_state(v2_save())
 	check(problem == "", "S4: a v2 save loads: " + problem)
 	check(close(g.cash, 41.5 * T.SAVE_V8_MONEY) and g.stock.bell == 23 and g.stock.table_mild == 6, "S4: cash and stock carry over")
-	check(g.plots.bell.owned and g.plots.bell.speed == 3 and g.plots.bell["yield"] == 1, "S4: the plot and its levels")
+	# v2's speed 3 (+45%) and yield 1 (+1 a harvest), in v9's levels (D041).
+	check(g.plots.bell.owned and g.plot_cycle("bell") <= g.data.plots.bell.seconds / 1.45 + 1e-9 and g.plot_yield_exact("bell") >= 2.0 - 1e-9, "S4: the plot and its levels")
 	check(g.vats.size() == 1 and g.vats[0].recipe == "sweet_mash" and g.vats[0].speed == 2 and g.vats[0].running, "S4: the vat is vat slot 1 on Sweet Pepper Mash")
 	check(g.lines.size() == 1 and g.lines[0].recipe == "table_mild" and g.lines[0].crate == 21, "S4: the line is line slot 1, crate kept")
 	check(g.stats.made.table_mild == 200 and g.stats.sold.table_mild == 194 and close(g.stats.cash_earned, 1100.0 * T.SAVE_V8_MONEY), "S4: stats carry over, money ×10 (D035)")
@@ -388,10 +387,12 @@ func test_v2_migration_produces_the_same() -> void:
 	var g := Game.new()
 	g.load_state(v2_save())
 	g.advance(seconds(60.0))
-	# Production follows today's rules: the migrated levels at today's plot speed.
-	var plot_cycle: float = g.data.plots.bell.seconds / (1.0 + 0.15 * 3)
-	var harvested := floori((60.0 + 0.7) / plot_cycle + 1e-6) * 2
-	check(g.stats.harvested.bell - 1500 == harvested, "S4: the migrated plot's rate: %d (want %d)" % [g.stats.harvested.bell - 1500, harvested])
+	# Production follows today's rules: the migrated levels at today's plot
+	# speed and yield, at least v2's rate (D041 rounds levels up).
+	var v2_rate := floori((60.0 + 0.7) / (g.data.plots.bell.seconds / 1.45) + 1e-6) * 2
+	var harvested := floori(floori((60.0 + 0.7) / g.plot_cycle("bell") + 1e-6) * g.plot_yield_exact("bell") + 1e-6)
+	var got: int = g.stats.harvested.bell - 1500
+	check(got == harvested and got >= v2_rate, "S4: the migrated plot's rate: %d (want %d, at least v2's %d)" % [got, harvested, v2_rate])
 	check(g.stats.made.sweet_mash > 210 and g.stats.made.table_mild > 200, "S4: the vat and line keep going")
 
 
@@ -453,10 +454,11 @@ func test_v3_save_migrates() -> void:
 	check(JSON.stringify(again.to_state()) == JSON.stringify(g.to_state()), "S9: the same save migrates the same way, random stream included")
 	# Production goes on as v0.3's rules had it: the plot's harvests, by hand.
 	g.advance(seconds(60.0))
-	# The migrated levels at today's plot speed.
-	var bell_cycle: float = g.data.plots.bell.seconds / (1.0 + 0.15 * 4)
-	var harvested := floori((60.0 + 0.4) / bell_cycle + 1e-6) * 3
-	check(g.stats.harvested.bell - 8000 == harvested, "S9: the migrated Bell plot's rate: %d (want %d)" % [g.stats.harvested.bell - 8000, harvested])
+	# The migrated levels at today's plot speed and yield, at least v0.3's rate.
+	var v3_rate := floori((60.0 + 0.4) / (g.data.plots.bell.seconds / 1.6) + 1e-6) * 3
+	var harvested := floori(floori((60.0 + 0.4) / g.plot_cycle("bell") + 1e-6) * g.plot_yield_exact("bell") + 1e-6)
+	var got: int = g.stats.harvested.bell - 8000
+	check(got == harvested and got >= v3_rate, "S9: the migrated Bell plot's rate: %d (want %d, at least v0.3's %d)" % [got, harvested, v3_rate])
 	var sm_cycle := 8.0 / (1.0 + 0.25 * 5)
 	check(g.stats.made.sweet_mash - 700 >= floori(60.0 / sm_cycle) - 1, "S9: the vat keeps going")
 	var h := Game.new()
@@ -492,3 +494,131 @@ func test_chances_are_deterministic() -> void:
 		for i in 200:
 			g.press()
 	check(other.stats.doubles != same.stats.doubles or other.rng.state != same.rng.state, "a different seed gives different chances")
+
+
+# --- v0.6d: Idle Planet Miner's early flow (ECONOMY.md, D041) ---------------
+
+func test_starting_plots() -> void:
+	var before := Game.new()
+	check(not before.plot_offered("poblano") and not before.plot_offered("jalapeno"), "A1: nothing on sale before the deck shows")
+	var g := opened(100000.0)
+	var order := ["bell", "poblano", "jalapeno"]
+	for crop in order:
+		check(g.plot_offered(crop) and g.data.plots[crop].unlocked, "A1: the %s is on sale with the deck, no blueprint" % g.data.plots[crop].name)
+	for crop in g.data.plots:
+		if not crop in order:
+			check(not g.plot_offered(crop), "A1: the %s still needs its blueprint" % g.data.plots[crop].name)
+	for i in range(1, order.size()):
+		check(g.plot_price(order[i]) > g.plot_price(order[i - 1]), "A1: the %s costs more than the %s" % [g.data.plots[order[i]].name, g.data.plots[order[i - 1]].name])
+	for crop in ["poblano", "jalapeno"]:
+		var plot: Dictionary = g.data.plots[crop]
+		var payback: float = g.plot_price(crop) / (plot["yield"] / plot.seconds * g.value(crop))
+		check(payback >= 300.0 and payback <= 600.0, "A1: the %s pays for itself raw in %.1f minutes (5–10)" % [plot.name, payback / 60.0])
+
+
+func test_upgrade_curve() -> void:
+	var g := opened(1e12)
+	for crop in g.data.plots:
+		g.plots[crop].owned = true
+		for upgrade in g.PLOT_UPGRADES:
+			var first: float = g.plot_price(crop) * 0.05
+			var ok := close(g.plot_upgrade_cost(crop, upgrade), first)
+			for lv in 4:
+				ok = ok and absf(g.plot_upgrade_cost(crop, upgrade, lv + 1) / g.plot_upgrade_cost(crop, upgrade, lv) - 1.3) < 1e-9
+			check(ok, "A2: %s %s: 5%% of the price, then ×1.3 a level" % [crop, upgrade])
+
+
+func test_sell_any_crop() -> void:
+	var g := opened(0.0)
+	g.stock.poblano = 7
+	g.stock.jalapeno = 3
+	g.stock.bell = 2
+	check(g.can_sell_crop("poblano") and g.sell_crop("poblano"), "A3: Poblano Peppers sell raw")
+	check(g.stock.poblano == 0 and close(g.cash, 7 * g.value("poblano")), "A3: at their value")
+	check(g.stock.jalapeno == 3 and g.stock.bell == 2, "A3: selling one crop leaves the others alone")
+	check(not g.sell_crop("poblano") and not g.can_sell_crop("poblano"), "A3: nothing to sell with none held")
+	g.stock.sweet_mash = 4
+	check(not g.can_sell_crop("sweet_mash") and not g.sell_crop("sweet_mash"), "A3: only crops sell raw")
+	var early := Game.new()
+	early.stock.jalapeno = 5
+	check(not early.sell_crop("jalapeno"), "A3: and not before the status bar")
+
+
+func test_v8_plots_convert() -> void:
+	# A v8 save with old levels: speed 3 (+45%), yield 2 (+2 crops), quality 10 (30%).
+	var g := opened(0.0)
+	g.buy_plot("jalapeno")
+	var s: Dictionary = g.to_state()
+	s.version = 8
+	s.run.plots.jalapeno.speed = 3
+	s.run.plots.jalapeno["yield"] = 2
+	s.run.plots.jalapeno.quality = 10
+	s.run.plots.jalapeno.erase("spare")
+	var h := Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(s))) == "", "A5: a v8 save loads")
+	var p: Dictionary = h.plots.jalapeno
+	var base: Dictionary = h.data.plots.jalapeno
+	check(h.plot_cycle("jalapeno") <= base.seconds / 1.45 + 1e-9, "A5: at least as fast (%.3f s against %.3f)" % [h.plot_cycle("jalapeno"), base.seconds / 1.45])
+	check(h.plot_yield_exact("jalapeno") >= base["yield"] + 2 - 1e-9, "A5: at least as productive (%.2f a harvest against %d)" % [h.plot_yield_exact("jalapeno"), base["yield"] + 2])
+	check(h.quality_chance("jalapeno") >= 0.30 - 1e-9, "A5: as likely to double (%.0f%%)" % (h.quality_chance("jalapeno") * 100.0))
+	check(p.speed <= 3 * 0.15 / T.PLOT_SPEED_STEP + 1 and h.to_state().version == Game.SAVE_VERSION, "A5: no more levels than it takes, saved as v%d" % Game.SAVE_VERSION)
+
+
+func test_fractional_yield_carries() -> void:
+	var g := opened(1000.0)
+	g.buy_plot("bell")
+	g.plots.bell["yield"] = 5   # 1 × (1 + 5 × step) a harvest
+	var exact: float = g.plot_yield_exact("bell")
+	var cycle: float = g.plot_cycle("bell")
+	for i in roundi(100.0 * cycle / T.TICK_SECONDS):
+		g.tick()
+	check(absi(g.stats.harvested.bell - roundi(100.0 * exact)) <= 1, "a fractional yield carries: %d from 100 harvests of %.2f" % [g.stats.harvested.bell, exact])
+
+
+func test_malformed_v8_plot_refused() -> void:
+	var g := opened(0.0)
+	var s: Dictionary = g.to_state()
+	s.version = 8
+	s.run.plots.bell = 5
+	var h := Game.new()
+	var problem := h.load_state(JSON.parse_string(JSON.stringify(s)))
+	check(problem != "", "A5: a v8 save with a broken plot is refused, not crashed on: %s" % problem)
+	s.run.plots.bell = {"owned": true, "speed": "fast"}
+	check(Game.new().load_state(JSON.parse_string(JSON.stringify(s))) == "", "A5: a level that isn't a number reads as 0")
+
+
+func test_v9_names_migrate() -> void:
+	# D042: a v9 save with the old ids loads under the new ones.
+	var g := opened(0.0)
+	var s: Dictionary = g.to_state()
+	var text := JSON.stringify(s)
+	for pair in Game.RENAMES_V10:
+		text = text.replace(pair[1], pair[0])
+	var old: Dictionary = JSON.parse_string(text)
+	old.version = 9
+	old.run.stock["savina_gold"] = 3
+	old.run.stock["savina"] = 4
+	old.run.stock["habanero_mash"] = 5
+	old.run.stock["sugar"] = 6
+	old.run.research.append("tabasco_blueprint")
+	var h := Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v9 save with the old pepper names loads")
+	check(h.stock.cocoa_loco == 3 and h.stock.chocolate == 4 and h.stock.caribbean_red_mash == 5 and h.stock.pineapple == 6, "S: Savina Gold, Red Savina, Habanero Mash and Cane Sugar become Cocoa Loco, Chocolate Habanero, Caribbean Red Mash and Pineapple")
+	check(h.is_researched("thai_chili_blueprint"), "S: research carries over under the new ids")
+
+
+func test_v8_renamed_plot_converts() -> void:
+	# A v8 save's Cane Sugar plot is renamed (D042) before its levels convert (D041).
+	var g := opened(0.0)
+	var s: Dictionary = g.to_state()
+	var text := JSON.stringify(s)
+	for pair in Game.RENAMES_V10:
+		text = text.replace(pair[1], pair[0])
+	var old: Dictionary = JSON.parse_string(text)
+	old.version = 8
+	old.run.plots.sugar = {"owned": true, "speed": 0, "yield": 2, "quality": 0, "progress": 0.0}
+	var h := Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v8 save with a Cane Sugar plot loads")
+	var base: int = h.data.plots.pineapple["yield"]
+	check(h.plots.pineapple.owned and h.plot_yield_exact("pineapple") >= base + 2 - 1e-9, "S: as a Pineapple Grove, its yield levels converted (%.2f a harvest, at least %d)" % [h.plot_yield_exact("pineapple"), base + 2])
+

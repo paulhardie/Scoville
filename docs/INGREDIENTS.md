@@ -2,7 +2,33 @@
 
 The pepper ladder: every crop the game will grow, ordered by real heat, with its value. The owner asked for real hot sauce peppers from the Bell Pepper (0 Scoville) up to Pepper X (the hottest on record), then fictional ones past it, priced with Idle Planet Miner's ore ladder as the reference ([D023](DECISIONS.md), proposed).
 
-Status: **design only.** Nothing here is in `data/` yet. The six peppers the brief already names keep their current values, so Tiers 1–3 as built don't change.
+Status: **built through Tier 6** (D029, D034, D035, D042); the fictional peppers past Pepper Y (rung 14 on) are design only.
+
+## The ladder since D042
+
+The owner asked for the peppers to be tiered by [PepperScale's hot pepper list](https://pepperscale.com/hot-pepper-list/) (read 2026-10-21): one pepper per heat band, and only generic variety names, so the ladder steps on nobody's trademark ([D042](DECISIONS.md)). Each rung keeps its ore value. The game's ids follow the names (save v10 renames them). Older sections below use the old names.
+
+| # | Pepper | Scoville (SHU) | Value | Was | Why |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Bell Pepper | 0 | $1 | — | |
+| 2 | Poblano | 1,000–1,500 | $2 | — | |
+| 3 | Jalapeño | 2,500–8,000 | $4 | — | |
+| 4 | Serrano | 10,000–23,000 | $8 | — | |
+| 5 | Cayenne | 30,000–50,000 | $17 | — | |
+| 6 | Thai Chili | 50,000–100,000 | $36 | Tabasco | Tabasco shared Cayenne's band, and TABASCO is McIlhenny's mark |
+| 7 | Scotch Bonnet | 100,000–350,000 | $75 | — | Kept over Habanero (same band): the Caribbean sauce pepper, Island Heat's |
+| 8 | Caribbean Red Habanero | 300,000–445,000 | $160 | Habanero | A habanero a band hotter than the Bonnet |
+| 9 | Chocolate Habanero | 425,000–577,000 | $340 | Red Savina | RED SAVINA HABANERO is a registered mark |
+| 10 | Ghost Pepper | 855,000–1,041,427 | $730 | — | |
+| 11 | Trinidad Moruga Scorpion | 1,200,000–2,000,000 | $1,600 | — | A Trinidad landrace nobody owns |
+| 12 | *Alabama Grim* | "about 2,000,000, give or take a lawsuit" | $3,500 | Carolina Reaper | Fictional: one state over, one shade darker |
+| 13 | *Pepper Y* | 2,693,001 | $7,800 | Pepper X | Fictional: one Scoville hotter, and nobody can say why |
+
+The sauces follow: Tabasco Mash is now Thai Chili Mash, Habanero Mash is Caribbean Red Mash, Savina Mash is Chocolate Habanero Mash, and **Savina Gold is Cocoa Loco**. Reaper Mash becomes Grim Mash, and Pepper X Mash becomes Pepper Y Mash.
+
+**Pineapple replaces Cane Sugar** (same Gold ore value, $75). It grows in a **Pineapple Grove** and makes **Charred Pineapple Glaze** with Garlic Paste. Scotch Bonnet with pineapple or mango is a real Caribbean pairing, which suits Island Heat and Sweet Heat better than cane sugar did.
+
+Scoville figures are facts and are used as such; PepperScale's descriptions and its list as a whole are not copied. The fictional peppers past Pepper Y (below, from rung 14) are unchanged.
 
 ## Since D035: each pepper is an Idle Planet Miner ore
 

@@ -18,7 +18,7 @@ The owner asked for the early game to flow roughly as Idle Planet Miner's does. 
 
 | Id | Criterion |
 | --- | --- |
-| A1 | The Bell, Poblano and Jalapeño Plots are on sale as soon as the deck shows, with no research; every other crop still needs its blueprint. Their prices rise in that order, and each starting plot pays for itself from raw sales, unupgraded, in 1–4 minutes (Idle Planet Miner's ladder keeps payback roughly even as prices climb). |
+| A1 | The Bell, Poblano and Jalapeño Plots are on sale as soon as the deck shows, with no research; every other crop still needs its blueprint. Their prices rise in that order, and the Poblano and Jalapeño Plots each pay for themselves from raw sales, unupgraded, in 1–4 minutes (the Bell Plot is the onboarding's and keeps its price) (Idle Planet Miner's ladder keeps payback roughly even as prices climb). |
 | A2 | Every plot upgrade's first level costs 5% of the plot's price, and each next level 1.3× the one before, for all three upgrades and every plot. |
 | A3 | Every crop sells raw at its value from its plot's card whenever any is held; selling one crop leaves the others alone. |
 | A4 | Between the first line and 14:00 the pacing player buys at least two new plots, and the longest wait between new stations (a plot or a slot) in that time is at most 6 minutes (was 12:37, 1:36 to 14:13). |

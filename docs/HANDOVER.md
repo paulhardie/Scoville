@@ -12,17 +12,23 @@ This branch carries **D043: Cargo replaces Crop Quality**, as the owner asked.
 
 **Results:** C1–C7 PASS. Cargo first comes into play at 7:56. Every earlier criterion passes except **A4, by one second** (6:31 against 6:30, W29). The sale lands at 2:07, Phantom at 2:39, and the second run passes 4/4.
 
+This branch also carries **D044: the dashboard from the first launch**, as the owner asked.
+- **No progressive disclosure:** the status bar, the upper viewport (the button, a factory view of Bottling, Vats and Fields with dots climbing between them, and Sell Batch), the six tab selectors directly under the viewport, and the Farms panel all show from the first second.
+- **Locked tabs show what opens them** ("Tech Tree $7.5K"); the thresholds are unchanged.
+- **One next action at a time** (`Game.next_action()`) is ringed in orange and named on the goal line through the early run: tap, sell, buy the plot, Vat 1, Line 1, Sell Batch, the starting plots, then open the Tech Tree.
+- **Results:** L10–L14 PASS. Two misses by one unit: A4 (6:31, W29) and E6 (9 mash for the casual player's Starter Crate, against 10, W30).
+
 ## Open decisions
 
-- **W29, A4:** it flaps on seconds. Recommend a 7:00 bar, or fold it into W28.
+- **W29 (A4) and W30 (E6):** both miss by one unit after the early game sped up. Recommend settling them in W28's early-game pass.
 - **W28:** the second plot feels slow to unlock on a phone; revisit the starting plots with the next early-game pass.
 - **W27:** fermentation, as its own version.
 - **W21, late growth; W24, a floor on how fast run 2 may be.**
-- **Layout step 2** (W22) waits on W8's visual direction.
+- **Layout step 3** (W22) waits on W8's visual direction, which can also restyle step 2's factory view.
 
 ## Next
 
-1. The owner settles W29 and merges this PR.
+1. The owner tries the dashboard on a phone, settles W29/W30 and merges this PR.
 2. W28's early-game pass, or fermentation (W27), whichever the owner picks.
 
-Touches: `game.gd` (field, truck, `cargo_rate`, `plot_boost`, Bumper Crop, save v11), `tuning.gd` (`CARGO_START`, `CARGO_STEP`), `data/tech.json` (E48–E50), `data_loader.gd`, `main.gd` (truck line, Cargo on the sheet), `engaged_player.gd`, tests, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27–W29, G1, G12–G20.
+Touches: `game.gd` (field, truck, `cargo_rate`, `plot_boost`, Bumper Crop, save v11), `tuning.gd` (`CARGO_START`, `CARGO_STEP`), `data/tech.json` (E48–E50), `data_loader.gd`, `main.gd` (truck line, Cargo on the sheet), `engaged_player.gd`, tests, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27–W30, G1, G12–G20.

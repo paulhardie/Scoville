@@ -74,3 +74,19 @@ The owner changed their mind on progressive disclosure: the game opens on the fu
 | L13 | Exactly one next action is shown through the early sequence, ringed on screen and named on the goal line, as `next_action()` gives it: from a fresh game, the button, then Sell Raw Peppers, then the Bell Pepper Plot, and so on to opening the Tech Tree. With the target on another tab, that tab's selector is ringed. |
 | L14 | Once the sequence is done, the goal line is the goal bar (next node, the sale's progress) and nothing is ringed. |
 | L15 | Every earlier criterion still passes, except those D044 retires: O1 (the blank screen), O3's and O4's "not before" (the counter and status bar show from the start), O8's nav bar appearing at a threshold, and L9's "stage 0 shows no text". F1 and F2 now read 0:00. |
+
+### Results (step 2)
+
+**L10–L14 PASS; L15 FAILS on two criteria by one unit each.**
+
+- **L10:** a fresh game shows the status bar, the viewport (the button, factory view, goal and stock lines), all six tab selectors directly under the viewport, and the Farms panel (UI suite).
+- **L11:** locked selectors read "Processing $4K", "Tech Tree $7.5K", "Market Van", "Shift Roster $150K" and "HQ $10M". A locked tab doesn't open, and Processing opens at $4,000.
+- **L12:** a tile per owned station on its floor, an orange tile for a backed-up plot, and dots climbing at most 6 a second.
+- **L13:** from a fresh game the ring goes from the button to Sell Raw Peppers (once 50 peppers cover the plot), to the Bell Pepper Plot's Buy, and on through Vat 1, Line 1, Sell Batch and the starting plots to opening the Tech Tree. A purchase on another tab rings that tab's selector (core and UI suites).
+- **L14:** with the sequence done, the goal line is the goal bar again (L6 passes).
+- **L15:** every earlier criterion passes except two:
+  - **A4: 6:31 against 6:30.** This is the same miss as D043's (W29).
+  - **E6: 9 Sweet Pepper Mash waiting for the casual player's Starter Crate, against 10.** The first plot can now be bought at $50 straight away rather than after $100 earned, so the casual player reaches the line sooner, with less mash piled up (eager player: plot at 0:17, was 0:34). Raising Line 1 to $115 or $130 fixed E6 but failed E3 (a casual player's 120 s with nothing new) and, at $115, U7; reverted.
+  - F1, F2 and E1 now read 0:00.1, since nothing is revealed.
+
+**Not checked:** how it feels on a phone, which is W16's phone test.

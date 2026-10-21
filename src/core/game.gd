@@ -29,7 +29,8 @@ var data: Dictionary
 # --- The run ---
 var cash := 0.0
 var stock := {}                 # item id → count
-var revealed := {"counter": false, "status_bar": false, "deck": false}
+## Kept in saves for older versions; since D044 everything shows from the start.
+var revealed := {"counter": true, "status_bar": true, "deck": true}
 var plots := {}                 # crop → {owned, speed, yield, cargo, progress, spare, field, haul}
 var vats: Array = []            # slots in buying order: {recipe, speed, progress, running, taken}
 var lines: Array = []           # the same, plus crate: Starter Crate bottles left
@@ -232,10 +233,10 @@ func nav_shown() -> bool:
 
 func tab_open(tab: String) -> bool:
 	if tab == "farms":
-		return revealed.deck
+		return true
 	# Market holds the Delivery Van's levers, so it opens with the Van (LAYOUT.md).
 	if tab == "market":
-		return revealed.deck and has_van()
+		return has_van()
 	if not tab in T.TABS_BUILT:
 		return false
 	return account.best_ov >= T.TAB_THRESHOLDS[tab] - EPSILON
@@ -267,7 +268,7 @@ func plot_unlocked(crop: String) -> bool:
 
 
 func plot_offered(crop: String) -> bool:
-	return revealed.deck and plot_unlocked(crop)
+	return plot_unlocked(crop)
 
 
 func plot_price(crop: String) -> float:
@@ -348,7 +349,7 @@ func slot_cap(station: String) -> int:
 ## vat is owned, and more of either once the Processing tab is open (Stage 3).
 func slot_offered(station: String) -> bool:
 	var owned := slots(station).size()
-	if not revealed.deck or owned >= slot_cap(station):
+	if owned >= slot_cap(station):
 		return false
 	if owned == 0:
 		return station == "vat" or not vats.is_empty()
@@ -585,7 +586,7 @@ func can_sell_raw() -> bool:
 
 
 func can_sell_crop(crop: String) -> bool:
-	return revealed.status_bar and data.items.has(crop) and data.items[crop].kind == "crop" and stock[crop] > 0
+	return data.items.has(crop) and data.items[crop].kind == "crop" and stock[crop] > 0
 
 
 func bottles_held() -> int:
@@ -755,6 +756,54 @@ func tech_cost_value(node: String) -> float:
 	for item in cost:
 		v += cost[item] * value(item)
 	return v
+
+
+## The early run's steps, in order, for the screen to ring one at a time
+## (LAYOUT.md step 2, D044).
+const NEXT_STEPS := [["plot", "bell"], ["slot", "vat"], ["slot", "line"], ["sell_batch", ""], ["plot", "poblano"],
+	["plot", "jalapeno"], ["tab", "tech"]]
+
+
+## The next action in the early run: {"do": "press" | "sell_raw" | "sell_batch"
+## | "buy_plot" | "buy_slot" | "tab", "id": the crop, station or tab}. Empty
+## while the next step waits on nothing the player can do (the Tech Tree not
+## yet open) and once the sequence is done.
+func next_action() -> Dictionary:
+	for step in NEXT_STEPS:
+		match step[0]:
+			"plot":
+				if not plots[step[1]].owned:
+					return _toward("buy_plot", step[1], plot_price(step[1]))
+			"slot":
+				if slots(step[1]).is_empty():
+					return _toward("buy_slot", step[1], slot_price(step[1]))
+			"sell_batch":
+				if not _sold_a_bottle():
+					return {"do": "sell_batch", "id": ""} if bottles_held() > 0 else {"do": "press", "id": ""}
+			"tab":
+				if stats.researched == 0:
+					return {"do": "tab", "id": step[1]} if tab_open(step[1]) else {}
+	return {}
+
+
+## Buying something: the purchase once cash covers it, else what raises the
+## cash: bottles to sell, raw peppers before the first line (when they cover
+## it), or the button.
+func _toward(action: String, id: String, price: float) -> Dictionary:
+	if cash >= price - 1e-9:
+		return {"do": action, "id": id}
+	if bottles_held() > 0:
+		return {"do": "sell_batch", "id": ""}
+	if lines.is_empty() and stock.bell > 0 and cash + stock.bell * sale_price("bell") * heat_mult() >= price - 1e-9:
+		return {"do": "sell_raw", "id": ""}
+	return {"do": "press", "id": ""}
+
+
+func _sold_a_bottle() -> bool:
+	for item in stats.sold:
+		if data.items[item].kind == "bottle" and stats.sold[item] > 0:
+			return true
+	return false
 
 
 ## The goal bar's node (LAYOUT.md): the pinned one, or else the reachable node
@@ -1074,9 +1123,6 @@ func _press() -> int:
 				_forage_drop()
 	stock.bell += picked
 	stats.bell_picked += picked
-	revealed.counter = true
-	if stats.bell_picked >= T.STAGE_1_PEPPERS:
-		revealed.status_bar = true
 	return picked
 
 
@@ -1357,8 +1403,6 @@ func _sell(item: String, count: int) -> void:
 func _earn(amount: float) -> void:
 	cash += amount
 	stats.cash_earned += amount
-	if stats.cash_earned >= T.STAGE_2_CASH - 1e-9:
-		revealed.deck = true
 
 
 ## Keeps the account's best Operation Value, which opens tabs.
@@ -1598,9 +1642,8 @@ func load_state(s: Variant) -> String:
 	stock = fresh.stock
 	for item in run.stock:
 		stock[item] = int(run.stock[item])
+	# Since D044 nothing waits to be revealed, whatever an older save says.
 	revealed = fresh.revealed
-	for k in revealed:
-		revealed[k] = bool(run.revealed.get(k, false))
 	plots = fresh.plots
 	for crop in run.plots:
 		var p: Dictionary = run.plots[crop]

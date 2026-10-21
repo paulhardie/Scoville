@@ -61,18 +61,13 @@ func tier_2(cash: float = 100000.0) -> Game:
 	return g
 
 
-func test_deck_opens_at_stage_2_cash() -> void:
+func test_on_sale_from_the_start() -> void:
+	# D044 retires the deck's reveal at $100 earned.
 	var g := Game.new()
-	for i in 99:
+	for i in 50:
 		g.press()
 	g.sell_raw()
-	check(not g.revealed.deck, "no deck at $%.2f earned" % g.stats.cash_earned)
-	check(not g.buy_plot("bell"), "can't buy before the deck")
-	g.press()
-	g.sell_raw()
-	check(g.revealed.deck, "the deck opens at $%.0f earned" % T.STAGE_2_CASH)
-	g.buy_plot("bell")
-	check(g.revealed.deck, "it stays after spending")
+	check(g.buy_plot("bell"), "the Bell Pepper Plot can be bought from the start, once cash covers it")
 
 
 func test_tier_1_offered_in_order() -> void:
@@ -497,8 +492,6 @@ func test_chances_are_deterministic() -> void:
 # --- v0.6d: Idle Planet Miner's early flow (ECONOMY.md, D041) ---------------
 
 func test_starting_plots() -> void:
-	var before := Game.new()
-	check(not before.plot_offered("poblano") and not before.plot_offered("jalapeno"), "A1: nothing on sale before the deck shows")
 	var g := opened(100000.0)
 	var order := ["bell", "poblano", "jalapeno"]
 	for crop in order:
@@ -537,9 +530,6 @@ func test_sell_any_crop() -> void:
 	check(not g.sell_crop("poblano") and not g.can_sell_crop("poblano"), "A3: nothing to sell with none held")
 	g.stock.sweet_mash = 4
 	check(not g.can_sell_crop("sweet_mash") and not g.sell_crop("sweet_mash"), "A3: only crops sell raw")
-	var early := Game.new()
-	early.stock.jalapeno = 5
-	check(not early.sell_crop("jalapeno"), "A3: and not before the status bar")
 
 
 func test_v8_plots_convert() -> void:

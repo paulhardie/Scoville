@@ -57,7 +57,7 @@ func run() -> void:
 	check(bar.visible, "O4: the status bar shows at 20 peppers")
 	var texts := visible_text(screen)
 	check("Cash: $0.00" in texts, "O4: it shows 'Cash: $0.00': %s" % str(texts))
-	check("Sell Raw Peppers ($1.00/ea)" in texts, "O4: it shows the sell button: %s" % str(texts))
+	check("Sell Raw Peppers\n($1.00/ea)" in texts, "O4: it shows the sell button (on two lines since LOOK.md): %s" % str(texts))
 
 	var sell: Button = screen.find_child("SellRaw", true, false)
 	sell.pressed.emit()

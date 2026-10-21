@@ -2,7 +2,7 @@
 
 After the first phone test the owner said the game "looks like a 2010 web game rather than a mobile app in 2026" (W8). The owner has now chosen **pixel art** as the game's style (D043). This doc is the first step: a **trial** of a ready-made pixel UI skin over today's screen, to see whether it carries the game before any art is drawn for it.
 
-Status: **criteria set, building.**
+Status: **built.** PX1–PX7 PASS (PX6 was tightened after the first captures, below); PX8 is the owner's.
 
 ## The kit
 
@@ -33,7 +33,7 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 | PX3 | **Every character drawn.** Every character in every visible text at those stages is in the kit's font or the companion font, so nothing falls back to a system font. |
 | PX4 | **No flat boxes.** No visible control at those stages draws a StyleBoxFlat (for panel, normal, hover, pressed, disabled, background or fill). |
 | PX5 | **Readable.** Text colours reach WCAG AA contrast against the surface they sit on, taking the surface's colour from the centre pixel of its art: 4.5:1 for TEXT, DIM, cash and Heat; 3:1 for MUTED (disabled text and hints). Surfaces: the inset card, the panel (status bar, nav, sheets) and the screen background. Dark text on the kit's buttons is the kit's choice and is measured too (4.5:1). |
-| PX6 | **It fits.** At those stages no visible control runs past the screen's left or right edge, apart from the Tech Tree's web, which scrolls sideways. Every button is at least 44 px tall (today's height for an ordinary button), so tap targets don't shrink. |
+| PX6 | **It fits.** At those stages no visible control runs past the screen's left or right edge, apart from the Tech Tree's web, which scrolls sideways. Every button is at least 44 px tall (today's height for an ordinary button), so tap targets don't shrink. *Tightened after the first captures (the agent's, before any result was reported):* no clipped label hides part of its text; wrapped text never breaks inside a word, Tech Tree nodes included; every tab's name fits the nav at once; the status bar keeps its height. |
 | PX7 | **Nothing else breaks.** Every suite passes, the headless boot is clean, stage 0 still shows the Blank Button alone with no text (O1), and the credit line is shown in the Settings card. |
 | PX8 | **The owner's eye.** Owner's call, on screenshots and then on the phone: does it look like a 2026 mobile game rather than a 2010 web game? The agent reports its own view but this one isn't the agent's to PASS. |
 
@@ -44,3 +44,28 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 - Wood, the only free theme. Ember or royal from the paid pack may suit hot sauce better.
 - Cards as the sunken inset, the status bar, nav and sheets as the raised panel.
 - The phone's screen isn't a whole multiple of 540 wide, so the final stretch to the phone can still make pixels slightly uneven (W28).
+- Measured into place (each found by the checks or the captures): the panel art darkened to 0.6 (PANEL_SHADE) so text on it reads; Tech Tree nodes 164×100 on a 180×116 grid, so "Concentrate" fits (they were 90×70, so less of the web shows at once); the nav says "Roster" for Shift Roster; Sell Raw Peppers on two lines, same words; card titles, the goal line, and valve and Auto-Sell labels wrap rather than widen the screen; valve and Auto-Sell rows put their label above their controls; the stock strip 16 px lower to make room for a two-line goal; the bottle pop rises 24 px, not 36; the compact Blank Button 140 px, not 150 (2× its disc).
+- The kit's demo isn't copied in; its art and theme are unchanged. Five glyphs (ñ × · → −) are ours, drawn by `tools/make_pixel_glyphs.gd`.
+- The selected Tech Tree node gets a cream frame and the pinned one a red frame, since the kit has no outlined button.
+
+## Results
+
+`tests/look_tests.gd` checks PX1–PX6 on the real screen, laid out at 540×960, at 17 stages from the bare button to HQ after a sale (7,310 checks). Every suite passes and the headless boot is clean.
+
+| Id | Result |
+| --- | --- |
+| PX1 | PASS: Nearest filtering; every kit box and icon are its art at exactly 2×, pixel for pixel, with margins doubled |
+| PX2 | PASS: every visible text uses the kit font at 16 or 24 px |
+| PX3 | PASS: every character drawn by the kit font or the companion glyphs |
+| PX4 | PASS: no flat boxes left on screen |
+| PX5 | PASS: on the inset card, the darkened panel and the background, TEXT 6.7–11.2:1, DIM 5.3–8.8, cash 6.8–11.3, Heat 4.6–7.7, MUTED 3.4–5.7; button text 6.2:1 (pressed 4.75, disabled 4.2) |
+| PX6 | PASS, after the fixes in "Measured into place" |
+| PX7 | PASS: all suites, the boot, O1 (stage 0 shows no text) and the credit line in Settings |
+| PX8 | The owner's: [before and after](look/trial_before_after.png) |
+
+Found on the way:
+- **A bug that would have shown on screen:** `get_image()` on an imported texture can hand back the texture's own image, so scaling it in place quietly changed the kit's art for the next reader. The kit loader now scales a copy. PX1's pixel-for-pixel check caught it.
+- **Headless isn't the phone's shape.** The first PX6 run saw a 960-wide window and passed what the captures showed overflowing. The suite now lays out at the design size.
+- **Wrapping every button was worse.** A wrapped button in a row shrank to one letter a line and stretched the status bar to half the screen. Now only full-width buttons wrap, and PX6 checks that no word breaks.
+
+The agent's view for PX8: it reads as a game now rather than a web page, and the chunky disc suits the Blank Button. But wood is a fantasy-RPG material, not a hot sauce one; the grey "can't afford" buttons are cold against the wood; and 3× headlines beside 2× borders show. The full pack's ember theme, or our own palette over the same parts, would fix the first two.

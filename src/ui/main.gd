@@ -521,7 +521,7 @@ func _bottle_feel(item: String) -> void:
 		_clink.volume_db = S.BOTTLE_VOLUME_DB
 		_clink.max_polyphony = 4
 		add_child(_clink)
-	last_clink_pitch = 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1)
+	last_clink_pitch = maxf(0.3, 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1))
 	_clink.pitch_scale = last_clink_pitch
 	_clink.play()
 	clinks_played += 1
@@ -1785,6 +1785,7 @@ func _rebase_juice() -> void:
 func _juice(delta: float) -> void:
 	_pop_wait = maxf(0.0, _pop_wait - delta)
 	_coin_wait = maxf(0.0, _coin_wait - delta)
+	var first_bottle := false
 	for item in game.data.items:
 		if game.data.items[item].kind != "bottle":
 			continue
@@ -1793,10 +1794,14 @@ func _juice(delta: float) -> void:
 		if made > before:
 			_pending_pop[item] = _pending_pop.get(item, 0) + made - before
 			# The first bottle of a sauce this run buzzes once (D045).
-			if before == 0 and settings.vibration:
-				Input.vibrate_handheld(S.FIRST_BOTTLE_MS)
-				bottle_buzzes += 1
+			if before == 0:
+				first_bottle = true
 		_made_seen[item] = made
+	# One buzz a frame, however many sauces' first bottles land in it: a phone
+	# only plays one vibration at a time.
+	if first_bottle and settings.vibration:
+		Input.vibrate_handheld(S.FIRST_BOTTLE_MS)
+		bottle_buzzes += 1
 	if not _pending_pop.is_empty() and _pop_wait <= 0.0 and _sell_batch.visible:
 		_pop(_pending_pop)
 		_pending_pop = {}

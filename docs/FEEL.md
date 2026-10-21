@@ -28,7 +28,7 @@ With v0.6a's 30 items, the stock line under the status bar wrapped to six lines 
 ## Assumed
 
 - The click's sound, 15 ms and the pitch ranges are defaults (UI polish); say if you want different.
-- Only the Blank Button makes a sound for now. Purchases and research stay silent until the visual pass (W8) sets the overall feel.
+- The Blank Button clicks and, since D045, bottles clink. Purchases and research stay silent until the visual pass (W8) sets the overall feel.
 
 ## Bottling: a sound, a buzz and a bottle (D045)
 
@@ -38,7 +38,7 @@ The owner asked what bottling a sauce looks and feels like. The honest answer wa
 
 - **A clink with every bottle pop.** The bottling sound is made in code: a glass clink, two bright partials that ring briefly. It plays with each bottle pop (LAYOUT.md), so it inherits the pop's limit of POPS_PER_SECOND and never drones. Sound off silences it.
 - **Richer sauces sound fuller.** The clink's pitch drops a step for each tier of the sauce in the pop (its most valuable bottle): Tier 1 at 1.0, each tier BOTTLE_TIER_PITCH lower.
-- **The first bottle of a sauce buzzes.** The first bottle of each sauce in a run asks for one short vibration, FIRST_BOTTLE_MS; later bottles don't. Vibration off silences it.
+- **The first bottle of a sauce buzzes.** The first bottle of each sauce in a run asks for one short vibration, FIRST_BOTTLE_MS; later bottles don't. Vibration off silences it. Two sauces' first bottles in the same frame give one buzz, since a phone plays one vibration at a time. First bottles made while away (the catch-up) don't buzz.
 - **A bottle in the factory view.** Each pop drops a small bottle shape onto the Bottling floor, tinted by the sauce's tier (`style.gd`, TIER_TINTS), which slides right towards Sell Batch and fades. Placeholder shapes, for W8 to restyle.
 
 ### Criteria

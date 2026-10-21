@@ -55,23 +55,28 @@ func test_whole_pixels() -> void:
 			check(_same_pixels(a.texture.get_image(), b.texture.get_image(), k), "PX1: %s/%s is the kit's art, each pixel %d×%d" % [type, n, k, k])
 			for side in [SIDE_LEFT, SIDE_TOP, SIDE_RIGHT, SIDE_BOTTOM]:
 				check(b.get_texture_margin(side) == (a as StyleBoxTexture).get_texture_margin(side) * k, "PX1: %s/%s's 9-slice margin %d is %d×" % [type, n, side, k])
+				if a.get_content_margin(side) >= 0.0:
+					check(b.get_content_margin(side) == a.get_content_margin(side) * k, "PX1: %s/%s's content margin %d is %d×" % [type, n, side, k])
 		for n in src.get_icon_list(type):
 			var ia := src.get_icon(n, type)
 			check(t.get_icon(n, type).get_size() == ia.get_size() * k, "PX1: icon %s/%s is %d×" % [type, n, k])
 	check(boxes >= 20, "PX1: the kit's boxes were all looked at (%d)" % boxes)
 	check(Kit.icon("coin").get_size() == Vector2(16, 16) * k, "PX1: icons are %d×" % k)
-	check(S.BLANK_BUTTON_SIZE == S.BLANK_DISC_PX * 4 and S.BLANK_BUTTON_COMPACT == S.BLANK_DISC_PX * 2, "PX1: the Blank Button's disc is drawn at whole scales")
 
 
 ## Each pixel of `small`, drawn k×k in `big`.
 func _same_pixels(small: Image, big: Image, k: int) -> bool:
 	if small.is_compressed():
 		small.decompress()
-	for y in small.get_height():
-		for x in small.get_width():
-			if not small.get_pixel(x, y).is_equal_approx(big.get_pixel(x * k + k - 1, y * k + k - 1)):
+	for y in big.get_height():
+		for x in big.get_width():
+			if not small.get_pixel(x / k, y / k).is_equal_approx(big.get_pixel(x, y)):
 				return false
 	return true
+
+
+func _whole_disc(size: Vector2) -> bool:
+	return is_equal_approx(size.x, size.y) and is_equal_approx(fmod(size.x, S.BLANK_DISC_PX), 0.0)
 
 
 ## PX5: WCAG contrast on the colours the surfaces really are (their art's centre).
@@ -124,8 +129,9 @@ func test_screens() -> void:
 	screen.settings_path = ""
 	root.add_child(screen)
 	await look("stage 0")
-
 	var blank: Button = screen.find_child("BlankButton", true, false)
+	check(_whole_disc(blank.size), "PX1: the Blank Button is a whole multiple of its %d px disc at the start (%s)" % [S.BLANK_DISC_PX, blank.size])
+
 	for p in T.STAGE_1_PEPPERS:
 		blank.pressed.emit()
 	await look("the status bar")
@@ -133,6 +139,7 @@ func test_screens() -> void:
 		blank.pressed.emit()
 	(screen.find_child("SellRaw", true, false) as Button).pressed.emit()
 	await look("the deck")
+	check(_whole_disc(blank.size), "PX1: the Blank Button is a whole multiple of its disc once compact (%s)" % blank.size)
 
 	var g = screen.game
 	var played := Game.new()
@@ -186,7 +193,9 @@ func test_screens() -> void:
 	check(widest <= nav.size.x - 12 - 4 * (screen.NAV_NAMES.size() - 1), "PX6: every tab's name fits the nav at once (%.0f px of %.0f)" % [widest, nav.size.x])
 
 	# Tech Tree nodes: no word broken across lines.
-	var room := S.WEB_NODE.x - 2 * Kit.theme().get_stylebox(&"normal", &"Button").get_content_margin(SIDE_LEFT)
+	# A node is a kit button or, researched or out of reach, a card: the tighter padding.
+	var pad := maxf(Kit.theme().get_stylebox(&"normal", &"Button").get_content_margin(SIDE_LEFT), screen._card_box().get_content_margin(SIDE_LEFT))
+	var room := S.WEB_NODE.x - 2 * pad
 	var longest := ""
 	for id in g.data.tech:
 		var node: Dictionary = g.data.tech[id]
@@ -226,7 +235,7 @@ func _walk(node: Node, where: String, width: float, web: Control) -> void:
 			var f := c.get_theme_font(&"font")
 			var px := c.get_theme_font_size(&"font_size")
 			check(f == Kit.font(), "PX2: %s, %s uses another font" % [where, c.name])
-			check(px % Kit.FONT_PX == 0, "PX2: %s, %s's text is %d px" % [where, c.name, px])
+			check(px % S.FONT_PX == 0, "PX2: %s, %s's text is %d px" % [where, c.name, px])
 			# Wrapped text breaks between words, never inside one (tightened after
 			# the first captures: a wrapped button collapsed to a letter a line).
 			var wraps: bool = c.autowrap_mode != TextServer.AUTOWRAP_OFF
@@ -239,6 +248,10 @@ func _walk(node: Node, where: String, width: float, web: Control) -> void:
 			for ch in c.text:
 				if ch != "\n" and not _drawn(ch):
 					check(false, "PX3: %s, %s shows '%s', which no pixel font has" % [where, c.name, ch])
+			if c is Label and (c as Label).max_lines_visible >= 0:
+				check(c.get_line_count() <= c.max_lines_visible, "PX6: %s, %s hides %d of its %d lines: %s" % [where, c.name, c.get_line_count() - c.max_lines_visible, c.get_line_count(), c.text.c_escape()])
+			if c.name == "Goal":
+				check(c.get_line_count() <= 2, "PX6: %s, the goal runs to %d lines" % [where, c.get_line_count()])
 			if c is Label and (c as Label).clip_text:
 				var tw := f.get_multiline_string_size(c.text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
 				check(tw <= c.size.x + 0.5, "PX6: %s, %s's text is cut off (%.0f px in %.0f)" % [where, c.name, tw, c.size.x])

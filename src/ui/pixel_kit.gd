@@ -11,8 +11,6 @@ const KIT := "res://addons/pixel_ui/"
 const THEME := KIT + "themes/wood.tres"
 ## The characters the kit's font lacks (tools/make_pixel_glyphs.gd).
 const EXTRA_FONT := "res://assets/fonts/pixel_extra.fnt"
-## The kit's font is drawn at whole multiples of this.
-const FONT_PX := 8
 
 static var _theme: Theme
 static var _font: FontFile

@@ -26,7 +26,7 @@ const BUTTON_HOVER := Color("#e05139")
 const BUTTON_PRESSED := Color("#b8391f")
 const BLANK_DISC_PX := 70
 
-## Researched nodes, and things you can afford now.
+## The goal line and the open tab.
 const ORANGE := Color("#ffa040")
 ## Heat, and the pinned node.
 const HEAT := Color("#ff8a70")
@@ -35,7 +35,8 @@ const KIT_CREDIT := "Pixel UI Free by heyheythere - https://heyheythere.itch.io/
 ## Behind the "While you were away" card.
 const SHADE := Color("#000000b0")
 
-## Text sizes: whole multiples of the kit font's 8 px (PX2).
+## The kit font's glyph height; text sizes are whole multiples of it (PX2).
+const FONT_PX := 8
 const SIZE_BODY := 24
 const SIZE_SMALL := 16
 const SIZE_TINY := 16
@@ -84,7 +85,7 @@ const GOLD := Color("#ffce54")
 ## smaller rises show at once.
 const COUNT_UP := 0.35
 const COUNT_UP_FROM := 100.0
-## The goal bar and the one-line stock strip under the status bar.
+## The goal bar (one line, or two when it wraps) and the stock strip under the status bar.
 const GOAL_TOP := 8.0
 const STRIP_TOP := 52.0
 ## The station sheet and the warehouse drawer, over the bottom of the screen.

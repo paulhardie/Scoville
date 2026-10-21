@@ -10,9 +10,9 @@ Merged: v0.1–v0.6c, D036–D042, layout step 1 and the second run (PRs #1–#1
 - **Layout knock-ons** for a wider font: Tech Tree nodes bigger; "Roster" on the nav; Sell Raw Peppers on two lines; titles, the goal line and Market rows wrap.
 - **The credit line** is in the Settings card and the README.
 
-**Results:** PX1–PX7 PASS. `tests/look_tests.gd` (new, 7,310 checks) walks the real screen at 17 stages. Every suite passes and the headless boot is clean. PX6 was tightened after the first captures, which is recorded in LOOK.md. PX8 (does it look like a 2026 mobile game?) is the owner's: [before and after](look/trial_before_after.png).
+**Results:** PX1–PX7 PASS. `tests/look_tests.gd` (new, 7,537 checks) walks the real screen at 17 stages. Every suite passes and the headless boot is clean. PX6 was tightened after the first captures, which is recorded in LOOK.md. PX8 (does it look like a 2026 mobile game?) is the owner's: [before and after](look/trial_before_after.png).
 
-Found on the way: the texture-scaling bug and the "headless isn't the phone's shape" trap, both in [LOOK.md](LOOK.md#results).
+The Web build loads and plays in a browser; at phone size the pixels come out uneven (W28, as expected). Found on the way: the texture-scaling bug and the "headless isn't the phone's shape" trap, both in [LOOK.md](LOOK.md#results).
 
 ## Open decisions
 

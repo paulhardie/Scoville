@@ -28,7 +28,7 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 
 | Id | Criterion |
 | --- | --- |
-| PX1 | **Square pixels.** The project's default texture filter is Nearest. Every kit texture on screen is the kit's art scaled by exactly PIXEL_SCALE, and every 9-slice margin is the kit's margin × PIXEL_SCALE. |
+| PX1 | **Square pixels.** The project's default texture filter is Nearest. Every kit texture on screen is the kit's art scaled by exactly PIXEL_SCALE, and every 9-slice margin is the kit's margin × PIXEL_SCALE. *Measured as (worded after the Haiku review, same bar):* every box and icon in the 2× theme the screen draws from is the kit's art with each pixel PIXEL_SCALE×PIXEL_SCALE, its texture and content margins × PIXEL_SCALE (PX4 rules out anything else on screen), and the Blank Button on screen is a whole multiple of its disc, at the start and compact. |
 | PX2 | **One font, whole sizes.** At each stage the capture tool visits, every visible Label and Button uses the kit's font at a size that is a whole multiple of 8. |
 | PX3 | **Every character drawn.** Every character in every visible text at those stages is in the kit's font or the companion font, so nothing falls back to a system font. |
 | PX4 | **No flat boxes.** No visible control at those stages draws a StyleBoxFlat (for panel, normal, hover, pressed, disabled, background or fill). |
@@ -50,11 +50,13 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 
 ## Results
 
-`tests/look_tests.gd` checks PX1–PX6 on the real screen, laid out at 540×960, at 17 stages from the bare button to HQ after a sale (7,310 checks). Every suite passes and the headless boot is clean.
+`tests/look_tests.gd` checks PX1–PX6 on the real screen, laid out at 540×960, at 17 stages from the bare button to HQ after a sale (7,537 checks). Every suite passes and the headless boot is clean.
+
+**The Web build** (`tools/export_web.sh`), opened in a browser: the kit, the font and the disc load with no console errors, so scaling the kit's art at start-up works in the export. At a phone's size (375×812 at 2× density) the layout is right, but W28 shows. The screen is drawn at 1.39×, so some art pixels are one device pixel wide and some two: uneven steps on the disc's edge and in the letters.
 
 | Id | Result |
 | --- | --- |
-| PX1 | PASS: Nearest filtering; every kit box and icon are its art at exactly 2×, pixel for pixel, with margins doubled |
+| PX1 | PASS: Nearest filtering; every kit box and icon is its art at exactly 2×, every pixel of every block checked, with texture and content margins doubled; the Blank Button 280 px then 140 px on screen |
 | PX2 | PASS: every visible text uses the kit font at 16 or 24 px |
 | PX3 | PASS: every character drawn by the kit font or the companion glyphs |
 | PX4 | PASS: no flat boxes left on screen |
@@ -64,6 +66,7 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 | PX8 | The owner's: [before and after](look/trial_before_after.png) |
 
 Found on the way:
+- **The Haiku review** found no runtime bugs but several soft spots in the checks, all fixed: the Tech Tree word check now uses a card's tighter padding; PX1 checks every pixel of every block, the content margins, and the Blank Button's real size on screen (it compared constants before); PX6 now catches labels that hide lines and a goal over two lines; two stale comments; the font's 8 px moved into `style.gd`.
 - **A bug that would have shown on screen:** `get_image()` on an imported texture can hand back the texture's own image, so scaling it in place quietly changed the kit's art for the next reader. The kit loader now scales a copy. PX1's pixel-for-pixel check caught it.
 - **Headless isn't the phone's shape.** The first PX6 run saw a 960-wide window and passed what the captures showed overflowing. The suite now lays out at the design size.
 - **Wrapping every button was worse.** A wrapped button in a row shrank to one letter a line and stretched the status bar to half the screen. Now only full-width buttons wrap, and PX6 checks that no word breaks.

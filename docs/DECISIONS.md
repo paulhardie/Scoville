@@ -272,3 +272,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Measured into place (the agent's assumptions, [ECONOMY.md](ECONOMY.md#built-v06d)):** Harvest Speed +3% a level, Yield per Cycle +6% of base yield a level (fractions carry), Crop Quality 1% a level to 30; Ancho Mash 18 s so one base Poblano Plot still feeds one vat; a Forager's Luck drop is what the plot grows in one base cycle (cheap speed levels had made its share swing 6–37%); Savina Pepper Plot $2.0M and Moruga Scorpion Plot $5M, reached now with less income. The pacing player learned to sell raw, save for starting plots, weigh levels by payback, and keep its old layout until the new one's plots are bought. **Bar moved after a result, said here:** A1's payback, 1–4 minutes to 5–10 (Idle Planet Miner's own is about 7–8; at 1–4 the early income tripled). **A4 fails** (6:22 against 6:00, W26).
 
+## D042: The pepper ladder by real heat, generic names only (proposed)
+
+**Proposed (the owner asked for the tiering; the names are the agent's judgement):** tier the peppers by PepperScale's heat ranges, one pepper a heat band, using only generic variety names: Thai Chili for Tabasco, Caribbean Red Habanero for Habanero, Chocolate Habanero for Red Savina, Trinidad 7 Pot added, Moruga Scorpion up a rung, Carolina Reaper dropped, rung 13 open ([INGREDIENTS.md](INGREDIENTS.md#proposed-d042-the-ladder-re-tiered-by-heat-with-generic-names-only)). Not built.
+
+**Why:** Tabasco duplicated Cayenne's heat and Habanero duplicated Scotch Bonnet's; Moruga and Reaper overlap. TABASCO (McIlhenny, enforced), RED SAVINA HABANERO and PepperX are registered marks, and "Smokin' Ed's Carolina Reaper" is registered with plain "Carolina Reaper" contested. Real names players know are the trade-off; the agent's searches used secondary sources, not the official register, so it isn't legal advice.
+

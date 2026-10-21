@@ -15,7 +15,7 @@ const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 9
+const SAVE_VERSION := 10
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
@@ -1478,7 +1478,11 @@ func load_state(s: Variant) -> String:
 		s = _to_dollars(s, 3)
 	if int(s.get("version", version)) < 8:
 		s = _migrate_7_to_8(s)
-	if int(s.get("version", version)) < 9:
+	# D042's names first, so v9's plot conversion finds the plots by their new ids.
+	var from_version := int(s.get("version", version))
+	if from_version < 10:
+		s = _migrate_9_to_10(s)
+	if from_version < 9:
 		problem = _check(s.run, {"plots": TYPE_DICTIONARY})
 		if problem != "":
 			return problem
@@ -1608,6 +1612,22 @@ func load_state(s: Variant) -> String:
 	_refresh_fx()
 	_note_value()
 	return ""
+
+
+## v10 (D042): peppers named by real heat with generic names, and Pineapple
+## for Cane Sugar. Ids in a save are renamed in this order (Habanero before Red
+## Savina becomes Chocolate Habanero; Savina Gold before Red Savina).
+const RENAMES_V10 := [["habanero", "caribbean_red"], ["savina_gold", "cocoa_loco"], ["savina", "chocolate"],
+	["tabasco", "thai_chili"], ["reaper", "grim"], ["pepper_x", "pepper_y"], ["sugar", "pineapple"]]
+
+
+func _migrate_9_to_10(s: Dictionary) -> Dictionary:
+	var text := JSON.stringify(s)
+	for pair in RENAMES_V10:
+		text = text.replace(pair[0], pair[1])
+	var out: Dictionary = JSON.parse_string(text)
+	out.version = 10
+	return out
 
 
 ## v9 (D041): plot upgrades take smaller steps, so each plot's levels become

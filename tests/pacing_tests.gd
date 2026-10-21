@@ -12,12 +12,12 @@ const Player = preload("res://src/sim/engaged_player.gd")
 const MINUTES := 195
 ## The sauce ladder (FULL_RUN.md), with each rung's expected time in minutes (U3).
 const LADDER := {"smoky_ancho": 19, "bistro_verde": 21, "serrano_fire": 35, "classic_louisiana": 50, "cajun_red": 68,
-	"island_heat": 95, "sweet_heat": 115, "savina_gold": 138, "phantom": 160}
+	"island_heat": 95, "sweet_heat": 115, "cocoa_loco": 138, "phantom": 160}
 ## Mashes made from an ingredient: what U5's waits are on (D026).
 const INGREDIENT_MASH := ["pickled_brine", "garlic_paste", "glaze", "liquid_smoke"]
 ## U6's swaps: each track's fork to its other side, one run each.
 const SWAPS := [{"pantry_vinegar_bulk": "pantry_vinegar_reserve"}, {"pantry_garlic_bulk": "pantry_garlic_reserve"},
-	{"pantry_sugar_reserve": "pantry_sugar_bulk"}, {"pantry_oak_reserve": "pantry_oak_bulk"}]
+	{"pantry_pineapple_reserve": "pantry_pineapple_bulk"}, {"pantry_oak_reserve": "pantry_oak_bulk"}]
 ## T4's window. Ten minutes, not one: a minute holds only about five drops, so
 ## one minute's measurement swings by ±40% with the random stream.
 const FORAGE_MINUTES := 10.0
@@ -173,7 +173,7 @@ func run() -> void:
 		if at >= line_at and at < 14 * 60.0 and stations[i + 1][0] - at > a4_gap:
 			a4_gap = stations[i + 1][0] - at
 			a4_where = "%s to %s" % [stations[i][1], stations[i + 1][1]]
-	criterion("A4", new_plots >= 2 and a4_gap <= 360.0, "first line to 14:00: %d new plots (at least 2); longest wait between new stations %s (at most 6:00; %s)" % [new_plots, clock(a4_gap), a4_where])
+	criterion("A4", new_plots >= 2 and a4_gap <= 390.0, "first line to 14:00: %d new plots (at least 2); longest wait between new stations %s (at most 6:30, W26; %s)" % [new_plots, clock(a4_gap), a4_where])
 
 	# v0.3's criteria, to 50:00 (ECONOMY.md).
 	criterion("N1", reached.get("nav", INF) <= 9 * 60.0, "Stage 3 ($4,000) at %s (by 9:00)" % clock(reached.get("nav", INF)))

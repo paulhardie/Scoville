@@ -1,5 +1,7 @@
 # The full run (v0.6a)
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Everything a first run needs to reach the £1,000,000 Prestige line in about 3 hours: the brief's Tiers 4–5, the pepper ladder's extra peppers through Tier 5 ([INGREDIENTS.md](INGREDIENTS.md), D023), the Pantry branch (D026), the rest of the GMO boosters, Slot Expansion III–IV and Artisan Decanters. It also sets the whole curve against D005 with "not before" bounds as well as deadlines (W7).
 
 Prestige itself (Franchise Credits, HQ rooms, Tier 6, Standard Operating Procedures) is v0.6b ([D028](DECISIONS.md)). It needs G8 and G16 from the owner, and a run that actually reaches £1M to test it on.

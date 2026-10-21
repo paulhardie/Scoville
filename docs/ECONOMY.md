@@ -1,5 +1,7 @@
 # Economy
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 What things are worth, what Operation Value counts, how long a first run should take, and when the tabs open. It settles G5, G6 and G7 ([D004–D006](DECISIONS.md)), and owns the run's pacing criteria.
 
 ## v0.6d: Idle Planet Miner's early flow (D041)
@@ -21,7 +23,7 @@ The owner asked for the early game to flow roughly as Idle Planet Miner's does. 
 | A1 | The Bell, Poblano and Jalapeño Plots are on sale as soon as the deck shows, with no research; every other crop still needs its blueprint. Their prices rise in that order, and the Poblano and Jalapeño Plots each pay for themselves from raw sales, unupgraded, in 5–10 minutes (the Bell Plot is the onboarding's and keeps its price). Idle Planet Miner's ladder keeps payback roughly even as prices climb. **Bar moved after a result, said here:** first set at 1–4 minutes, my guess; Idle Planet Miner's own first planets pay back in about 7–8 minutes (Planet 2: $200 for 0.25 iron a second at $2), and at 1–4 minutes the two plots tripled the early income (the $10,000 band at 9:24, F8 at 16%). |
 | A2 | Every plot upgrade's first level costs 5% of the plot's price, and each next level 1.3× the one before, for all three upgrades and every plot. |
 | A3 | Every crop sells raw at its value from its plot's card whenever any is held; selling one crop leaves the others alone. |
-| A4 | Between the first line and 14:00 the pacing player buys at least two new plots, and the longest wait between new stations (a plot or a slot) in that time is at most 6 minutes (was 12:37, 1:36 to 14:13). |
+| A4 | Between the first line and 14:00 the pacing player buys at least two new plots, and the longest wait between new stations (a plot or a slot) in that time is at most 6:30 (was 12:37, 1:36 to 14:13). **Bar moved after a result, by the owner's choice (W26):** first set at 6:00; measured 6:22, the Ancho vat waiting on the Tech Tree. |
 | A5 | A v8 save loads as v9 with every plot at least as fast, as productive and as likely to double as before. |
 | A6 | Every criterion already set still passes: onboarding, factory, economy, tech tree, offline, full run, prestige, second run and layout. |
 
@@ -45,12 +47,12 @@ As built, after measuring (each change's reason in D041):
 
 ### Results (v0.6d)
 
-**A1, A2, A3, A5 PASS; A4 FAIL; A6 PASS apart from A4** (every other suite passes: 39 pacing criteria less A4, second run 4/4).
+**All PASS** (A4 against its 6:30 bar, the owner's choice; it failed the first bar of 6:00). Every suite passes: 39 pacing criteria, second run 4/4.
 
 - **A1:** Poblano $800 pays back in 8:00, Jalapeño $1,900 in 9:30; no blueprint needed; every other crop still needs one. PASS.
 - **A2:** every plot and every upgrade: 5%, then ×1.3. PASS.
 - **A3:** every crop sells from its card, at its value, alone. PASS (factory and UI suites).
-- **A4: FAIL.** Two new plots by 14:00 (Poblano 3:15, Jalapeño 7:14), but 6:22 from the Jalapeño Plot to the Ancho vat at 13:36, against 6:00 (was 12:37). The vat waits on the Tech Tree (Ancho's blueprint). Priced at $1,000 and $2,000 the gap is 5:15, but E3 then fails (87 s with nothing new, against 75) and T4 (22%, against 20%).
+- **A4: PASS at 6:30** (FAIL at the first bar of 6:00). Two new plots by 14:00 (Poblano 3:15, Jalapeño 7:14), then 6:22 from the Jalapeño Plot to the Ancho vat at 13:36 (was 12:37). The vat waits on the Tech Tree (Ancho's blueprint). Priced at $1,000 and $2,000 the gap is 5:15, but E3 then fails (87 s with nothing new, against 75) and T4 (22%, against 20%).
 - **A5:** a v8 plot with speed 3, yield 2 and quality 10 loads at least as fast and productive, and as likely to double. PASS.
 - **A6:** every earlier criterion passes. The curve's bands: $10k at 12:45, $150k at 45:21, $4M at 1:37:36, the sale at 2:01:56, just inside its 2:00 floor. The ladder is on time (U3), from Smoky Ancho at 15:03 to Phantom at 2:38:37, about 14 minutes earlier than before. Tapping adds 27% at 15:00 (F8, was 53%) and 11% at 30:00 (N8, at least 10).
 

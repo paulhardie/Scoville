@@ -1,5 +1,7 @@
 # Tech Tree
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Brief §4: a web of projects radiating from `[00] Kitchen Table`, researched instantly by turning in crops, mashes and bottles from stock. v0.3 builds the slice Tier 2 needs ([D007](DECISIONS.md)): the root, the East Wing's Tier 2 blueprints, the West Wing's Delivery Van, and the North Wing's first node ([D008](DECISIONS.md)). The rest of the five wings comes in v0.4 and later (G9).
 
 ## Rules

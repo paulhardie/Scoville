@@ -1,5 +1,7 @@
 # Prestige (v0.6b)
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Brief §6: once a run's Operation Value reaches £1,000,000, the player can **sell the franchise**. That resets the run and pays **Franchise Credits**, spent on **HQ Facility rooms** that last across runs. A new room comes from a **2-card draft**. This first part builds the loop itself: selling, credits, the 12 rooms with their draft and levels, and the brief's anti-exploit cost formula. The second part adds what changes on repeat runs: Standard Operating Procedures and Tier 6 ([below](#part-2-standard-operating-procedures-and-tier-6)).
 
 Status: **built** (rules, save v7, the HQ tab), all criteria PASS. It doesn't depend on v0.6a's tuning: the rules are checked with games set up directly, at any Operation Value.

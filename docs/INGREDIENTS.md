@@ -4,27 +4,31 @@ The pepper ladder: every crop the game will grow, ordered by real heat, with its
 
 Status: **design only.** Nothing here is in `data/` yet. The six peppers the brief already names keep their current values, so Tiers 1–3 as built don't change.
 
-## Proposed (D042): the ladder re-tiered by heat, with generic names only
+## The ladder since D042
 
-The owner asked for the peppers to be tiered from [PepperScale's hot pepper list](https://pepperscale.com/hot-pepper-list/) (read 2026-10-21). Where several peppers share a heat band, the agent keeps one, and only generic variety names are used, so nothing on the ladder is someone's trademark. **Proposed, not built.** Each rung keeps its ore value, so pacing shouldn't move.
+The owner asked for the peppers to be tiered by [PepperScale's hot pepper list](https://pepperscale.com/hot-pepper-list/) (read 2026-10-21): one pepper per heat band, and only generic variety names, so the ladder steps on nobody's trademark ([D042](DECISIONS.md)). Each rung keeps its ore value. The game's ids follow the names (save v10 renames them). Older sections below use the old names.
 
-| # | Pepper | Scoville (SHU) | Value | Change |
-| --- | --- | --- | --- | --- |
-| 1 | Bell Pepper | 0 | $1 | — |
-| 2 | Poblano | 1,000–1,500 | $2 | — |
-| 3 | Jalapeño | 2,500–8,000 | $4 | — |
-| 4 | Serrano | 10,000–23,000 | $8 | — |
-| 5 | Cayenne | 30,000–50,000 | $17 | — |
-| 6 | Thai Chili | 50,000–100,000 | $36 | replaces Tabasco (same heat as Cayenne; TABASCO is McIlhenny's trademark) |
-| 7 | Scotch Bonnet | 100,000–350,000 | $75 | — (kept over Habanero, same band: the Caribbean sauce pepper, Island Heat's) |
-| 8 | Caribbean Red Habanero | 300,000–445,000 | $160 | replaces Habanero, a band hotter |
-| 9 | Chocolate Habanero | 425,000–577,000 | $340 | replaces Red Savina (RED SAVINA HABANERO is a registered mark) |
-| 10 | Ghost Pepper | 855,000–1,041,427 | $730 | — |
-| 11 | Trinidad 7 Pot | 1,000,000–1,200,000 | $1,600 | new |
-| 12 | Trinidad Moruga Scorpion | 1,200,000–2,000,000 | $3,500 | up a rung (kept over Carolina Reaper, which overlaps it) |
-| 13 | open | over 2,200,000 | $7,800 | Carolina Reaper and Pepper X have trademark questions; recommended: a fictional pepper |
+| # | Pepper | Scoville (SHU) | Value | Was | Why |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Bell Pepper | 0 | $1 | — | |
+| 2 | Poblano | 1,000–1,500 | $2 | — | |
+| 3 | Jalapeño | 2,500–8,000 | $4 | — | |
+| 4 | Serrano | 10,000–23,000 | $8 | — | |
+| 5 | Cayenne | 30,000–50,000 | $17 | — | |
+| 6 | Thai Chili | 50,000–100,000 | $36 | Tabasco | Tabasco shared Cayenne's band, and TABASCO is McIlhenny's mark |
+| 7 | Scotch Bonnet | 100,000–350,000 | $75 | — | Kept over Habanero (same band): the Caribbean sauce pepper, Island Heat's |
+| 8 | Caribbean Red Habanero | 300,000–445,000 | $160 | Habanero | A habanero a band hotter than the Bonnet |
+| 9 | Chocolate Habanero | 425,000–577,000 | $340 | Red Savina | RED SAVINA HABANERO is a registered mark |
+| 10 | Ghost Pepper | 855,000–1,041,427 | $730 | — | |
+| 11 | Trinidad Moruga Scorpion | 1,200,000–2,000,000 | $1,600 | — | A Trinidad landrace nobody owns |
+| 12 | *Alabama Grim* | "about 2,000,000, give or take a lawsuit" | $3,500 | Carolina Reaper | Fictional: one state over, one shade darker |
+| 13 | *Pepper Y* | 2,693,001 | $7,800 | Pepper X | Fictional: one Scoville hotter, and nobody can say why |
 
-Scoville figures are facts and are used as such; PepperScale's descriptions and its list as a whole are not copied. Building this renames crops, their mashes (Tabasco, Habanero, Savina, Reaper and Pepper X Mash) and Savina Gold, with a save migration like v8's rename (G21).
+The sauces follow: Tabasco Mash is now Thai Chili Mash, Habanero Mash is Caribbean Red Mash, Savina Mash is Chocolate Habanero Mash, and **Savina Gold is Cocoa Loco**. Reaper Mash becomes Grim Mash, and Pepper X Mash becomes Pepper Y Mash.
+
+**Pineapple replaces Cane Sugar** (same Gold ore value, $75). It grows in a **Pineapple Grove** and makes **Charred Pineapple Glaze** with Garlic Paste. Scotch Bonnet with pineapple or mango is a real Caribbean pairing, which suits Island Heat and Sweet Heat better than cane sugar did.
+
+Scoville figures are facts and are used as such; PepperScale's descriptions and its list as a whole are not copied. The fictional peppers past Pepper Y (below, from rung 14) are unchanged.
 
 ## Since D035: each pepper is an Idle Planet Miner ore
 

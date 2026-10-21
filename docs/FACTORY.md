@@ -1,5 +1,7 @@
 # Factory (v0.2 Operation Deck)
 
+**Names since D042** ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042)): Tabasco is Thai Chili, Habanero is Caribbean Red Habanero, Red Savina is Chocolate Habanero (Savina Gold is Cocoa Loco), Carolina Reaper is Alabama Grim, Pepper X is Pepper Y, and Cane Sugar is Pineapple (Caramelized Glaze is Charred Pineapple Glaze). This doc keeps the names it was written with.
+
 Brief §2 Stage 2 and §3 Tier 1: at £10 the button moves into the upper 35% of the screen and the Farms deck slides up from below. There the player buys the Tier 1 spine: a Bell Pepper Plot, a Sweet Pepper Mash vat and a Table Mild bottling line.
 
 The rules are in `src/core/game.gd`, the numbers in `src/core/tuning.gd`, and the screen in `src/ui/main.gd`. The pacing criteria are measured by `tests/pacing_tests.gd`.

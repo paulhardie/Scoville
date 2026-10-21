@@ -586,3 +586,23 @@ func test_malformed_v8_plot_refused() -> void:
 	s.run.plots.bell = {"owned": true, "speed": "fast"}
 	check(Game.new().load_state(JSON.parse_string(JSON.stringify(s))) == "", "A5: a level that isn't a number reads as 0")
 
+
+func test_v9_names_migrate() -> void:
+	# D042: a v9 save with the old ids loads under the new ones.
+	var g := opened(0.0)
+	var s: Dictionary = g.to_state()
+	var text := JSON.stringify(s)
+	for pair in Game.RENAMES_V10:
+		text = text.replace(pair[1], pair[0])
+	var old: Dictionary = JSON.parse_string(text)
+	old.version = 9
+	old.run.stock["savina_gold"] = 3
+	old.run.stock["savina"] = 4
+	old.run.stock["habanero_mash"] = 5
+	old.run.stock["sugar"] = 6
+	old.run.research.append("tabasco_blueprint")
+	var h := Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v9 save with the old pepper names loads")
+	check(h.stock.cocoa_loco == 3 and h.stock.chocolate == 4 and h.stock.caribbean_red_mash == 5 and h.stock.pineapple == 6, "S: Savina Gold, Red Savina, Habanero Mash and Cane Sugar become Cocoa Loco, Chocolate Habanero, Caribbean Red Mash and Pineapple")
+	check(h.is_researched("thai_chili_blueprint"), "S: research carries over under the new ids")
+

@@ -19,7 +19,7 @@ var decide_every := 1.0
 const RAW_SELL_ABOVE := 50
 ## Research in this order, saving for each in turn. v0.6a's ladder, Pantry
 ## and slots are slotted in near their expected times (docs/FULL_RUN.md); the
-## forks are Bulk on Vinegar and Garlic, Reserve on Cane Sugar and Smoked Oak
+## forks are Bulk on Vinegar and Garlic, Reserve on Pineapple and Smoked Oak
 ## (`forks` swaps them, for U6).
 const RESEARCH := [
 	"jalapeno_blueprint", "poblano_blueprint", "ancho_blueprint", "smoky_ancho_blueprint", "calloused_thumbs",
@@ -27,21 +27,21 @@ const RESEARCH := [
 	"slot_expansion_1", "serrano_blueprint", "serrano_mash_blueprint", "serrano_fire_blueprint",
 	"cayenne_blueprint", "garlic_blueprint", "paste_blueprint", "cayenne_mash_blueprint", "slot_expansion_2",
 	"louisiana_blueprint", "ergonomic_grip", "heat_meter", "night_shift_1", "overflow_valve", "overclock_1",
-	"smart_stockpiling", "pantry_vinegar_booster", "tabasco_blueprint", "tabasco_mash_blueprint", "cajun_red_blueprint",
+	"smart_stockpiling", "pantry_vinegar_booster", "thai_chili_blueprint", "thai_chili_mash_blueprint", "cajun_red_blueprint",
 	"flint_glass", "slot_expansion_3", "zero_waste_1", "pantry_garlic_booster", "pantry_vinegar_concentrate",
-	"sugar_blueprint", "glaze_blueprint", "bonnet_blueprint", "bonnet_mash_blueprint", "island_heat_blueprint",
+	"pineapple_blueprint", "glaze_blueprint", "bonnet_blueprint", "bonnet_mash_blueprint", "island_heat_blueprint",
 	"overclock_2", "slow_burn", "overclock_3", "automated_piston", "night_shift_2", "market_ticker", "pantry_vinegar_bulk", "pantry_garlic_concentrate",
-	"habanero_blueprint", "habanero_mash_blueprint", "sweet_heat_blueprint", "byproduct_recycling",
-	"franchise_auditors", "zero_waste_2", "slot_expansion_4", "pantry_sugar_booster", "pantry_garlic_bulk",
-	"foil_wraps", "savina_blueprint", "savina_mash_blueprint",
-	"savina_gold_blueprint", "hydroponic_bell", "pantry_sugar_concentrate", "oak_blueprint",
-	"smoke_blueprint", "ghost_blueprint", "ghost_mash_blueprint", "phantom_blueprint", "pantry_sugar_reserve",
+	"caribbean_red_blueprint", "caribbean_red_mash_blueprint", "sweet_heat_blueprint", "byproduct_recycling",
+	"franchise_auditors", "zero_waste_2", "slot_expansion_4", "pantry_pineapple_booster", "pantry_garlic_bulk",
+	"foil_wraps", "chocolate_blueprint", "chocolate_mash_blueprint",
+	"cocoa_loco_blueprint", "hydroponic_bell", "pantry_pineapple_concentrate", "oak_blueprint",
+	"smoke_blueprint", "ghost_blueprint", "ghost_mash_blueprint", "phantom_blueprint", "pantry_pineapple_reserve",
 	"hydroponic_jalapeno", "overdrive_turbines", "pantry_oak_booster", "pantry_oak_concentrate", "pantry_oak_reserve", "artisan_decanters",
 	"hydroponic_cayenne",
 	# After a sale (PRESTIGE.md, the second run): Tier 6. Skipped before one.
 	"moruga_blueprint", "moruga_mash_blueprint", "scorpion_sting_blueprint",
-	"reaper_blueprint", "reaper_mash_blueprint", "widowmaker_blueprint",
-	"pepper_x_blueprint", "pepper_x_mash_blueprint", "extinction_event_blueprint",
+	"grim_blueprint", "grim_mash_blueprint", "widowmaker_blueprint",
+	"pepper_y_blueprint", "pepper_y_mash_blueprint", "extinction_event_blueprint",
 ]
 ## Rooms it takes from a draft, best first (PRESTIGE.md, the second run).
 const ROOM_ORDER := ["fermentation_cellar", "high_speed_cannery", "seed_vault", "tasting_room", "seed_capital",
@@ -60,26 +60,26 @@ const LAYOUTS := [
 		"line": ["table_mild", "bistro_verde", "classic_louisiana", "classic_louisiana", "serrano_fire"], "lend": [5, 1]},
 	# From Cajun Red on, slots move to the best sauce they can supply, keeping
 	# their index where they can, and Pickled Brine gets more vats.
-	{"when": "cajun_red", "vat": ["sweet_mash", "pickled_brine", "tabasco_mash", "garlic_paste", "cayenne_mash", "pickled_brine", "verde_mash"],
+	{"when": "cajun_red", "vat": ["sweet_mash", "pickled_brine", "thai_chili_mash", "garlic_paste", "cayenne_mash", "pickled_brine", "verde_mash"],
 		"line": ["table_mild", "cajun_red", "classic_louisiana", "classic_louisiana", "cajun_red", "bistro_verde"], "lend": [0, 6, 5]},
 	{"when": "island_heat", "vat": ["sweet_mash", "pickled_brine", "pickled_brine", "garlic_paste", "glaze", "bonnet_mash", "cayenne_mash"],
 		"line": ["table_mild", "island_heat", "island_heat", "classic_louisiana", "classic_louisiana", "island_heat"], "lend": [0, 6]},
 	# Sweet Heat takes 2 Glaze a bottle, and each Glaze 1 Garlic Paste: one
 	# line is what two Glaze vats and two Paste vats keep fed.
-	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "habanero_mash", "garlic_paste"],
+	{"when": "sweet_heat", "vat": ["sweet_mash", "pickled_brine", "glaze", "garlic_paste", "glaze", "caribbean_red_mash", "garlic_paste"],
 		"line": ["table_mild", "sweet_heat", "table_mild"], "lend": [6, 1]},
 	# Three Louisiana lines take a Paste and a Cayenne Mash each: two Paste
 	# vats, or the Louisiana lines starve on Paste (D035).
-	{"when": "savina_gold", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "garlic_paste"],
-		"line": ["classic_louisiana", "savina_gold", "savina_gold", "classic_louisiana", "savina_gold", "classic_louisiana"], "lend": [6, 2]},
+	{"when": "cocoa_loco", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "chocolate_mash", "garlic_paste"],
+		"line": ["classic_louisiana", "cocoa_loco", "cocoa_loco", "classic_louisiana", "cocoa_loco", "classic_louisiana"], "lend": [6, 2]},
 	# One Liquid Smoke vat keeps two Phantom lines fed, not three, and the
 	# Brine vats are lent before it (D041).
 	{"when": "phantom", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "ghost_mash", "liquid_smoke"],
-		"line": ["classic_louisiana", "phantom", "classic_louisiana", "classic_louisiana", "savina_gold", "phantom"], "lend": [2, 1, 0]},
-	# Tier 6 (second run): Scorpion Sting takes a Moruga Mash and a Savina Gold,
-	# so Savina Gold lines stay beside it.
-	{"when": "scorpion_sting", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "savina_mash", "moruga_mash"],
-		"line": ["classic_louisiana", "savina_gold", "scorpion_sting", "classic_louisiana", "savina_gold", "scorpion_sting"], "lend": [2, 1]},
+		"line": ["classic_louisiana", "phantom", "classic_louisiana", "classic_louisiana", "cocoa_loco", "phantom"], "lend": [2, 1, 0]},
+	# Tier 6 (second run): Scorpion Sting takes a Moruga Mash and a Cocoa Loco,
+	# so Cocoa Loco lines stay beside it.
+	{"when": "scorpion_sting", "vat": ["pickled_brine", "pickled_brine", "pickled_brine", "garlic_paste", "cayenne_mash", "chocolate_mash", "moruga_mash"],
+		"line": ["classic_louisiana", "cocoa_loco", "scorpion_sting", "classic_louisiana", "cocoa_loco", "scorpion_sting"], "lend": [2, 1]},
 ]
 ## Seconds a plot level may take to pay for itself before it skips it (GUESS,
 ## D041: with ×1.3 a level, buying the cheapest forever wastes cash).
@@ -160,7 +160,7 @@ func decide(g) -> void:
 				elif g.keep.has(item):
 					g.clear_keep(item)
 	# Bottles a running recipe takes (Table Mild for Sweet Heat, Classic
-	# Louisiana for Savina Gold and Phantom) stay in stock for the lines.
+	# Louisiana for Cocoa Loco and Phantom) stay in stock for the lines.
 	var layout := current_layout(g, true)
 	var wanted_items := _wanted(g, layout, need)
 	var lent := _slots_for_research(g, layout, wanted_items)

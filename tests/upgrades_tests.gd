@@ -1,6 +1,6 @@
 extends SceneTree
-## The South and West Wings, the bridges, Tier 3 and Crop Quality
-## (docs/TECH_TREE.md R9–R18, docs/FACTORY.md S7–S8).
+## The South and West Wings, the bridges, Tier 3, Cargo and Bumper Crop
+## (docs/TECH_TREE.md R9–R18, docs/FACTORY.md S7 and C2–C4).
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")

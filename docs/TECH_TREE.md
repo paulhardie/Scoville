@@ -186,7 +186,7 @@ Built (save v6, which adds `stats.foraged`). Asked for by the owner, beyond the 
 | N10 | Forager's Luck | N2 | 20 Bistro Verde | Each press has a 2.25% chance (was 2.5% until v0.6a moved Garlic earlier) to drop one harvest of the shortest ingredient (D041: what its plot grows in one base cycle, speed levels included) | 0:35 | 1, −2 |
 
 - **Shortest ingredient:** among owned non-pepper stations (D024) that a researched recipe uses, the one whose stock covers the fewest cycles of that use (stock ÷ the most any one of those recipes takes a cycle). Ties go in data order. With no such station, nothing drops and nothing is drawn.
-- **One harvest:** what that station's next harvest would give, yield upgrades included, without Crop Quality's double.
+- **One harvest:** what that station's next harvest would give, yield upgrades included, without Crop Quality's double (since D043 Bumper Crop can double it; it goes straight to stock).
 - Every press counts, as for the other button perks: Double-Tap, Grip and the Piston, offline included (D019). The chance draws from `Game.rng` (D017).
 - Size (GUESS, the target to measure): 3 presses a second is about 4.5 drops a minute. Against a Vinegar Cask harvesting every 2 s (30 a minute) that's about +15%; the Piston alone about +5%. It shrinks as speed upgrades make the station harvest more often, which is right for a top-up.
 

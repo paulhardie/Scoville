@@ -1605,8 +1605,8 @@ func load_state(s: Variant) -> String:
 	for crop in run.plots:
 		var p: Dictionary = run.plots[crop]
 		plots[crop] = {"owned": bool(p.get("owned", false)), "speed": int(p.get("speed", 0)), "yield": int(p.get("yield", 0)),
-			"cargo": int(p.get("cargo", 0)), "progress": float(p.get("progress", 0.0)), "spare": float(p.get("spare", 0.0)),
-			"field": int(p.get("field", 0)), "haul": float(p.get("haul", 0.0))}
+			"cargo": maxi(0, int(p.get("cargo", 0))), "progress": float(p.get("progress", 0.0)), "spare": float(p.get("spare", 0.0)),
+			"field": maxi(0, int(p.get("field", 0))), "haul": maxf(0.0, float(p.get("haul", 0.0)))}
 	vats = []
 	lines = []
 	for station in ["vat", "line"]:

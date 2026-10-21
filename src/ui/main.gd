@@ -28,6 +28,10 @@ var clicks_played := 0
 var vibrations := 0
 var last_pitch := 1.0
 var _click: AudioStreamPlayer
+var _clink: AudioStreamPlayer
+var clinks_played := 0
+var last_clink_pitch := 1.0
+var bottle_buzzes := 0
 var _settings_buttons := {}
 ## Wall-clock time (D021). Tests set their own before the screen is added.
 var clock = RealClock.new()
@@ -129,12 +133,22 @@ class FactoryView extends Control:
 	const EMPTY := {"line": "Lines bottle here", "vat": "Vats make mash here", "plot": "Plots grow here"}
 	var game
 	var dots: Array = []    # [from floor index, x, age]
+	var bottles: Array = [] # [start x, age, tint] (D045)
+	var bottles_dropped := 0
 
 	func _process(delta: float) -> void:
 		for d in dots:
 			d[2] += delta
 		dots = dots.filter(func(d) -> bool: return d[2] < S.DOT_SECONDS)
+		for b in bottles:
+			b[1] += delta
+		bottles = bottles.filter(func(b) -> bool: return b[1] < S.BOTTLE_SECONDS)
 		queue_redraw()
+
+	## A bottle dropping onto the Bottling floor, sliding towards Sell Batch.
+	func bottle(tint: Color) -> void:
+		bottles.append([randf_range(0.1, 0.45) * size.x, 0.0, tint])
+		bottles_dropped += 1
 
 	## A dot climbing from a floor (2 Fields, 1 Vats) to the one above.
 	func climb(from: int) -> void:
@@ -172,6 +186,14 @@ class FactoryView extends Control:
 				var fill: float = clampf(tiles[i][0], 0.0, 1.0)
 				draw_rect(Rect2(r.position.x, r.end.y - r.size.y * fill, r.size.x, r.size.y * fill), S.PROGRESS_FILL)
 				draw_rect(r, S.ORANGE if tiles[i][1] else S.LINE, false, 2.0 if tiles[i][1] else 1.0)
+		for b in bottles:
+			var t: float = b[1] / S.BOTTLE_SECONDS
+			var x: float = b[0] + t * size.x * 0.5
+			var floor_y := h - 8.0
+			var c: Color = b[2]
+			c.a = 1.0 if t < 0.7 else (1.0 - t) / 0.3
+			draw_rect(Rect2(x, floor_y - 20.0, 12.0, 20.0), c)
+			draw_rect(Rect2(x + 3.5, floor_y - 27.0, 5.0, 7.0), c)
 		for d in dots:
 			var t: float = d[2] / S.DOT_SECONDS
 			var from_y: float = (d[0] + 0.5) * h
@@ -484,6 +506,46 @@ func _feel_press() -> void:
 	if settings.vibration:
 		Input.vibrate_handheld(S.HAPTIC_MS)
 		vibrations += 1
+
+
+## Each bottle pop (D045): a clink, lower for richer tiers, and a bottle in the
+## factory view tinted by tier.
+func _bottle_feel(item: String) -> void:
+	var tier: int = game.data.items[item].tier
+	_factory.bottle(S.TIER_TINTS[clampi(tier - 1, 0, S.TIER_TINTS.size() - 1)])
+	if not settings.sound:
+		return
+	if _clink == null:
+		_clink = AudioStreamPlayer.new()
+		_clink.stream = _clink_sound()
+		_clink.volume_db = S.BOTTLE_VOLUME_DB
+		_clink.max_polyphony = 4
+		add_child(_clink)
+	last_clink_pitch = 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1)
+	_clink.pitch_scale = last_clink_pitch
+	_clink.play()
+	clinks_played += 1
+
+
+## A glass clink made in code: two bright partials, struck and ringing out.
+static func _clink_sound() -> AudioStreamWAV:
+	var rate := 22050
+	var n := int(rate * S.BOTTLE_SOUND_SECONDS)
+	var data := PackedByteArray()
+	data.resize(n * 2)
+	for i in n:
+		var t := float(i) / rate
+		var v := 0.0
+		for k in S.BOTTLE_HZ.size():
+			v += sin(TAU * S.BOTTLE_HZ[k] * t) * exp(-t / (S.BOTTLE_SOUND_SECONDS * (0.35 - 0.12 * k)))
+		v *= 0.5 * minf(1.0, t / 0.002)
+		data.encode_s16(i * 2, int(clampf(v, -1.0, 1.0) * 30000.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = rate
+	wav.stereo = false
+	wav.data = data
+	return wav
 
 
 ## A short click made in code: a tone that dies away fast, with a little
@@ -1730,6 +1792,10 @@ func _juice(delta: float) -> void:
 		var before: int = _made_seen.get(item, made)
 		if made > before:
 			_pending_pop[item] = _pending_pop.get(item, 0) + made - before
+			# The first bottle of a sauce this run buzzes once (D045).
+			if before == 0 and settings.vibration:
+				Input.vibrate_handheld(S.FIRST_BOTTLE_MS)
+				bottle_buzzes += 1
 		_made_seen[item] = made
 	if not _pending_pop.is_empty() and _pop_wait <= 0.0 and _sell_batch.visible:
 		_pop(_pending_pop)
@@ -1765,6 +1831,7 @@ func _pop(made: Dictionary) -> void:
 	var start := _sell_batch.position + Vector2((_sell_batch.size.x - l.size.x) / 2.0, -l.size.y)
 	start.x = clampf(start.x, S.GUTTER, size.x - S.GUTTER - l.size.x)
 	l.position = start
+	_bottle_feel(best)
 	var t := create_tween().set_parallel()
 	t.tween_property(l, "position:y", start.y - S.POP_RISE, S.POP_SECONDS).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	t.tween_property(l, "modulate:a", 0.0, S.POP_SECONDS).set_ease(Tween.EASE_IN)

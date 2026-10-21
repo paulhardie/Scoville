@@ -105,3 +105,18 @@ const CLICK_PITCH_SPREAD := 0.08
 const CLICK_HEAT_PITCH := 0.2
 ## A finger press's vibration, in milliseconds.
 const HAPTIC_MS := 15
+
+# --- Bottling (docs/FEEL.md, D045) ---------------------------------------------
+## The clink: two glassy partials ringing this long, at this volume.
+const BOTTLE_HZ := [2350.0, 3420.0]
+const BOTTLE_SOUND_SECONDS := 0.22
+const BOTTLE_VOLUME_DB := -14.0
+## Each tier of sauce plays the clink this much lower (Tier 1 at 1.0).
+const BOTTLE_TIER_PITCH := 0.07
+## The first bottle of a sauce in a run: one vibration this long.
+const FIRST_BOTTLE_MS := 30
+## A bottle in the factory view slides for this long; its tint by tier (GUESS:
+## Table Mild's red, Verde's green, Louisiana's orange, Sweet Heat's gold,
+## Phantom's smoke, Tier 6's purple).
+const BOTTLE_SECONDS := 0.9
+const TIER_TINTS := [Color("#f87171"), Color("#84cc16"), Color("#fb923c"), Color("#facc15"), Color("#a8a29e"), Color("#a78bfa")]

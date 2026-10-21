@@ -18,6 +18,8 @@ This branch also carries **D044: the dashboard from the first launch**, as the o
 - **One next action at a time** (`Game.next_action()`) is ringed in orange and named on the goal line through the early run: tap, sell, buy the plot, Vat 1, Line 1, Sell Batch, the starting plots, then open the Tech Tree.
 - **Results:** L10–L14 PASS. Two misses by one unit: A4 (6:31, W29) and E6 (9 mash for the casual player's Starter Crate, against 10, W30).
 
+And **D045, bottling feel**. Every bottle pop now plays a glass clink, pitched lower for richer tiers, and drops a tier-tinted bottle onto the factory view's Bottling floor. The first bottle of each sauce in a run gives a short buzz. K6–K9 PASS; how it feels on a real phone is W16's test. The first-bottle ceremony waits for layout step 3.
+
 ## Open decisions
 
 - **W29 (A4) and W30 (E6):** both miss by one unit after the early game sped up. Recommend settling them in W28's early-game pass.

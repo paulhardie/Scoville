@@ -195,6 +195,7 @@ func run() -> void:
 	await test_layout()
 	await test_raw_sales()
 	await test_dashboard()
+	await test_bottling()
 	await test_feel()
 	for failure in failures:
 		printerr("FAIL: ", failure)
@@ -520,6 +521,59 @@ func test_dashboard() -> void:
 	var ring: Control = screen.find_child("Ring", true, false)
 	var farms_tab: Control = screen.find_child("Tab_farms", true, false)
 	check(g.next_action() == {"do": "buy_plot", "id": "poblano"} and ring.visible and ring.get_global_rect().encloses(farms_tab.get_global_rect()), "L13: the Poblano Plot is on Farms, so the Farms selector is ringed")
+	screen.queue_free()
+	await settle()
+
+
+## K6–K9 (FEEL.md, D045): bottling's clink, the first-bottle buzz and the
+## bottle in the factory view.
+func test_bottling() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	root.add_child(screen)
+	await settle()
+	var g = screen.game
+	g.cash = 1e6
+	g.buy_plot("bell")
+	g.buy_slot("vat")
+	g.buy_slot("line")
+	await settle()
+	var factory = screen.find_child("Factory", true, false)
+	var clinks: int = screen.clinks_played
+	var dropped: int = factory.bottles_dropped
+	g.stats.made.table_mild += 1
+	await create_timer(0.4).timeout
+	check(screen.clinks_played == clinks + 1 and factory.bottles_dropped == dropped + 1, "K6/K9: a bottle pop clinks once and drops one bottle (%d, %d)" % [screen.clinks_played - clinks, factory.bottles_dropped - dropped])
+	check(is_equal_approx(screen.last_clink_pitch, 1.0), "K7: Tier 1 clinks at 1.0 (%.2f)" % screen.last_clink_pitch)
+	check(screen.bottle_buzzes == 1, "K8: the first Table Mild buzzes once")
+	check(factory.bottles.size() == 1 and factory.bottles[0][2] == S.TIER_TINTS[0], "K9: the bottle is tinted Tier 1's colour")
+	g.stats.made.table_mild += 1
+	await create_timer(0.4).timeout
+	check(screen.bottle_buzzes == 1, "K8: the second doesn't buzz")
+	await create_timer(S.BOTTLE_SECONDS).timeout
+	check(factory.bottles.is_empty(), "K9: bottles are gone within %.1f s" % S.BOTTLE_SECONDS)
+	var tier: int = g.data.items.bistro_verde.tier
+	screen.settings.vibration = false
+	g.stats.made.bistro_verde += 1
+	await create_timer(0.4).timeout
+	check(is_equal_approx(screen.last_clink_pitch, 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1)) and screen.last_clink_pitch < 1.0, "K7: a Tier %d sauce clinks lower (%.2f)" % [tier, screen.last_clink_pitch])
+	check(screen.bottle_buzzes == 1, "K8: with Vibration off a first bottle doesn't buzz")
+	screen.settings.sound = false
+	clinks = screen.clinks_played
+	dropped = factory.bottles_dropped
+	g.stats.made.table_mild += 1
+	await create_timer(0.4).timeout
+	check(screen.clinks_played == clinks and factory.bottles_dropped == dropped + 1, "K6: with Sound off no clink, the bottle still drops")
+	screen.settings.sound = true
+	clinks = screen.clinks_played
+	var seconds := 2.0
+	var until: int = Time.get_ticks_msec() + int(seconds * 1000.0)
+	while Time.get_ticks_msec() < until:
+		g.stats.made.table_mild += 5
+		await process_frame
+	var n: int = screen.clinks_played - clinks
+	check(n >= 1 and n <= ceili(seconds * S.POPS_PER_SECOND) + 1, "K6: bottling flat out, at most %d clinks a second (%d in %.0f s)" % [S.POPS_PER_SECOND, n, seconds])
 	screen.queue_free()
 	await settle()
 

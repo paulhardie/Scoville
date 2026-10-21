@@ -2,6 +2,29 @@
 
 What things are worth, what Operation Value counts, how long a first run should take, and when the tabs open. It settles G5, G6 and G7 ([D004–D006](DECISIONS.md)), and owns the run's pacing criteria.
 
+## v0.6d: Idle Planet Miner's early flow (D041)
+
+The owner asked for the early game to flow roughly as Idle Planet Miner's does. There, planets 1–4 are on sale from the start at about ×2 each, ore sells raw and is the main early income, telescopes reveal later planets, and every planet upgrade costs (planet price ÷ 20) × 1.3^(level − 1), with small gains a level. Here, until now, the bell plot was the only one until the Tech Tree opened: nothing new to buy between the first line (1:36) and the Poblano Plot (14:13), and plot upgrades cost ×2 a level.
+
+**Changes (D041):**
+
+- **Poblano and Jalapeño Plots are on sale from the start** (once the deck shows), with Bell. Blueprints gate crops from White Vinegar on, as telescopes gate planets. The two old blueprints keep their places in the tree and their ids (so saves load) but become cultivation nodes: E1 and E12 speed their plot up instead of unlocking it.
+- **Every crop sells raw** at its value, from its plot's card, as ore does. Sell Raw Peppers stays for the Bell Pepper and the onboarding.
+- **Plot upgrades on Idle Planet Miner's curve:** every plot upgrade's first level costs 5% of the plot's price, and each level after it ×1.3. Gains a level are smaller to match. Yield grows by a share of the plot's base yield (a fraction carries to the next harvest); Crop Quality takes more, smaller steps to the same 30% cap.
+- **Kept from the brief:** the Blank Button start, the early vat and line (Tier 1's spine), and bottles worth 5× their raw value.
+- **Saves (v9):** a v8 save's plot levels convert to the number of new levels with the same effect (rounded up), so no progress is lost.
+
+### Criteria (v0.6d)
+
+| Id | Criterion |
+| --- | --- |
+| A1 | The Bell, Poblano and Jalapeño Plots are on sale as soon as the deck shows, with no research; every other crop still needs its blueprint. Their prices rise in that order, and each starting plot pays for itself from raw sales, unupgraded, in 1–4 minutes (Idle Planet Miner's ladder keeps payback roughly even as prices climb). |
+| A2 | Every plot upgrade's first level costs 5% of the plot's price, and each next level 1.3× the one before, for all three upgrades and every plot. |
+| A3 | Every crop sells raw at its value from its plot's card whenever any is held; selling one crop leaves the others alone. |
+| A4 | Between the first line and 14:00 the pacing player buys at least two new plots, and the longest wait between new stations (a plot or a slot) in that time is at most 6 minutes (was 12:37, 1:36 to 14:13). |
+| A5 | A v8 save loads as v9 with every plot at least as fast, as productive and as likely to double as before. |
+| A6 | Every criterion already set still passes: onboarding, factory, economy, tech tree, offline, full run, prestige, second run and layout. |
+
 ## v0.6c: Idle Planet Miner's values in dollars (D035)
 
 **Superseded below:** the £ values and thresholds in the sections after this one are the history up to v0.6b. Since D035:

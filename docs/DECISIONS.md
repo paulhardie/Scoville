@@ -284,3 +284,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** Harvest Speed and Yield both mean more crops; Idle Planet Miner's third upgrade is delivery, which makes each plot a balance to keep rather than three ways to grow it. A chance to double is the kind of perk the Tech Tree holds. Boosts raise cargo too so research never backs a plot up by itself; only the player's own levels can outgrow the truck, the moment to rebalance.
 
+## D044: The dashboard from the first launch; the next action, not the empty screen
+
+**Decision (the owner's):** the game opens on the full split-viewport dashboard. Status bar, upper viewport with the button and a factory view, the tab selectors directly below the viewport, and the panel all show from the first second. Nothing waits for a milestone to appear. The start stays gentle because exactly one next action is ringed and named at a time through the early run (`Game.next_action()`). Tabs still unlock at their thresholds, shown dimmed with what opens them. This replaces the brief's Pillar 1 (Strict Progressive Disclosure) and the reveal stages of §2. It retires O1, O3's and O4's thresholds, O8 and L9's blank stage. ([LAYOUT.md](LAYOUT.md#step-2-the-dashboard-from-the-first-launch-d044))
+
+**Why:** the owner changed their mind: progression should come from the obvious next step rather than from hiding the screen. The tab thresholds stay because the pacing is measured against them (N1, N2) and they stage the run's content. Keeping them is the agent's assumption. The factory view is drawn in code rather than waiting on W8, so step 2 can ship and be restyled later.
+

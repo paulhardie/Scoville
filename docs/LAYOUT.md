@@ -51,3 +51,26 @@ Found on the way:
 - From looking at the screens: the pop ran off the right edge and over the stock line, a catch-up made one huge pop, and ×10 said "max" for Crop Quality with three levels left. All fixed.
 
 **Not checked:** how it feels on a phone (the pops, the coin and the count-up are motion; W16's phone test covers them).
+
+## Step 2: the dashboard from the first launch (D044)
+
+The owner changed their mind on progressive disclosure: the game opens on the full dashboard, and what makes the start gentle is that the next early action is unmistakable, not that the screen is empty. This builds layout step 2's viewport and puts the tab selectors directly beneath it. The factory view is drawn in code with the existing palette; it doesn't wait on W8's visual direction, which can restyle it later.
+
+### Rules
+
+- **The screen, top to bottom:** the status bar (Cash, Operation Value, Sell Raw Peppers); the **upper viewport** (the goal line, the stock line, the Blank Button with the Heat bar, the **factory view** and Sell Batch); the **tab selectors**; the panel of the open tab.
+- **Nothing is hidden until a milestone.** Selling raw peppers and buying the first plot work from the first second.
+- **Tabs:** every selector shows from the start. A locked one is dimmed and says what opens it ("$7.5K", "Van"). Tapping one explains, as now. Tabs open at the same Operation Value thresholds as before.
+- **The factory view** shows three floors, Bottling over Vats over Fields. Each owned station is a tile that fills as its cycle runs; a plot whose truck can't keep up shows orange. An empty floor says what goes there. A dot climbs from Fields to Vats when crops reach stock, and from Vats to Bottling when a mash is made, at most DOTS_PER_SECOND a second.
+- **The next action** (`Game.next_action()`, so the rule lives in the simulation) is one of: press the button, sell raw peppers, Sell Batch, buy a station, or open a tab. It walks a fixed early sequence: the Bell Pepper Plot, Vat 1, Line 1, the first Sell Batch, the Poblano Plot, the Jalapeño Plot, then opening the Tech Tree once it's open. While cash is short of the next purchase, it points at Sell Batch (with bottles held), else Sell Raw Peppers (before the first vat, when selling covers the price), else the button. The target is ringed with a pulsing orange outline and named on the goal line. If it's on another tab, that tab's selector is ringed. On a long page, the page scrolls to it.
+
+### Criteria (step 2)
+
+| Id | Criterion |
+| --- | --- |
+| L10 | A fresh game shows the full dashboard: status bar, viewport (goal line, stock line, button, factory view), every tab selector directly below the viewport, and the Farms panel. Nothing appears later or slides in. |
+| L11 | Every tab selector shows from the start; a locked one is dimmed and names what opens it; tabs open at the thresholds they did before (N1, N2, Q9). |
+| L12 | The factory view has a tile for every owned station on its floor, filling with its cycle; a backed-up plot's tile is orange; an empty floor names what goes there; dots climb when crops reach stock and when mash is made, at most DOTS_PER_SECOND. |
+| L13 | Exactly one next action is shown through the early sequence, ringed on screen and named on the goal line, as `next_action()` gives it: from a fresh game, the button, then Sell Raw Peppers, then the Bell Pepper Plot, and so on to opening the Tech Tree. With the target on another tab, that tab's selector is ringed. |
+| L14 | Once the sequence is done, the goal line is the goal bar (next node, the sale's progress) and nothing is ringed. |
+| L15 | Every earlier criterion still passes, except those D044 retires: O1 (the blank screen), O3's and O4's "not before" (the counter and status bar show from the start), O8's nav bar appearing at a threshold, and L9's "stage 0 shows no text". F1 and F2 now read 0:00. |

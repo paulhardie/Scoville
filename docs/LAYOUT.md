@@ -14,7 +14,7 @@ This doc is step 1. Status: **built**, all criteria PASS.
 - **Station sheets.** A plot, vat or line is a compact card: its name, what it does, its cycle bar, and one **Manage** button. Manage carries a "!" when one of its upgrades is affordable. Tapping it opens the station's sheet over the bottom of the screen: its upgrades, with a **×1 / ×10 / Max** switch. ×1 buys one level; ×10 buys ten if all ten are affordable, and is otherwise disabled; Max buys as many as cash covers (at least one). Each upgrade button shows the price of what it would buy. The switch is remembered with the other settings (`user://settings.json`). Tapping outside the sheet closes it. Buying a plot or a slot, and a slot's recipe picker, stay on the card (picking a recipe is too frequent to bury).
 - **A bottle lands.** Each time lines make bottles, a "+N Name $value" label floats up from Sell Batch and fades. Bottles from the same frame are gathered into one label, and at most POPS_PER_SECOND labels show a second. When a sale (Sell Batch, Auto-Sell, the valve) adds cash, a coin flies from Sell Batch to Cash, at most COINS_PER_SECOND a second.
 - **Cash counts up.** A rise of COUNT_UP_FROM ($100) or more moves Cash on screen towards the real cash over COUNT_UP seconds, rather than jumping; smaller rises, and any spending, show at once (so the first $2 of raw peppers isn't animated). It never shows more than the real cash.
-- **The goal bar.** One line between the status bar and the stock (two when a long goal wraps in the pixel font, LOOK.md), from Stage 3 (the nav bar), so the early reveals stay a surprise:
+- **The goal bar.** One line between the status bar and the stock (two when a long goal wraps in the pixel font, LOOK.md), from the first launch since D044:
   - before the Tech Tree opens: the next tab and how far Operation Value is towards it ("Tech Tree at $7,500: 62%");
   - then: the pinned node, or else the reachable node whose cost is worth least, with its scarcest cost item ("Next: Jalapeño, 2/3 Table Mild");
   - once the run is past half the sale: "Sale 64%", then "Sale ready" (the HQ tab sells).
@@ -85,7 +85,7 @@ The owner changed their mind on progressive disclosure: the game opens on the fu
 - **L13:** from a fresh game the ring goes from the button to Sell Raw Peppers (once 50 peppers cover the plot), to the Bell Pepper Plot's Buy, and on through Vat 1, Line 1, Sell Batch and the starting plots to opening the Tech Tree. A purchase on another tab rings that tab's selector (core and UI suites).
 - **L14:** with the sequence done, the goal line is the goal bar again (L6 passes).
 - **L15:** every earlier criterion passes except two:
-  - **A4: 6:31 against 6:30.** This is the same miss as D043's (W29).
+  - **A4: 6:31 against 6:30.** This is the same miss as D043's (W29), settled by D048 (6:19).
   - **E6: 9 Sweet Pepper Mash waiting for the casual player's Starter Crate, against 10.** The first plot can now be bought at $50 straight away rather than after $100 earned, so the casual player reaches the line sooner, with less mash piled up (eager player: plot at 0:17, was 0:34). Raising Line 1 to $115 or $130 fixed E6 but failed E3 (a casual player's 120 s with nothing new) and, at $115, U7; reverted.
   - F1, F2 and E1 now read 0:00.1, since nothing is revealed.
 

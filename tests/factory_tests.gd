@@ -505,6 +505,11 @@ func test_starting_plots() -> void:
 		var plot: Dictionary = g.data.plots[crop]
 		var payback: float = g.plot_price(crop) / (plot["yield"] / plot.seconds * g.value(crop))
 		check(payback >= 300.0 and payback <= 600.0, "A1: the %s pays for itself raw in %.1f minutes (5–10)" % [plot.name, payback / 60.0])
+	# A8 (D048): after Bell, each starting plot costs 2–4× the one before, as
+	# Idle Planet Miner's first planets do ($200, $500, $1,250, $5,000).
+	for i in range(2, order.size()):
+		var step: float = g.plot_price(order[i]) / g.plot_price(order[i - 1])
+		check(step >= 2.0 and step <= 4.0, "A8: the %s costs %.1f× the %s (2–4)" % [g.data.plots[order[i]].name, step, g.data.plots[order[i - 1]].name])
 
 
 func test_upgrade_curve() -> void:

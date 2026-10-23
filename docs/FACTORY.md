@@ -227,7 +227,7 @@ E3 stops at 15:00, and N6 (15:00–50:00, at most 120 s) is measured on the flat
 | --- | --- |
 | J3 | From 15:00 to 30:00, the casual player never goes longer than 120 s without something new (a purchase, an upgrade or a research; reveals as in E3). |
 
-**Result: J3 PASS**, 48 s (the pacing player 38 s, not judged); 50 s and 49 s once merged with Cargo and the dashboard (D043–D044). Research and Tier 2 stations keep coming every 30–60 seconds through this window, so it needs no tuning. The flat spots in the first half hour are earlier: the vat-to-line saving (E3's 96 s) and the plots in between (W28).
+**Result: J3 PASS**, 48 s (the pacing player 38 s, not judged); 50 s and 49 s once merged with Cargo and the dashboard (D043–D044); 54 s and 53 s after the opening ladder (D048). Research and Tier 2 stations keep coming every 30–60 seconds through this window, so it needs no tuning. The flat spots in the first half hour are earlier: the vat-to-line saving (E3's 96 s) and the plots in between (W28, settled by D048).
 
 ### What moved
 

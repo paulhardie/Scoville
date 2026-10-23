@@ -1,12 +1,12 @@
 {
-	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md); prices are v0.6a's × the value change of the sauce that pays for the plot (D035). `unlocked` plots need no blueprint: Bell, Poblano and Jalapeño are on sale from the start, priced to pay back from raw sales in 8–10 minutes (D041). Chocolate Habanero (was Red Savina) and Moruga Scorpion were lowered in D041 ($2.6M to $2.0M, $9.5M to $5M). `name` is the station's name on screen, by default <crop> Plot; made ingredients get their own (D024).",
+	"_source": "One plot per crop. Prices and seconds are GUESSES (docs/FACTORY.md); prices are v0.6a's × the value change of the sauce that pays for the plot (D035). `unlocked` plots need no blueprint: Bell, Poblano and Jalapeño are on sale from the start, priced on Idle Planet Miner's opening ladder (Poblano $520, Jalapeño $1,700, ×3.3) to pay back from raw sales in 5–10 minutes (D041, D048). Chocolate Habanero (was Red Savina) and Moruga Scorpion were lowered in D041 ($2.6M to $2.0M, $9.5M to $5M). `name` is the station's name on screen, by default <crop> Plot; made ingredients get their own (D024).",
 	"plots": [
 		{"crop": "bell", "price": 50.0, "seconds": 1.0, "yield": 1, "unlocked": true},
-		{"crop": "jalapeno", "price": 1900.0, "seconds": 2.4, "yield": 2, "unlocked": true},
+		{"crop": "jalapeno", "price": 1700.0, "seconds": 2.4, "yield": 2, "unlocked": true},
 		{"crop": "vinegar", "name": "Vinegar Cask", "price": 1700.0, "seconds": 2.0, "yield": 2},
 		{"crop": "cayenne", "price": 3200.0, "seconds": 2.4, "yield": 5},
 		{"crop": "garlic", "price": 3500.0, "seconds": 2.4, "yield": 4},
-		{"crop": "poblano", "price": 800.0, "seconds": 2.4, "yield": 2, "unlocked": true},
+		{"crop": "poblano", "price": 520.0, "seconds": 2.4, "yield": 2, "unlocked": true},
 		{"crop": "serrano", "price": 3000.0, "seconds": 2.2, "yield": 4},
 		{"crop": "thai_chili", "price": 23000.0, "seconds": 2.6, "yield": 10},
 		{"crop": "pineapple", "name": "Pineapple Grove", "price": 42000.0, "seconds": 2.8, "yield": 6},

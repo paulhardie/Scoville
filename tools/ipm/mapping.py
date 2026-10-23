@@ -523,7 +523,12 @@ def level_cost(t):
     if re.fullmatch(r"\d{1,3}(\.\d{3})+", t):
         t = t.replace(".", "")
     return int(t.replace(",", ""))
-open_costs = [int(r["min_cost"].replace(",", "")) for r in snap["rooms"] if r["min_cost"].replace(",", "").isdigit()]
+# The n-th room bought costs this many credits. The wiki's Min Cost column gives
+# Engineering and the Forge 3 each because either can be first; its Combined
+# Min Cost column (3, 3, 9, 21, 42…) shows the second purchase costs 6, so the
+# Forge's row is skipped.
+mins = [int(r["min_cost"].replace(",", "")) for r in snap["rooms"] if r["min_cost"].replace(",", "").isdigit()]
+open_costs = [mins[0]] + mins[2:]
 L = ["| Offered | Our room | IPM room | Effect | Level 1 | Per level | Max level | Opening cost (credits, as the n-th room bought) |", "| --- | --- | --- | --- | --- | --- | --- | --- |"]
 mapping["rooms"] = []
 for i, (ipm, ours_r, eff) in enumerate(ROOMS):

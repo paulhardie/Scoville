@@ -40,27 +40,44 @@ func test_numbers() -> void:
 		check(Main._count(n) == counts[n], "L1: %d counts as %s (got %s)" % [n, counts[n], Main._count(n)])
 
 
+func test_big_numbers() -> void:
+	# I12: three figures and a suffix at each boundary up to 10³⁶, never inf or an exponent.
+	var names := ["K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
+	for i in names.size():
+		var at := pow(1000.0, i + 1)
+		# Under $10,000 keeps its cents (L1), so $1K isn't $1.00K.
+		check(i == 0 or Main._money(at) == "$1.00" + names[i], "I12: $1e%d shows as $1.00%s (got %s)" % [3 * (i + 1), names[i], Main._money(at)])
+		var below := at * 999.4
+		check(Main._money(below) == "$999" + names[i], "I12: just under the next suffix shows as $999%s (got %s)" % [names[i], Main._money(below)])
+	check(Main._money(5e35) == "$500Dc", "I12: the top sauces' $500Dc (got %s)" % Main._money(5e35))
+	check(Main._count(int(9.2e18)) == "9.20Qi", "I12: the biggest count reads (got %s)" % Main._count(int(9.2e18)))
+	for x in [1e12, 3.7e20, 1e33, 9.99e35]:
+		var shown := Main._money(x)
+		check(not ("e" in shown or "inf" in shown.to_lower()), "I12: %s has no exponent or inf" % shown)
+
+
 static func owned(cash: float) -> Game:
 	var g := Game.new({}, 1)
 	g.revealed.deck = true
 	g.cash = 1e12
 	g.buy_plot("bell")
-	g.buy_slot("vat")
+	if g.slots("vat").is_empty():
+		g.buy_slot("vat")
 	g.cash = cash
 	return g
 
 
 func test_buy_ten() -> void:
 	var g := owned(0.0)
-	var ten := g.plot_upgrade_cost_n("bell", "speed", 10)
+	var ten := g.plot_upgrade_cost_n("bell", "truck", 10)
 	var sum := 0.0
 	for i in 10:
-		sum += g.plot_upgrade_cost("bell", "speed", i)
+		sum += g.plot_upgrade_cost("bell", "truck", i)
 	check(absf(ten - sum) < 1e-6, "L2: ten levels cost the next ten prices together")
 	g.cash = ten - 0.01
-	check(g.upgrade_plot_n("bell", "speed", 10) == 0 and g.plots.bell.speed == 0, "L2: ten aren't bought a cent short")
+	check(g.upgrade_plot_n("bell", "truck", 10) == 0 and g.plots.bell.truck == 0, "L2: ten aren't bought a cent short")
 	g.cash = ten
-	check(g.upgrade_plot_n("bell", "speed", 10) == 10 and g.plots.bell.speed == 10 and absf(g.cash) < 1e-6, "L2: and are at the price (cash left %.2f)" % g.cash)
+	check(g.upgrade_plot_n("bell", "truck", 10) == 10 and g.plots.bell.truck == 10 and absf(g.cash) < 1e-6, "L2: and are at the price (cash left %.2f)" % g.cash)
 	var v := owned(0.0)
 	v.cash = v.slot_upgrade_cost_n("vat", 0, 10)
 	check(v.upgrade_slot_n("vat", 0, 10) == 10 and v.vats[0].speed == 10, "L2: a slot buys ten the same way")
@@ -68,7 +85,7 @@ func test_buy_ten() -> void:
 
 func test_max() -> void:
 	var g := owned(5e6)
-	var n := g.plot_levels_affordable("bell", "yield")
-	check(n >= 2, "L2: $5M covers several Yield levels (%d)" % n)
-	check(g.upgrade_plot_n("bell", "yield", n) == n and g.cash < g.plot_upgrade_cost("bell", "yield"), "L2: Max buys %d and leaves less than the next level's price" % n)
-	check(owned(0.0).plot_levels_affordable("bell", "speed") == 0, "L2: nothing affordable, nothing to buy")
+	var n := g.plot_levels_affordable("bell", "harvest")
+	check(n >= 2, "L2: $5M covers several Harvest Rate levels (%d)" % n)
+	check(g.upgrade_plot_n("bell", "harvest", n) == n and g.cash < g.plot_upgrade_cost("bell", "harvest"), "L2: Max buys %d and leaves less than the next level's price" % n)
+	check(owned(0.0).plot_levels_affordable("bell", "truck") == 0, "L2: nothing affordable, nothing to buy")

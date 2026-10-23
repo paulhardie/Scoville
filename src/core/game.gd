@@ -2111,11 +2111,39 @@ static func _level(p: Dictionary, key: String) -> int:
 
 
 ## v8 (D035): the Tier 6 sauce Event Horizon became Extinction Event (the name
-## is the last fictional pepper's).
+## is the last fictional pepper's). Only whole ids are renamed, as keys or
+## values: v12 reuses event_horizon for a pepper, so a text replace would also
+## rename ids that start with it.
+const V8_RENAMES := {"event_horizon": "extinction_event", "event_horizon_blueprint": "extinction_event_blueprint"}
+
+
 func _migrate_7_to_8(s: Dictionary) -> Dictionary:
-	var out: Dictionary = JSON.parse_string(JSON.stringify(s).replace("event_horizon", "extinction_event"))
+	var out: Dictionary = _rename_ids(s, V8_RENAMES)
 	out.version = 8
 	return out
+
+
+## A copy of `v` with every string, and every dictionary key, found in `names`
+## replaced by its new name. A renamed key that meets the new one adds to it
+## when both are numbers.
+static func _rename_ids(v: Variant, names: Dictionary) -> Variant:
+	match typeof(v):
+		TYPE_STRING:
+			return names.get(v, v)
+		TYPE_ARRAY:
+			var a := []
+			for x in v:
+				a.append(_rename_ids(x, names))
+			return a
+		TYPE_DICTIONARY:
+			var d := {}
+			for k in v:
+				var nk: Variant = names.get(k, k)
+				var nv: Variant = _rename_ids(v[k], names)
+				var both_numbers := d.has(nk) and typeof(d[nk]) in [TYPE_INT, TYPE_FLOAT] and typeof(nv) in [TYPE_INT, TYPE_FLOAT]
+				d[nk] = d[nk] + nv if both_numbers else nv
+			return d
+	return v
 
 
 ## A pre-v8 save's money in Idle Planet Miner's dollars (D035): about ×10 at

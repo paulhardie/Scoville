@@ -365,25 +365,25 @@ Bought with cash once the Processing tab is open, no cap but the ten. Slot Expan
 
 The sale, the $10M floor and the credit table are unchanged (D035). **Operation Value becomes IPM's Galaxy Value:** cash, stock at its values, and everything spent on farms, upgrades, vats, lines, recipes and research (items spent at their values). Today research lowers Operation Value; after this it doesn't.
 
-Rooms are offered two at a time in a fixed order, IPM's, not a random draft (this changes the brief's 2-card draft, §6). The n-th room bought costs the n-th opening price; levels cost each room's own IPM table (in the snapshot). Two of ours fill the places of rooms we left out.
+Rooms are offered two at a time in a fixed order, IPM's, not a random draft (this changes the brief's 2-card draft, §6). The n-th room bought costs the n-th opening price (the wiki's Min Cost column lists 3 for both Engineering and the Forge, either of which can be first; its Combined Min Cost column shows the second costs 6); levels cost each room's own IPM table (in the snapshot). Two of ours fill the places of rooms we left out.
 
 | Offered | Our room | IPM room | Effect | Level 1 | Per level | Max level | Opening cost (credits, as the n-th room bought) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Seed Vault | Engineering | farm harvest speed | x1.25 | +.15 | 60 | 3 |
-| 2 | Fermentation Cellar | Forge | vat speed | x1.20 | +.10 | 60 | 3 |
-| 3 | Motor Pool | Aeronautical | truck speed (new) | x1.50 | +.25 | 60 | 6 |
-| 4 | Land Office | Astronomy | farm upgrade prices (new) | x90% | - 4% | 11 | 12 |
-| 5 | Crate Yard | Packaging | truck cargo (new) | x1.50 | +.25 | 60 | 21 |
-| 6 | High-Speed Cannery | Workshop | line speed | x1.20 | +.10 | 60 | 35 |
-| 7 | Test Kitchen | Laboratory | Tech Tree costs | x90% | - 4% | 11 | 56 |
-| 8 | Ergonomics Lab | (none) | button yield (ours, brief; in Robotics's place) | as now (rooms.json) | as now | as now | 87 |
-| 9 | Boardroom | Lounge | credits (was the Executive Lounge) | x1.15 | +.05 | 60 | 133 |
-| 10 | Night Watchman's Desk | Backup Generator | offline time | +0:30 | +0:30 | 44 | 200 |
-| 11 | Seed Capital Office | (none) | starting cash (ours, brief; in Terrarium's place) | as now (rooms.json) | as now | as now | 298 |
-| 12 | Cooperage | Underforge | vat inputs | x90% | - 4% | 11 | 439 |
-| 13 | Glassworks | Dorm | line inputs | x90% | - 4% | 11 | 642 |
-| 14 | Tasting Room | Sales | mash and sauce values | x1.15 | +.05 | 60 | 934 |
-| 15 | Ad Agency | Marketing | Market Ticker spikes (new) | x1.30 | +.10 | 60 | 1351 |
+| 2 | Fermentation Cellar | Forge | vat speed | x1.20 | +.10 | 60 | 6 |
+| 3 | Motor Pool | Aeronautical | truck speed (new) | x1.50 | +.25 | 60 | 12 |
+| 4 | Land Office | Astronomy | farm upgrade prices (new) | x90% | - 4% | 11 | 21 |
+| 5 | Crate Yard | Packaging | truck cargo (new) | x1.50 | +.25 | 60 | 35 |
+| 6 | High-Speed Cannery | Workshop | line speed | x1.20 | +.10 | 60 | 56 |
+| 7 | Test Kitchen | Laboratory | Tech Tree costs | x90% | - 4% | 11 | 87 |
+| 8 | Ergonomics Lab | (none) | button yield (ours, brief; in Robotics's place) | as now (rooms.json) | as now | as now | 133 |
+| 9 | Boardroom | Lounge | credits (was the Executive Lounge) | x1.15 | +.05 | 60 | 200 |
+| 10 | Night Watchman's Desk | Backup Generator | offline time | +0:30 | +0:30 | 44 | 298 |
+| 11 | Seed Capital Office | (none) | starting cash (ours, brief; in Terrarium's place) | as now (rooms.json) | as now | as now | 439 |
+| 12 | Cooperage | Underforge | vat inputs | x90% | - 4% | 11 | 642 |
+| 13 | Glassworks | Dorm | line inputs | x90% | - 4% | 11 | 934 |
+| 14 | Tasting Room | Sales | mash and sauce values | x1.15 | +.05 | 60 | 1351 |
+| 15 | Ad Agency | Marketing | Market Ticker spikes (new) | x1.30 | +.10 | 60 | 1946 |
 
 - **Hydroponics Bay goes:** it raised plot yield, and Yield per Cycle goes with IPM's upgrades.
 - **Night Watchman's Desk** adds IPM's 30 minutes a level to 44 levels (+22 hours) on top of our 4-hour cap; offline speed is ours (OFFLINE.md). The wiki's "24 hours" at the top is its 2-hour default plus those 22. This replaces G16's Level 8.

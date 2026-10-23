@@ -19,13 +19,15 @@ This branch is **the pixel-art trial** (W8, D047, [LOOK.md](LOOK.md)), now merge
 
 - **PX8 and the kit (W8):** keep this free wood kit, buy the full pack (the ember theme suits hot sauce better, same files), or have UI art made in our own palette. Recommend: judge it on the phone first.
 - **Mixed scales:** headlines at 3× beside 2× borders.
-- **W32:** whole pixels on the phone need Godot's integer stretch. **W33:** who draws the game's own art, and at what pixel density.
+- **W32:** whole pixels on the phone: Godot's integer stretch would fix it, but changes how much screen we get. **W33:** who draws the game's own art, and at what pixel density.
+- **W28:** the second plot feels slow to unlock on a phone; revisit the starting plots with the next early-game pass.
 - **W29 and W30 (A4, E6):** settle in W28's early-game pass, or move A4's bar to 7:00.
+- **W27:** fermentation, as its own version.
 - Still open: W31 the first sale (on #22), W21 late growth, W24 a floor for repeat runs.
 
 ## Next
 
 1. The owner plays the Web build on the phone (`bash tools/serve_web.sh`), then keeps, swaps or replaces the kit (W8).
-2. Layout step 3 (W22) once the look is settled.
+2. Layout step 3 (W22) once the look is settled; W28's early-game pass or fermentation (W27), whichever the owner picks.
 
 Touches: `project.godot` (Nearest filter), `addons/pixel_ui/`, `assets/fonts/`, `src/ui/pixel_kit.gd`, `style.gd`, `main.gd` (kit boxes, wraps, nav names, the factory view's pixel dress), `tests/look_tests.gd`, `ui_tests.gd` (O4, L10, L11), `tools/make_pixel_glyphs.gd`, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27–W30, W32–W33, G1, G12–G20.

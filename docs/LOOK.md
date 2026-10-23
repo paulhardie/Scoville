@@ -21,7 +21,7 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 - **Whole pixels.** The kit's art is drawn at 1×. We draw it at exactly `Style.PIXEL_SCALE` (2×) on the 540×960 screen, never stretched to an in-between size. Texture filtering is Nearest everywhere, so pixels stay hard-edged.
 - **One font.** All text uses the kit's bitmap font, at a whole multiple of its 8 px: 16 (2×) for most text, 24 (3×) for headlines (Cash, card titles). The five characters the game shows that the font lacks (ñ, ×, ·, →, −) come from a small companion font drawn to match (`assets/fonts/pixel_extra.fnt`), as a fallback.
 - **The kit's boxes, not flat ones.** Panels, cards, buttons and bars use the kit's art. The screen draws no flat rounded boxes any more.
-- **The Blank Button stays the hero.** It's still a large chilli-red disc with no label (brief §2), now drawn as a pixel disc at whole scales: 4× at the start and 2× once compact.
+- **The Blank Button stays the hero.** It's still a large chilli-red disc with no label (brief §2), now drawn as a pixel disc at whole scales: 4× at the start and 2× once compact (2× throughout since the dashboard, D044).
 - **Colours** that are ours (cash, Heat, highlights, text) live in `style.gd` as before, chosen to sit with the wood palette. The kit's own colours stay in its theme.
 
 ## Criteria
@@ -31,10 +31,10 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 | PX1 | **Square pixels.** The project's default texture filter is Nearest. Every kit texture on screen is the kit's art scaled by exactly PIXEL_SCALE, and every 9-slice margin is the kit's margin × PIXEL_SCALE. *Measured as (worded after the Haiku review, same bar):* every box and icon in the 2× theme the screen draws from is the kit's art with each pixel PIXEL_SCALE×PIXEL_SCALE, its texture and content margins × PIXEL_SCALE (PX4 rules out anything else on screen), and the Blank Button on screen is a whole multiple of its disc, at the start and compact. |
 | PX2 | **One font, whole sizes.** At each stage the capture tool visits, every visible Label and Button uses the kit's font at a size that is a whole multiple of 8. |
 | PX3 | **Every character drawn.** Every character in every visible text at those stages is in the kit's font or the companion font, so nothing falls back to a system font. |
-| PX4 | **No flat boxes.** No visible control at those stages draws a StyleBoxFlat (for panel, normal, hover, pressed, disabled, background or fill). |
+| PX4 | **No flat boxes.** No visible control at those stages draws a StyleBoxFlat (for panel, normal, hover, pressed, disabled, background or fill). *Narrowed after the merge with #20 (below):* an unfilled outline with square corners is allowed. |
 | PX5 | **Readable.** Text colours reach WCAG AA contrast against the surface they sit on, taking the surface's colour from the centre pixel of its art: 4.5:1 for TEXT, DIM, cash and Heat; 3:1 for MUTED (disabled text and hints). Surfaces: the inset card, the panel (status bar, nav, sheets) and the screen background. Dark text on the kit's buttons is the kit's choice and is measured too (4.5:1). |
 | PX6 | **It fits.** At those stages no visible control runs past the screen's left or right edge, apart from the Tech Tree's web, which scrolls sideways. Every button is at least 44 px tall (today's height for an ordinary button), so tap targets don't shrink. *Tightened after the first captures (the agent's, before any result was reported):* no clipped label hides part of its text; wrapped text never breaks inside a word, Tech Tree nodes included; every tab's name fits the nav at once; the status bar keeps its height. |
-| PX7 | **Nothing else breaks.** Every suite passes, the headless boot is clean, stage 0 still shows the Blank Button alone with no text (O1), and the credit line is shown in the Settings card. |
+| PX7 | **Nothing else breaks.** Every suite passes, the headless boot is clean, stage 0 still shows the Blank Button alone with no text (O1; retired by D044, below), and the credit line is shown in the Settings card. |
 | PX8 | **The owner's eye.** Owner's call, on screenshots and then on the phone: does it look like a 2026 mobile game rather than a 2010 web game? The agent reports its own view but this one isn't the agent's to PASS. |
 
 ## Assumed
@@ -56,13 +56,13 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 
 | Id | Result |
 | --- | --- |
-| PX1 | PASS: Nearest filtering; every kit box and icon is its art at exactly 2×, every pixel of every block checked, with texture and content margins doubled; the Blank Button 280 px then 140 px on screen |
+| PX1 | PASS: Nearest filtering; every kit box and icon is its art at exactly 2×, every pixel of every block checked, with texture and content margins doubled; the Blank Button 280 px then 140 px on screen (140 px throughout since D044) |
 | PX2 | PASS: every visible text uses the kit font at 16 or 24 px |
 | PX3 | PASS: every character drawn by the kit font or the companion glyphs |
 | PX4 | PASS: no flat boxes left on screen |
 | PX5 | PASS: on the inset card, the darkened panel and the background, TEXT 6.7–11.2:1, DIM 5.3–8.8, cash 6.8–11.3, Heat 4.6–7.7, MUTED 3.4–5.7; button text 6.2:1 (pressed 4.75, disabled 4.2) |
 | PX6 | PASS, after the fixes in "Measured into place" |
-| PX7 | PASS: all suites, the boot, O1 (stage 0 shows no text) and the credit line in Settings |
+| PX7 | PASS: all suites, the boot, O1 (stage 0 shows no text) and the credit line in Settings. Since D044 O1 is retired, so PX7 is the suites (bar main's A4 and E6), the boot and the credit line |
 | PX8 | The owner's: [before and after](look/trial_before_after.png) |
 
 Found on the way:
@@ -85,4 +85,4 @@ The kit now dresses the dashboard. What had to change:
 - **Heat** uses the kit's red bar under the button, 12 px tall.
 - L10 checks that the selectors sit at the upper viewport's foot (`UPPER_FRACTION` of the screen) instead of a fixed gap under the button. L11 expects "Roster" in the nav.
 
-**Results after the merge:** PX1–PX7 PASS (`look_tests.gd`, 8,078 checks), and the captures were looked at. A4 and E6 fail by one unit, as they do on `main` (W29, W30).
+**Results after the merge:** PX1–PX7 PASS (`look_tests.gd`, about 8,080 checks; the count moves a little with the random stream), with O1 dropped from PX7 because D044 retired it and stage 0 now shows the whole dashboard, and the captures were looked at. A4 and E6 fail by one unit, as they do on `main` (W29, W30).

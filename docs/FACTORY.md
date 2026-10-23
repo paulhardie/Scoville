@@ -219,6 +219,14 @@ Otherwise it plays like the pacing player. Both are measured over the first 20 m
 
 **E3 is tight** (96 s of 100). The wait is the vat-to-line saving, while the casual player keeps 50 peppers back for the vat. Trying a £12 vat didn't shorten it, because the line's price is what's being saved for.
 
+### The 15–30 minute window (J3, this session)
+
+E3 stops at 15:00, and N6 (15:00–50:00, at most 120 s) is measured on the flat-out pacing player only. Nothing bounds the window a phone player meets next. Set before measuring, from the owner's guide of something new every 30–60 seconds early on, with gaps stretching gradually:
+
+| Id | Criterion |
+| --- | --- |
+| J3 | From 15:00 to 30:00, the casual player never goes longer than 120 s without something new (a purchase, an upgrade or a research; reveals as in E3). |
+
 ### What moved
 
 - **Bell Pepper Plot:** £10 → £5, and 1 pepper every 2.0 s → 1.0 s. It now picks about a third of a casual player's peppers, so it matters.

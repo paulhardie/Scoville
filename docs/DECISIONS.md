@@ -278,3 +278,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** Tabasco duplicated Cayenne's heat and Habanero duplicated Scotch Bonnet's; Moruga and Reaper overlap. TABASCO (McIlhenny, enforced), RED SAVINA HABANERO and PepperX are registered marks, and "Smokin' Ed's Carolina Reaper" is registered with plain "Carolina Reaper" contested. Real names players know are the trade-off; the agent's searches used secondary sources, not the official register, so it isn't legal advice. Pepper Y and Alabama Grim are parodies by design: they nod at the marks without using them. Pineapple: Scotch Bonnet with pineapple or mango is a real Caribbean pairing, and it fits Island Heat and Sweet Heat better than cane sugar. The Trinidad 7 Pot the proposal added is dropped: the two parody peppers fill Tier 6. Fermentation as a mechanic is a later version (W27).
 
+
+## D046: The return card says what's waiting to sell
+
+**Decision:** after time away, the "While you were away" card shows what Sell Batch would pay ("+$X of sauce waiting: tap Sell Batch") and drops the cash line when no cash came in. Crops waiting aren't counted. Criteria J1–J2 in [OFFLINE.md](OFFLINE.md#the-return-before-the-delivery-van-d046).
+
+**Why:** before the Delivery Van nothing sells while away, so every return in the first 20 minutes said "+$0.00 cash" though the factory had kept working. Showing the waiting value fixes the feel without changing what the Van is for. The other option, selling bottles while away before the Van, changes the game's rules and the Van's worth; it's the owner's call if the card isn't enough.

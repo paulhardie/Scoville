@@ -162,6 +162,8 @@ As measured for D040, before D041: run 1 reaches the sale at 2:07:58 and sells a
 
 ## When the first sale comes (W31, a proposal, not built)
 
+**Settled (2026-10-23):** the owner kept D035's 2:00–2:30 (SKELETON.md I6), and v0.7 PR 3 tunes the copy to it; this section is the history.
+
 **The question.** The owner's instructions for this session (a message, not in the repo) say the first prestige should arrive within roughly the first hour. The repo's own target is about 3 hours to the end of the first run's ladder (D005), with the sale opening at about 2:00 (D035). Today the sale opens at $10M Operation Value, which the pacing player reaches at 2:02 (U1's bar is 2:00–2:30, the owner's choice in D035). The two don't agree, and the sale's timing is the owner's to set, so nothing here is built.
 
 **Measured on `main` (this session, no Cargo from PR #20):**

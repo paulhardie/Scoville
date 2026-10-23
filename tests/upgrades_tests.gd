@@ -134,15 +134,16 @@ func test_overflow_valve() -> void:
 
 
 func test_smart_stockpiling() -> void:
-	# Pin Land Survey 1 (1,500 Pimento and 5 Bell Pepper Purée): the valve
-	# holds back what it needs; researching it unpins.
+	# Pin Land Survey 1 (Pimento and Bell Pepper Purée): the valve holds back
+	# what it needs; researching it unpins.
 	var g := with(["smart_stockpiling"])
+	var cost: Dictionary = g.tech_cost("survey_1")
 	check(g.set_pin("survey_1"), "pins Land Survey 1")
-	check(g.pinned_need("bell_puree") == 5 and g.pinned_need("pimento") == 1500, "R14: what it needs is held back")
+	check(g.pinned_need("bell_puree") == cost.bell_puree and g.pinned_need("pimento") == cost.pimento, "R14: what it needs is held back (%s)" % str(cost))
 	g.set_keep("bell_puree", 0)
 	g.stock.bell_puree = 12
 	g.advance(10)
-	check(g.stock.bell_puree == 5, "R13/R14: the valve keeps the pinned node's Purée, no more: %d" % g.stock.bell_puree)
+	check(g.stock.bell_puree == cost.bell_puree, "R13/R14: the valve keeps the pinned node's Purée, no more: %d" % g.stock.bell_puree)
 	# Bottles: pinned Calloused Thumbs (10 Table Mild) keeps the Van's Auto-Sell
 	# off them until it has 10.
 	var b := with(["smart_stockpiling"])
@@ -155,7 +156,7 @@ func test_smart_stockpiling() -> void:
 	b.advance(seconds(600.0))
 	check(b.stock.table_mild >= 10 and b.stock.table_mild <= 11, "R14: Table Mild held back until 10 are in stock: %d" % b.stock.table_mild)
 	check(b.stats.sold.table_mild > 0, "R14: then Auto-Sell works as set again")
-	g.stock.pimento = 1500
+	g.stock.pimento = cost.pimento
 	check(g.research_node("survey_1") and g.pin == "", "researching the node unpins it")
 	check(not with([]).set_pin("survey_1"), "no pins before the node")
 
@@ -163,6 +164,13 @@ func test_smart_stockpiling() -> void:
 func test_market_ticker() -> void:
 	var g := with(["market_ticker"], 7)
 	var sauces := g.unlocked_bottles()
+	# Every unlocked line recipe's bottle, from the data, not only the kitchen's
+	# (T4 made the kitchen's line run only Table Mild; the ticker mustn't follow).
+	var want := []
+	for id in g.data.recipes:
+		if g.data.recipes[id].station == "line" and g.recipe_unlocked(id):
+			want.append(g.data.recipes[id].output)
+	check(sauces == want and sauces.size() > 1, "R15: the ticker picks from every unlocked sauce: %s" % str(sauces))
 	var starts: Array = []
 	var last := ""
 	for i in seconds(4 * 3600.0):

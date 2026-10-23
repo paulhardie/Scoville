@@ -1,5 +1,5 @@
 {
-	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). IPM's rooms: `base` at Level 1, `step` a level, `cap`, `level_costs` (credits from each level to the next) and `open_cost` (credits for the n-th room bought, offered two at a time in file order). Ergonomics Lab and Seed Capital Office are ours, on Seed Vault's level costs (assumed).",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053), with tools/ipm/tweaks.json applied (PR 3, Z2). IPM's rooms: `base` at Level 1, `step` a level, `cap`, `level_costs` (credits from each level to the next) and `open_cost` (credits for the n-th room bought, offered two at a time in file order). Ergonomics Lab and Seed Capital Office are ours, on Seed Vault's level costs (assumed).",
 	"rooms": [
 		{
 			"id": "seed_vault",

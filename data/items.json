@@ -1,5 +1,5 @@
 {
-	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). Values are Idle Planet Miner's (ores, alloys, items); the kitchen's two are D004's (D052). `tier` groups crops four rungs a tier, and a made item takes its highest input's.",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053), with tools/ipm/tweaks.json applied (PR 3, Z2). Values are Idle Planet Miner's (ores, alloys, items); the kitchen's two are D004's (D052). `tier` groups crops four rungs a tier, and a made item takes its highest input's.",
 	"items": [
 		{
 			"id": "vinegar",

@@ -812,6 +812,8 @@ func _build_tech(holder: Control) -> void:
 	detail.add_theme_constant_override("separation", 6)
 	panel.add_child(detail)
 	_detail.title = _label("", S.SIZE_BODY, S.TEXT)
+	# A long name (Standard Operating Procedures) wraps rather than widening the panel.
+	_detail.title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.add_child(_detail.title)
 	_detail.effect = _label("", S.SIZE_SMALL, S.DIM)
 	_detail.effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1602,7 +1604,7 @@ func _effect_text(node: Dictionary) -> String:
 		elif e.has("smart_stockpiling"):
 			out.append("Pin a node to hold back the bottles, mash and crops it needs.")
 		elif e.has("sop"):
-			out.append("Any node costing under 1% of an hour's bottles researches itself, free. Either/or nodes stay your choice.")
+			out.append("Any node costing under 5% of your Operation Value researches itself, free. Either/or nodes stay your choice.")
 		elif e.has("market_ticker"):
 			out.append("Demand spikes: a sauce sells for ×2 or ×3 for 30 minutes, about once an hour.")
 		elif e.has("forage"):

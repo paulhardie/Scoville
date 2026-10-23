@@ -162,6 +162,9 @@ const PRESTIGE_OV := 10000000.0
 ## (D035), straight lines between, rounded, × the Boardroom. Past the table
 ## each decade adds 10 more than the last step did.
 const CREDIT_TABLE := [10, 30, 60, 101, 150, 210, 285, 367, 459]
+## PR 3's T9: a sale pays CREDIT_SCALE × the table (GUESS, measured against
+## I9: at IPM's 10 credits, two rooms, run 2 took 80% of run 1's time).
+const CREDIT_SCALE := 5.0
 ## v11's room prices (G8), for refunding a v11 save's rooms in credits: the
 ## n-th room cost ROOM_OPEN_COST × n, a level from L cost ROOM_LEVEL_COST × L.
 const ROOM_OPEN_COST := 5
@@ -171,9 +174,8 @@ const ROOM_LEVEL_COST := 2
 const ROOMS_OFFERED := 2
 
 ## Standard Operating Procedures (brief §4, D034): a node researches itself
-## when its cost is worth under SOP_SHARE of SOP_WINDOW seconds of the bottles
-## running lines make (the window is a GUESS at "throughput"), looked at every
-## SOP_EVERY_SECONDS (GUESS).
-const SOP_SHARE := 0.01
-const SOP_WINDOW := 3600.0
+## when its cost is worth under SOP_SHARE of the run's Operation Value, looked
+## at every SOP_EVERY_SECONDS (GUESS). PR 3's T5: it was 1% of an hour's
+## bottles, which on the copy was under every node's cost (Y2, W41).
+const SOP_SHARE := 0.05
 const SOP_EVERY_SECONDS := 1.0

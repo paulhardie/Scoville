@@ -194,7 +194,7 @@ func test_calloused_thumbs() -> void:
 	check(g.press() == 1, "a press picks 1 before")
 	g.research_node("calloused_thumbs")
 	var before: int = g.stock.bell
-	check(g.press() == 3 and g.stock.bell - before == 3, "N1 (Calloused Thumbs): +2 a press, so 3")
+	check(g.press() == 9 and g.stock.bell - before == 9, "N1 (Calloused Thumbs): +8 a press since PR 3's T6, so 9")
 
 
 func test_autosell_slider() -> void:

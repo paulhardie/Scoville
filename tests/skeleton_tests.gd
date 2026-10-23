@@ -1,7 +1,8 @@
 extends SceneTree
-## v0.7's copy of Idle Planet Miner (docs/SKELETON.md): I1 (the data is the
-## snapshot through the mapping), I2 (the farm formulas), I3 (trucks), I5
-## (farms open in order) and I11's unreadable save.
+## v0.7's copy of Idle Planet Miner (docs/SKELETON.md): Z2 (the data is the
+## snapshot through the mapping with PR 3's tweaks applied, replacing I1), I2
+## (the farm formulas), I3 (trucks), I5 (farms open in order) and I11's
+## unreadable save.
 ##
 ## I1 reads tools/ipm/mapping.json, which tools/ipm/mapping.py builds from
 ## docs/ipm_snapshot.json (run_tests.sh checks it's current), and also reads
@@ -12,6 +13,7 @@ const T = preload("res://src/core/tuning.gd")
 const Main = preload("res://scenes/main.tscn")
 
 const MAPPING := "res://tools/ipm/mapping.json"
+const TWEAKS := "res://tools/ipm/tweaks.json"
 const SNAPSHOT := "res://docs/ipm_snapshot.json"
 ## The snapshot's number suffixes (IPM's letters).
 const SUFFIX := {"K": 1e3, "k": 1e3, "M": 1e6, "B": 1e9, "T": 1e12, "q": 1e15, "Q": 1e18, "s": 1e21, "S": 1e24, "O": 1e27, "N": 1e30, "D": 1e33}
@@ -57,6 +59,11 @@ static func num(text: String) -> float:
 	return float(t) * mult if t.is_valid_float() else NAN
 
 
+## Prices tweaked to three figures may round a hair differently here.
+static func close_price(a: float, b: float) -> bool:
+	return absf(a - b) <= 1e-6 * maxf(1.0, maxf(absf(a), absf(b)))
+
+
 static func near(a: float, b: float) -> bool:
 	return absf(a - b) <= 1e-9 * maxf(1.0, maxf(absf(a), absf(b)))
 
@@ -66,6 +73,70 @@ static func ids_by_name(g: Game) -> Dictionary:
 	var out := {}
 	for id in g.data.items:
 		out[g.data.items[id].name] = id
+	return out
+
+
+## The tweak table's rows by op (Z2).
+static func tweak(op: String) -> Dictionary:
+	for t in read_json(TWEAKS).tweaks:
+		if t.op == op:
+			return t
+	return {}
+
+
+## Three significant figures, as build_data.py rounds tweaked prices.
+static func sig3(x: float) -> float:
+	if x <= 0.0:
+		return x
+	var scale := pow(10.0, floorf(log(x) / log(10.0)) - 2.0)
+	return roundf(x / scale) * scale
+
+
+## A farm's price after T1, from its mapped price.
+static func tweaked_price(m: Dictionary, price: float, survey: int) -> float:
+	var t := tweak("farm_price_curve")
+	if t.is_empty() or survey < 1 or price <= t.anchor:
+		return price
+	var cap := 0.0
+	for f in m.farms:
+		if f.survey >= 1 and f.survey <= t.until_survey:
+			cap = maxf(cap, f.price)
+	return sig3(price * pow(minf(price, cap) / t.anchor, t.gamma - 1.0))
+
+
+## A farm's harvest and cargo multiplier after T3 (the Bell Plot's ×4 is D052's).
+static func tweaked_rate(id: String, survey: int) -> float:
+	var t := tweak("farm_rate_per_survey")
+	var m := 4.0 if id == "bell" else 1.0
+	return m * (pow(t.factor, survey) if not t.is_empty() and survey >= 1 else 1.0)
+
+
+## A survey's cost after T2.
+static func tweaked_survey(cost: Dictionary, n: int) -> Dictionary:
+	var t := tweak("survey_cost_scale")
+	if t.is_empty():
+		return cost
+	var f: float = pow(t.factor, mini(n, int(t.exponent_cap)))
+	var out := {}
+	for item in cost:
+		out[item] = maxi(1, floori(cost[item] * f + 0.5))
+	return out
+
+
+## A JSON cost as whole numbers.
+static func counts_of(cost: Dictionary) -> Dictionary:
+	var out := {}
+	for item in cost:
+		out[item] = roundi(cost[item])
+	return out
+
+
+## Slot prices after T4: the inserted price at its place.
+static func tweaked_slots(prices: Array, station: String) -> Array:
+	var out := prices.duplicate()
+	var t := tweak("slot_insert")
+	if not t.is_empty():
+		out.insert(int(t.index), float(t[station]))
 	return out
 
 
@@ -83,7 +154,8 @@ static func counts(pairs: Array, ids: Dictionary) -> Dictionary:
 	return out
 
 
-## I1: every number in data/ is the mapping's.
+## Z2 (replacing I1): every number in data/ is the mapping's, with the tweak
+## table applied.
 func test_copied() -> void:
 	var g := Game.new()
 	var m: Dictionary = read_json(MAPPING)
@@ -112,11 +184,24 @@ func test_copied() -> void:
 		var shares := {}
 		for crop in data.get("crops", {}):
 			shares[crop] = roundi(data.crops[crop] * 100.0)
-		if data.is_empty() or not near(data.price, f.price) or shares != crops or not near(data.distance, f.distance) or data.survey != f.survey:
+		if data.is_empty() or not close_price(data.price, tweaked_price(m, f.price, f.survey)) or shares != crops or not near(data.distance, f.distance) or data.survey != f.survey:
 			bad.append("farm %d" % f.n)
+		elif not near(data.harvest_mult, tweaked_rate(id, f.survey)) or not near(data.cargo_mult, tweaked_rate(id, f.survey)):
+			bad.append("farm %d rates" % f.n)
+	# Ingredient stations: their value, and their survey's cheapest farm's price
+	# and rates, tweaked like a farm's (T1, T3).
+	for ing in m.ingredients:
+		var data: Dictionary = g.data.plots.get(ing.id, {})
+		var cheapest := INF
+		for f in m.farms:
+			if f.survey == ing.survey:
+				cheapest = minf(cheapest, f.price)
+		if data.is_empty() or data.survey != ing.survey or not close_price(data.price, tweaked_price(m, cheapest, ing.survey)) \
+				or not near(data.harvest_mult, tweaked_rate(ing.id, ing.survey)) or not near(data.cargo_mult, tweaked_rate(ing.id, ing.survey)):
+			bad.append("station " + ing.id)
 	for s in m.surveys:
 		var node: Dictionary = g.data.tech.get("survey_%d" % s.n, {})
-		if node.is_empty() or node.cost != counts(s.cost, ids):
+		if node.is_empty() or node.cost != tweaked_survey(counts(s.cost, ids), s.n):
 			bad.append("survey %d" % s.n)
 	var nodes := {}
 	for id in g.data.tech:
@@ -146,11 +231,28 @@ func test_copied() -> void:
 			bad.append("room " + r.name)
 	for station in ["vat", "line"]:
 		var prices: Array = g.data.slots[station].prices
-		var want: Array = m.vats if station == "vat" else m.lines
+		var want: Array = tweaked_slots(m.vats if station == "vat" else m.lines, station)
+		check(prices.size() == want.size(), "Z2: %d %s prices, want %d" % [prices.size(), station, want.size()])
 		for i in want.size():
 			if i >= prices.size() or not near(prices[i], want[i]):
 				bad.append("%s %d" % [station, i + 1])
-	check(bad.is_empty(), "I1: these differ from the mapping: %s" % str(bad))
+	# Our own nodes' tweaks (T6–T8) are what the data holds.
+	for t in read_json(TWEAKS).tweaks:
+		match t.op:
+			"node_effect":
+				if JSON.stringify(g.data.tech[t.node].effects) != JSON.stringify(t.effects):
+					bad.append("tweak %s" % t.id)
+			"node_cost":
+				if g.data.tech[t.node].cost != counts_of(t.cost):
+					bad.append("tweak %s" % t.id)
+			"node_cost_scale":
+				for id in t.nodes:
+					var want := {}
+					for item in t.was[id]:
+						want[item] = ceili(t.was[id][item] * t.factor)
+					if g.data.tech[id].cost != want:
+						bad.append("tweak %s %s" % [t.id, id])
+	check(bad.is_empty(), "Z2: these differ from the mapping with its tweaks: %s" % str(bad))
 	check(m.farms.size() == 79 and m.peppers.size() == 28 and m.rooms.size() == 15, "I1: 79 farms, 28 peppers and 15 rooms mapped (%d, %d, %d)" % [m.farms.size(), m.peppers.size(), m.rooms.size()])
 
 
@@ -173,7 +275,8 @@ func test_snapshot() -> void:
 		check(planet.name == f.ipm, "I1: farm %d is %s, not %s" % [f.n, planet.name, f.ipm])
 		# The Bell Plot's $50 is the kitchen's (D052); Balor's $100 prices its levels.
 		var price: float = g.data.plots[id].upgrade_price if f.n == 1 else g.data.plots[id].price
-		if not f.price_assumed and not near(price, num(planet.price)):
+		var ipm := num(planet.price) if f.n == 1 else tweaked_price(m, num(planet.price), f.survey)
+		if not f.price_assumed and not close_price(price, ipm):
 			bad.append("farm %d price" % f.n)
 		if not f.distance_assumed and not near(g.data.plots[id].distance, num(planet.distance)):
 			bad.append("farm %d distance" % f.n)
@@ -187,14 +290,16 @@ func test_snapshot() -> void:
 		ours.sort()
 		if not f.price_assumed and shares != ours:
 			bad.append("farm %d shares" % f.n)
-	# The first vat and line are the kitchen's (D052); crafters 7–10 are doubled
-	# (SKELETON.md, assumed).
+	# The first vat and line are the kitchen's (D052) and IPM's free first
+	# smelter and crafter come next (T4), so IPM's n-th is our (n + shift)-th;
+	# crafters 7–10 are doubled (SKELETON.md, assumed).
+	var shift: int = 1 if not tweak("slot_insert").is_empty() else 0
 	for i in range(1, snap.smelters.size()):
-		if not near(g.data.slots.vat.prices[i], num(snap.smelters[i])):
-			bad.append("vat %d" % (i + 1))
+		if not near(g.data.slots.vat.prices[i + shift], num(snap.smelters[i])):
+			bad.append("vat %d" % (i + 1 + shift))
 	for i in range(1, 6):
-		if not near(g.data.slots.line.prices[i], num(snap.crafters[i])):
-			bad.append("line %d" % (i + 1))
+		if not near(g.data.slots.line.prices[i + shift], num(snap.crafters[i])):
+			bad.append("line %d" % (i + 1 + shift))
 	var credits := []
 	for row in snap.credits:
 		credits.append(int(num(row[1])))

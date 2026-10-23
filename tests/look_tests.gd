@@ -183,6 +183,10 @@ func test_screens() -> void:
 	g.open_room(g.rooms_offered()[0])
 	screen._refresh(false)
 	await look("HQ after a sale")
+	# The longest node name, selected: its panel stays on the screen.
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_standard_operating_procedures", true, false) as Button).pressed.emit()
+	await look("Standard Operating Procedures selected")
 
 	# I13: the deep end's Farms tab, every farm owned and upgraded.
 	var deep := Game.new()

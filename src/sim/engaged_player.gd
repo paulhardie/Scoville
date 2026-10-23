@@ -24,6 +24,10 @@ var decide_every := 1.0
 const PAYBACK_MAX := 3600.0
 ## Minutes of income a slot for an extra recipe may cost (GUESS).
 const SLOT_MINUTES := 10.0
+## Minutes of income a slot for the goal's own recipe may cost; dearer, the
+## goal's recipes take turns in the slots it has (GUESS, as IPM players switch
+## a smelter between bars).
+const GOAL_SLOT_MINUTES := 30.0
 ## IPM's guide (Upgrade Strategy): unlock a new planet once every planet is at
 ## Mining 12, its level 11 here. GUESS that its players follow it.
 const NEXT_FARM_LEVEL := 11
@@ -43,6 +47,9 @@ const KEEP_CYCLES := 2
 const ROOM_ORDER := ["seed_vault", "fermentation_cellar", "land_office", "high_speed_cannery", "test_kitchen", "motor_pool",
 	"crate_yard", "boardroom", "cooperage", "glassworks", "tasting_room", "seed_capital", "ergonomics_lab", "night_watchman", "ad_agency"]
 
+## The North Wing nodes it takes first, in order (GUESS: to the Heat Meter).
+const BUTTON_BASICS := 4
+
 ## Whether it buys and researches (off when measuring a minute as things stand).
 var buys := true
 
@@ -52,6 +59,7 @@ var events: Array = []
 var _tap_acc := 0.0
 var _earned := []   # [seconds, cash earned so far], for its income
 var _wanted_now := {}   # what the goal still needs, for weighing farm levels
+var _goal_total := {}   # everything the goal takes, stock included, for keeping
 
 
 ## A casual phone player (GUESS, docs/FACTORY.md): 2 taps a second in
@@ -84,21 +92,25 @@ func decide(g) -> void:
 	_earned.append([now, g.stats.cash_earned])
 	while _earned.size() > 1 and _earned[0][0] < now - INCOME_WINDOW:
 		_earned.pop_front()
-	var goal := next_research(g) if buys else ""
+	# The kitchen comes first: until the Bell Plot, the vat and the line are
+	# bought, nothing is saved for research (after a sale the Tech Tree is open
+	# from the start, and saving Bell Peppers for a survey left no cash).
+	var set_up: bool = g.plots.bell.owned and not g.vats.is_empty() and not g.lines.is_empty()
+	var goal := next_research(g) if buys and set_up else ""
 	if goal != "" and g.research_node(goal):
 		_note(now, "research " + goal)
 		goal = next_research(g)
 	var need: Dictionary = g.tech_cost(goal) if goal != "" and g.research_reachable(goal) else {}
 	if buys:
-		_research_spare(g, now, goal, need)
+		_research_spare(g, now, goal, need, _kitchen_node(g))
 		_use_crossbreeds(g)
 	var wanted := _wanted(g, need)
 	if g.fx.stockpile:
 		g.set_pin(goal if not need.is_empty() else "")
 	var plan := _plan_slots(g, wanted)
-	_assign(g, plan)
+	_assign(g, plan, wanted)
 	# The kitchen's nodes are paid in its bottles (D052): it keeps them for
-	# the cheapest it can reach, as the player before v0.7 did.
+	# the one it's after (_kitchen_node).
 	var keep := need.duplicate()
 	var kitchen := _kitchen_node(g)
 	if kitchen != "":
@@ -130,9 +142,16 @@ func next_research(g) -> String:
 	return best if best != "" else (survey if g.data.tech.has(survey) and not g.is_researched(survey) else "")
 
 
-## The cheapest node it can reach that is paid only in the kitchen's mash and
-## bottles, or "".
+## The node it can reach that is paid only in the kitchen's mash and bottles,
+## or "": Standard Operating Procedures once it can, then the button's basics
+## (N1–N4, in order), since it taps; otherwise the cheapest.
 func _kitchen_node(g) -> String:
+	# After a sale, Standard Operating Procedures (and the Van it needs) before
+	# anything (GUESS: it researches the rest for free).
+	if g.account.prestiges > 0 and not g.is_researched("standard_operating_procedures"):
+		for node in ["delivery_van", "standard_operating_procedures"]:
+			if g.research_reachable(node):
+				return node
 	var best := ""
 	for node in g.data.tech_order:
 		if not g.research_reachable(node):
@@ -141,20 +160,41 @@ func _kitchen_node(g) -> String:
 		var kitchen_only := not cost.is_empty()
 		for item in cost:
 			kitchen_only = kitchen_only and g.data.recipes.has(item) and g.data.recipes[item].get("kitchen", false)
-		if kitchen_only and (best == "" or g.tech_cost_value(node) < g.tech_cost_value(best)):
+		if not kitchen_only:
+			continue
+		var north: bool = g.data.tech[node].wing == "north" and _label_n(g, node) <= BUTTON_BASICS
+		var best_north: bool = best != "" and g.data.tech[best].wing == "north" and _label_n(g, best) <= BUTTON_BASICS
+		if best == "" or north and not best_north:
 			best = node
+		elif north == best_north:
+			var before: bool = _label_n(g, node) < _label_n(g, best) if north else g.tech_cost_value(node) < g.tech_cost_value(best)
+			if before:
+				best = node
 	return best
 
 
-## Other nodes it can afford without touching what the goal needs.
-func _research_spare(g, now: float, goal: String, need: Dictionary) -> void:
+## A node's number on the web (N4 → 4).
+static func _label_n(g, node: String) -> int:
+	return int(g.data.tech[node].label.substr(1)) if node != "" else 0
+
+
+## Other nodes it can afford without touching what the goal or the kitchen
+## node needs (the kitchen node itself, once its cost is in stock).
+func _research_spare(g, now: float, goal: String, need: Dictionary, kitchen: String) -> void:
+	# Saved for: the goal's cost and the kitchen node's.
+	var held := need.duplicate()
+	if kitchen != "":
+		var kc: Dictionary = g.tech_cost(kitchen)
+		for item in kc:
+			held[item] = held.get(item, 0) + kc[item]
 	for node in g.data.tech_order:
 		if node == goal or not g.can_research(node):
 			continue
 		var cost: Dictionary = g.tech_cost(node)
 		var clash := false
 		for item in cost:
-			if need.has(item) and g.stock[item] - cost[item] < need[item]:
+			var hold: int = held.get(item, 0) - (cost[item] if node == kitchen else 0)
+			if g.stock[item] - cost[item] < hold:
 				clash = true
 		if not clash and g.research_node(node):
 			_note(now, "research " + node)
@@ -201,6 +241,7 @@ func _wanted(g, need: Dictionary) -> Dictionary:
 		var inputs: Dictionary = g.recipe_inputs(next)
 		for input in inputs:
 			total[input] = total.get(input, 0) + short * inputs[input]
+	_goal_total = total
 	var out := {}
 	for item in total:
 		if total[item] > g.stock[item]:
@@ -272,18 +313,31 @@ func _grows(g, crop: String) -> bool:
 
 ## Assigns each owned slot its planned recipe, if it owns the recipe; a slot
 ## past the plan, or on a recipe it doesn't own yet, is left as it is.
-func _assign(g, plan: Dictionary) -> void:
+func _assign(g, plan: Dictionary, wanted: Dictionary) -> void:
 	for station in ["vat", "line"]:
-		var picks: Array = plan[station]
-		var used := 0
-		for i in g.slots(station).size():
+		var n: int = g.slots(station).size()
+		# What the slots should run: the kitchen's recipe in the first, the
+		# plan's others in as many slots as there are after it.
+		var picks: Array = plan[station].filter(func(r): return g.data.recipes[r].kitchen).slice(0, 1) \
+			+ plan[station].filter(func(r): return not g.data.recipes[r].kitchen).slice(0, n - 1)
+		# A slot mid-cycle on a recipe the plan still wants keeps it: switching
+		# hands its inputs back, and two goal recipes would take turns forever.
+		var kept := {}
+		for i in n:
+			var s: Dictionary = g.slots(station)[i]
+			if s.running and (s.recipe in picks or wanted.has(s.recipe)):
+				kept[i] = true
+				picks.erase(s.recipe)
+		# Each other slot takes the first pick it can run.
+		for i in n:
+			if kept.has(i):
+				continue
 			var want := ""
-			while used < picks.size():
-				var r: String = picks[used]
-				used += 1
+			for r in picks:
 				if g.recipe_unlocked(r) and r in g.recipes_for(station, i):
 					want = r
 					break
+			picks.erase(want)
 			if want != "" and g.slots(station)[i].recipe != want:
 				g.assign(station, i, want)
 		# Pressure Cookers on the first vats after the kitchen's.
@@ -297,6 +351,9 @@ func _assign(g, plan: Dictionary) -> void:
 ## running recipe's inputs and the goal's cost (D041: crops sell raw too).
 func _sell(g, now: float, plan: Dictionary, need: Dictionary) -> void:
 	var keep := need.duplicate()
+	# Everything the goal takes, all the way down, stays until it's used.
+	for item in _goal_total:
+		keep[item] = maxi(keep.get(item, 0), _goal_total[item])
 	for station in ["vat", "line"]:
 		for i in g.slots(station).size():
 			var r: String = g.slots(station)[i].recipe
@@ -417,12 +474,14 @@ func _needs(g, plan: Dictionary, wanted: Dictionary) -> Array:
 	# which runs only in the first slot (D052).
 	for station in ["vat", "line"]:
 		var n: int = g.slots(station).size()
-		var rest: Array = plan[station].slice(n).filter(func(x): return not g.data.recipes[x].kitchen)
-		if n == 0 or rest.is_empty() or not g.slot_offered(station):
+		# The first slot is the kitchen's; the others run the rest of the plan.
+		var rest: Array = plan[station].filter(func(x): return not g.data.recipes[x].kitchen)
+		if n == 0 or rest.size() < n or not g.slot_offered(station):
 			continue
-		var r: String = rest[0]
+		var r: String = rest[n - 1]
 		var cheap: bool = g.slot_price(station) <= income() * 60.0 * SLOT_MINUTES
-		if wanted.has(r) or cheap and _can_feed(g, r):
+		var affordable: bool = g.slot_price(station) <= income() * 60.0 * GOAL_SLOT_MINUTES
+		if wanted.has(r) and affordable or cheap and _can_feed(g, r):
 			if not g.recipe_unlocked(r):
 				out.append({"name": "buy recipe " + r, "cost": g.recipe_price(r), "buy": g.buy_recipe.bind(r)})
 			out.append({"name": "buy %s %d (%s)" % [station, n + 1, r], "cost": g.slot_price(station), "buy": g.buy_slot.bind(station)})

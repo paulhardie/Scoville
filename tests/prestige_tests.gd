@@ -56,15 +56,17 @@ func test_selling_threshold() -> void:
 
 func test_credits() -> void:
 	# Idle Planet Miner's table (D035): 10, 30, 60 at $10M, $100M, $1B, straight
-	# lines between, rounded.
-	for c in [[1e7, 10], [1.25e7, 11], [1.75e7, 12], [1e8, 30], [5.5e8, 45], [1e9, 60], [1e10, 101]]:
+	# lines between, × CREDIT_SCALE (PR 3's T9), rounded.
+	var k: float = T.CREDIT_SCALE
+	for c in [[1e7, 10.0], [1.25e7, 10.0 + 20.0 / 36.0], [1.75e7, 10.0 + 20.0 / 12.0], [1e8, 30.0], [5.5e8, 45.0], [1e9, 60.0], [1e10, 101.0]]:
 		var got: int = worth(c[0]).prestige_credits()
-		check(got == c[1], "Q2: %d credits at $%.0f (got %d)" % [c[1], c[0], got])
+		check(got == roundi(c[1] * k), "Q2: %d credits at $%.0f, IPM's %.2f × %.0f (got %d)" % [roundi(c[1] * k), c[0], c[1], k, got])
+	check(worth(1e7).prestige_credits() == 50, "Q2/T9: the first sale pays 50 credits (got %d)" % worth(1e7).prestige_credits())
 	var lounge := worth(1e8, {"boardroom": 1})
-	check(lounge.prestige_credits() == 35, "Q2: the Boardroom (IPM's Lounge) ×1.15, rounded: 30 × 1.15 = 34.5 → 35 (got %d)" % lounge.prestige_credits())
+	check(lounge.prestige_credits() == roundi(30.0 * k * 1.15), "Q2: the Boardroom (IPM's Lounge) ×1.15, rounded (got %d)" % lounge.prestige_credits())
 	var g := worth(1e8)
 	g.prestige()
-	check(g.account.credits == 30 and g.account.prestiges == 1, "Q2: the sale pays them into the account")
+	check(g.account.credits == roundi(30.0 * k) and g.account.prestiges == 1, "Q2: the sale pays them into the account")
 
 
 func test_reset_scope() -> void:
@@ -162,7 +164,7 @@ func test_room_effects() -> void:
 	check(glass.recipe_inputs("pickled_brine").vinegar == 1000, "Q6: Glassworks leaves vats alone")
 	var lab := worth(0.0, {"ergonomics_lab": 1})
 	research(lab, "calloused_thumbs")
-	check(lab.tap_yield() == 4, "Q6: Ergonomics Lab Lv1 with Calloused Thumbs: 3 × 1.25 rounds to 4 (got %d)" % lab.tap_yield())
+	check(lab.tap_yield() == 11, "Q6: Ergonomics Lab Lv1 with Calloused Thumbs: 9 × 1.25 rounds to 11 (got %d)" % lab.tap_yield())
 	var amounts := []
 	for lv in range(1, 6):
 		amounts.append(worth(0.0, {"seed_capital": lv}).start_cash())
@@ -260,7 +262,7 @@ static func sold(nodes: Array, sauce: String = "") -> Game:
 
 ## Nodes Standard Operating Procedures would research now.
 static func under_bar(g: Game) -> Array:
-	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
+	var bar: float = g.sop_bar()
 	var out := []
 	for id in g.data.tech_order:
 		if g.data.tech[id].excludes.is_empty() and g.research_reachable(id) and g.tech_cost_value(id) < bar:
@@ -288,7 +290,7 @@ func test_after_sale_gate() -> void:
 func test_sop() -> void:
 	var nodes := ["standard_operating_procedures", "pantry_vinegar_concentrate"]
 	var g := sold(nodes, "island_heat")
-	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
+	var bar: float = g.sop_bar()
 	check(bar > 0.0, "Q12: a running Island Heat line sets a bar ($%.0f)" % bar)
 	var due := under_bar(g)
 	var waiting := []
@@ -302,6 +304,10 @@ func test_sop() -> void:
 			var parents_due := true
 			for need in g.data.tech[id].needs:
 				parents_due = parents_due and (g.is_researched(need) or due.has(need))
+			# IPM's "any of": one of them researched or due.
+			var any: Array = g.data.tech[id].needs_any
+			if not any.is_empty():
+				parents_due = parents_due and any.any(func(n): return g.is_researched(n) or due.has(n))
 			if parents_due:
 				later.append(id)
 	var forks := ["pantry_vinegar_bulk", "pantry_vinegar_reserve"]

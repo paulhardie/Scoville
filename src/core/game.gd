@@ -530,13 +530,14 @@ func can_buy_recipe(recipe: String) -> bool:
 	return data.recipes.has(recipe) and not recipe_unlocked(recipe) and cash >= recipe_price(recipe)
 
 
-## Recipes a slot can run now, in data order: kitchen recipes only in the
-## first vat and line (D052).
+## Recipes a slot can run now, in data order. The first vat and line are the
+## kitchen's and run only its recipes, which run nowhere else (D052; PR 3's
+## T4 keeps the kitchen making Table Mild all run, for the Tech Tree).
 func recipes_for(station: String, index: int = 0) -> Array:
 	var out := []
 	for id in data.recipes:
 		var r: Dictionary = data.recipes[id]
-		if r.station == station and recipe_unlocked(id) and (index == 0 or not r.kitchen):
+		if r.station == station and recipe_unlocked(id) and (index == 0) == r.kitchen:
 			out.append(id)
 	return out
 
@@ -692,11 +693,14 @@ func default_keep(item: String) -> int:
 	return fx.default_keep[item]
 
 
-## Sauces that can be made now, for the Market Ticker.
+## Sauces that can be made now, for the Market Ticker: every unlocked line
+## recipe, whichever slot runs it (since T4 the kitchen's line runs only its own).
 func unlocked_bottles() -> Array:
 	var out := []
-	for r in recipes_for("line"):
-		out.append(data.recipes[r].output)
+	for id in data.recipes:
+		var r: Dictionary = data.recipes[id]
+		if r.station == "line" and recipe_unlocked(id):
+			out.append(r.output)
 	return out
 
 
@@ -1048,12 +1052,17 @@ func scarcest_cost(node: String) -> Array:
 	return out
 
 
+## What a node may cost and still research itself under Standard Operating
+## Procedures: SOP_SHARE of the run's Operation Value (PR 3's T5).
+func sop_bar() -> float:
+	return T.SOP_SHARE * operation_value()
+
+
 ## Standard Operating Procedures (D034): nodes the player could research whose
 ## cost is under the bar research themselves, free, in file order (D040: a
-## cost under 1% of an hour's bottles is too small to charge). Forks are the
-## player's choice.
+## cost that small is too small to charge). Forks are the player's choice.
 func _sop() -> void:
-	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * bottle_rate()
+	var bar := sop_bar()
 	var due := []
 	for node in data.tech_order:
 		if data.tech[node].excludes.is_empty() and research_reachable(node) and tech_cost_value(node) < bar:
@@ -1210,12 +1219,13 @@ func prestige_credits() -> int:
 	var ov := operation_value()
 	if ov < T.PRESTIGE_OV - EPSILON:
 		return 0
-	# Idle Planet Miner's table: straight from one decade's credits to the next.
+	# Idle Planet Miner's table, × CREDIT_SCALE (T9): straight from one
+	# decade's credits to the next.
 	var decade := floori(log(ov / T.PRESTIGE_OV) / log(10.0) + 1e-9)
 	var low: float = T.PRESTIGE_OV * pow(10.0, decade)
 	var share := clampf((ov - low) / (9.0 * low), 0.0, 1.0)
 	var credits := _credits_at(decade) + share * (_credits_at(decade + 1) - _credits_at(decade))
-	return roundi(credits * hq("credits"))
+	return roundi(credits * T.CREDIT_SCALE * hq("credits"))
 
 
 ## Credits at PRESTIGE_OV × 10^decade (Idle Planet Miner's table, D035).

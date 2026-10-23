@@ -2,26 +2,28 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6d, layout step 1, the second run, D036–D047 (PRs #1–#22): Cargo (D043), the dashboard from the first launch (D044), bottling feel (D045), the return card's waiting sauce (D046) and the pixel-art skin (D047).
+Merged: v0.1–v0.6d, layout step 1, the second run, D036–D048 (PRs #1–#23), the last being Idle Planet Miner's opening ladder (Poblano $520, Jalapeño $1,700).
 
-This branch is **the early-game pass on Idle Planet Miner's opening ladder (D048, W28–W30)**, as the owner asked:
-- **Poblano Plot $520 (was $800), Jalapeño Plot $1,700 (was $1,900)**, rates unchanged. Idle Planet Miner's first planets go $200, $500, $1,250, $5,000, ×2–4 a step; ours went ×16 from Bell to Poblano, then left a gap after the Jalapeño Plot.
-- **A7 PASS:** the casual player's second plot at 3:18 (was 3:54). **A8 PASS:** ×3.3, paybacks 5:12 and 8:30. **A4 PASS:** 6:19 (was 6:31, W29 closed).
-- **A fourth starting plot was tried and dropped:** a Serrano Plot at $5,000 never got bought early, and cheaper ones paid back in under 4 minutes.
-- **Also restored:** D046's entry in DECISIONS.md and the W31 backlog row, which #22 merged without (its code and OFFLINE.md criteria did merge), and the #21 review's doc fixes, pushed after #21 merged.
+This branch is **v0.7 PR 1: the Idle Planet Miner skeleton, mapped (D049–D053).** Docs only, no game code. The owner asked to bring Idle Planet Miner's progression in whole and tweak from there, with more peppers by Scoville and fictional ones past Pepper Y, and took the agent's three recommendations: farms grow mixes of crops (D050), IPM's recipe graph with the brief's names on the closest slots (D051), and the kitchen stays as the tutorial (D052).
 
-**Results:** every suite passes except **E6** (9 against 10, W30); the headless boot is clean. $520 was picked over $500 after $500 failed X3 by 0.05 points: said in D048. No UI code changed.
+- [`docs/SKELETON.md`](SKELETON.md): the full mapping. 28 peppers (D053), 79 farms, 29 mashes plus the four ingredient mashes, 48 sauces, 25 Land Surveys, 30 adopted Tech Tree nodes, 10 vats and 10 lines, 15 HQ rooms. Also what's left out and what of ours stays, criteria I1–I14, the criteria retired before measuring, and everything assumed.
+- [`docs/ipm_snapshot.json`](ipm_snapshot.json): the wiki's numbers as data, read 2026-10-23. `tools/ipm/` fetches the pages, parses them and rebuilds SKELETON.md's tables (and a `mapping.json` that PR 2 can turn into `data/*.json`).
+- Backlog: G21–G25 (assumed IPM gaps, our own node costs, names, a trademark check), W34 (PR 2), W35 (PR 3), W36 (IPM left out for now).
+- Roadmap: v0.7 is the skeleton; the Shift Roster moves to v0.8 and the Cook-Off to v0.9.
+
+Tests and the headless boot run on this branch unchanged (no code touched); E6 still fails as on `main` (W30).
 
 ## Open decisions
 
-- **W30, E6:** prices can't fix it. Line 1's price moves it in a step with the casual player's tapping bursts, so either E6 or E3 fails. Recommend retiring E6: the dashboard's ring now walks the player to the line (D044), and the crate still bottles what's there at 10× speed. Or lower its bar to 9. CI stays red until this is settled.
-- **W31:** the first sale at about 2:00 (D035) or about an hour. Recommend an early sale at about $400K for 5 credits if the hour stands.
-- **W8, the kit:** keep the free wood kit, buy the full pack (ember), or commission UI art; W32 integer stretch, W33 who draws the art.
-- Still open: W27 fermentation, W21 late growth, W24 a floor for repeat runs, layout step 3 (W22).
+- **Look over SKELETON.md before PR 2,** above all the assumed rows: farm names, the new pepper picks, Heat Death, rooms in IPM's fixed order instead of a random draft, Operation Value counted as Galaxy Value, recipes bought with cash.
+- **W30, E6:** still open from #23. Recommend retiring E6.
+- **W31** (the first sale at about 2:00 or about an hour) meets I6, which keeps 2:00–2:30. Say now if the hour stands, and I6 changes before PR 2 measures.
+- Still open: W8 and W32–W33 (the look), W27 fermentation, W21, W24 (I9 now proposes a 60% floor), W22.
 
 ## Next
 
-1. The owner settles E6 (W30), then merges this PR.
-2. Fermentation (W27), W31 or layout step 3, whichever the owner picks.
+1. The owner reads SKELETON.md and merges PR 1 (or says what to change).
+2. PR 2 (W34): build the copy, measure I1–I14, report every FAIL with a backlog row.
+3. PR 3 (W35): the tweaks.
 
-Touches: `data/plots.json` (Poblano, Jalapeño prices), `tests/pacing_tests.gd` (A7), `tests/factory_tests.gd` (A8), docs (ECONOMY v0.6f, D046 restored, D048, backlog). Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27, W30–W33, G1, G12–G20.
+Touches: docs only (SKELETON.md new, ipm_snapshot.json new, DECISIONS D049–D053, BACKLOG, ROADMAP, INGREDIENTS note, AGENTS.md layout and sources), plus `tools/ipm/`. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27, W30–W36, G1, G12–G14, G16–G25.

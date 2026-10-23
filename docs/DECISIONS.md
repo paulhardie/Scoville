@@ -316,3 +316,33 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** the second plot felt slow (W28) because it was one ×16 step from the Bell Plot, and A4 failed by a second (W29) because nothing new came between the Jalapeño Plot and the Ancho vat. A cheaper Poblano brings the casual player's second plot to 3:18 (A7), and a Jalapeño ×3.3 above it lands mid-gap, so A4 passes at 6:19. A Serrano Plot from the start was tried as Idle Planet Miner's fourth planet and dropped: the pacing player never afforded it early, and any price it could afford paid back in under 4 minutes. **$520 rather than $500 was picked after a result:** $500 failed X3 by 0.05 points from an unusual 2:30 state. E6 (W30) can't be met by prices: Line 1's price trades it against E3.
 
+
+## D049: Copy Idle Planet Miner's skeleton whole, then tweak
+
+**Decision (the owner's):** Idle Planet Miner's progression comes into the game whole: its ores, planets, upgrades, telescopes, bars and alloys, items, recipe prices, smelters and crafters, the projects that fit, rooms, Galaxy Value and the sale, mapped to peppers, farms, mashes, sauces, vats, lines and HQ ([SKELETON.md](SKELETON.md)). In three pull requests: the mapping and criteria (docs only), the copy as it stands with its results reported honestly, then a tweak pass. Systems with no counterpart here (asteroids, rovers, colonies, the station, surges, dark matter, paid ships, IPM's markets) are left out; managers wait for the Shift Roster, now v0.8.
+
+**Why:** the owner judged it easier to copy the skeleton entirely and tweak once it's in than to keep borrowing pieces (D035, D041, D043, D048 each took one). The agent flagged that a whole copy makes the game read as a reskin of Idle Planet Miner in its numbers; the tweak pass is where it becomes ours. Main never holds a half-converted economy: PR 2 lands whole.
+
+## D050: Farms grow a mix of crops, as planets mine a mix of ores
+
+**Decision (the owner's, on the agent's recommendation):** plots become farms, each growing several peppers in IPM's planet shares (farm 2 is 80% Bell Pepper, 20% Pimento), with IPM's three upgrades: Harvest Rate, Truck Speed and Truck Cargo, on its formulas and its price ÷ 20 × 1.3^level curve. Yield per Cycle goes. A truck makes round trips of 2 × distance ÷ speed, assumed (G21).
+
+**Why:** IPM's planet table only works this way: a new ore arrives as a small share on one planet, grows to a majority on the next, then gets a pure planet, so each step mixes the new with the known. One crop per plot can't copy it. **The cost:** a bigger change to the Farms screen and saves, and more crops in stock at once.
+
+## D051: IPM's recipe graph, with the brief's names on the closest slots
+
+**Decision (the owner's, on the agent's recommendation):** mashes and sauces take IPM's bars', alloys' and items' recipes, values, times and cash unlock prices. Mashes take 1,000 crops as bars take 1,000 ore. The brief's mash and sauce names (Verde Mash, Bistro Verde, Classic Louisiana, Phantom Smokehouse…) go on the slot closest to their old recipe. The four ingredients keep their stations (D024) and each goes into two sauces as an extra input at about 10% of the inputs, the sauce's value rising by the same share. Recipes are bought with cash, not Culinary Blueprints.
+
+**Why:** IPM's chains already do what the brief's pillar 3 asks (higher alloys take lower bars), and copying the graph keeps its markups and pacing intact. **This departs from the brief's recipes (§3) and from D029's one-pepper-one-sauce rule,** by the owner's word. Bottles still pay for research through the Land Surveys and the Tech Tree.
+
+## D052: The kitchen stays as the tutorial
+
+**Decision (the owner's, on the agent's recommendation):** the first minutes don't take IPM's batch sizes. The Blank Button, the Bell Plot ($50, one Bell Pepper a second: IPM's Balor at four times the rate), Sweet Pepper Mash (10 Bell Peppers), Table Mild, the Starter Crate and the first vat ($150) and line ($100) stay as they are. Kitchen recipes run only in the kitchen vat and line; IPM's ratios apply from Bell Pepper Purée (1,000 Bell Peppers) on.
+
+**Why:** copied straight, the first mash would take 1,000 Bell Peppers, over an hour at IPM's 0.25 a second, and the button and Starter Crate would mean nothing. Keeping the kitchen to its own vat and line stops it out-earning the factory: it tops out at 1.25 Bell Peppers a second into Table Mild.
+
+## D053: 28 peppers by Scoville, fictional past Pepper Y
+
+**Decision (the owner's):** one pepper for each of IPM's 28 ores, ordered by heat on PepperScale's list, generic names only (D042). Real peppers run Bell Pepper to Pepper Y (21 rungs, adding Pimento, Cascabel, Hungarian Wax, Chile de Árbol, Pequin, Fatalii, Trinidad 7 Pot and Naga Morich); the fictional seven past it are D023's six and Heat Death. Every pepper we grow keeps its id; values move to their new rung's ore (Jalapeño becomes Aluminium's $17). ([SKELETON.md](SKELETON.md#the-pepper-ladder-d053))
+
+**Why:** the owner asked for more peppers tiered by Scoville and a deep endgame of made-up ones. The ladder of 13 (D042) left 15 ores with no pepper. Trinidad 7 Pot, which D042 dropped as overlapping, comes back because there are now rungs to fill. Apollo (3,000,000 SHU) is left out so Pepper Y stays the last real-world rung.

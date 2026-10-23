@@ -1,0 +1,6010 @@
+{
+ "source": "Idle Planet Miner Wiki (idle-planet-miner.fandom.com), CC BY-SA, read 2026-10-23 through the MediaWiki API",
+ "ores": [
+  {
+   "name": "Copper",
+   "value": "1"
+  },
+  {
+   "name": "Iron",
+   "value": "2"
+  },
+  {
+   "name": "Lead",
+   "value": "4"
+  },
+  {
+   "name": "Silicon",
+   "value": "8"
+  },
+  {
+   "name": "Aluminum",
+   "value": "17"
+  },
+  {
+   "name": "Silver",
+   "value": "36"
+  },
+  {
+   "name": "Gold",
+   "value": "75"
+  },
+  {
+   "name": "Diamond",
+   "value": "160"
+  },
+  {
+   "name": "Platinum",
+   "value": "340"
+  },
+  {
+   "name": "Titanium",
+   "value": "730"
+  },
+  {
+   "name": "Iridium",
+   "value": "1.6K"
+  },
+  {
+   "name": "Palladium",
+   "value": "3.5K"
+  },
+  {
+   "name": "Osmium",
+   "value": "7.8K"
+  },
+  {
+   "name": "Rhodium",
+   "value": "17.5K"
+  },
+  {
+   "name": "Inerton",
+   "value": "40K"
+  },
+  {
+   "name": "Quadium",
+   "value": "92K"
+  },
+  {
+   "name": "Scrith",
+   "value": "215K"
+  },
+  {
+   "name": "Uru",
+   "value": "510K"
+  },
+  {
+   "name": "Vibranium",
+   "value": "1.25M"
+  },
+  {
+   "name": "Aether",
+   "value": "3.2M"
+  },
+  {
+   "name": "Viterium",
+   "value": "9M"
+  },
+  {
+   "name": "Xynium",
+   "value": "28M"
+  },
+  {
+   "name": "Quolium",
+   "value": "90M"
+  },
+  {
+   "name": "Luterium",
+   "value": "300M"
+  },
+  {
+   "name": "Wraith",
+   "value": "1.1B"
+  },
+  {
+   "name": "Aqualite",
+   "value": "4.3B"
+  },
+  {
+   "name": "Opalite",
+   "value": "18B"
+  },
+  {
+   "name": "Celestite",
+   "value": "78B"
+  }
+ ],
+ "alloys": [
+  {
+   "name": "Copper Bar",
+   "unlock": "Free",
+   "inputs": "1K Copper",
+   "time": "0:20",
+   "value": "1.45K"
+  },
+  {
+   "name": "Iron Bar",
+   "unlock": "3K",
+   "inputs": "1K Iron",
+   "time": "0:30",
+   "value": "3K"
+  },
+  {
+   "name": "Lead Bar",
+   "unlock": "9K",
+   "inputs": "1K Lead",
+   "time": "0:40",
+   "value": "6.1K"
+  },
+  {
+   "name": "Silicon Bar",
+   "unlock": "25K",
+   "inputs": "1K Silicon",
+   "time": "1:00",
+   "value": "12.5K"
+  },
+  {
+   "name": "Aluminum Bar",
+   "unlock": "75K",
+   "inputs": "1K Aluminum",
+   "time": "1:20",
+   "value": "27.6K"
+  },
+  {
+   "name": "Silver Bar",
+   "unlock": "225K",
+   "inputs": "1K Silver",
+   "time": "2:00",
+   "value": "60K"
+  },
+  {
+   "name": "Gold Bar",
+   "unlock": "500K",
+   "inputs": "1K Gold",
+   "time": "3:00",
+   "value": "120K"
+  },
+  {
+   "name": "Bronze Bar",
+   "unlock": "1M",
+   "inputs": "2 Silver Bar, 10 Copper Bar",
+   "time": "4:00",
+   "value": "234K"
+  },
+  {
+   "name": "Steel Bar",
+   "unlock": "2M",
+   "inputs": "15 Lead Bar, 30 Iron Bar",
+   "time": "8:00",
+   "value": "340K"
+  },
+  {
+   "name": "Platinum Bar",
+   "unlock": "4M",
+   "inputs": "2 Gold Bar, 1K Platinum",
+   "time": "10:00",
+   "value": "780K"
+  },
+  {
+   "name": "Titanium Bar",
+   "unlock": "8M",
+   "inputs": "2 Bronze Bar, 1K Titanium",
+   "time": "12:00",
+   "value": "1.63M"
+  },
+  {
+   "name": "Iridium Bar",
+   "unlock": "15M",
+   "inputs": "2 Steel Bar, 1K Iridium",
+   "time": "14:00",
+   "value": "3.11M"
+  },
+  {
+   "name": "Palladium Bar",
+   "unlock": "30M",
+   "inputs": "2 Platinum Bar, 1K Palladium",
+   "time": "16:00",
+   "value": "7M"
+  },
+  {
+   "name": "Osmium Bar",
+   "unlock": "60M",
+   "inputs": "2 Titanium Bar, 1K Osmium",
+   "time": "18:00",
+   "value": "14.5M"
+  },
+  {
+   "name": "Rhodium Bar",
+   "unlock": "120M",
+   "inputs": "2 Iridium bar, 1K Rhodium",
+   "time": "20:00",
+   "value": "31M"
+  },
+  {
+   "name": "Inerton Alloy",
+   "unlock": "250M",
+   "inputs": "2 Paladium Bar, 1K Inerton",
+   "time": "24:00",
+   "value": "68M"
+  },
+  {
+   "name": "Quadium Alloy",
+   "unlock": "500M",
+   "inputs": "2 Osmium Bar, 1K Quadium",
+   "time": "28:00",
+   "value": "152M"
+  },
+  {
+   "name": "Scrith Alloy",
+   "unlock": "1B",
+   "inputs": "2 Rhodium Bar, 1K Scrith",
+   "time": "32:00",
+   "value": "352M"
+  },
+  {
+   "name": "Uru Alloy",
+   "unlock": "2B",
+   "inputs": "2 Inerton Alloy, 1K Uru",
+   "time": "36:00",
+   "value": "832M"
+  },
+  {
+   "name": "Vibranium Alloy",
+   "unlock": "4B",
+   "inputs": "2 Quadium Alloy, 1K Vibranium",
+   "time": "40:00",
+   "value": "2.05B"
+  },
+  {
+   "name": "Aether Alloy",
+   "unlock": "8B",
+   "inputs": "2 Scrith Alloy, 1K Aether",
+   "time": "44:00",
+   "value": "5.12B"
+  },
+  {
+   "name": "Viterium Alloy",
+   "unlock": "16B",
+   "inputs": "2 Uru Alloy, 1k Viterium",
+   "time": "48:00",
+   "value": "15.50B"
+  },
+  {
+   "name": "Xynium Alloy",
+   "unlock": "84B",
+   "inputs": "5 Vibranium Alloy, 1500 Xynium",
+   "time": "55:00",
+   "value": "48.0B"
+  },
+  {
+   "name": "Quolium Alloy",
+   "unlock": "275B",
+   "inputs": "5 Aether Alloy, 1500 Quolium",
+   "time": "1:02:00",
+   "value": "160B"
+  },
+  {
+   "name": "Luterium Alloy",
+   "unlock": "1T",
+   "inputs": "5 Viterium Alloy, 1500 Luterium",
+   "time": "1:09:00",
+   "value": "600B"
+  },
+  {
+   "name": "Wraith Alloy",
+   "unlock": "4.2T",
+   "inputs": "5 Xynium Alloy, 1500 Wraith",
+   "time": "1:16:00",
+   "value": "2.40T"
+  },
+  {
+   "name": "Aqualite Alloy",
+   "unlock": "12T",
+   "inputs": "5 Quolium Alloy, 1500 Aqualite",
+   "time": "1:23:00",
+   "value": "17.50T"
+  },
+  {
+   "name": "Opalite Alloy",
+   "unlock": "30T",
+   "inputs": "5 Wraith Alloy, 1500 Opalite",
+   "time": "1:32:00",
+   "value": "277T"
+  },
+  {
+   "name": "Celestite Alloy",
+   "unlock": "70T",
+   "inputs": "10 Aqualite Alloy, 1500 Celestite",
+   "time": "",
+   "value": "1.2q"
+  }
+ ],
+ "items": [
+  {
+   "name": "Copper Wire",
+   "unlock": "Free",
+   "value": "10K",
+   "inputs": "5 Copper Bar",
+   "time_s": "60"
+  },
+  {
+   "name": "Iron Nails",
+   "unlock": "20K",
+   "value": "20K",
+   "inputs": "5 Iron Bar",
+   "time_s": "120"
+  },
+  {
+   "name": "Battery",
+   "unlock": "50K",
+   "value": "70K",
+   "inputs": "2 Copper Wire, 10 Copper Bar",
+   "time_s": "240"
+  },
+  {
+   "name": "Hammer",
+   "unlock": "100K",
+   "value": "135K",
+   "inputs": "2 Iron Nails, 5 Lead Bar",
+   "time_s": "480"
+  },
+  {
+   "name": "Glass",
+   "unlock": "200K",
+   "value": "220K",
+   "inputs": "10 Silicon Bar",
+   "time_s": "720"
+  },
+  {
+   "name": "Circuit",
+   "unlock": "400K",
+   "value": "620K",
+   "inputs": "5 Silicon Bar, 5 Aluminum Bar, 10 Copper Wire",
+   "time_s": "1,200"
+  },
+  {
+   "name": "Lens",
+   "unlock": "1M",
+   "value": "1.1M",
+   "inputs": "1 Glass, 5 Silver Bar",
+   "time_s": "2,400"
+  },
+  {
+   "name": "Laser",
+   "unlock": "2M",
+   "value": "3.2M",
+   "inputs": "5 Gold Bar, 1 Lens, 10 Iron Bar",
+   "time_s": "3,600"
+  },
+  {
+   "name": "Basic Computer",
+   "unlock": "5M",
+   "value": "7.60M",
+   "inputs": "5 Circuit, 5 Silver Bar",
+   "time_s": "4,800"
+  },
+  {
+   "name": "Solar Panel",
+   "unlock": "10M",
+   "value": "12.5M",
+   "inputs": "5 Circuit, 10 Glass",
+   "time_s": "6,000"
+  },
+  {
+   "name": "Laser Torch",
+   "unlock": "20M",
+   "value": "31M",
+   "inputs": "5 Bronze Bar, 2 Laser, 5 Lens",
+   "time_s": "7,200"
+  },
+  {
+   "name": "Advanced Battery",
+   "unlock": "30M",
+   "value": "35M",
+   "inputs": "20 Steel Bar, 30 Battery",
+   "time_s": "9,000"
+  },
+  {
+   "name": "Thermal Scanner",
+   "unlock": "50M",
+   "value": "71.5M",
+   "inputs": "5 Platinum Bar, 2 Laser, 5 Glass",
+   "time_s": "10,800"
+  },
+  {
+   "name": "Advanced Computer",
+   "unlock": "120M",
+   "value": "180M",
+   "inputs": "5 Titanium Bar, 5 Basic Computer",
+   "time_s": "12,600"
+  },
+  {
+   "name": "Navigation Module",
+   "unlock": "250M",
+   "value": "1B",
+   "inputs": "1 Thermal Scanner, 2 Laser Torch",
+   "time_s": "13,500"
+  },
+  {
+   "name": "Plasma Torch",
+   "unlock": "550M",
+   "value": "1.15B",
+   "inputs": "15 Iridium Bar, 5 Laser Torch",
+   "time_s": "15,000"
+  },
+  {
+   "name": "Radio Tower",
+   "unlock": "1.50B",
+   "value": "1.45B",
+   "inputs": "75 Platinum Bar, 150 Aluminum Bar, 50 Titanium Bar",
+   "time_s": "15,600"
+  },
+  {
+   "name": "Telescope",
+   "unlock": "5B",
+   "value": "2.7B",
+   "inputs": "20 Lens, 1 Advanced Computer",
+   "time_s": "16,800"
+  },
+  {
+   "name": "Satellite Dish",
+   "unlock": "17.50B",
+   "value": "3.4B",
+   "inputs": "150 Steel Bar, 30 Palladium Bar",
+   "time_s": "18,000"
+  },
+  {
+   "name": "Motor",
+   "unlock": "60B",
+   "value": "7B",
+   "inputs": "500 Bronze Bar, 200 Hammer",
+   "time_s": "19,200"
+  },
+  {
+   "name": "Accumulator",
+   "unlock": "100B",
+   "value": "12B",
+   "inputs": "20 Osmium Bar, 3 Advanced Battery",
+   "time_s": "20,400"
+  },
+  {
+   "name": "Nuclear Capsule",
+   "unlock": "200B",
+   "value": "26B",
+   "inputs": "5 Rhodium bar, 1 Plasma Torch",
+   "time_s": "21,000"
+  },
+  {
+   "name": "Wind Turbine",
+   "unlock": "500B",
+   "value": "140B",
+   "inputs": "300 Aluminum Bar, 1 Motor",
+   "time_s": "21,600"
+  },
+  {
+   "name": "Space Probe",
+   "unlock": "1T",
+   "value": "180B",
+   "inputs": "1 Satellite Dish, 1 Telescope, 25 Solar Panel",
+   "time_s": "22,200"
+  },
+  {
+   "name": "Nuclear Reactor",
+   "unlock": "2T",
+   "value": "1T",
+   "inputs": "1 Nuclear Capsule, 300 Iridium Bar",
+   "time_s": "22,800"
+  },
+  {
+   "name": "Collider",
+   "unlock": "3T",
+   "value": "2T",
+   "inputs": "500 Inerton Alloy, 100 Quadium Alloy",
+   "time_s": "23,100"
+  },
+  {
+   "name": "Gravity Chamber",
+   "unlock": "6T",
+   "value": "15T",
+   "inputs": "60 Advanced Computer, 1 Nuclear Reactor",
+   "time_s": "24,300"
+  },
+  {
+   "name": "Robot",
+   "unlock": "15T",
+   "value": "50T",
+   "inputs": "300 Scrith Alloy, 90 Accumulator",
+   "time_s": "26,000"
+  },
+  {
+   "name": "Fusion Capsule",
+   "unlock": "75T",
+   "value": "240T",
+   "inputs": "200 Uru Alloy, 100 Vibranium Alloy, 100 Nuclear Capsule",
+   "time_s": "27,000"
+  },
+  {
+   "name": "Teleporter",
+   "unlock": "500T",
+   "value": "1.8q",
+   "inputs": "250 Navigation Module,  1 Gravity Chamber",
+   "time_s": "29,000"
+  },
+  {
+   "name": "Fusion Reactor",
+   "unlock": "2.5q",
+   "value": "40q",
+   "inputs": "1 Fusion Capsule, 40 Collider, 50 Nuclear Reactor",
+   "time_s": "31,000"
+  },
+  {
+   "name": "Subspace Relay",
+   "unlock": "15q",
+   "value": "1Q",
+   "inputs": "70 Space Probe, 100 Satellite Dish, 1 Teleporter",
+   "time_s": "32,300"
+  },
+  {
+   "name": "Advanced Robot",
+   "unlock": "142.00q",
+   "value": "29.5Q",
+   "inputs": "100 Robot, 5 Fusion Reactor",
+   "time_s": "62,300"
+  },
+  {
+   "name": "Advanced Teleporter",
+   "unlock": "1.49Q",
+   "value": "650Q",
+   "inputs": "5 Subspace Relay, 100 Teleporters, 1000 Xynium Alloy",
+   "time_s": "115,200"
+  },
+  {
+   "name": "Quantum CPU",
+   "unlock": "20.00Q",
+   "value": "14s",
+   "inputs": "4 Advanced Robots, 500 Quolium Alloy",
+   "time_s": "120,000"
+  },
+  {
+   "name": "Deflector Shield",
+   "unlock": "270.00Q",
+   "value": "320s",
+   "inputs": "4 Advanced Teleporters, 400 Luterium Alloy",
+   "time_s": "125,000"
+  },
+  {
+   "name": "Warp Core",
+   "unlock": "3.65s",
+   "value": "6.80 S",
+   "inputs": "160 Wind Turbine, 40 Fusion Reactor, 4 Quantum CPU",
+   "time_s": "180,000s (50h)"
+  },
+  {
+   "name": "Deep Space Scanner",
+   "unlock": "49.30s",
+   "value": "145 S",
+   "inputs": "250 Advanced Battery, 1000 Aqualite Alloy, 4 Deflector Shield",
+   "time_s": "188,000"
+  },
+  {
+   "name": "Antimatter Cell",
+   "unlock": "665.00s",
+   "value": "3.2 O",
+   "inputs": "50 Nuclear Reactor, 10k Palladium Bar, 4 Warp Core",
+   "time_s": "194,000"
+  },
+  {
+   "name": "Atmospheric Processor",
+   "unlock": "500 S",
+   "value": "68 O",
+   "inputs": "10k Iridium Bar, 4 Deep Space Scanner, 15 Quantum CPU",
+   "time_s": "244,000"
+  },
+  {
+   "name": "Orbital Dock",
+   "unlock": "100 O",
+   "value": "2.8 N",
+   "inputs": "6k Wraith Alloy, 4 Antimatter Cell, 10 Warp Core",
+   "time_s": "399,000"
+  },
+  {
+   "name": "Solar Collector",
+   "unlock": "100 O",
+   "value": "2.8 N",
+   "inputs": "1000 Solar Panel, 20 Deflector Shield, 132 Deep Space Scanner",
+   "time_s": "399,000"
+  },
+  {
+   "name": "Phase Gate",
+   "unlock": "50 N",
+   "value": "452 N",
+   "inputs": "100 Deep Space Scanner, 350 Advanced Teleporter, 1 Orbital Dock",
+   "time_s": "699,000"
+  },
+  {
+   "name": "Neural Matrix",
+   "unlock": "50 N",
+   "value": "452 N",
+   "inputs": "20 AntiMatter Cell, 1 Solar Collector, 16k Osmium Bar",
+   "time_s": "699,000"
+  },
+  {
+   "name": "Stellar Capacitor",
+   "unlock": "80 D",
+   "value": "probably 500 D",
+   "inputs": "9 Atmospheric Processor, 3 Phase Gate, 15.12k Opalite Alloy (with epic Incubation suit -10% craft cost)",
+   "time_s": "19,976,068"
+  },
+  {
+   "name": "Plasma Conduit",
+   "unlock": "80 D",
+   "value": "probably 500 D",
+   "inputs": "9 Atmospheric Processor, 3 Phase Gate, 15.12k Celestite Alloy (with epic Incubation suit -10% craft cost)",
+   "time_s": "19,976,068"
+  },
+  {
+   "name": "Graviton Lance",
+   "unlock": "80 D",
+   "value": "probably 500 D",
+   "inputs": "9 Atmospheric Processor, 3 Neural Matrix, 15.12k Opalite Alloy (with epic Incubation suit -10% craft cost)",
+   "time_s": "19,976,068"
+  },
+  {
+   "name": "System Regulator",
+   "unlock": "80 D",
+   "value": "probably 500 D",
+   "inputs": "9 Atmospheric Processor, 3 Neural Matrix, 15.12k Celestite Alloy (with epic Incubation suit -10% craft cost)",
+   "time_s": "19,976,068"
+  }
+ ],
+ "planets": [
+  {
+   "n": 1,
+   "name": "Balor",
+   "price": "100",
+   "telescope": "Default",
+   "ores": [
+    [
+     "Copper",
+     "100"
+    ]
+   ],
+   "distance": "10"
+  },
+  {
+   "n": 2,
+   "name": "Drasta",
+   "price": "200",
+   "telescope": "Default",
+   "ores": [
+    [
+     "Copper",
+     "80"
+    ],
+    [
+     "Iron",
+     "20"
+    ]
+   ],
+   "distance": "12"
+  },
+  {
+   "n": 3,
+   "name": "Anadius",
+   "price": "500",
+   "telescope": "Default",
+   "ores": [
+    [
+     "Copper",
+     "50"
+    ],
+    [
+     "Iron",
+     "50"
+    ]
+   ],
+   "distance": "14"
+  },
+  {
+   "n": 4,
+   "name": "Dholen",
+   "price": "1.25K",
+   "telescope": "Default",
+   "ores": [
+    [
+     "Iron",
+     "80"
+    ],
+    [
+     "Lead",
+     "20"
+    ]
+   ],
+   "distance": "15"
+  },
+  {
+   "n": 5,
+   "name": "Verr",
+   "price": "5K",
+   "telescope": "1",
+   "ores": [
+    [
+     "Lead",
+     "50"
+    ],
+    [
+     "Iron",
+     "30"
+    ],
+    [
+     "Copper",
+     "20"
+    ]
+   ],
+   "distance": "16"
+  },
+  {
+   "n": 6,
+   "name": "Newton",
+   "price": "9K",
+   "telescope": "1",
+   "ores": [
+    [
+     "Lead",
+     "100"
+    ]
+   ],
+   "distance": "18"
+  },
+  {
+   "n": 7,
+   "name": "Widow",
+   "price": "15K",
+   "telescope": "1",
+   "ores": [
+    [
+     "Iron",
+     "40"
+    ],
+    [
+     "Copper",
+     "40"
+    ],
+    [
+     "Silica",
+     "20"
+    ]
+   ],
+   "distance": "20"
+  },
+  {
+   "n": 8,
+   "name": "Acheron",
+   "price": "25K",
+   "telescope": "2",
+   "ores": [
+    [
+     "Silica",
+     "60"
+    ],
+    [
+     "Copper",
+     "40"
+    ]
+   ],
+   "distance": "22"
+  },
+  {
+   "n": 9,
+   "name": "Yangtze",
+   "price": "40K",
+   "telescope": "2",
+   "ores": [
+    [
+     "Silica",
+     "80"
+    ],
+    [
+     "Aluminium",
+     "20"
+    ]
+   ],
+   "distance": "23"
+  },
+  {
+   "n": 10,
+   "name": "Solveig",
+   "price": "75K",
+   "telescope": "2",
+   "ores": [
+    [
+     "Aluminium",
+     "50"
+    ],
+    [
+     "Silica",
+     "30"
+    ],
+    [
+     "Lead",
+     "20"
+    ]
+   ],
+   "distance": "25"
+  },
+  {
+   "n": 11,
+   "name": "Imir",
+   "price": "150K",
+   "telescope": "3",
+   "ores": [
+    [
+     "Aluminium",
+     "100"
+    ]
+   ],
+   "distance": "26"
+  },
+  {
+   "n": 12,
+   "name": "Relic",
+   "price": "250K",
+   "telescope": "3",
+   "ores": [
+    [
+     "Lead",
+     "45"
+    ],
+    [
+     "Silica",
+     "35"
+    ],
+    [
+     "Silver",
+     "20"
+    ]
+   ],
+   "distance": "28"
+  },
+  {
+   "n": 13,
+   "name": "Nith",
+   "price": "400K",
+   "telescope": "3",
+   "ores": [
+    [
+     "Silver",
+     "80"
+    ],
+    [
+     "Aluminium",
+     "20"
+    ]
+   ],
+   "distance": "30"
+  },
+  {
+   "n": 14,
+   "name": "Batalla",
+   "price": "800K",
+   "telescope": "4",
+   "ores": [
+    [
+     "Copper",
+     "40"
+    ],
+    [
+     "Iron",
+     "40"
+    ],
+    [
+     "Gold",
+     "20"
+    ]
+   ],
+   "distance": "33"
+  },
+  {
+   "n": 15,
+   "name": "Micah",
+   "price": "1.5M",
+   "telescope": "4",
+   "ores": [
+    [
+     "Gold",
+     "50"
+    ],
+    [
+     "Silver",
+     "50"
+    ]
+   ],
+   "distance": "35"
+  },
+  {
+   "n": 16,
+   "name": "Pranas",
+   "price": "3.0M",
+   "telescope": "4",
+   "ores": [
+    [
+     "Gold",
+     "100"
+    ]
+   ],
+   "distance": "37"
+  },
+  {
+   "n": 17,
+   "name": "Castellus",
+   "price": "6M",
+   "telescope": "5",
+   "ores": [
+    [
+     "Aluminium",
+     "40"
+    ],
+    [
+     "Silica",
+     "35"
+    ],
+    [
+     "Diamond",
+     "25"
+    ]
+   ],
+   "distance": "40"
+  },
+  {
+   "n": 18,
+   "name": "Gorgon",
+   "price": "12M",
+   "telescope": "5",
+   "ores": [
+    [
+     "Diamond",
+     "80"
+    ],
+    [
+     "Lead",
+     "20"
+    ]
+   ],
+   "distance": "43"
+  },
+  {
+   "n": 19,
+   "name": "Parnitha",
+   "price": "25M",
+   "telescope": "5",
+   "ores": [
+    [
+     "Gold",
+     "70"
+    ],
+    [
+     "Platinum",
+     "30"
+    ]
+   ],
+   "distance": "45"
+  },
+  {
+   "n": 20,
+   "name": "Orisoni",
+   "price": "50M",
+   "telescope": "6",
+   "ores": [
+    [
+     "Platinum",
+     "70"
+    ],
+    [
+     "Diamond",
+     "30"
+    ]
+   ],
+   "distance": "48"
+  },
+  {
+   "n": 21,
+   "name": "Theseus",
+   "price": "100M",
+   "telescope": "6",
+   "ores": [
+    [
+     "Platinum",
+     "100"
+    ]
+   ],
+   "distance": "51"
+  },
+  {
+   "n": 22,
+   "name": "Zelene",
+   "price": "200M",
+   "telescope": "6",
+   "ores": [
+    [
+     "Silver",
+     "70"
+    ],
+    [
+     "Titanium",
+     "30"
+    ]
+   ],
+   "distance": "54"
+  },
+  {
+   "n": 23,
+   "name": "Han",
+   "price": "400M",
+   "telescope": "7",
+   "ores": [
+    [
+     "Titanium",
+     "70"
+    ],
+    [
+     "Diamond",
+     "20"
+    ],
+    [
+     "Gold",
+     "10"
+    ]
+   ],
+   "distance": "57"
+  },
+  {
+   "n": 24,
+   "name": "Strennus",
+   "price": "800M",
+   "telescope": "7",
+   "ores": [
+    [
+     "Titanium",
+     "70"
+    ],
+    [
+     "Platinum",
+     "30"
+    ]
+   ],
+   "distance": "58"
+  },
+  {
+   "n": 25,
+   "name": "Osun",
+   "price": "1.6B",
+   "telescope": "7",
+   "ores": [
+    [
+     "Aluminium",
+     "60"
+    ],
+    [
+     "Iridium",
+     "40"
+    ]
+   ],
+   "distance": "60"
+  },
+  {
+   "n": 26,
+   "name": "Ploitari",
+   "price": "3.2B",
+   "telescope": "8",
+   "ores": [
+    [
+     "Iridium",
+     "50"
+    ],
+    [
+     "Diamond",
+     "50"
+    ]
+   ],
+   "distance": "63"
+  },
+  {
+   "n": 27,
+   "name": "Elysta",
+   "price": "6.4B",
+   "telescope": "8",
+   "ores": [
+    [
+     "Iridium",
+     "100"
+    ]
+   ],
+   "distance": "67"
+  },
+  {
+   "n": 28,
+   "name": "Tikkun",
+   "price": "12.5B",
+   "telescope": "8",
+   "ores": [
+    [
+     "Iridium",
+     "40"
+    ],
+    [
+     "Titanium",
+     "35"
+    ],
+    [
+     "Palladium",
+     "25"
+    ]
+   ],
+   "distance": "70"
+  },
+  {
+   "n": 29,
+   "name": "Satent",
+   "price": "25B",
+   "telescope": "9",
+   "ores": [
+    [
+     "Palladium",
+     "60"
+    ],
+    [
+     "Titanium",
+     "40"
+    ]
+   ],
+   "distance": "72"
+  },
+  {
+   "n": 30,
+   "name": "Urla Rast",
+   "price": "50B",
+   "telescope": "9",
+   "ores": [
+    [
+     "Palladium",
+     "90"
+    ],
+    [
+     "Diamond",
+     "10"
+    ]
+   ],
+   "distance": "73"
+  },
+  {
+   "n": 31,
+   "name": "Vular",
+   "price": "100B",
+   "telescope": "9",
+   "ores": [
+    [
+     "Palladium",
+     "70"
+    ],
+    [
+     "Osmium",
+     "30"
+    ]
+   ],
+   "distance": "75"
+  },
+  {
+   "n": 32,
+   "name": "Nibiru",
+   "price": "250B",
+   "telescope": "10",
+   "ores": [
+    [
+     "Osmium",
+     "60"
+    ],
+    [
+     "Iridium",
+     "40"
+    ]
+   ],
+   "distance": "76"
+  },
+  {
+   "n": 33,
+   "name": "Xena",
+   "price": "600B",
+   "telescope": "10",
+   "ores": [
+    [
+     "Osmium",
+     "100"
+    ]
+   ],
+   "distance": "78"
+  },
+  {
+   "n": 34,
+   "name": "Rupert",
+   "price": "1.5T",
+   "telescope": "10",
+   "ores": [
+    [
+     "Palladium",
+     "55"
+    ],
+    [
+     "Osmium",
+     "30"
+    ],
+    [
+     "Rhodium",
+     "15"
+    ]
+   ],
+   "distance": "78"
+  },
+  {
+   "n": 35,
+   "name": "Pax",
+   "price": "4T",
+   "telescope": "11",
+   "ores": [
+    [
+     "Rhodium",
+     "50"
+    ],
+    [
+     "Platinum",
+     "50"
+    ]
+   ],
+   "distance": "80"
+  },
+  {
+   "n": 36,
+   "name": "Ivyra",
+   "price": "10T",
+   "telescope": "11",
+   "ores": [
+    [
+     "Rhodium",
+     "100"
+    ]
+   ],
+   "distance": "81"
+  },
+  {
+   "n": 37,
+   "name": "Utritis",
+   "price": "25T",
+   "telescope": "11",
+   "ores": [
+    [
+     "Rhodium",
+     "75"
+    ],
+    [
+     "Inerton",
+     "25"
+    ]
+   ],
+   "distance": "82"
+  },
+  {
+   "n": 38,
+   "name": "Dosie",
+   "price": "62T",
+   "telescope": "12",
+   "ores": [
+    [
+     "Inerton",
+     "50"
+    ],
+    [
+     "Osmium",
+     "50"
+    ]
+   ],
+   "distance": "84"
+  },
+  {
+   "n": 39,
+   "name": "Zulu",
+   "price": "160T",
+   "telescope": "12",
+   "ores": [
+    [
+     "Inerton",
+     "100"
+    ]
+   ],
+   "distance": "84"
+  },
+  {
+   "n": 40,
+   "name": "Unicae",
+   "price": "400T",
+   "telescope": "12",
+   "ores": [
+    [
+     "Inerton",
+     "80"
+    ],
+    [
+     "Quadium",
+     "20"
+    ]
+   ],
+   "distance": "85"
+  },
+  {
+   "n": 41,
+   "name": "Dune",
+   "price": "1q",
+   "telescope": "13",
+   "ores": [
+    [
+     "Osmium",
+     "60"
+    ],
+    [
+     "Quadium",
+     "40"
+    ]
+   ],
+   "distance": "87"
+  },
+  {
+   "n": 42,
+   "name": "Naraka",
+   "price": "2.50q",
+   "telescope": "13",
+   "ores": [
+    [
+     "Quadium",
+     "100"
+    ]
+   ],
+   "distance": "88"
+  },
+  {
+   "n": 43,
+   "name": "Daedalus",
+   "price": "6.20q",
+   "telescope": "13",
+   "ores": [
+    [
+     "Quadium",
+     "60"
+    ],
+    [
+     "Inerton",
+     "25"
+    ],
+    [
+     "Scrith",
+     "15"
+    ]
+   ],
+   "distance": "89"
+  },
+  {
+   "n": 44,
+   "name": "Clovis",
+   "price": "15q",
+   "telescope": "14",
+   "ores": [
+    [
+     "Scrith",
+     "50"
+    ],
+    [
+     "Quadium",
+     "50"
+    ]
+   ],
+   "distance": "91"
+  },
+  {
+   "n": 45,
+   "name": "Zero",
+   "price": "40q",
+   "telescope": "14",
+   "ores": [
+    [
+     "Scrith",
+     "100"
+    ]
+   ],
+   "distance": "92"
+  },
+  {
+   "n": 46,
+   "name": "Sotomi",
+   "price": "100q",
+   "telescope": "14",
+   "ores": [
+    [
+     "Scrith",
+     "75"
+    ],
+    [
+     "Uru",
+     "25"
+    ]
+   ],
+   "distance": "92"
+  },
+  {
+   "n": 47,
+   "name": "Remidian",
+   "price": "250q",
+   "telescope": "15",
+   "ores": [
+    [
+     "Uru",
+     "60"
+    ],
+    [
+     "Quadium",
+     "40"
+    ]
+   ],
+   "distance": "93"
+  },
+  {
+   "n": 48,
+   "name": "Muse",
+   "price": "600q",
+   "telescope": "15",
+   "ores": [
+    [
+     "Uru",
+     "100"
+    ]
+   ],
+   "distance": "95"
+  },
+  {
+   "n": 49,
+   "name": "Arabis",
+   "price": "1.50Q",
+   "telescope": "15",
+   "ores": [
+    [
+     "Uru",
+     "50"
+    ],
+    [
+     "Vibranium",
+     "50"
+    ]
+   ],
+   "distance": "97"
+  },
+  {
+   "n": 50,
+   "name": "Vesna",
+   "price": "3.80Q",
+   "telescope": "16",
+   "ores": [
+    [
+     "Vibranium",
+     "60"
+    ],
+    [
+     "Scrith",
+     "40"
+    ]
+   ],
+   "distance": "100"
+  },
+  {
+   "n": 51,
+   "name": "Chandra",
+   "price": "10.00Q",
+   "telescope": "16",
+   "ores": [
+    [
+     "Vibranium",
+     "100"
+    ]
+   ],
+   "distance": "102"
+  },
+  {
+   "n": 52,
+   "name": "Vega",
+   "price": "25.00Q",
+   "telescope": "16",
+   "ores": [
+    [
+     "Vibranium",
+     "70"
+    ],
+    [
+     "Aether",
+     "20"
+    ],
+    [
+     "Rhodium",
+     "10"
+    ]
+   ],
+   "distance": "103"
+  },
+  {
+   "n": 53,
+   "name": "Crius",
+   "price": "60.00Q",
+   "telescope": "17",
+   "ores": [
+    [
+     "Aether",
+     "50"
+    ],
+    [
+     "Scrith",
+     "50"
+    ]
+   ],
+   "distance": "105"
+  },
+  {
+   "n": 54,
+   "name": "Singhana",
+   "price": "150.00Q",
+   "telescope": "17",
+   "ores": [
+    [
+     "Aether",
+     "100"
+    ]
+   ],
+   "distance": "107"
+  },
+  {
+   "n": 55,
+   "name": "Zumbia",
+   "price": "360.00Q",
+   "telescope": "17",
+   "ores": [
+    [
+     "Aether",
+     "70"
+    ],
+    [
+     "Vibranium",
+     "20"
+    ],
+    [
+     "Viterium",
+     "10"
+    ]
+   ],
+   "distance": "108"
+  },
+  {
+   "n": 56,
+   "name": "Elysium",
+   "price": "900.00Q",
+   "telescope": "18",
+   "ores": [
+    [
+     "Viterium",
+     "60"
+    ],
+    [
+     "Uru",
+     "40"
+    ]
+   ],
+   "distance": "109"
+  },
+  {
+   "n": 57,
+   "name": "Nyota",
+   "price": "2.60s",
+   "telescope": "18",
+   "ores": [
+    [
+     "Viterium",
+     "100"
+    ]
+   ],
+   "distance": "110"
+  },
+  {
+   "n": 58,
+   "name": "Doral",
+   "price": "7.50s",
+   "telescope": "18",
+   "ores": [
+    [
+     "Viterium",
+     "40"
+    ],
+    [
+     "Aether",
+     "40"
+    ],
+    [
+     "Xynium",
+     "20"
+    ]
+   ],
+   "distance": "112"
+  },
+  {
+   "n": 59,
+   "name": "Nikara",
+   "price": "21.00s",
+   "telescope": "19",
+   "ores": [
+    [
+     "Xynium",
+     "70"
+    ],
+    [
+     "Vibranium",
+     "30"
+    ]
+   ],
+   "distance": "114"
+  },
+  {
+   "n": 60,
+   "name": "Limbo",
+   "price": "59.00s",
+   "telescope": "19",
+   "ores": [
+    [
+     "Xynium",
+     "100"
+    ]
+   ],
+   "distance": "115"
+  },
+  {
+   "n": 61,
+   "name": "Bob",
+   "price": "170.00s",
+   "telescope": "19",
+   "ores": [
+    [
+     "Xynium",
+     "70"
+    ],
+    [
+     "Quolium",
+     "30"
+    ]
+   ],
+   "distance": "116"
+  },
+  {
+   "n": 62,
+   "name": "Midas",
+   "price": "460.00s",
+   "telescope": "20",
+   "ores": [
+    [
+     "Quolium",
+     "55"
+    ],
+    [
+     "Aether",
+     "45"
+    ]
+   ],
+   "distance": "118"
+  },
+  {
+   "n": 63,
+   "name": "Antigone",
+   "price": "1.30S",
+   "telescope": "20",
+   "ores": [
+    [
+     "Quolium",
+     "100"
+    ]
+   ],
+   "distance": "120"
+  },
+  {
+   "n": 64,
+   "name": "Hecate",
+   "price": "3.90S",
+   "telescope": "20",
+   "ores": [
+    [
+     "Quolium",
+     "50"
+    ],
+    [
+     "Xynium",
+     "25"
+    ],
+    [
+     "Luterium",
+     "25"
+    ]
+   ],
+   "distance": "122"
+  },
+  {
+   "n": 65,
+   "name": "Sterop",
+   "price": "11.00S",
+   "telescope": "21",
+   "ores": [
+    [
+     "Luterium",
+     "60"
+    ],
+    [
+     "Quolium",
+     "20"
+    ],
+    [
+     "Viterium",
+     "17*"
+    ]
+   ],
+   "distance": "124"
+  },
+  {
+   "n": 66,
+   "name": "Lavinia",
+   "price": "33.00S",
+   "telescope": "21",
+   "ores": [
+    [
+     "Luterium",
+     "100"
+    ]
+   ],
+   "distance": "125"
+  },
+  {
+   "n": 67,
+   "name": "Ren",
+   "price": "95.00S",
+   "telescope": "21",
+   "ores": [
+    [
+     "Luterium",
+     "70"
+    ],
+    [
+     "Quolium",
+     "20"
+    ],
+    [
+     "Wraith",
+     "10"
+    ]
+   ],
+   "distance": "127"
+  },
+  {
+   "n": 68,
+   "name": "Gorgons",
+   "price": "270.00S",
+   "telescope": "22",
+   "ores": [
+    [
+     "Wraith",
+     "60"
+    ],
+    [
+     "Xynium",
+     "40"
+    ]
+   ],
+   "distance": "129"
+  },
+  {
+   "n": 69,
+   "name": "Pontus",
+   "price": "800.00S",
+   "telescope": "22",
+   "ores": [
+    [
+     "Wraith",
+     "80"
+    ],
+    [
+     "Luterium",
+     "20"
+    ]
+   ],
+   "distance": "131"
+  },
+  {
+   "n": 70,
+   "name": "Leto",
+   "price": "2.40 O",
+   "telescope": "22",
+   "ores": [
+    [
+     "Wraith",
+     "100"
+    ]
+   ],
+   "distance": "134"
+  },
+  {
+   "n": 71,
+   "name": "Laconia",
+   "price": "6.92 O",
+   "telescope": "23",
+   "ores": [
+    [
+     "Wraith",
+     "40"
+    ],
+    [
+     "Luterium",
+     "40"
+    ],
+    [
+     "Aqualite",
+     "20"
+    ]
+   ],
+   "distance": "Unknown"
+  },
+  {
+   "n": 72,
+   "name": "Awohali",
+   "price": "20.80 O",
+   "telescope": "23",
+   "ores": [
+    [
+     "Aqualite",
+     "70"
+    ],
+    [
+     "Quolium",
+     "30"
+    ]
+   ],
+   "distance": "Unknown"
+  },
+  {
+   "n": 73,
+   "name": "Pegasi",
+   "price": "62.30 O",
+   "telescope": "23",
+   "ores": [
+    [
+     "Aqualite",
+     "100"
+    ]
+   ],
+   "distance": "Unknown"
+  },
+  {
+   "n": 74,
+   "name": "Typhon",
+   "price": "178 O",
+   "telescope": "24",
+   "ores": [
+    [
+     "Aqualite",
+     "60"
+    ],
+    [
+     "Opalite",
+     "40"
+    ]
+   ],
+   "distance": "Unknown"
+  },
+  {
+   "n": 75,
+   "name": "Surtur",
+   "price": "516 O",
+   "telescope": "24",
+   "ores": [
+    [
+     "Opalite",
+     "70"
+    ],
+    [
+     "Wraith",
+     "30"
+    ]
+   ],
+   "distance": "Unknown"
+  },
+  {
+   "n": 76,
+   "name": "Vesta",
+   "price": "1.81 N",
+   "telescope": "24",
+   "ores": [
+    [
+     "Opalite",
+     "100"
+    ]
+   ],
+   "distance": "Unknown"
+  },
+  {
+   "n": 77,
+   "name": "Jolrael",
+   "price": "",
+   "telescope": "25",
+   "ores": [
+    [
+     "",
+     ""
+    ]
+   ],
+   "distance": ""
+  },
+  {
+   "n": 78,
+   "name": "Hyperion",
+   "price": "",
+   "telescope": "25",
+   "ores": [
+    [
+     "",
+     ""
+    ]
+   ],
+   "distance": ""
+  },
+  {
+   "n": 79,
+   "name": "Astrea",
+   "price": "",
+   "telescope": "25",
+   "ores": [
+    [
+     "",
+     ""
+    ]
+   ],
+   "distance": ""
+  }
+ ],
+ "projects": [
+  {
+   "name": "Management",
+   "cost": "400 Copper, 50 Iron",
+   "text": "Hire and assign managers to planets",
+   "needs": "Prerequisite for Telescope 1, Colonization",
+   "note": ""
+  },
+  {
+   "name": "Asteroid Miner",
+   "cost": "400 Copper, 100 Iron",
+   "text": "Ability to mine asteroids for ore",
+   "needs": "Prerequisite for Rover, Smelter",
+   "note": ""
+  },
+  {
+   "name": "Telescope 1",
+   "cost": "1.5K Iron, 5 Copper Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Management",
+   "note": "Prerequisite for Beacon"
+  },
+  {
+   "name": "Telescope 2",
+   "cost": "10 Lead Bar, 500 Silicon",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 1",
+   "note": "Prerequisite for Resource Details"
+  },
+  {
+   "name": "Telescope 3",
+   "cost": "10 Iron Nail, 15 Silicon Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 2",
+   "note": "Prerequisite for Asteroid Refined Drilling"
+  },
+  {
+   "name": "Telescope 4",
+   "cost": "5 Hammer, 20 Aluminum Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 3",
+   "note": "Prerequisite for Cargo Logistics, Alchemy"
+  },
+  {
+   "name": "Telescope 5",
+   "cost": "3 Circuit, 10 Gold Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 4",
+   "note": "Prerequisite for Rover Advanced Logistics"
+  },
+  {
+   "name": "Telescope 6",
+   "cost": "3 Laser, 25 Bronze Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 5",
+   "note": "Prerequisite for Manager Training"
+  },
+  {
+   "name": "Telescope 7",
+   "cost": "3 Solar Panel, 20 Platinum Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 6",
+   "note": ""
+  },
+  {
+   "name": "Telescope 8",
+   "cost": "3 Laser Torch, 10 Titanium Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 7",
+   "note": ""
+  },
+  {
+   "name": "Telescope 9",
+   "cost": "3 Advanced Battery, 10 Iridium Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 8",
+   "note": ""
+  },
+  {
+   "name": "Telescope 10",
+   "cost": "3 Thermal Scanner, 10 Palladium Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 9",
+   "note": ""
+  },
+  {
+   "name": "Telescope 11",
+   "cost": "3 Advanced Computer, 10 Osmium Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 10",
+   "note": ""
+  },
+  {
+   "name": "Telescope 12",
+   "cost": "3 Navigation Module, 10 Rhodium Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 11",
+   "note": ""
+  },
+  {
+   "name": "Telescope 13",
+   "cost": "3 Radio Tower, 10 Inerton Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 12",
+   "note": ""
+  },
+  {
+   "name": "Telescope 14",
+   "cost": "3 Satellite Dish, 10 Quadium Bar",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 13",
+   "note": ""
+  },
+  {
+   "name": "Telescope 15",
+   "cost": "5 Motor, 10 Scrith Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 14",
+   "note": ""
+  },
+  {
+   "name": "Telescope 16",
+   "cost": "3 Accumulator, 10 Uru Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 15",
+   "note": ""
+  },
+  {
+   "name": "Telescope 17",
+   "cost": "3 Nuclear Capsule, 10 Vibranium Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 16",
+   "note": ""
+  },
+  {
+   "name": "Telescope 18",
+   "cost": "4 Wind Turbine, 10 Aether Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 17",
+   "note": ""
+  },
+  {
+   "name": "Telescope 19",
+   "cost": "4 Nuclear Reactor, 12 Viterium Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 18",
+   "note": ""
+  },
+  {
+   "name": "Telescope 20",
+   "cost": "5 Collider, 15 Xynium Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 19",
+   "note": ""
+  },
+  {
+   "name": "Telescope 21",
+   "cost": "5 Gravity Chamber, 20 Quolium Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 20",
+   "note": ""
+  },
+  {
+   "name": "Telescope 22",
+   "cost": "6 Robot, 24 Luterium Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 21",
+   "note": ""
+  },
+  {
+   "name": "Telescope 23",
+   "cost": "6 Fusion Capsules, 30 Wraith Alloy",
+   "text": "Extends vision to 3 more planets",
+   "needs": "Telescope 22",
+   "note": ""
+  },
+  {
+   "name": "Beacon",
+   "cost": "15 Iron Bar",
+   "text": "Constructs a beacon that provides bonuses to clusters of planets",
+   "needs": "Telescope 1",
+   "note": ""
+  },
+  {
+   "name": "Resource Details",
+   "cost": "3 Battery",
+   "text": "Adds a detail panel with resource stats. Accessed from resource panel",
+   "needs": "Telescope 2",
+   "note": ""
+  },
+  {
+   "name": "Bottleneck Optimizations",
+   "cost": "5 Titanium Bar, 25 Platinum Bar, 50 Steel Bar",
+   "text": "Adds red/green lights to planet panel; red on shipping/cargo means planet counts as backlogging",
+   "needs": "Resource Details",
+   "note": ""
+  },
+  {
+   "name": "Cargo Logistics",
+   "cost": "10 Aluminum Bar, 3 Circuit",
+   "text": "Ability to prioritize which ore to pick up first, even if it isn't the most valuable",
+   "needs": "Telescope 4",
+   "note": ""
+  },
+  {
+   "name": "Ore Targeting",
+   "cost": "100 Hammer, 50 Battery",
+   "text": "Prioritized ore on each planet receives +15% yield bonus",
+   "needs": "Cargo Logistics",
+   "note": ""
+  },
+  {
+   "name": "Advanced Ore Targeting",
+   "cost": "100 Basic Computer, 15 Thermal Scanner",
+   "text": "Prioritized ore on each planet receives +30% yield bonus",
+   "needs": "Ore Targeting",
+   "note": "Does not stack with Ore Targeting - net planet output is 130% instead of 115%"
+  },
+  {
+   "name": "Alchemy",
+   "cost": "50 Gold Bar, 6 Lens",
+   "text": "Convert an ore on a planet to an ore worth 1 level higher",
+   "needs": "Telescope 4",
+   "note": "Upon researching, you immediately pick a planet to upgrade."
+  },
+  {
+   "name": "Advanced Alchemy",
+   "cost": "50k Silver Ore, 25k Titanium Ore, 6 Basic Computer",
+   "text": "Convert an ore on a planet to an ore worth 2 levels higher",
+   "needs": "Alchemy",
+   "note": "Cannot upgrade a previously-upgraded planet."
+  },
+  {
+   "name": "Superior Alchemy",
+   "cost": "400 Palladium Bar, 200 Osmium Bar, 5 Advanced Computer",
+   "text": "Convert an ore on a planet to an ore worth 3 levels higher",
+   "needs": "Advanced Alchemy",
+   "note": ""
+  },
+  {
+   "name": "Asteroid Refined Drilling",
+   "cost": "40 Silicon Bar, 80 Lead Bar",
+   "text": "10% chance of an asteroid containing 20x normal value worth of alloy",
+   "needs": "Telescope 3",
+   "note": "Pink asteroids give smelted alloys, not raw ore."
+  },
+  {
+   "name": "Asteroid Harvester",
+   "cost": "400 Iron Bar, 5 Circuit",
+   "text": "All asteroids value x1.3",
+   "needs": "Asteroid Refined Drilling",
+   "note": ""
+  },
+  {
+   "name": "Advanced Asteroid Harvester",
+   "cost": "1 Space Probe, 50 Plasma Torch",
+   "text": "All asteroids value x1.3 (multiplicative with Asteroid Harvester)",
+   "needs": "Asteroid Harvester",
+   "note": ""
+  },
+  {
+   "name": "Superior Asteroid Harvester",
+   "cost": "10 Nuclear Reactor, 300 Scrith Alloy, 600 Inerton Alloy",
+   "text": "All asteroids value x1.3 (multiplicative with Advanced Asteroid Harvester)",
+   "needs": "Advanced Asteroid Harvester",
+   "note": ""
+  },
+  {
+   "name": "Debris Scanner",
+   "cost": "1 Collider, 8 Gravity Chamber",
+   "text": "Allows discovery of debris fields that provide valuable items",
+   "needs": "Superior Asteroid Harvester",
+   "note": "Debris gives crafted items, not raw ore/alloys."
+  },
+  {
+   "name": "Debris Harvester",
+   "cost": "250 Uru Alloy, 1200 Quadium Alloy",
+   "text": "All debris value x1.3",
+   "needs": "Debris Scanner",
+   "note": ""
+  },
+  {
+   "name": "Advanced Debris Harvester",
+   "cost": "250 Vibranium Alloy, 1200 Scrith Alloy",
+   "text": "All debris value x1.3 (multiplicative with Debris Harvester)",
+   "needs": "Debris Harvester",
+   "note": ""
+  },
+  {
+   "name": "Superior Debris Harvester",
+   "cost": "300 Viterium Alloy, 1400 Aether Alloy",
+   "text": "All debris value x1.3 (multiplicative with previous upgrades)",
+   "needs": "Advanced Debris Harvester",
+   "note": ""
+  },
+  {
+   "name": "Asteroid Auto Miner",
+   "cost": "20 Advanced Computer, 100 Solar Panel",
+   "text": "Automatically mine asteroids, even while idle",
+   "needs": "Asteroid Harvester",
+   "note": "Also will auto-mine while you are active"
+  },
+  {
+   "name": "Asteroid Scanner",
+   "cost": "30 Thermal Scanner, 5 Navigation Module",
+   "text": "Frequency of asteroids increased by 30%",
+   "needs": "Asteroid Harvester",
+   "note": ""
+  },
+  {
+   "name": "Advanced Asteroid Scanner",
+   "cost": "150 Telescope",
+   "text": "Frequency of asteroids increased by 30% (60% total timer reduction  to spawn)",
+   "needs": "Asteroid Scanner",
+   "note": ""
+  },
+  {
+   "name": "Market Insight",
+   "cost": "20 Silver Bar, 10 Hammer",
+   "text": "Ability for forecast upcoming market changes",
+   "needs": "Telescope 4",
+   "note": ""
+  },
+  {
+   "name": "Inside Trader",
+   "cost": "25 Steel Bar, 10 Lens",
+   "text": "+15% chance of positive market fluctuations on future changes",
+   "needs": "Market Insight",
+   "note": ""
+  },
+  {
+   "name": "Market Manipulation",
+   "cost": "30k Diamond, 15k Gold Bar, 10 Basic Computer",
+   "text": "Chance of x4 positive market",
+   "needs": "Inside Trader",
+   "note": ""
+  },
+  {
+   "name": "Advanced Market Manipulation",
+   "cost": "100 Quadium Alloy, 10 Advanced Computer, 5 Telescope",
+   "text": "Chance of x5 positive market",
+   "needs": "Market Manipulation",
+   "note": ""
+  },
+  {
+   "name": "Market Accelerator",
+   "cost": "400 Iridium Bar, 1 Motor",
+   "text": "Ability to replace the current market with the following one, once every 8 hours",
+   "needs": "Inside Trader",
+   "note": ""
+  },
+  {
+   "name": "Advanced Market Accelerator",
+   "cost": "115 Inerton Alloy, 1 Gravity Chamber",
+   "text": "Ability to replace the current market with the following one a second time every 8 hours",
+   "needs": "Market Accelerator",
+   "note": ""
+  },
+  {
+   "name": "Rover Advanced Logistics",
+   "cost": "20 Bronze Bar, 20 Battery, 10 Lens",
+   "text": "Unlocks an additional mission choice for new scans",
+   "needs": "Telescope 5",
+   "note": ""
+  },
+  {
+   "name": "Rover Scanning Module",
+   "cost": "100 Aluminum Bar, 1 Basic Computer",
+   "text": "+5% chance of rovers finding all rewards",
+   "needs": "Rover Advanced Logistics",
+   "note": ""
+  },
+  {
+   "name": "Rover Resupply",
+   "cost": "6 Platinum Bar, 1 Laser Torch, 1 Solar Panel",
+   "text": "Planets being scanned by a rover receive x2.5 bonus to mining speed, ship speed, and cargo",
+   "needs": "Rover Advanced Logistics",
+   "note": ""
+  },
+  {
+   "name": "Advanced Rover Resupply",
+   "cost": "10 Advanced Battery, 6 Plasma Torch, 25 Rhodium Bar",
+   "text": "Planets being scanned by a rover receive x5 bonus instead of x2.5",
+   "needs": "Rover Resupply",
+   "note": ""
+  },
+  {
+   "name": "Manager Training",
+   "cost": "1 Laser Torch, 50 Steel Bar",
+   "text": "All manager benefits x1.10",
+   "needs": "Telescope 6",
+   "note": ""
+  },
+  {
+   "name": "Contract Manager",
+   "cost": "25 Titanium Bar, 20 Circuit, 20 Basic Computer",
+   "text": "Increases manager slots by 1",
+   "needs": "Manager Training",
+   "note": ""
+  },
+  {
+   "name": "Advanced Contract Manager",
+   "cost": "10 Advanced Computer, 10 Thermal Scanner",
+   "text": "Increases manager slots by 1",
+   "needs": "Contract Manager",
+   "note": ""
+  },
+  {
+   "name": "Advanced Manager Training",
+   "cost": "2 Advanced Computer, 10 Advanced Battery",
+   "text": "All manager benefits x1.10",
+   "needs": "Manager Training",
+   "note": ""
+  },
+  {
+   "name": "Superior Manager Training",
+   "cost": "200 Rhodium Bar",
+   "text": "All manager benefits x1.10",
+   "needs": "Advanced Manager Training",
+   "note": ""
+  },
+  {
+   "name": "Specialist University",
+   "cost": "300 Inerton Alloy, 3 Motor",
+   "text": "All manager secondary benefits x1.05",
+   "needs": "Advanced Manager Training",
+   "note": ""
+  },
+  {
+   "name": "Advanced Specialist University",
+   "cost": "2 Accumulator, 100 Scrith Alloy",
+   "text": "All manager secondary benefits x1.05",
+   "needs": "Specialist University",
+   "note": "Stacks with previous project"
+  },
+  {
+   "name": "Superior Specialist University",
+   "cost": "800 Viterium Alloy",
+   "text": "All manager secondary benefits x1.05",
+   "needs": "Advanced Specialist University",
+   "note": "Stacks with previous projects"
+  },
+  {
+   "name": "Leader",
+   "cost": "60 Rhodium Bar, 5 Navigation Module",
+   "text": "Ability to elect a leader among the managers. Leader bonuses x2",
+   "needs": "Advanced Manager Training",
+   "note": ""
+  },
+  {
+   "name": "Advanced Leader",
+   "cost": "200 Scrith Alloy, 10 Telescope, 10 Motor",
+   "text": "All leader bonuses x3",
+   "needs": "Leader",
+   "note": ""
+  },
+  {
+   "name": "Senior Leader",
+   "cost": "10 Robot",
+   "text": "Ability to elect a second Leader among 5+ star managers",
+   "needs": "Advanced Leader",
+   "note": ""
+  },
+  {
+   "name": "Superior Leader",
+   "cost": "50 Collider, 20 Gravity Chamber, 200 Quolium Alloy",
+   "text": "All leader bonuses x4",
+   "needs": "Senior Leader",
+   "note": ""
+  },
+  {
+   "name": "Colonization",
+   "cost": "20 Copper Bar, 10 Iron Bar",
+   "text": "Complete planet requests to colonize them and earn bonuses",
+   "needs": "Management",
+   "note": "Bonuses are Mining, Speed, and Cargo Multipliers"
+  },
+  {
+   "name": "Colonization Scouting",
+   "cost": "15 Iron Nail",
+   "text": "Increases max colonization tasks available from 3 to 4",
+   "needs": "Colonization",
+   "note": ""
+  },
+  {
+   "name": "Colonization Advanced Scouting",
+   "cost": "60 Silver Bar",
+   "text": "Increases max colonization tasks available from 4 to 5",
+   "needs": "Colonization Scouting",
+   "note": ""
+  },
+  {
+   "name": "Colonization Superior Scouting",
+   "cost": "50K Diamond",
+   "text": "Increases max colonization tasks available from 5 to 6",
+   "needs": "Colonization Advanced Scouting",
+   "note": ""
+  },
+  {
+   "name": "Colonization Efficiency",
+   "cost": "15 Silver Bar, 10 Hammer",
+   "text": "Colonization costs 20% less resources",
+   "needs": "Colonization",
+   "note": ""
+  },
+  {
+   "name": "Colony Renegotiation",
+   "cost": "100 Bronze Bar, 400 Hammer",
+   "text": "Allows you to renegotiate colonization requests of planets",
+   "needs": "Colonization Efficiency",
+   "note": ""
+  },
+  {
+   "name": "Colonization Advanced Efficiency",
+   "cost": "40 Steel Bar, 10 Laser",
+   "text": "Colonization costs 20% less resources",
+   "needs": "Colonization Efficiency",
+   "note": ""
+  },
+  {
+   "name": "Colonization Superior Efficiency",
+   "cost": "50 Palladium Bar, 15 Laser Torch",
+   "text": "Colonization costs 20% less resources",
+   "needs": "Colonization Advanced Efficiency",
+   "note": ""
+  },
+  {
+   "name": "Terraforming",
+   "cost": "20K Diamond, 10 Thermal Scanner",
+   "text": "Increases one purchased planet's colonization level by 2 instantly",
+   "needs": "Colonization Advanced Efficiency",
+   "note": ""
+  },
+  {
+   "name": "Advanced Terraforming",
+   "cost": "10 Satellite",
+   "text": "Increases one purchased planet's colonization level by 3 instantly",
+   "needs": "Terraforming",
+   "note": ""
+  },
+  {
+   "name": "Colony Tax Incentives",
+   "cost": "60 Aluminum Bar",
+   "text": "Planet upgrades reduced by 5% per colony level (mine, speed, cargo)",
+   "needs": "Colonization Scouting OR Colonization Efficiency",
+   "note": ""
+  },
+  {
+   "name": "Colony Advanced Tax Incentives",
+   "cost": "60 Bronze Bar",
+   "text": "Planet upgrades reduced by 5% more per colony level (mine, speed, cargo)",
+   "needs": "Colony Tax Incentives",
+   "note": ""
+  },
+  {
+   "name": "Colony Superior Tax Incentives",
+   "cost": "60 Palladium Bar",
+   "text": "Planet upgrades reduced by 5% more per colony level (mine, speed, cargo)",
+   "needs": "Colony Advanced Tax Incentives",
+   "note": ""
+  },
+  {
+   "name": "Rover",
+   "cost": "10 Copper Wire",
+   "text": "Ability to scan planets for valuable items",
+   "needs": "Asteroid Miner",
+   "note": "Finds dark matter, boosts, and occasionally resource stars and managers."
+  },
+  {
+   "name": "Advanced Mining",
+   "cost": "5 Battery, 20 Aluminum Bar",
+   "text": "All planet mine rates x 1.25",
+   "needs": "Rover",
+   "note": ""
+  },
+  {
+   "name": "Advanced Thrusters",
+   "cost": "2 Glass, 10 Gold Bar",
+   "text": "All ship speeds x 1.25",
+   "needs": "Advanced Mining",
+   "note": ""
+  },
+  {
+   "name": "Advanced Cargo Handling",
+   "cost": "5 Hammer, 25 Silver Bar",
+   "text": "All ship cargo x 1.25",
+   "needs": "Advanced Mining",
+   "note": ""
+  },
+  {
+   "name": "Superior Mining",
+   "cost": "10 Laser Torch, 25 Platinum Bar",
+   "text": "All planet mine rates x 1.25",
+   "needs": "Advanced Thrusters OR Advanced Cargo Handling",
+   "note": "Additive with Advanced, or actually only x1.2"
+  },
+  {
+   "name": "Superior Thrusters",
+   "cost": "4 Advanced Battery",
+   "text": "All ship speeds x 1.25",
+   "needs": "Superior Mining",
+   "note": "Additive with Advanced, or actually only x1.2"
+  },
+  {
+   "name": "Superior Cargo Handling",
+   "cost": "50 Titanium Bar",
+   "text": "All ship cargo x 1.25",
+   "needs": "Superior Mining",
+   "note": "Additive with Advanced, or actually only x1.2"
+  },
+  {
+   "name": "Smelter",
+   "cost": "600 Copper, 250 Iron",
+   "text": "Refine ores into more valuable materials",
+   "needs": "Asteroid Miner",
+   "note": ""
+  },
+  {
+   "name": "Crafter",
+   "cost": "5K Lead, 5 Iron Bar",
+   "text": "Crafts items from raw materials",
+   "needs": "Smelter",
+   "note": ""
+  },
+  {
+   "name": "Advanced Crafter",
+   "cost": "5 Lens, 50 Gold Bar",
+   "text": "All crafters speed x 1.20",
+   "needs": "Crafter",
+   "note": ""
+  },
+  {
+   "name": "Crafting Efficiency",
+   "cost": "30 Solar Panel",
+   "text": "Decreases ingredients required by 20% for all crafters",
+   "needs": "Advanced Crafter",
+   "note": ""
+  },
+  {
+   "name": "Superior Crafting",
+   "cost": "2 Thermal Scanner, 10 Advanced Battery, 20 Laser Torch",
+   "text": "All crafters speed x1.20",
+   "needs": "Crafting Efficiency OR Advanced Item Value",
+   "note": ""
+  },
+  {
+   "name": "Advanced Item Value",
+   "cost": "1 Lens, 5 Silver Bar",
+   "text": "x1.20 to all item values",
+   "needs": "Advanced Crafter",
+   "note": ""
+  },
+  {
+   "name": "Crafting Specialist",
+   "cost": "3 Advanced Battery, 2 Advanced Computer",
+   "text": "10% chance to craft double of an item",
+   "needs": "Advanced Item Value",
+   "note": ""
+  },
+  {
+   "name": "Superior Item Value",
+   "cost": "200 Palladium Bar, 25 Laser Torch",
+   "text": "x1.20 to all item values",
+   "needs": "Advanced Item Value",
+   "note": ""
+  },
+  {
+   "name": "Advanced Furnace",
+   "cost": "3 Glass, 10 Aluminum Bar",
+   "text": "All smelters speed x 1.20",
+   "needs": "Smelter",
+   "note": ""
+  },
+  {
+   "name": "Smelting Efficiency",
+   "cost": "200 Bronze Bar",
+   "text": "Decreases ingredients required by 20% for all smelters",
+   "needs": "Advanced Furnace",
+   "note": ""
+  },
+  {
+   "name": "Superior Furnace",
+   "cost": "5 Iridium Bar, 20 Titanium Bar, 50 Platinum Bar",
+   "text": "All smelters speed x1.20",
+   "needs": "Smelting Efficiency OR Advanced Alloy Value",
+   "note": ""
+  },
+  {
+   "name": "Advanced Alloy Value",
+   "cost": "3 Circuit, 10 Silver Bar",
+   "text": "x1.2 to all alloy values",
+   "needs": "Advanced Furnace",
+   "note": ""
+  },
+  {
+   "name": "Smelting Specialist",
+   "cost": "5 Basic Computer, 2 Advanced Battery",
+   "text": "10% chance to smelt double of an alloy",
+   "needs": "Advanced Alloy Value",
+   "note": ""
+  },
+  {
+   "name": "Superior Alloy Value",
+   "cost": "250K Diamond, 30 Laser",
+   "text": "x1.2 to all alloy values",
+   "needs": "Advanced Alloy Value",
+   "note": ""
+  },
+  {
+   "name": "Preferred Vendor",
+   "cost": "200 Iron Nail, 75 Hammer, 40 Circuit",
+   "text": "Price of building new smelters and crafters reduced by 50%",
+   "needs": "Superior Furnace",
+   "note": ""
+  },
+  {
+   "name": "Furnace Overdrive",
+   "cost": "20 Osmium Bar, 1 Plasma Torch",
+   "text": "Ability to put one furnace into overdrive. Smelt speed x2, but ingredients cost +50%",
+   "needs": "Superior furnace",
+   "note": ""
+  },
+  {
+   "name": "Advanced Furnace Overdrive",
+   "cost": "40 Rhodium Bar, 20 Inerton Alloy, 10 Thermal Scanner",
+   "text": "Increases Furnace Overdrive smelt speed to x4",
+   "needs": "Furnace Overdrive",
+   "note": ""
+  },
+  {
+   "name": "Furnace Overdrive Efficiency",
+   "cost": "200 Iridium Bar, 1 Motor",
+   "text": "Decreases Furnace Overdrive extra ingredient cost to +20%",
+   "needs": "Furnace Overdrive",
+   "note": ""
+  },
+  {
+   "name": "Furnace Overdrive 2",
+   "cost": "200 Uru Alloy, 20 Plasma Torch, 2 Nuclear Capsule",
+   "text": "Ability to put a second furnace into overdrive",
+   "needs": "Furnace Overdrive",
+   "note": ""
+  },
+  {
+   "name": "Furnace Overdrive 3",
+   "cost": "300 Aether Alloy, 100 Plasma Torch, 2 Fusion Capsule",
+   "text": "Ability to put a third furnace into overdrive",
+   "needs": "Furnace Overdrive 2",
+   "note": ""
+  },
+  {
+   "name": "Surge Mapping",
+   "cost": "2 Battery, 2 Lead Bar",
+   "text": "Detected Surges on planets within Telescopes 0 to 3 are now class 2. Higher classes amplify surge effects.",
+   "needs": "Telescope 3 & Surge Branch 1 node",
+   "note": "Costs 80 Cells"
+  },
+  {
+   "name": "Advanced Surge Mapping",
+   "cost": "4 Hammer, 6 Silicon Bar",
+   "text": "Detected Surges on planets within Telescopes 0 to 3 are now class 3. Higher classes amplify surge effects.",
+   "needs": "Surge Mapping",
+   "note": ""
+  },
+  {
+   "name": "Superior Surge Mapping",
+   "cost": "5 Glass, 10 Aluminum Bar",
+   "text": "Detected Surges on planets within Telescopes 0 to 3 are now class 4. Higher classes amplify surge effects.",
+   "needs": "Advanced Surge Mapping",
+   "note": ""
+  },
+  {
+   "name": "Echo Filtering",
+   "cost": "5 Circuit, 8 Silver Bar",
+   "text": "Detected Surges on planets within Telescopes 4 to 7 are now class 2. Higher classes amplify surge effects.",
+   "needs": "Surge Branch 2 node",
+   "note": "Costs 160 Cells"
+  },
+  {
+   "name": "Advanced Echo Filtering",
+   "cost": "6 Lens, 12 Gold Bar",
+   "text": "Detected Surges on planets within Telescopes 4 to 7 are now class 3. Higher classes amplify surge effects.",
+   "needs": "Echo Filtering",
+   "note": ""
+  },
+  {
+   "name": "Superior Echo Filtering",
+   "cost": "8 Laser, 20 Bronze Bar",
+   "text": "Detected Surges on planets within Telescopes 4 to 7 are now class 4. Higher classes amplify surge effects.",
+   "needs": "Advanced Echo Filtering",
+   "note": ""
+  },
+  {
+   "name": "Harmonic Calibration",
+   "cost": "8 Basic Computer, 12 Steel Bar",
+   "text": "Detected Surges on planets within Telescopes 8 to 11 are now class 2. Higher classes amplify surge effects.",
+   "needs": "Surge Branch 3 node",
+   "note": "Costs 250 Cells"
+  },
+  {
+   "name": "Advanced Harmonic Calibration",
+   "cost": "10 Solar Panel, 20 Platinum Bar",
+   "text": "Detected Surges on planets within Telescopes 8 to 11 are now class 3. Higher classes amplify surge effects.",
+   "needs": "Harmonic Calibration",
+   "note": ""
+  },
+  {
+   "name": "Superior Harmonic Calibration",
+   "cost": "20 Laser Torch, 30 Titanium Bar",
+   "text": "Detected Surges on planets within Telescopes 8 to 11 are now class 4. Higher classes amplify surge effects.",
+   "needs": "Advanced Harmonic Calibration",
+   "note": ""
+  },
+  {
+   "name": "Reactive Sweep",
+   "cost": "10 Advanced Battery, 18 Iridium Bar",
+   "text": "Detected Surges on planets within Telescopes 12 to 15 are now class 2. Higher classes amplify surge effects.",
+   "needs": "Surge Branch 4 node",
+   "note": "Costs 320 Cells"
+  },
+  {
+   "name": "Advanced Reactive Sweep",
+   "cost": "18 Thermal Scanner, 28 Palladium Bar",
+   "text": "Detected Surges on planets within Telescopes 12 to 15 are now class 3. Higher classes amplify surge effects.",
+   "needs": "Reactive Sweep",
+   "note": ""
+  },
+  {
+   "name": "Superior Reactive Sweep",
+   "cost": "30 Advanced Computer, 40 Osmium Bar",
+   "text": "Detected Surges on planets within Telescopes 12 to 15 are now class 4. Higher classes amplify surge effects.",
+   "needs": "Advanced Reactive Sweep",
+   "note": ""
+  },
+  {
+   "name": "Anomaly Resolution",
+   "cost": "15 Navigation Module, 22 Rhodium Bar",
+   "text": "Detected Surges on planets within Telescopes 16 to 19 are now class 2. Higher classes amplify surge effects.",
+   "needs": "Surge Branch 5 node",
+   "note": "Costs 360 Cells"
+  },
+  {
+   "name": "Advanced Anomaly Resolution",
+   "cost": "25 Plasma Torch, 35 Quadium Alloy",
+   "text": "Detected Surges on planets within Telescopes 16 to 19 are now class 3. Higher classes amplify surge effects.",
+   "needs": "Anomaly Resolution",
+   "note": ""
+  },
+  {
+   "name": "Superior Anomaly Resolution",
+   "cost": "40 Radio Tower, 50 Scrith Alloy",
+   "text": "Detected Surges on planets within Telescopes 16 to 19 are now class 4. Higher classes amplify surge effects.",
+   "needs": "Advanced Anomaly Resolution",
+   "note": ""
+  },
+  {
+   "name": "Signal Stratification",
+   "cost": "20 Telescope, 28 Uru Alloy",
+   "text": "Detected Surges on planets within Telescopes 20 to 23 are now class 2. Higher classes amplify surge effects.",
+   "needs": "Surge Branch 6 node",
+   "note": "Costs 400 Cells"
+  },
+  {
+   "name": "Advanced Signal Stratification",
+   "cost": "32 Satellite Dish, 42 Vibranium Alloy",
+   "text": "Detected Surges on planets within Telescopes 20 to 23 are now class 3. Higher classes amplify surge effects.",
+   "needs": "Signal Stratification",
+   "note": ""
+  },
+  {
+   "name": "Superior Signal Stratification",
+   "cost": "50 Motor, 60 Aether Alloy",
+   "text": "Detected Surges on planets within Telescopes 20 to 23 are now class 4. Higher classes amplify surge effects.",
+   "needs": "Advanced Signal Stratification",
+   "note": ""
+  }
+ ],
+ "smelters": [
+  "Free",
+  "50K",
+  "500K",
+  "10M",
+  "5B",
+  "100B",
+  "50T",
+  "1q",
+  "500q",
+  "10Q"
+ ],
+ "crafters": [
+  "free",
+  "1M",
+  "100M",
+  "50B",
+  "1T",
+  "500T",
+  "5q*",
+  "2.50Q*",
+  "50Q*",
+  "25s*"
+ ],
+ "rooms": [
+  {
+   "name": "Engineering",
+   "boost": "Increase mine speed",
+   "min_cost": "3",
+   "combined": "3",
+   "base": "x1.25",
+   "per_level": "+.15",
+   "max_level": "60",
+   "max_bonus": "x10.1"
+  },
+  {
+   "name": "Forge",
+   "boost": "Increase smelt speed",
+   "min_cost": "3",
+   "combined": "3",
+   "base": "x1.20",
+   "per_level": "+.10",
+   "max_level": "60",
+   "max_bonus": "x7.10"
+  },
+  {
+   "name": "Aeronautical",
+   "boost": "Increase ship speed",
+   "min_cost": "6",
+   "combined": "9",
+   "base": "x1.50",
+   "per_level": "+.25",
+   "max_level": "60",
+   "max_bonus": "x16.25"
+  },
+  {
+   "name": "Astronomy",
+   "boost": "Reduce planet upgrade prices",
+   "min_cost": "12",
+   "combined": "21",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max_level": "11",
+   "max_bonus": "x50%"
+  },
+  {
+   "name": "Packaging",
+   "boost": "Increase cargo",
+   "min_cost": "21",
+   "combined": "42",
+   "base": "x1.50",
+   "per_level": "+.25",
+   "max_level": "60",
+   "max_bonus": "x16.25"
+  },
+  {
+   "name": "Workshop",
+   "boost": "Increase craft speed",
+   "min_cost": "35",
+   "combined": "77",
+   "base": "x1.20",
+   "per_level": "+.10",
+   "max_level": "60",
+   "max_bonus": "x7.1"
+  },
+  {
+   "name": "Laboratory",
+   "boost": "Decrease project cost",
+   "min_cost": "56",
+   "combined": "133",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max_level": "11",
+   "max_bonus": "x50%"
+  },
+  {
+   "name": "Robotics",
+   "boost": "Decrease rover time",
+   "min_cost": "87",
+   "combined": "220",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max_level": "11",
+   "max_bonus": "x50%"
+  },
+  {
+   "name": "Lounge",
+   "boost": "Increase credits earned",
+   "min_cost": "133",
+   "combined": "353",
+   "base": "x1.15",
+   "per_level": "+.05",
+   "max_level": "60",
+   "max_bonus": "x4.1"
+  },
+  {
+   "name": "Backup Generator",
+   "boost": "Increase max idle time",
+   "min_cost": "200",
+   "combined": "553",
+   "base": "+0:30",
+   "per_level": "+0:30",
+   "max_level": "44",
+   "max_bonus": "24hours"
+  },
+  {
+   "name": "Terrarium",
+   "boost": "Decrease colonization cost",
+   "min_cost": "298",
+   "combined": "851",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max_level": "11",
+   "max_bonus": "x50%"
+  },
+  {
+   "name": "Underforge",
+   "boost": "Decrease smelter ingredients",
+   "min_cost": "439",
+   "combined": "1290",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max_level": "11",
+   "max_bonus": "x50%"
+  },
+  {
+   "name": "Dorm",
+   "boost": "Decrease crafter ingredients",
+   "min_cost": "642",
+   "combined": "1932",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max_level": "11",
+   "max_bonus": "x50%"
+  },
+  {
+   "name": "Probability Drive",
+   "boost": "Enables Surges (50% roll)",
+   "min_cost": "934",
+   "combined": "2866",
+   "base": "T0",
+   "per_level": "+1",
+   "max_level": "23",
+   "max_bonus": "T23"
+  },
+  {
+   "name": "Sales",
+   "boost": "Increase alloy and item value",
+   "min_cost": "1351",
+   "combined": "4217",
+   "base": "x1.15",
+   "per_level": "+.05",
+   "max_level": "60",
+   "max_bonus": "x4.1"
+  },
+  {
+   "name": "Classroom",
+   "boost": "All manager bonuses",
+   "min_cost": "1946",
+   "combined": "6163",
+   "base": "x1.15",
+   "per_level": "+.05",
+   "max_level": "60",
+   "max_bonus": "x4.1"
+  },
+  {
+   "name": "Marketing",
+   "boost": "Increase market bonuses",
+   "min_cost": "2932",
+   "combined": "9,095",
+   "base": "x1.30",
+   "per_level": "+.10",
+   "max_level": "60",
+   "max_bonus": "x7.2"
+  },
+  {
+   "name": "Planet Relations",
+   "boost": "Colonizing Bonuses",
+   "min_cost": "4402",
+   "combined": "13,497",
+   "base": "x1.25",
+   "per_level": "+.10",
+   "max_level": "60",
+   "max_bonus": "x7.15"
+  },
+  {
+   "name": "Belt Studies",
+   "boost": "Asteroid and debris Value",
+   "min_cost": "6,586",
+   "combined": "20,083",
+   "base": "x1.25",
+   "per_level": "+.10",
+   "max_level": "60",
+   "max_bonus": "x7.15"
+  },
+  {
+   "name": "Crew Quarters",
+   "boost": "Additional 20% roll for surges",
+   "min_cost": "9,358",
+   "combined": "29,441",
+   "base": "T0",
+   "per_level": "+1",
+   "max_level": "23",
+   "max_bonus": "T23"
+  },
+  {
+   "name": "Eleven Forward",
+   "boost": "Additional 10% roll for surges",
+   "min_cost": "13,267",
+   "combined": "42,708",
+   "base": "T0",
+   "per_level": "+1",
+   "max_level": "23",
+   "max_bonus": "T23"
+  },
+  {
+   "name": "Final unpicked room",
+   "boost": "-",
+   "min_cost": "18,762",
+   "combined": "61,470",
+   "base": "-",
+   "per_level": "-",
+   "max_level": "-",
+   "max_bonus": "-"
+  }
+ ],
+ "room_levels": {
+  "Engineering": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.25"
+   },
+   {
+    "level": 2,
+    "cost": "5",
+    "boost": "1.40"
+   },
+   {
+    "level": 3,
+    "cost": "8",
+    "boost": "1.55"
+   },
+   {
+    "level": 4,
+    "cost": "12",
+    "boost": "1.70"
+   },
+   {
+    "level": 5,
+    "cost": "18",
+    "boost": "1.85"
+   },
+   {
+    "level": 6,
+    "cost": "25",
+    "boost": "2.00"
+   },
+   {
+    "level": 7,
+    "cost": "34",
+    "boost": "2.15"
+   },
+   {
+    "level": 8,
+    "cost": "46",
+    "boost": "2.30"
+   },
+   {
+    "level": 9,
+    "cost": "62",
+    "boost": "2.45"
+   },
+   {
+    "level": 10,
+    "cost": "82",
+    "boost": "2.60"
+   },
+   {
+    "level": 11,
+    "cost": "107",
+    "boost": "2.75"
+   },
+   {
+    "level": 12,
+    "cost": "139",
+    "boost": "2.90"
+   },
+   {
+    "level": 13,
+    "cost": "180",
+    "boost": "3.05"
+   },
+   {
+    "level": 14,
+    "cost": "231",
+    "boost": "3.20"
+   },
+   {
+    "level": 15,
+    "cost": "296",
+    "boost": "3.35"
+   },
+   {
+    "level": 16,
+    "cost": "377",
+    "boost": "3.50"
+   },
+   {
+    "level": 17,
+    "cost": "479",
+    "boost": "3.65"
+   },
+   {
+    "level": 18,
+    "cost": "607",
+    "boost": "3.80"
+   },
+   {
+    "level": 19,
+    "cost": "767",
+    "boost": "3.95"
+   },
+   {
+    "level": 20,
+    "cost": "966",
+    "boost": "4.10"
+   },
+   {
+    "level": 21,
+    "cost": "1215",
+    "boost": "4.25"
+   },
+   {
+    "level": 22,
+    "cost": "1524",
+    "boost": "4.40"
+   },
+   {
+    "level": 23,
+    "cost": "1908",
+    "boost": "4.55"
+   },
+   {
+    "level": 24,
+    "cost": "2385",
+    "boost": "4.70"
+   },
+   {
+    "level": 25,
+    "cost": "2976",
+    "boost": "4.85"
+   },
+   {
+    "level": 26,
+    "cost": "3709",
+    "boost": "5.00"
+   },
+   {
+    "level": 27,
+    "cost": "4,616",
+    "boost": "5.15"
+   },
+   {
+    "level": 28,
+    "cost": "5,737",
+    "boost": "5.30"
+   },
+   {
+    "level": 29,
+    "cost": "7,121",
+    "boost": "5.45"
+   },
+   {
+    "level": 30,
+    "cost": "8,830",
+    "boost": "5.60"
+   },
+   {
+    "level": 31,
+    "cost": "10,938",
+    "boost": "5.75"
+   },
+   {
+    "level": 32,
+    "cost": "13,536",
+    "boost": "5.90"
+   },
+   {
+    "level": 33,
+    "cost": "16,736",
+    "boost": "6.05"
+   },
+   {
+    "level": 34,
+    "cost": "20,673",
+    "boost": "6.20"
+   },
+   {
+    "level": 35,
+    "cost": "25,517",
+    "boost": "6.35"
+   },
+   {
+    "level": 36,
+    "cost": "31,471",
+    "boost": "6.50"
+   },
+   {
+    "level": 37,
+    "cost": "38,786",
+    "boost": "6.65"
+   },
+   {
+    "level": 38,
+    "cost": "47,768",
+    "boost": "6.80"
+   },
+   {
+    "level": 39,
+    "cost": "58,791",
+    "boost": "6.95"
+   },
+   {
+    "level": 40,
+    "cost": "72,313",
+    "boost": "7.10"
+   },
+   {
+    "level": 41,
+    "cost": "102,226",
+    "boost": "7.25"
+   },
+   {
+    "level": 42,
+    "cost": "125,592",
+    "boost": "7.40"
+   },
+   {
+    "level": 43,
+    "cost": "154,215",
+    "boost": "7.55"
+   },
+   {
+    "level": 44,
+    "cost": "189,264",
+    "boost": "7.70"
+   },
+   {
+    "level": 45,
+    "cost": "232,163",
+    "boost": "7.85"
+   },
+   {
+    "level": 46,
+    "cost": "355,816",
+    "boost": "8.00"
+   },
+   {
+    "level": 47,
+    "cost": "436,062",
+    "boost": "8.15"
+   },
+   {
+    "level": 48,
+    "cost": "534,178",
+    "boost": "8.30"
+   },
+   {
+    "level": 49,
+    "cost": "654,095",
+    "boost": "8.45"
+   },
+   {
+    "level": 50,
+    "cost": "800,612",
+    "boost": "8.60"
+   },
+   {
+    "level": 51,
+    "cost": "979,572",
+    "boost": "8.75"
+   },
+   {
+    "level": 52,
+    "cost": "1,198,092",
+    "boost": "8.90"
+   },
+   {
+    "level": 53,
+    "cost": "1,464,839",
+    "boost": "9.05"
+   },
+   {
+    "level": 54,
+    "cost": "1,790,359",
+    "boost": "9.20"
+   },
+   {
+    "level": 55,
+    "cost": "2,187,492",
+    "boost": "9.35"
+   },
+   {
+    "level": 56,
+    "cost": "2,671,868",
+    "boost": "9.50"
+   },
+   {
+    "level": 57,
+    "cost": "3,262,490",
+    "boost": "9.65"
+   },
+   {
+    "level": 58,
+    "cost": "3,982,488",
+    "boost": "9.80"
+   },
+   {
+    "level": 59,
+    "cost": "4,859,985",
+    "boost": "9.95"
+   },
+   {
+    "level": 60,
+    "cost": "5,929,181",
+    "boost": "10.10"
+   }
+  ],
+  "Forge": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.20"
+   },
+   {
+    "level": 2,
+    "cost": "5",
+    "boost": "1.30"
+   },
+   {
+    "level": 3,
+    "cost": "8",
+    "boost": "1.40"
+   },
+   {
+    "level": 4,
+    "cost": "12",
+    "boost": "1.50"
+   },
+   {
+    "level": 5,
+    "cost": "18",
+    "boost": "1.60"
+   },
+   {
+    "level": 6,
+    "cost": "25",
+    "boost": "1.70"
+   },
+   {
+    "level": 7,
+    "cost": "34",
+    "boost": "1.80"
+   },
+   {
+    "level": 8,
+    "cost": "46",
+    "boost": "1.90"
+   },
+   {
+    "level": 9,
+    "cost": "62",
+    "boost": "2.00"
+   },
+   {
+    "level": 10,
+    "cost": "82",
+    "boost": "2.10"
+   },
+   {
+    "level": 11,
+    "cost": "107",
+    "boost": "2.20"
+   },
+   {
+    "level": 12,
+    "cost": "139",
+    "boost": "2.30"
+   },
+   {
+    "level": 13,
+    "cost": "180",
+    "boost": "2.40"
+   },
+   {
+    "level": 14,
+    "cost": "231",
+    "boost": "2.50"
+   },
+   {
+    "level": 15,
+    "cost": "296",
+    "boost": "2.60"
+   },
+   {
+    "level": 16,
+    "cost": "377",
+    "boost": "2.70"
+   },
+   {
+    "level": 17,
+    "cost": "479",
+    "boost": "2.80"
+   },
+   {
+    "level": 18,
+    "cost": "607",
+    "boost": "2.90"
+   },
+   {
+    "level": 19,
+    "cost": "767",
+    "boost": "3.00"
+   },
+   {
+    "level": 20,
+    "cost": "966",
+    "boost": "3.10"
+   },
+   {
+    "level": 21,
+    "cost": "1,215",
+    "boost": "3.20"
+   },
+   {
+    "level": 22,
+    "cost": "1,524",
+    "boost": "3.30"
+   },
+   {
+    "level": 23,
+    "cost": "1,908",
+    "boost": "3.40"
+   },
+   {
+    "level": 24,
+    "cost": "2,385",
+    "boost": "3.50"
+   },
+   {
+    "level": 25,
+    "cost": "2,976",
+    "boost": "3.60"
+   },
+   {
+    "level": 26,
+    "cost": "3,709",
+    "boost": "3.70"
+   },
+   {
+    "level": 27,
+    "cost": "4,616",
+    "boost": "3.80"
+   },
+   {
+    "level": 28,
+    "cost": "5,737",
+    "boost": "3.90"
+   },
+   {
+    "level": 29,
+    "cost": "7,121",
+    "boost": "4.00"
+   },
+   {
+    "level": 30,
+    "cost": "8,830",
+    "boost": "4.10"
+   },
+   {
+    "level": 31,
+    "cost": "10,938",
+    "boost": "4.20"
+   },
+   {
+    "level": 32,
+    "cost": "13,536",
+    "boost": "4.30"
+   },
+   {
+    "level": 33,
+    "cost": "16,736",
+    "boost": "4.40"
+   },
+   {
+    "level": 34,
+    "cost": "20,673",
+    "boost": "4.50"
+   },
+   {
+    "level": 35,
+    "cost": "25,517",
+    "boost": "4.60"
+   },
+   {
+    "level": 36,
+    "cost": "31,471",
+    "boost": "4.70"
+   },
+   {
+    "level": 37,
+    "cost": "38,768",
+    "boost": "4.80"
+   },
+   {
+    "level": 38,
+    "cost": "47,768",
+    "boost": "4.90"
+   },
+   {
+    "level": 39,
+    "cost": "58,791",
+    "boost": "5.00"
+   },
+   {
+    "level": 40,
+    "cost": "72,313",
+    "boost": "5.10"
+   },
+   {
+    "level": 41,
+    "cost": "124,449",
+    "boost": "5.20"
+   },
+   {
+    "level": 42,
+    "cost": "152,894",
+    "boost": "5.30"
+   },
+   {
+    "level": 43,
+    "cost": "187,740",
+    "boost": "5.40"
+   },
+   {
+    "level": 44,
+    "cost": "230,408",
+    "boost": "5.50"
+   },
+   {
+    "level": 45,
+    "cost": "282,633",
+    "boost": "5.60"
+   },
+   {
+    "level": 46,
+    "cost": "554,454",
+    "boost": "5.70"
+   },
+   {
+    "level": 47,
+    "cost": "679,499",
+    "boost": "5.80"
+   },
+   {
+    "level": 48,
+    "cost": "832,389",
+    "boost": "5.90"
+   },
+   {
+    "level": 49,
+    "cost": "1,019,251",
+    "boost": "6.00"
+   },
+   {
+    "level": 50,
+    "cost": "1,247,593",
+    "boost": "6.10"
+   },
+   {
+    "level": 51,
+    "cost": "1,526,430",
+    "boost": "6.20"
+   },
+   {
+    "level": 52,
+    "cost": "1,866,941",
+    "boost": "6.30"
+   },
+   {
+    "level": 53,
+    "cost": "2,282,600",
+    "boost": "6.40"
+   },
+   {
+    "level": 54,
+    "cost": "2,789,846",
+    "boost": "6.50"
+   },
+   {
+    "level": 55,
+    "cost": "3,408,685",
+    "boost": "6.60"
+   },
+   {
+    "level": 56,
+    "cost": "4,163,466",
+    "boost": "6.70"
+   },
+   {
+    "level": 57,
+    "cost": "5,083,810",
+    "boost": "6.80"
+   },
+   {
+    "level": 58,
+    "cost": "6,205,754",
+    "boost": "6.90"
+   },
+   {
+    "level": 59,
+    "cost": "7,573,124",
+    "boost": "7.00"
+   },
+   {
+    "level": 60,
+    "cost": "9,239,211",
+    "boost": "7.10"
+   }
+  ],
+  "Aeronautical": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.50"
+   },
+   {
+    "level": 2,
+    "cost": "5",
+    "boost": "1.75"
+   },
+   {
+    "level": 3,
+    "cost": "8",
+    "boost": "2.00"
+   },
+   {
+    "level": 4,
+    "cost": "12",
+    "boost": "2.25"
+   },
+   {
+    "level": 5,
+    "cost": "18",
+    "boost": "2.50"
+   },
+   {
+    "level": 6,
+    "cost": "25",
+    "boost": "2.75"
+   },
+   {
+    "level": 7,
+    "cost": "34",
+    "boost": "3.00"
+   },
+   {
+    "level": 8,
+    "cost": "46",
+    "boost": "3.25"
+   },
+   {
+    "level": 9,
+    "cost": "62",
+    "boost": "3.50"
+   },
+   {
+    "level": 10,
+    "cost": "82",
+    "boost": "3.75"
+   },
+   {
+    "level": 11,
+    "cost": "107",
+    "boost": "4.00"
+   },
+   {
+    "level": 12,
+    "cost": "139",
+    "boost": "4.25"
+   },
+   {
+    "level": 13,
+    "cost": "180",
+    "boost": "4.50"
+   },
+   {
+    "level": 14,
+    "cost": "231",
+    "boost": "4.75"
+   },
+   {
+    "level": 15,
+    "cost": "296",
+    "boost": "5.00"
+   },
+   {
+    "level": 16,
+    "cost": "377",
+    "boost": "5.25"
+   },
+   {
+    "level": 17,
+    "cost": "479",
+    "boost": "5.50"
+   },
+   {
+    "level": 18,
+    "cost": "607",
+    "boost": "5.75"
+   },
+   {
+    "level": 19,
+    "cost": "767",
+    "boost": "6.00"
+   },
+   {
+    "level": 20,
+    "cost": "966",
+    "boost": "6.25"
+   },
+   {
+    "level": 21,
+    "cost": "1,215",
+    "boost": "6.50"
+   },
+   {
+    "level": 22,
+    "cost": "1,524",
+    "boost": "6.75"
+   },
+   {
+    "level": 23,
+    "cost": "1,908",
+    "boost": "7.00"
+   },
+   {
+    "level": 24,
+    "cost": "2,385",
+    "boost": "7.25"
+   },
+   {
+    "level": 25,
+    "cost": "2,976",
+    "boost": "7.50"
+   },
+   {
+    "level": 26,
+    "cost": "3,709",
+    "boost": "7.75"
+   },
+   {
+    "level": 27,
+    "cost": "4,616",
+    "boost": "8.00"
+   },
+   {
+    "level": 28,
+    "cost": "5,737",
+    "boost": "8.25"
+   },
+   {
+    "level": 29,
+    "cost": "7,121",
+    "boost": "8.50"
+   },
+   {
+    "level": 30,
+    "cost": "8,830",
+    "boost": "8.75"
+   },
+   {
+    "level": 31,
+    "cost": "10.938",
+    "boost": "9.00"
+   },
+   {
+    "level": 32,
+    "cost": "13,536",
+    "boost": "9.25"
+   },
+   {
+    "level": 33,
+    "cost": "16,736",
+    "boost": "9.50"
+   },
+   {
+    "level": 34,
+    "cost": "20,673",
+    "boost": "9.75"
+   },
+   {
+    "level": 35,
+    "cost": "25,517",
+    "boost": "10.00"
+   },
+   {
+    "level": 36,
+    "cost": "31,471",
+    "boost": "10.25"
+   },
+   {
+    "level": 37,
+    "cost": "38,786",
+    "boost": "10.50"
+   },
+   {
+    "level": 38,
+    "cost": "47,768",
+    "boost": "10.75"
+   },
+   {
+    "level": 39,
+    "cost": "58,791",
+    "boost": "11.00"
+   },
+   {
+    "level": 40,
+    "cost": "72,313",
+    "boost": "11.25"
+   },
+   {
+    "level": 41,
+    "cost": "102,226",
+    "boost": "11.50"
+   },
+   {
+    "level": 42,
+    "cost": "125,592",
+    "boost": "11.75"
+   },
+   {
+    "level": 43,
+    "cost": "154,215",
+    "boost": "12.00"
+   },
+   {
+    "level": 44,
+    "cost": "189,264",
+    "boost": "12.25"
+   },
+   {
+    "level": 45,
+    "cost": "232,163",
+    "boost": "12.50"
+   },
+   {
+    "level": 46,
+    "cost": "355,816",
+    "boost": "12.75"
+   },
+   {
+    "level": 47,
+    "cost": "436,062",
+    "boost": "13.00"
+   },
+   {
+    "level": 48,
+    "cost": "534,178",
+    "boost": "13.25"
+   },
+   {
+    "level": 49,
+    "cost": "654,095",
+    "boost": "13.50"
+   },
+   {
+    "level": 50,
+    "cost": "800,612",
+    "boost": "13.75"
+   },
+   {
+    "level": 51,
+    "cost": "979,572",
+    "boost": "14.00"
+   },
+   {
+    "level": 52,
+    "cost": "1,198,092",
+    "boost": "14.25"
+   },
+   {
+    "level": 53,
+    "cost": "1,464,839",
+    "boost": "14.50"
+   },
+   {
+    "level": 54,
+    "cost": "1,790,359",
+    "boost": "14.75"
+   },
+   {
+    "level": 55,
+    "cost": "2,187,492",
+    "boost": "15.00"
+   },
+   {
+    "level": 56,
+    "cost": "2,671,808",
+    "boost": "15.25"
+   },
+   {
+    "level": 57,
+    "cost": "3,262,490",
+    "boost": "15.50"
+   },
+   {
+    "level": 58,
+    "cost": "3,982,488",
+    "boost": "15.75"
+   },
+   {
+    "level": 59,
+    "cost": "4,859,985",
+    "boost": "16.00"
+   },
+   {
+    "level": 60,
+    "cost": "5,929,181",
+    "boost": "16.25"
+   }
+  ],
+  "Astronomy": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "-10%"
+   },
+   {
+    "level": 2,
+    "cost": "26",
+    "boost": "-14%"
+   },
+   {
+    "level": 3,
+    "cost": "46",
+    "boost": "-18%"
+   },
+   {
+    "level": 4,
+    "cost": "74",
+    "boost": "-22%"
+   },
+   {
+    "level": 5,
+    "cost": "111",
+    "boost": "-26%"
+   },
+   {
+    "level": 6,
+    "cost": "160",
+    "boost": "-30%"
+   },
+   {
+    "level": 7,
+    "cost": "224",
+    "boost": "-34%"
+   },
+   {
+    "level": 8,
+    "cost": "307",
+    "boost": "-38%"
+   },
+   {
+    "level": 9,
+    "cost": "414",
+    "boost": "-42%"
+   },
+   {
+    "level": 10,
+    "cost": "552",
+    "boost": "-46%"
+   },
+   {
+    "level": 11,
+    "cost": "729",
+    "boost": "-50%"
+   }
+  ],
+  "Packaging": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.50"
+   },
+   {
+    "level": 2,
+    "cost": "5",
+    "boost": "1.75"
+   },
+   {
+    "level": 3,
+    "cost": "8",
+    "boost": "2.00"
+   },
+   {
+    "level": 4,
+    "cost": "12",
+    "boost": "2.25"
+   },
+   {
+    "level": 5,
+    "cost": "18",
+    "boost": "2.50"
+   },
+   {
+    "level": 6,
+    "cost": "25",
+    "boost": "2.75"
+   },
+   {
+    "level": 7,
+    "cost": "34",
+    "boost": "3.00"
+   },
+   {
+    "level": 8,
+    "cost": "46",
+    "boost": "3.25"
+   },
+   {
+    "level": 9,
+    "cost": "62",
+    "boost": "3.50"
+   },
+   {
+    "level": 10,
+    "cost": "82",
+    "boost": "3.75"
+   },
+   {
+    "level": 11,
+    "cost": "107",
+    "boost": "4.00"
+   },
+   {
+    "level": 12,
+    "cost": "139",
+    "boost": "4.25"
+   },
+   {
+    "level": 13,
+    "cost": "180",
+    "boost": "4.50"
+   },
+   {
+    "level": 14,
+    "cost": "231",
+    "boost": "4.75"
+   },
+   {
+    "level": 15,
+    "cost": "296",
+    "boost": "5.00"
+   },
+   {
+    "level": 16,
+    "cost": "377",
+    "boost": "5.25"
+   },
+   {
+    "level": 17,
+    "cost": "479",
+    "boost": "5.50"
+   },
+   {
+    "level": 18,
+    "cost": "607",
+    "boost": "5.75"
+   },
+   {
+    "level": 19,
+    "cost": "767",
+    "boost": "6.00"
+   },
+   {
+    "level": 20,
+    "cost": "966",
+    "boost": "6.25"
+   },
+   {
+    "level": 21,
+    "cost": "1,215",
+    "boost": "6.50"
+   },
+   {
+    "level": 22,
+    "cost": "1,524",
+    "boost": "6.75"
+   },
+   {
+    "level": 23,
+    "cost": "1,908",
+    "boost": "7.00"
+   },
+   {
+    "level": 24,
+    "cost": "2,385",
+    "boost": "7.25"
+   },
+   {
+    "level": 25,
+    "cost": "2,976",
+    "boost": "7.50"
+   },
+   {
+    "level": 26,
+    "cost": "3,709",
+    "boost": "7.75"
+   },
+   {
+    "level": 27,
+    "cost": "4,616",
+    "boost": "8.00"
+   },
+   {
+    "level": 28,
+    "cost": "5,737",
+    "boost": "8.25"
+   },
+   {
+    "level": 29,
+    "cost": "7,121",
+    "boost": "8.50"
+   },
+   {
+    "level": 30,
+    "cost": "8,830",
+    "boost": "8.75"
+   },
+   {
+    "level": 31,
+    "cost": "10.938",
+    "boost": "9.00"
+   },
+   {
+    "level": 32,
+    "cost": "13,536",
+    "boost": "9.25"
+   },
+   {
+    "level": 33,
+    "cost": "16,736",
+    "boost": "9.50"
+   },
+   {
+    "level": 34,
+    "cost": "20,673",
+    "boost": "9.75"
+   },
+   {
+    "level": 35,
+    "cost": "25,517",
+    "boost": "10.00"
+   },
+   {
+    "level": 36,
+    "cost": "31,471",
+    "boost": "10.25"
+   },
+   {
+    "level": 37,
+    "cost": "38,786",
+    "boost": "10.50"
+   },
+   {
+    "level": 38,
+    "cost": "47,768",
+    "boost": "10.75"
+   },
+   {
+    "level": 39,
+    "cost": "58,791",
+    "boost": "11.00"
+   },
+   {
+    "level": 40,
+    "cost": "72,313",
+    "boost": "11.25"
+   },
+   {
+    "level": 41,
+    "cost": "102,226",
+    "boost": "11.50"
+   },
+   {
+    "level": 42,
+    "cost": "125,592",
+    "boost": "11.75"
+   },
+   {
+    "level": 43,
+    "cost": "154,215",
+    "boost": "12.00"
+   },
+   {
+    "level": 44,
+    "cost": "189,264",
+    "boost": "12.25"
+   },
+   {
+    "level": 45,
+    "cost": "232,163",
+    "boost": "12.50"
+   },
+   {
+    "level": 46,
+    "cost": "355,816",
+    "boost": "12.75"
+   },
+   {
+    "level": 47,
+    "cost": "436,062",
+    "boost": "13.00"
+   },
+   {
+    "level": 48,
+    "cost": "534,178",
+    "boost": "13.25"
+   },
+   {
+    "level": 49,
+    "cost": "654,095",
+    "boost": "13.50"
+   },
+   {
+    "level": 50,
+    "cost": "800,612",
+    "boost": "13.75"
+   },
+   {
+    "level": 51,
+    "cost": "979,572",
+    "boost": "14.00"
+   },
+   {
+    "level": 52,
+    "cost": "1,198,092",
+    "boost": "14.25"
+   },
+   {
+    "level": 53,
+    "cost": "1,464,839",
+    "boost": "14.50"
+   },
+   {
+    "level": 54,
+    "cost": "1,790,359",
+    "boost": "14.75"
+   },
+   {
+    "level": 55,
+    "cost": "2,187,492",
+    "boost": "15.00"
+   },
+   {
+    "level": 56,
+    "cost": "2,671,808",
+    "boost": "15.25"
+   },
+   {
+    "level": 57,
+    "cost": "3,262,490",
+    "boost": "15.50"
+   },
+   {
+    "level": 58,
+    "cost": "3,982,488",
+    "boost": "15.75"
+   },
+   {
+    "level": 59,
+    "cost": "4,859,985",
+    "boost": "16.00"
+   },
+   {
+    "level": 60,
+    "cost": "5,929,181",
+    "boost": "16.25"
+   }
+  ],
+  "Workshop": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.20"
+   },
+   {
+    "level": 2,
+    "cost": "5",
+    "boost": "1.30"
+   },
+   {
+    "level": 3,
+    "cost": "8",
+    "boost": "1.40"
+   },
+   {
+    "level": 4,
+    "cost": "12",
+    "boost": "1.50"
+   },
+   {
+    "level": 5,
+    "cost": "18",
+    "boost": "1.60"
+   },
+   {
+    "level": 6,
+    "cost": "25",
+    "boost": "1.70"
+   },
+   {
+    "level": 7,
+    "cost": "34",
+    "boost": "1.80"
+   },
+   {
+    "level": 8,
+    "cost": "46",
+    "boost": "1.90"
+   },
+   {
+    "level": 9,
+    "cost": "62",
+    "boost": "2.00"
+   },
+   {
+    "level": 10,
+    "cost": "82",
+    "boost": "2.10"
+   },
+   {
+    "level": 11,
+    "cost": "107",
+    "boost": "2.20"
+   },
+   {
+    "level": 12,
+    "cost": "139",
+    "boost": "2.30"
+   },
+   {
+    "level": 13,
+    "cost": "180",
+    "boost": "2.40"
+   },
+   {
+    "level": 14,
+    "cost": "231",
+    "boost": "2.50"
+   },
+   {
+    "level": 15,
+    "cost": "296",
+    "boost": "2.60"
+   },
+   {
+    "level": 16,
+    "cost": "377",
+    "boost": "2.70"
+   },
+   {
+    "level": 17,
+    "cost": "479",
+    "boost": "2.80"
+   },
+   {
+    "level": 18,
+    "cost": "607",
+    "boost": "2.90"
+   },
+   {
+    "level": 19,
+    "cost": "767",
+    "boost": "3.00"
+   },
+   {
+    "level": 20,
+    "cost": "966",
+    "boost": "3.10"
+   },
+   {
+    "level": 21,
+    "cost": "1,215",
+    "boost": "3.20"
+   },
+   {
+    "level": 22,
+    "cost": "1,524",
+    "boost": "3.30"
+   },
+   {
+    "level": 23,
+    "cost": "1,908",
+    "boost": "3.40"
+   },
+   {
+    "level": 24,
+    "cost": "2,385",
+    "boost": "3.50"
+   },
+   {
+    "level": 25,
+    "cost": "2,976",
+    "boost": "3.60"
+   },
+   {
+    "level": 26,
+    "cost": "3,709",
+    "boost": "3.70"
+   },
+   {
+    "level": 27,
+    "cost": "4,616",
+    "boost": "3.80"
+   },
+   {
+    "level": 28,
+    "cost": "5,737",
+    "boost": "3.90"
+   },
+   {
+    "level": 29,
+    "cost": "7,121",
+    "boost": "4.00"
+   },
+   {
+    "level": 30,
+    "cost": "8,830",
+    "boost": "4.10"
+   },
+   {
+    "level": 31,
+    "cost": "10,938",
+    "boost": "4.20"
+   },
+   {
+    "level": 32,
+    "cost": "13,536",
+    "boost": "4.30"
+   },
+   {
+    "level": 33,
+    "cost": "16,736",
+    "boost": "4.40"
+   },
+   {
+    "level": 34,
+    "cost": "20,673",
+    "boost": "4.50"
+   },
+   {
+    "level": 35,
+    "cost": "25,517",
+    "boost": "4.60"
+   },
+   {
+    "level": 36,
+    "cost": "31,471",
+    "boost": "4.70"
+   },
+   {
+    "level": 37,
+    "cost": "38,768",
+    "boost": "4.80"
+   },
+   {
+    "level": 38,
+    "cost": "47,768",
+    "boost": "4.90"
+   },
+   {
+    "level": 39,
+    "cost": "58,791",
+    "boost": "5.00"
+   },
+   {
+    "level": 40,
+    "cost": "72,313",
+    "boost": "5.10"
+   },
+   {
+    "level": 41,
+    "cost": "124,449",
+    "boost": "5.20"
+   },
+   {
+    "level": 42,
+    "cost": "152,894",
+    "boost": "5.30"
+   },
+   {
+    "level": 43,
+    "cost": "187,740",
+    "boost": "5.40"
+   },
+   {
+    "level": 44,
+    "cost": "230,408",
+    "boost": "5.50"
+   },
+   {
+    "level": 45,
+    "cost": "282,633",
+    "boost": "5.60"
+   },
+   {
+    "level": 46,
+    "cost": "554,454",
+    "boost": "5.70"
+   },
+   {
+    "level": 47,
+    "cost": "679,499",
+    "boost": "5.80"
+   },
+   {
+    "level": 48,
+    "cost": "832,389",
+    "boost": "5.90"
+   },
+   {
+    "level": 49,
+    "cost": "1,019,251",
+    "boost": "6.00"
+   },
+   {
+    "level": 50,
+    "cost": "1,247,593",
+    "boost": "6.10"
+   },
+   {
+    "level": 51,
+    "cost": "1,526,430",
+    "boost": "6.20"
+   },
+   {
+    "level": 52,
+    "cost": "1,866,941",
+    "boost": "6.30"
+   },
+   {
+    "level": 53,
+    "cost": "2,282,600",
+    "boost": "6.40"
+   },
+   {
+    "level": 54,
+    "cost": "2,789,846",
+    "boost": "6.50"
+   },
+   {
+    "level": 55,
+    "cost": "3,408,685",
+    "boost": "6.60"
+   },
+   {
+    "level": 56,
+    "cost": "4,163,466",
+    "boost": "6.70"
+   },
+   {
+    "level": 57,
+    "cost": "5,083,810",
+    "boost": "6.80"
+   },
+   {
+    "level": 58,
+    "cost": "6,205,754",
+    "boost": "6.90"
+   },
+   {
+    "level": 59,
+    "cost": "7,573,124",
+    "boost": "7.00"
+   },
+   {
+    "level": 60,
+    "cost": "9,239,211",
+    "boost": "7.10"
+   }
+  ],
+  "Laboratory": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "-10%"
+   },
+   {
+    "level": 2,
+    "cost": "26",
+    "boost": "-14%"
+   },
+   {
+    "level": 3,
+    "cost": "46",
+    "boost": "-18%"
+   },
+   {
+    "level": 4,
+    "cost": "74",
+    "boost": "-22%"
+   },
+   {
+    "level": 5,
+    "cost": "111",
+    "boost": "-26%"
+   },
+   {
+    "level": 6,
+    "cost": "160",
+    "boost": "-30%"
+   },
+   {
+    "level": 7,
+    "cost": "224",
+    "boost": "-34%"
+   },
+   {
+    "level": 8,
+    "cost": "307",
+    "boost": "-38%"
+   },
+   {
+    "level": 9,
+    "cost": "414",
+    "boost": "-42%"
+   },
+   {
+    "level": 10,
+    "cost": "552",
+    "boost": "-46%"
+   },
+   {
+    "level": 11,
+    "cost": "729",
+    "boost": "-50%"
+   }
+  ],
+  "Lounge": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.15x"
+   },
+   {
+    "level": 2,
+    "cost": "8",
+    "boost": "1.20x"
+   },
+   {
+    "level": 3,
+    "cost": "12",
+    "boost": "1.25x"
+   },
+   {
+    "level": 4,
+    "cost": "18",
+    "boost": "1.30x"
+   },
+   {
+    "level": 5,
+    "cost": "25",
+    "boost": "1.35x"
+   },
+   {
+    "level": 6,
+    "cost": "34",
+    "boost": "1.40x"
+   },
+   {
+    "level": 7,
+    "cost": "46",
+    "boost": "1.45x"
+   },
+   {
+    "level": 8,
+    "cost": "62",
+    "boost": "1.50x"
+   },
+   {
+    "level": 9,
+    "cost": "82",
+    "boost": "1.55x"
+   },
+   {
+    "level": 10,
+    "cost": "107",
+    "boost": "1.60x"
+   },
+   {
+    "level": 11,
+    "cost": "139",
+    "boost": "1.65x"
+   },
+   {
+    "level": 12,
+    "cost": "180",
+    "boost": "1.70x"
+   },
+   {
+    "level": 13,
+    "cost": "231",
+    "boost": "1.75x"
+   },
+   {
+    "level": 14,
+    "cost": "296",
+    "boost": "1.80x"
+   },
+   {
+    "level": 15,
+    "cost": "377",
+    "boost": "1.85x"
+   },
+   {
+    "level": 16,
+    "cost": "479",
+    "boost": "1.90x"
+   },
+   {
+    "level": 17,
+    "cost": "607",
+    "boost": "1.95x"
+   },
+   {
+    "level": 18,
+    "cost": "767",
+    "boost": "2.00x"
+   },
+   {
+    "level": 19,
+    "cost": "966",
+    "boost": "2.05x"
+   },
+   {
+    "level": 20,
+    "cost": "1,215",
+    "boost": "2.10x"
+   },
+   {
+    "level": 21,
+    "cost": "1,524",
+    "boost": "2.15x"
+   },
+   {
+    "level": 22,
+    "cost": "1,908",
+    "boost": "2.20x"
+   },
+   {
+    "level": 23,
+    "cost": "2,385",
+    "boost": "2.25x"
+   },
+   {
+    "level": 24,
+    "cost": "2,976",
+    "boost": "2.30x"
+   },
+   {
+    "level": 25,
+    "cost": "3,709",
+    "boost": "2.35x"
+   },
+   {
+    "level": 26,
+    "cost": "4,616",
+    "boost": "2.40x"
+   },
+   {
+    "level": 27,
+    "cost": "5,737",
+    "boost": "2.45x"
+   },
+   {
+    "level": 28,
+    "cost": "7,121",
+    "boost": "2.50x"
+   },
+   {
+    "level": 29,
+    "cost": "8,830",
+    "boost": "2.55x"
+   },
+   {
+    "level": 30,
+    "cost": "10,938",
+    "boost": "2.60x"
+   },
+   {
+    "level": 31,
+    "cost": "13,536",
+    "boost": "2.65x"
+   },
+   {
+    "level": 32,
+    "cost": "16,736",
+    "boost": "2.70x"
+   },
+   {
+    "level": 33,
+    "cost": "20,673",
+    "boost": "2.75x"
+   },
+   {
+    "level": 34,
+    "cost": "25,517",
+    "boost": "2.80x"
+   },
+   {
+    "level": 35,
+    "cost": "31,471",
+    "boost": "2.85x"
+   },
+   {
+    "level": 36,
+    "cost": "38,786",
+    "boost": "2.90x"
+   },
+   {
+    "level": 37,
+    "cost": "47,768",
+    "boost": "2.95x"
+   },
+   {
+    "level": 38,
+    "cost": "70,459",
+    "boost": "3.00x"
+   },
+   {
+    "level": 39,
+    "cost": "86,776",
+    "boost": "3.05x"
+   },
+   {
+    "level": 40,
+    "cost": "106,670",
+    "boost": "3.10x"
+   },
+   {
+    "level": 41,
+    "cost": "131,052",
+    "boost": "3.15x"
+   },
+   {
+    "level": 42,
+    "cost": "160,920",
+    "boost": "3.20x"
+   },
+   {
+    "level": 43,
+    "cost": "197,492",
+    "boost": "3.25x"
+   },
+   {
+    "level": 44,
+    "cost": "242,257",
+    "boost": "3.30x"
+   },
+   {
+    "level": 45,
+    "cost": "297,029",
+    "boost": "3.35x"
+   },
+   {
+    "level": 46,
+    "cost": "436,822",
+    "boost": "3.40x"
+   },
+   {
+    "level": 47,
+    "cost": "535,106",
+    "boost": "3.45x"
+   },
+   {
+    "level": 48,
+    "cost": "655,234",
+    "boost": "3.50x"
+   },
+   {
+    "level": 49,
+    "cost": "802,006",
+    "boost": "3.55x"
+   },
+   {
+    "level": 50,
+    "cost": "981,276",
+    "boost": "3.60x"
+   },
+   {
+    "level": 51,
+    "cost": "1,200,176",
+    "boost": "3.65x"
+   },
+   {
+    "level": 52,
+    "cost": "1,467,386",
+    "boost": "3.70x"
+   },
+   {
+    "level": 53,
+    "cost": "1,793,472",
+    "boost": "3.75x"
+   },
+   {
+    "level": 54,
+    "cost": "2,191,297",
+    "boost": "3.80x"
+   },
+   {
+    "level": 55,
+    "cost": "2,676,514",
+    "boost": "3.85x"
+   },
+   {
+    "level": 56,
+    "cost": "3,268,164",
+    "boost": "3.90x"
+   },
+   {
+    "level": 57,
+    "cost": "3,989,413",
+    "boost": "3.95x"
+   },
+   {
+    "level": 58,
+    "cost": "4,868,438",
+    "boost": "4.00x"
+   },
+   {
+    "level": 59,
+    "cost": "5,939,494",
+    "boost": "4.05x"
+   },
+   {
+    "level": 60,
+    "cost": "7,244,234",
+    "boost": "4.10x"
+   }
+  ],
+  "Backup Generator": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "+30 min"
+   },
+   {
+    "level": 2,
+    "cost": "21",
+    "boost": "+60 min (1:00)"
+   },
+   {
+    "level": 3,
+    "cost": "29",
+    "boost": "+90 min (1:30)"
+   },
+   {
+    "level": 4,
+    "cost": "39",
+    "boost": "+120 min (2:00)"
+   },
+   {
+    "level": 5,
+    "cost": "52",
+    "boost": "+150 min (2:30)"
+   },
+   {
+    "level": 6,
+    "cost": "68",
+    "boost": "+180 min (3:00)"
+   },
+   {
+    "level": 7,
+    "cost": "89",
+    "boost": "+210 min (3:30)"
+   },
+   {
+    "level": 8,
+    "cost": "116",
+    "boost": "+240 min (4:00)"
+   },
+   {
+    "level": 9,
+    "cost": "150",
+    "boost": "+270 min (4:30)"
+   },
+   {
+    "level": 10,
+    "cost": "193",
+    "boost": "+300 min (5:00)"
+   },
+   {
+    "level": 11,
+    "cost": "247",
+    "boost": "+330 min (5:30)"
+   },
+   {
+    "level": 12,
+    "cost": "314",
+    "boost": "+360 min (6:00)"
+   },
+   {
+    "level": 13,
+    "cost": "399",
+    "boost": "+390 min (6:30)"
+   },
+   {
+    "level": 14,
+    "cost": "506",
+    "boost": "+420 min (7:00)"
+   },
+   {
+    "level": 15,
+    "cost": "639",
+    "boost": "+450 min (7:30)"
+   },
+   {
+    "level": 16,
+    "cost": "805",
+    "boost": "+480 min (8:00)"
+   },
+   {
+    "level": 17,
+    "cost": "1012",
+    "boost": "+510 min (8:30)"
+   },
+   {
+    "level": 18,
+    "cost": "1270",
+    "boost": "+540 min (9:00)"
+   },
+   {
+    "level": 19,
+    "cost": "1590",
+    "boost": "+570 min (9:30)"
+   },
+   {
+    "level": 20,
+    "cost": "1987",
+    "boost": "+600 min (10:00)"
+   },
+   {
+    "level": 21,
+    "cost": "2480",
+    "boost": "+630 min (10:30)"
+   },
+   {
+    "level": 22,
+    "cost": "3091",
+    "boost": "+660 min (11:00)"
+   },
+   {
+    "level": 23,
+    "cost": "3846",
+    "boost": "+690 min (11:30)"
+   },
+   {
+    "level": 24,
+    "cost": "4781",
+    "boost": "+720 min (12:00)"
+   },
+   {
+    "level": 25,
+    "cost": "5934",
+    "boost": "+750 min (12:30)"
+   },
+   {
+    "level": 26,
+    "cost": "7359",
+    "boost": "+780 min (13:00)"
+   },
+   {
+    "level": 27,
+    "cost": "9115",
+    "boost": "+810 min (13:30)"
+   },
+   {
+    "level": 28,
+    "cost": "11280",
+    "boost": "+840 min (14:00)"
+   },
+   {
+    "level": 29,
+    "cost": "13946",
+    "boost": "+870 min (14:30)"
+   },
+   {
+    "level": 30,
+    "cost": "17228",
+    "boost": "+900 min (15:00)"
+   },
+   {
+    "level": 31,
+    "cost": "21264",
+    "boost": "+930 min (15:30)"
+   },
+   {
+    "level": 31,
+    "cost": "24226",
+    "boost": "+960 min (16:00)"
+   },
+   {
+    "level": 33,
+    "cost": "32321",
+    "boost": "+990 min (16:30)"
+   },
+   {
+    "level": 34,
+    "cost": "39806",
+    "boost": "+1020 min (17:00)"
+   },
+   {
+    "level": 35,
+    "cost": "48992",
+    "boost": "+1050 min (17:30)"
+   },
+   {
+    "level": 36,
+    "cost": "60261",
+    "boost": "+1080 min (18:00)"
+   },
+   {
+    "level": 37,
+    "cost": "74077",
+    "boost": "+1110 min (18:30)"
+   },
+   {
+    "level": 38,
+    "cost": "91008",
+    "boost": "+1140 min (19:00)"
+   },
+   {
+    "level": 39,
+    "cost": "111750",
+    "boost": "+1170 min (19:30)"
+   },
+   {
+    "level": 40,
+    "cost": "137148",
+    "boost": "+1200 min (20:00)"
+   },
+   {
+    "level": 41,
+    "cost": "168234",
+    "boost": "+1230 min (20:30)"
+   },
+   {
+    "level": 42,
+    "cost": "206270",
+    "boost": "+1260 min (21:00)"
+   },
+   {
+    "level": 43,
+    "cost": "252790",
+    "boost": "+1290 min (21:30)"
+   },
+   {
+    "level": 44,
+    "cost": "309668",
+    "boost": "+1320 min (22:00)"
+   }
+  ],
+  "Underforge": [
+   {
+    "level": 1,
+    "cost": "-",
+    "boost": "-10%"
+   },
+   {
+    "level": 2,
+    "cost": "18",
+    "boost": "-14%"
+   },
+   {
+    "level": 3,
+    "cost": "25",
+    "boost": "-18%"
+   },
+   {
+    "level": 4,
+    "cost": "34",
+    "boost": "-22%"
+   },
+   {
+    "level": 5,
+    "cost": "46",
+    "boost": "-26%"
+   },
+   {
+    "level": 6,
+    "cost": "62",
+    "boost": "-30%"
+   },
+   {
+    "level": 7,
+    "cost": "82",
+    "boost": "-34%"
+   },
+   {
+    "level": 8,
+    "cost": "107",
+    "boost": "-38%"
+   },
+   {
+    "level": 9,
+    "cost": "139",
+    "boost": "-42%"
+   },
+   {
+    "level": 10,
+    "cost": "180",
+    "boost": "-46%"
+   },
+   {
+    "level": 11,
+    "cost": "231",
+    "boost": "-50%"
+   }
+  ],
+  "Dorm": [
+   {
+    "level": 1,
+    "cost": "-",
+    "boost": "-10%"
+   },
+   {
+    "level": 2,
+    "cost": "21",
+    "boost": "-14%"
+   },
+   {
+    "level": 3,
+    "cost": "29",
+    "boost": "-18%"
+   },
+   {
+    "level": 4,
+    "cost": "39",
+    "boost": "-22%"
+   },
+   {
+    "level": 5,
+    "cost": "52",
+    "boost": "-26%"
+   },
+   {
+    "level": 6,
+    "cost": "68",
+    "boost": "-30%"
+   },
+   {
+    "level": 7,
+    "cost": "89",
+    "boost": "-34%"
+   },
+   {
+    "level": 8,
+    "cost": "116",
+    "boost": "-38%"
+   },
+   {
+    "level": 9,
+    "cost": "150",
+    "boost": "-42%"
+   },
+   {
+    "level": 10,
+    "cost": "193",
+    "boost": "-46%"
+   },
+   {
+    "level": 11,
+    "cost": "247",
+    "boost": "-50%"
+   }
+  ],
+  "Sales": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.15"
+   },
+   {
+    "level": 2,
+    "cost": "30",
+    "boost": "1.20"
+   },
+   {
+    "level": 3,
+    "cost": "40",
+    "boost": "1.25"
+   },
+   {
+    "level": 4,
+    "cost": "53",
+    "boost": "1.30"
+   },
+   {
+    "level": 5,
+    "cost": "68",
+    "boost": "1.35"
+   },
+   {
+    "level": 6,
+    "cost": "88",
+    "boost": "1.40"
+   },
+   {
+    "level": 7,
+    "cost": "114",
+    "boost": "1.45"
+   },
+   {
+    "level": 8,
+    "cost": "145",
+    "boost": "1.50"
+   },
+   {
+    "level": 9,
+    "cost": "185",
+    "boost": "1.55"
+   },
+   {
+    "level": 10,
+    "cost": "235",
+    "boost": "1.60"
+   },
+   {
+    "level": 11,
+    "cost": "298",
+    "boost": "1.65"
+   },
+   {
+    "level": 12,
+    "cost": "377",
+    "boost": "1.70"
+   },
+   {
+    "level": 13,
+    "cost": "474",
+    "boost": "1.75"
+   },
+   {
+    "level": 14,
+    "cost": "596",
+    "boost": "1.80"
+   },
+   {
+    "level": 15,
+    "cost": "748",
+    "boost": "1.85"
+   },
+   {
+    "level": 16,
+    "cost": "937",
+    "boost": "1.90"
+   },
+   {
+    "level": 17,
+    "cost": "1,171",
+    "boost": "1.95"
+   },
+   {
+    "level": 18,
+    "cost": "1,462",
+    "boost": "2.00"
+   },
+   {
+    "level": 19,
+    "cost": "1,822",
+    "boost": "2.05"
+   },
+   {
+    "level": 20,
+    "cost": "2,267",
+    "boost": "2.10"
+   },
+   {
+    "level": 21,
+    "cost": "2,817",
+    "boost": "2.15"
+   },
+   {
+    "level": 22,
+    "cost": "3,497",
+    "boost": "2.20"
+   },
+   {
+    "level": 23,
+    "cost": "4,337",
+    "boost": "2.25"
+   },
+   {
+    "level": 24,
+    "cost": "5,372",
+    "boost": "2.30"
+   },
+   {
+    "level": 25,
+    "cost": "6,648",
+    "boost": "2.35"
+   },
+   {
+    "level": 26,
+    "cost": "8,219",
+    "boost": "2.40"
+   },
+   {
+    "level": 27,
+    "cost": "10,153",
+    "boost": "2.45"
+   },
+   {
+    "level": 28,
+    "cost": "12,532",
+    "boost": "2.50"
+   },
+   {
+    "level": 29,
+    "cost": "15,456",
+    "boost": "2.55"
+   },
+   {
+    "level": 30,
+    "cost": "19,049",
+    "boost": "2.60"
+   },
+   {
+    "level": 31,
+    "cost": "23,460",
+    "boost": "2.65"
+   },
+   {
+    "level": 32,
+    "cost": "28,874",
+    "boost": "2.70"
+   },
+   {
+    "level": 33,
+    "cost": "35,515",
+    "boost": "2.75"
+   },
+   {
+    "level": 34,
+    "cost": "43,657",
+    "boost": "2.80"
+   },
+   {
+    "level": 35,
+    "cost": "53,636",
+    "boost": "2.85"
+   },
+   {
+    "level": 36,
+    "cost": "65,860",
+    "boost": "2.90"
+   },
+   {
+    "level": 37,
+    "cost": "80,828",
+    "boost": "2.95"
+   },
+   {
+    "level": 38,
+    "cost": "99,149",
+    "boost": "3.00"
+   },
+   {
+    "level": 39,
+    "cost": "121,565",
+    "boost": "3.05"
+   },
+   {
+    "level": 40,
+    "cost": "148,982",
+    "boost": "3.10"
+   },
+   {
+    "level": 41,
+    "cost": "209,878",
+    "boost": "3.15"
+   },
+   {
+    "level": 42,
+    "cost": "256,995",
+    "boost": "3.20"
+   },
+   {
+    "level": 43,
+    "cost": "314,562",
+    "boost": "2.25"
+   },
+   {
+    "level": 44,
+    "cost": "384,875",
+    "boost": "3.30"
+   },
+   {
+    "level": 45,
+    "cost": "470,732",
+    "boost": "3.35"
+   },
+   {
+    "level": 46,
+    "cost": "661,866",
+    "boost": "3.40"
+   },
+   {
+    "level": 47,
+    "cost": "808,948",
+    "boost": "3.45"
+   },
+   {
+    "level": 48,
+    "cost": "988,387",
+    "boost": "3.50"
+   },
+   {
+    "level": 49,
+    "cost": "1,207,246",
+    "boost": "3.55"
+   },
+   {
+    "level": 50,
+    "cost": "1,474,110",
+    "boost": "3.60"
+   },
+   {
+    "level": 51,
+    "cost": "1,799,430",
+    "boost": "3.65"
+   },
+   {
+    "level": 52,
+    "cost": "2,195,916",
+    "boost": "3.70"
+   },
+   {
+    "level": 53,
+    "cost": "2,679,017",
+    "boost": "3.75"
+   },
+   {
+    "level": 54,
+    "cost": "3,267,522",
+    "boost": "3.80"
+   },
+   {
+    "level": 55,
+    "cost": "3,984,270",
+    "boost": "3.85"
+   },
+   {
+    "level": 56,
+    "cost": "4,857,014",
+    "boost": "3.90"
+   },
+   {
+    "level": 57,
+    "cost": "5,919,487",
+    "boost": "3.95"
+   },
+   {
+    "level": 58,
+    "cost": "7,212,668",
+    "boost": "4.00"
+   },
+   {
+    "level": 59,
+    "cost": "8,786,340",
+    "boost": "4.05"
+   },
+   {
+    "level": 60,
+    "cost": "10,700,976",
+    "boost": "4.10"
+   }
+  ],
+  "Marketing": [
+   {
+    "level": 1,
+    "cost": "Buy",
+    "boost": "1.30x"
+   },
+   {
+    "level": 2,
+    "cost": "69",
+    "boost": "1.40x"
+   },
+   {
+    "level": 3,
+    "cost": "86",
+    "boost": "1.50x"
+   },
+   {
+    "level": 4,
+    "cost": "107",
+    "boost": "1.60x"
+   },
+   {
+    "level": 5,
+    "cost": "134",
+    "boost": "1.70x"
+   },
+   {
+    "level": 6,
+    "cost": "167",
+    "boost": "1.80x"
+   },
+   {
+    "level": 7,
+    "cost": "208",
+    "boost": "1.90x"
+   },
+   {
+    "level": 8,
+    "cost": "259",
+    "boost": "2.00x"
+   },
+   {
+    "level": 9,
+    "cost": "321",
+    "boost": "2.10x"
+   },
+   {
+    "level": 10,
+    "cost": "398",
+    "boost": "2.20x"
+   },
+   {
+    "level": 10,
+    "cost": "493",
+    "boost": "2.30x"
+   },
+   {
+    "level": 12,
+    "cost": "610",
+    "boost": "2.40x"
+   },
+   {
+    "level": 13,
+    "cost": "754",
+    "boost": "2.50x"
+   },
+   {
+    "level": 14,
+    "cost": "932",
+    "boost": "2.60x"
+   },
+   {
+    "level": 15,
+    "cost": "1,150",
+    "boost": "2.70x"
+   },
+   {
+    "level": 16,
+    "cost": "1,418",
+    "boost": "2.80x"
+   },
+   {
+    "level": 17,
+    "cost": "1,748",
+    "boost": "2.90x"
+   },
+   {
+    "level": 18,
+    "cost": "2,153",
+    "boost": "3.00x"
+   },
+   {
+    "level": 19,
+    "cost": "2,650",
+    "boost": "3.10x"
+   },
+   {
+    "level": 20,
+    "cost": "3,259",
+    "boost": "3.20x"
+   },
+   {
+    "level": 21,
+    "cost": "4,007",
+    "boost": "3.30x"
+   },
+   {
+    "level": 22,
+    "cost": "4,922",
+    "boost": "3.40x"
+   },
+   {
+    "level": 23,
+    "cost": "6,044",
+    "boost": "3.50x"
+   },
+   {
+    "level": 24,
+    "cost": "7,418",
+    "boost": "3.60x"
+   },
+   {
+    "level": 25,
+    "cost": "9,099",
+    "boost": "3.70x"
+   },
+   {
+    "level": 26,
+    "cost": "11,157",
+    "boost": "3.80x"
+   },
+   {
+    "level": 27,
+    "cost": "13,673",
+    "boost": "3.90x"
+   },
+   {
+    "level": 28,
+    "cost": "16,749",
+    "boost": "4.00x"
+   },
+   {
+    "level": 29,
+    "cost": "20,509",
+    "boost": "4.10x"
+   },
+   {
+    "level": 30,
+    "cost": "25,109",
+    "boost": "4.20x"
+   },
+   {
+    "level": 31,
+    "cost": "30,715",
+    "boost": "4.30x"
+   },
+   {
+    "level": 32,
+    "cost": "37,567",
+    "boost": "4.40x"
+   },
+   {
+    "level": 33,
+    "cost": "45,930",
+    "boost": "4.50x"
+   },
+   {
+    "level": 34,
+    "cost": "56,137",
+    "boost": "4.60x"
+   },
+   {
+    "level": 35,
+    "cost": "68,589",
+    "boost": "4.70x"
+   },
+   {
+    "level": 36,
+    "cost": "83,777",
+    "boost": "4.80x"
+   },
+   {
+    "level": 37,
+    "cost": "102,296",
+    "boost": "4.90x"
+   },
+   {
+    "level": 38,
+    "cost": "124,872",
+    "boost": "5.00x"
+   },
+   {
+    "level": 39,
+    "cost": "152,386",
+    "boost": "5.10x"
+   },
+   {
+    "level": 40,
+    "cost": "185,911",
+    "boost": "5.20x"
+   },
+   {
+    "level": 41,
+    "cost": "306,114",
+    "boost": "5.30x"
+   },
+   {
+    "level": 42,
+    "cost": "373,262",
+    "boost": "5.40x"
+   },
+   {
+    "level": 43,
+    "cost": "455,023",
+    "boost": "5.50x"
+   },
+   {
+    "level": 44,
+    "cost": "554,558",
+    "boost": "5.60x"
+   },
+   {
+    "level": 45,
+    "cost": "675,709",
+    "boost": "5.70x"
+   },
+   {
+    "level": 46,
+    "cost": "1,275,862",
+    "boost": "5.80x"
+   },
+   {
+    "level": 47,
+    "cost": "1,553,884",
+    "boost": "5.90x"
+   },
+   {
+    "level": 48,
+    "cost": "1,892,082",
+    "boost": "6.00x"
+   },
+   {
+    "level": 49,
+    "cost": "2,303,405",
+    "boost": "6.10x"
+   },
+   {
+    "level": 50,
+    "cost": "2,803,573",
+    "boost": "6.20x"
+   },
+   {
+    "level": 51,
+    "cost": "3,411,672",
+    "boost": "6.30x"
+   },
+   {
+    "level": 52,
+    "cost": "4,150,869",
+    "boost": "6.40x"
+   },
+   {
+    "level": 53,
+    "cost": "5,049,278",
+    "boost": "6.50x"
+   },
+   {
+    "level": 54,
+    "cost": "6,141,013",
+    "boost": "6.60x"
+   },
+   {
+    "level": 55,
+    "cost": "7,467,472",
+    "boost": "6.70x"
+   },
+   {
+    "level": 56,
+    "cost": "9,078,874",
+    "boost": "6.80x"
+   },
+   {
+    "level": 57,
+    "cost": "11,036,138",
+    "boost": "6.90x"
+   },
+   {
+    "level": 58,
+    "cost": "13,413,152",
+    "boost": "7.00x"
+   },
+   {
+    "level": 59,
+    "cost": "16,299,528",
+    "boost": "7.10x"
+   },
+   {
+    "level": 60,
+    "cost": "19,803,926",
+    "boost": "7.20x"
+   }
+  ]
+ },
+ "credits": [
+  [
+   "10M",
+   "10"
+  ],
+  [
+   "100M",
+   "30"
+  ],
+  [
+   "1B",
+   "60"
+  ],
+  [
+   "10B",
+   "101"
+  ],
+  [
+   "100B",
+   "150"
+  ],
+  [
+   "1T",
+   "210"
+  ],
+  [
+   "10T",
+   "285"
+  ],
+  [
+   "100T",
+   "367"
+  ],
+  [
+   "1q",
+   "459"
+  ],
+  [
+   "(10x more than the previous)",
+   "(next triangular number, x10)"
+  ]
+ ]
+}

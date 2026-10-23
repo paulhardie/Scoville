@@ -4,6 +4,8 @@ The pepper ladder: every crop the game will grow, ordered by real heat, with its
 
 Status: **built through Tier 6** (D029, D034, D035, D042); the fictional peppers past Pepper Y (rung 14 on) are design only.
 
+**Superseded by v0.7 (D053):** the ladder becomes 28 peppers, one for each Idle Planet Miner ore, in [SKELETON.md](SKELETON.md#the-pepper-ladder-d053). This doc is the history up to v0.6.
+
 ## The ladder since D042
 
 The owner asked for the peppers to be tiered by [PepperScale's hot pepper list](https://pepperscale.com/hot-pepper-list/) (read 2026-10-21): one pepper per heat band, and only generic variety names, so the ladder steps on nobody's trademark ([D042](DECISIONS.md)). Each rung keeps its ore value. The game's ids follow the names (save v10 renames them). Older sections below use the old names.

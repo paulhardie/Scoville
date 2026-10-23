@@ -200,7 +200,7 @@ A GUESS at a phone player (`Player.casual()` in `src/sim/engaged_player.gd`):
 - taps 2 times a second in 45-second bursts with 15-second rests (1.5 a second on average);
 - looks at the game every 2 seconds.
 
-Otherwise it plays like the pacing player. Both are measured over the first 20 minutes.
+Otherwise it plays like the pacing player. Both are measured over the first 30 minutes.
 
 ### Criteria (v0.5.1)
 
@@ -218,6 +218,16 @@ Otherwise it plays like the pacing player. Both are measured over the first 20 m
 **E6 was narrowed after measuring.** It was written for both players, but the pacing player buys the line 36 s after the vat, so only 3 mash waits. That's what a flat-out player gets, so it's now judged on the casual player only.
 
 **E3 is tight** (96 s of 100). The wait is the vat-to-line saving, while the casual player keeps 50 peppers back for the vat. Trying a £12 vat didn't shorten it, because the line's price is what's being saved for.
+
+### The 15–30 minute window (J3, this session)
+
+E3 stops at 15:00, and N6 (15:00–50:00, at most 120 s) is measured on the flat-out pacing player only. Nothing bounds the window a phone player meets next. Set before measuring, from the owner's guide of something new every 30–60 seconds early on, with gaps stretching gradually:
+
+| Id | Criterion |
+| --- | --- |
+| J3 | From 15:00 to 30:00, the casual player never goes longer than 120 s without something new (a purchase, an upgrade or a research; reveals as in E3). |
+
+**Result: J3 PASS**, 48 s (the pacing player 38 s, not judged); 50 s and 49 s once merged with Cargo and the dashboard (D043–D044). Research and Tier 2 stations keep coming every 30–60 seconds through this window, so it needs no tuning. The flat spots in the first half hour are earlier: the vat-to-line saving (E3's 96 s) and the plots in between (W28).
 
 ### What moved
 

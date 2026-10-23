@@ -55,6 +55,21 @@ Brief §4: "Extends the current run's Offline production cap (+2 hours per node)
   - The cap note mentions Night Shift Protocols only while one is still to research.
 - **Dismissing it:** tapping anywhere closes it. Nothing on it is a choice.
 
+## The return before the Delivery Van (D046)
+
+**Why.** Until the Delivery Van (about 18–20 minutes in) nothing sells itself, so time away makes bottles and crops but no cash. The card led with "+$0.00 cash" even after a night that left $56,000 of Table Mild waiting (casual player away 8 hours from 8:00). Coming back is meant to feel rewarding, and this is the first return most players see.
+
+**Rule.** The catch-up report carries what Sell Batch would pay once it's done (`bottles_waiting`, the same figure as `Game.bottles_value()`). The card shows "+$X of sauce waiting: tap Sell Batch" when that's above zero, and leaves out the cash line when no cash was earned. Crops waiting aren't counted: selling them can starve a vat, so that stays the player's choice on the plot cards.
+
+| Id | Criterion |
+| --- | --- |
+| J1 | Before the Delivery Van, a return of more than 60 s that made bottles shows what Sell Batch would pay, matching `bottles_value()` after the catch-up, and doesn't show a "+$0.00 cash" line. |
+| J2 | With the Delivery Van selling everything, the card is as before: the cash line shows, and no waiting line (nothing is held). |
+
+After the Van the waiting line still shows whenever bottles are held (Auto-Sell under 100%, or a pin), which is what Sell Batch would pay then too. The figure is taken as the catch-up ends, Heat included; Heat is 0 after any real night, so it can only be a little high after a short return with Piston presses.
+
+**Results: J1 and J2 PASS** (`tests/ui_tests.gd`). In the capture (`tools/capture_ui.gd`, `j1_return.png`) a night at the Tier 1 factory reads "+$42.8K of sauce waiting: tap Sell Batch" where it used to read "+$0.00 cash". A late return with sauce stockpiled for research shows both lines.
+
 ## Saves
 
 Version 5 adds `saved_at`, the device time when the save was written, beside `run` and `account`. A v4 save migrates with no `saved_at`, so its first load gives no offline progress (a v4 game never promised any).

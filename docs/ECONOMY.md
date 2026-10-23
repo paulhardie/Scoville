@@ -4,6 +4,24 @@
 
 What things are worth, what Operation Value counts, how long a first run should take, and when the tabs open. It settles G5, G6 and G7 ([D004–D006](DECISIONS.md)), and owns the run's pacing criteria.
 
+## v0.6f: Idle Planet Miner's opening ladder (W28–W30, D048)
+
+**Why.** On a phone the second plot feels slow to unlock (W28), and since Cargo and the dashboard (D043, D044) two early criteria miss by one unit: A4, the longest wait between new stations, 6:31 against 6:30 (W29), and E6, the mash waiting for the casual player's Starter Crate, 9 against 10 (W30). The owner asked how Idle Planet Miner handles this.
+
+**How Idle Planet Miner does it.** Its first planets are all on sale from the start, on a short ladder: Balor $100, Drasta $200, Anadius $500, Dholen $1,250, then Verr $5,000 ([fandom wiki](https://idle-planet-miner.fandom.com/wiki/Planet_prices), a community spreadsheet). That's ×2, ×2.5, ×2.5, ×4. Each planet's upgrades start at its price ÷ 20 and climb ×1.3 a level, which we already copy (D041). So between planets there's always a cheap upgrade, and the next planet is never more than a couple of steps away. Ours climbs Bell $50, Poblano $800 (×16), Jalapeño $1,900, then nothing until the Tech Tree: the second plot is one big step, and the gap after the Jalapeño Plot is where A4 fails.
+
+### Criteria (v0.6f)
+
+Set before measuring. A4 and E6 keep their bars; this pass is to meet them, not move them.
+
+| Id | Criterion |
+| --- | --- |
+| A7 | The casual player buys its first plot after Bell by 3:30 (the owner's "feels slow"; 4:28 before #20). |
+| A8 | The plots on sale from the start, after Bell, follow Idle Planet Miner's opening: each costs 2–4× the one before, and each pays back from raw sales, unupgraded, in 5–10 minutes (A1's bar). |
+| A4 | Unchanged: at most 6:30 between new stations from the first line to 14:00, with at least two new plots. |
+| E6 | Unchanged: at least 10 Sweet Pepper Mash waiting for the casual player's Starter Crate. |
+| A9 | Every other criterion still passes. |
+
 ## v0.6d: Idle Planet Miner's early flow (D041)
 
 The owner asked for the early game to flow roughly as Idle Planet Miner's does. There, planets 1–4 are on sale from the start at about ×2 each, ore sells raw and is the main early income, telescopes reveal later planets, and every planet upgrade costs (planet price ÷ 20) × 1.3^(level − 1), with small gains a level. Here, until now, the bell plot was the only one until the Tech Tree opened: nothing new to buy between the first line (1:36) and the Poblano Plot (14:13), and plot upgrades cost ×2 a level.

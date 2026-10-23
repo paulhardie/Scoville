@@ -4,7 +4,7 @@
 
 Merged: v0.1–v0.6d, layout step 1, the second run, D036–D053 (PRs #1–#24), the last being v0.7 PR 1, the Idle Planet Miner skeleton mapped. PR #24 merged without its Haiku-review commit (Shift Roster as v0.8 everywhere, the Bell Plot's truck, criteria lists, formulas in the snapshot); PR 2 carries it.
 
-This branch is **v0.7 PR 2: the copy built and measured (W34).** Idle Planet Miner's progression is in the game as [SKELETON.md](SKELETON.md) maps it: 79 farms growing pepper mixes with trucks, 28 peppers, 33 mashes, 48 sauces, 25 Land Surveys, 30 adopted nodes, 10 vats and 10 lines, 15 HQ rooms in IPM's order, Operation Value as Galaxy Value, save v12 (an old run comes back as cash and items). `data/*.json` is built from `tools/ipm/mapping.json` by `tools/ipm/build_data.py`.
+This branch is **v0.7 PR 2: the copy built and measured (W34).** Idle Planet Miner's progression is in the game as [SKELETON.md](SKELETON.md) maps it: 79 farms growing pepper mixes with trucks, 28 peppers, 33 mashes and 48 sauces (plus the kitchen's Sweet Pepper Mash and Table Mild), 25 Land Surveys, 30 adopted nodes, 10 vats and 10 lines, 15 HQ rooms in IPM's order, Operation Value as Galaxy Value, save v12 (an old run comes back as cash and items). `data/*.json` is built from `tools/ipm/mapping.json` by `tools/ipm/build_data.py`.
 
 **Results** ([SKELETON.md](SKELETON.md#results-pr-2)): I1–I3, I5, I11–I13 PASS. **FAIL:** I6 (the $10M sale at 7:56, not 2:00–2:30), I7 (1:11 with nothing new while Land Survey 3 fills), I8 (tapping 13%, 10%, 6%), I9 (run 2 at 85%), I4 (F6, E3, E6), I14 (P2 by 2%, Y2: SOP grants nothing), and I10 (run 2 is at Land Survey 5 of 25 after 48 hours). Each has a backlog row, W37–W44 and W30.
 

@@ -252,7 +252,8 @@ func longest_wait(p: Player, from: float, to: float) -> float:
 ## player had lent to research at that tick (D035).
 func set_up(state: Dictionary) -> Game:
 	var c := Game.new()
-	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	var problem := c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	assert_loaded(problem)
 	var p := Player.new()
 	p.buys = false
 	p.decide(c)
@@ -261,7 +262,7 @@ func set_up(state: Dictionary) -> Game:
 
 func minute_from(state: Dictionary, taps_per_second: float, no_spike: bool = false) -> float:
 	var c := Game.new()
-	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	assert_loaded(c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true))))
 	if no_spike:
 		# A spike lasts 30 minutes; a minute scaled to hours mustn't carry it.
 		c.ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
@@ -280,3 +281,11 @@ func minute_from(state: Dictionary, taps_per_second: float, no_spike: bool = fal
 		p.step(c)
 		c.tick()
 	return c.operation_value() - start
+
+
+## A saved state that doesn't load would leave a fresh game behind and let a
+## criterion pass on nothing (U8 under the sale's bar), so it fails the suite.
+func assert_loaded(problem: String) -> void:
+	checks += 1
+	if problem != "":
+		failures.append("a saved state didn't load: " + problem)

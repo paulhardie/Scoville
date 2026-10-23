@@ -6,9 +6,10 @@ extends SceneTree
 ##   bash run_godot.sh --headless --path . -s res://tools/deep_run.gd
 ## Settings come from the environment: RUNS (50), RUN_HOURS (the most one run
 ## may take, 48), BUDGET_MINUTES (wall-clock minutes before it stops, 60).
-## It looks at the game once a second and steps the game a second at a time
-## (Game._step(10), as the catch-up does), tapping at the pacing player's rate
-## between steps.
+## The player looks at the game once a second, between one-second steps
+## (Game._step(10), as the catch-up does), tapping at the pacing player's rate;
+## the tool checks for the sale, farm 79 and sauces every 10 minutes of play,
+## so a sale can come up to 10 minutes late.
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
@@ -30,7 +31,9 @@ func _init() -> void:
 	var farm_79 := ""
 	var every_sauce := ""
 	var total_seconds := 0.0
+	var runs_played := 0
 	for run in range(1, runs + 1):
+		runs_played = run
 		var p := Player.new()
 		var taps := roundi(p.taps_per_second)
 		var steps := 0
@@ -73,7 +76,7 @@ func _init() -> void:
 		if farm_79 != "" and every_sauce != "":
 			break
 	print("I10: farm 79 %s; every sauce %s; %d runs, %s of play, %d s of computing" % [
-		farm_79 if farm_79 != "" else "never", every_sauce if every_sauce != "" else "never", g.account.prestiges + 1,
+		farm_79 if farm_79 != "" else "never", every_sauce if every_sauce != "" else "never", runs_played,
 		_clock(int(total_seconds)), (Time.get_ticks_msec() - started) / 1000])
 	quit()
 

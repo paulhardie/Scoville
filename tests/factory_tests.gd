@@ -473,7 +473,65 @@ func test_v3_save_migrates() -> void:
 
 func test_v11_save_refunds() -> void:
 	# I11: a v11 save, built by hand as v0.6 wrote it, mid-run with rooms.
-	var s := {
+	var s := v11_save()
+	var g := Game.new()
+	var problem := g.load_state(JSON.parse_string(JSON.stringify(s)))
+	check(problem == "", "I11: a v11 save loads: " + problem)
+	# Cash: every dollar earned plus Seed Capital Level 2's $5,000.
+	check(close(g.cash, 50000.0 + 5000.0), "I11: cash is the run's earnings plus its starting cash ($%.2f)" % g.cash)
+	check(g.stock.bell == 10 + 7 + 10 and g.stock.poblano == 3 and g.stock.jalapeno == 5 and g.stock.bistro_verde == 2, "I11: fields and the vat's inputs go to stock")
+	# Removed: Jalapeño Cultivation (3 Table Mild), Slot Expansion I (40 Sweet Mash + 20 Verde).
+	check(g.stock.table_mild == 3 and g.stock.sweet_mash == 40 and g.stock.verde_mash == 20, "I11: removed nodes give back their items")
+	check(g.is_researched("delivery_van") and not g.is_researched("slot_expansion_1"), "I11: kept research stays")
+	# Credits: 2 rooms (5 + 10), levels (2 for Seed Capital; 2 + 4 for the
+	# Tasting Room), the paid draft (15), plus 4 held.
+	check(g.account.credits == 4 + 15 + 2 + 6 + 15 and g.account.rooms.is_empty(), "I11: every room comes back as its credits (%d)" % g.account.credits)
+	check(g.account.best_ov >= 90000.0 and g.account.prestiges == 1, "I11: the account's best Operation Value and sales kept")
+	# A pin on a removed node goes with it rather than refusing the save.
+	var pinned := v11_save()
+	pinned.run.pin = "jalapeno_blueprint"
+	var h := Game.new()
+	problem = h.load_state(JSON.parse_string(JSON.stringify(pinned)))
+	check(problem == "" and h.pin == "", "I11: a v11 save pinning a removed node loads, unpinned: %s" % problem)
+	pinned.run.pin = "delivery_van"
+	h = Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(pinned))) == "" and h.pin == "delivery_van", "I11: a pin on a kept node stays")
+
+
+## v8–v10 saves, made from the v11 fixture in each version's shape, reach v12
+## with nothing lost (I11): their plot conversions and renames still run first.
+func test_v8_to_v10_saves_refund() -> void:
+	var v10 := v11_save()
+	v10.version = 10
+	for id in v10.run.plots:
+		var p: Dictionary = v10.run.plots[id]
+		p.quality = p.cargo
+		for k in ["cargo", "field", "haul"]:
+			p.erase(k)
+	var v9: Dictionary = JSON.parse_string(JSON.stringify(v10).replace("thai_chili", "tabasco"))
+	v9.version = 9
+	v9.run.stock["savina_gold"] = 4
+	var v8: Dictionary = v9.duplicate(true)
+	v8.version = 8
+	for id in v8.run.plots:
+		v8.run.plots[id].erase("spare")
+	for save in [v10, v9, v8]:
+		var g := Game.new()
+		var problem := g.load_state(JSON.parse_string(JSON.stringify(save)))
+		var label := "v%d" % save.version
+		check(problem == "", "I11 %s: loads: %s" % [label, problem])
+		check_no_loss(g, 50000.0, 90000.0, {"bell": 10, "jalapeno": 5, "bistro_verde": 2}, label)
+		check(g.account.credits == 4 + 15 + 2 + 6 + 15, "I11 %s: rooms back as credits (%d)" % [label, g.account.credits])
+	var g9 := Game.new()
+	g9.load_state(JSON.parse_string(JSON.stringify(v9)))
+	check(g9.stock.cocoa_loco == 4, "I11 v9: D042's renames still run (Savina Gold is Cocoa Loco: %d)" % g9.stock.cocoa_loco)
+	var bad := v8.duplicate(true)
+	bad.run.plots.bell = 5
+	check(Game.new().load_state(JSON.parse_string(JSON.stringify(bad))) != "", "I11 v8: a broken plot is refused, not crashed on")
+
+
+func v11_save() -> Dictionary:
+	return {
 		"version": 11,
 		"run": {
 			"cash": 1234.0, "stock": {"bell": 10, "jalapeno": 5, "bistro_verde": 2},
@@ -488,16 +546,3 @@ func test_v11_save_refunds() -> void:
 		},
 		"account": {"best_ov": 90000.0, "credits": 4, "prestiges": 1, "rooms": {"seed_capital": 2, "tasting_room": 3}, "draft": ["cooperage", "glassworks"]},
 	}
-	var g := Game.new()
-	var problem := g.load_state(JSON.parse_string(JSON.stringify(s)))
-	check(problem == "", "I11: a v11 save loads: " + problem)
-	# Cash: every dollar earned plus Seed Capital Level 2's $5,000.
-	check(close(g.cash, 50000.0 + 5000.0), "I11: cash is the run's earnings plus its starting cash ($%.2f)" % g.cash)
-	check(g.stock.bell == 10 + 7 + 10 and g.stock.poblano == 3 and g.stock.jalapeno == 5 and g.stock.bistro_verde == 2, "I11: fields and the vat's inputs go to stock")
-	# Removed: Jalapeño Cultivation (3 Table Mild), Slot Expansion I (40 Sweet Mash + 20 Verde).
-	check(g.stock.table_mild == 3 and g.stock.sweet_mash == 40 and g.stock.verde_mash == 20, "I11: removed nodes give back their items")
-	check(g.is_researched("delivery_van") and not g.is_researched("slot_expansion_1"), "I11: kept research stays")
-	# Credits: 2 rooms (5 + 10), levels (2 for Seed Capital; 2 + 4 for the
-	# Tasting Room), the paid draft (15), plus 4 held.
-	check(g.account.credits == 4 + 15 + 2 + 6 + 15 and g.account.rooms.is_empty(), "I11: every room comes back as its credits (%d)" % g.account.credits)
-	check(g.account.best_ov >= 90000.0 and g.account.prestiges == 1, "I11: the account's best Operation Value and sales kept")

@@ -1811,6 +1811,9 @@ func load_state(s: Variant) -> String:
 			"research": TYPE_ARRAY, "stats": TYPE_DICTIONARY})
 		if problem != "":
 			return problem
+		for id in s.run.plots:
+			if typeof(s.run.plots[id]) != TYPE_DICTIONARY:
+				return "save holds a broken plot " + str(id)
 		s = _migrate_11_to_12(s)
 	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
@@ -2023,6 +2026,9 @@ func _migrate_11_to_12(s: Dictionary) -> Dictionary:
 		elif data.tech.has(node):
 			kept.append(node)
 	run.research = kept
+	# A pin on a node v12 removed would refuse the save; it goes with the node.
+	if typeof(run.get("pin")) == TYPE_STRING and not data.tech.has(run.pin):
+		run.pin = ""
 	# Seed Capital's amount at the account's level (same room, same amounts).
 	var start := 0.0
 	var rooms_v: Variant = acc.get("rooms", {})

@@ -1,0 +1,29 @@
+{
+	"_source": "v0.7 PR 3's tweaks to the copy (docs/SKELETON.md Z2): tools/ipm/build_data.py applies them to what the mapping gives, and tests/skeleton_tests.gd checks data/ is the mapping with exactly these applied. Each row says what it answers. Everything not named here is Idle Planet Miner's number.",
+	"tweaks": [
+		{
+			"id": "T1",
+			"op": "farm_price_curve",
+			"anchor": 1250.0,
+			"gamma": 0.3,
+			"until_survey": 10,
+			"what": "Farms from Land Survey 1 on: prices climb from farm 4's $1,250 as (price ÷ $1,250)^0.3, to Land Survey 10's farms; after that they keep IPM's own steps from there. Upgrades follow, at price ÷ 20 (I2).",
+			"answers": "I6, I7, Z3 (W37, W38): IPM's planet prices outrun a run without its managers, colonies and Beacon"
+		},
+		{
+			"id": "T2",
+			"op": "survey_cost_scale",
+			"factor": 0.5,
+			"until_survey": 2,
+			"what": "Land Survey 1 costs IPM's Telescope 1 × 0.5, every later survey its telescope × 0.25 (at least 1 of each item).",
+			"answers": "I6, I7 (W37, W38): Land Survey 3 alone asked for 50,000 Pimento"
+		},
+		{
+			"id": "T3",
+			"op": "farm_rate_per_survey",
+			"factor": 1.2,
+			"what": "A farm from Land Survey n harvests and carries × 1.2^n: newer land, better trucks, in place of IPM's managers and colonies (left out, W36).",
+			"answers": "I6, Z3 (W37): the middle of the run grew too slowly to reach $10M by 2:30"
+		}
+	]
+}

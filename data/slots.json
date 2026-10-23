@@ -1,5 +1,5 @@
 {
-	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). Vat and line prices in buying order: IPM's smelters and crafters; the first of each is the kitchen's (D052); crafters 7–10 are the wiki's doubled (it quotes them after Preferred Vendor).",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053), with tools/ipm/tweaks.json applied (PR 3, Z2). Vat and line prices in buying order: IPM's smelters and crafters; the first of each is the kitchen's (D052); crafters 7–10 are the wiki's doubled (it quotes them after Preferred Vendor).",
 	"vat": {
 		"prices": [
 			150.0,

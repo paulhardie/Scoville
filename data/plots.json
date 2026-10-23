@@ -1,5 +1,5 @@
 {
-	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). The farms: IPM's planets with their crop shares (percent), prices, distances and telescope (`survey`, 0 on sale from the start); farm 1 is the tutorial's Bell Plot (D052). Ingredient stations are priced and placed like their survey's cheapest farm. Farms 77–79 and distances from farm 71 are assumed (G22).",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053), with tools/ipm/tweaks.json applied (PR 3, Z2). The farms: IPM's planets with their crop shares (percent), prices, distances and telescope (`survey`, 0 on sale from the start); farm 1 is the tutorial's Bell Plot (D052). Ingredient stations are priced and placed like their survey's cheapest farm. Farms 77–79 and distances from farm 71 are assumed (G22).",
 	"plots": [
 		{
 			"id": "bell",
@@ -54,7 +54,7 @@
 		{
 			"id": "farm_05",
 			"name": "Poblano Farm",
-			"price": 5000.0,
+			"price": 1890.0,
 			"crops": {
 				"poblano": 50,
 				"pimento": 30,
@@ -62,23 +62,27 @@
 			},
 			"distance": 16.0,
 			"survey": 1,
-			"ipm": "Verr"
+			"ipm": "Verr",
+			"harvest_mult": 1.2,
+			"cargo_mult": 1.2
 		},
 		{
 			"id": "farm_06",
 			"name": "Poblano Farm II",
-			"price": 9000.0,
+			"price": 2260.0,
 			"crops": {
 				"poblano": 100
 			},
 			"distance": 18.0,
 			"survey": 1,
-			"ipm": "Newton"
+			"ipm": "Newton",
+			"harvest_mult": 1.2,
+			"cargo_mult": 1.2
 		},
 		{
 			"id": "farm_07",
 			"name": "Pimento Farm II",
-			"price": 15000.0,
+			"price": 2630.0,
 			"crops": {
 				"pimento": 40,
 				"bell": 40,
@@ -86,36 +90,42 @@
 			},
 			"distance": 20.0,
 			"survey": 1,
-			"ipm": "Widow"
+			"ipm": "Widow",
+			"harvest_mult": 1.2,
+			"cargo_mult": 1.2
 		},
 		{
 			"id": "farm_08",
 			"name": "Cascabel Farm",
-			"price": 25000.0,
+			"price": 3070.0,
 			"crops": {
 				"cascabel": 60,
 				"bell": 40
 			},
 			"distance": 22.0,
 			"survey": 2,
-			"ipm": "Acheron"
+			"ipm": "Acheron",
+			"harvest_mult": 1.44,
+			"cargo_mult": 1.44
 		},
 		{
 			"id": "farm_09",
 			"name": "Cascabel Farm II",
-			"price": 40000.0,
+			"price": 3540.0,
 			"crops": {
 				"cascabel": 80,
 				"jalapeno": 20
 			},
 			"distance": 23.0,
 			"survey": 2,
-			"ipm": "Yangtze"
+			"ipm": "Yangtze",
+			"harvest_mult": 1.44,
+			"cargo_mult": 1.44
 		},
 		{
 			"id": "farm_10",
 			"name": "Jalapeño Farm",
-			"price": 75000.0,
+			"price": 4270.0,
 			"crops": {
 				"jalapeno": 50,
 				"cascabel": 30,
@@ -123,23 +133,27 @@
 			},
 			"distance": 25.0,
 			"survey": 2,
-			"ipm": "Solveig"
+			"ipm": "Solveig",
+			"harvest_mult": 1.44,
+			"cargo_mult": 1.44
 		},
 		{
 			"id": "farm_11",
 			"name": "Jalapeño Farm II",
-			"price": 150000.0,
+			"price": 5260.0,
 			"crops": {
 				"jalapeno": 100
 			},
 			"distance": 26.0,
 			"survey": 3,
-			"ipm": "Imir"
+			"ipm": "Imir",
+			"harvest_mult": 1.7279999999999998,
+			"cargo_mult": 1.7279999999999998
 		},
 		{
 			"id": "farm_12",
 			"name": "Poblano Farm III",
-			"price": 250000.0,
+			"price": 6130.0,
 			"crops": {
 				"poblano": 45,
 				"cascabel": 35,
@@ -147,24 +161,28 @@
 			},
 			"distance": 28.0,
 			"survey": 3,
-			"ipm": "Relic"
+			"ipm": "Relic",
+			"harvest_mult": 1.7279999999999998,
+			"cargo_mult": 1.7279999999999998
 		},
 		{
 			"id": "farm_13",
 			"name": "Hungarian Wax Farm",
-			"price": 400000.0,
+			"price": 7050.0,
 			"crops": {
 				"hungarian_wax": 80,
 				"jalapeno": 20
 			},
 			"distance": 30.0,
 			"survey": 3,
-			"ipm": "Nith"
+			"ipm": "Nith",
+			"harvest_mult": 1.7279999999999998,
+			"cargo_mult": 1.7279999999999998
 		},
 		{
 			"id": "farm_14",
 			"name": "Bell Farm III",
-			"price": 800000.0,
+			"price": 8680.0,
 			"crops": {
 				"bell": 40,
 				"pimento": 40,
@@ -172,35 +190,41 @@
 			},
 			"distance": 33.0,
 			"survey": 4,
-			"ipm": "Batalla"
+			"ipm": "Batalla",
+			"harvest_mult": 2.0736,
+			"cargo_mult": 2.0736
 		},
 		{
 			"id": "farm_15",
 			"name": "Serrano Farm",
-			"price": 1500000.0,
+			"price": 10500.0,
 			"crops": {
 				"serrano": 50,
 				"hungarian_wax": 50
 			},
 			"distance": 35.0,
 			"survey": 4,
-			"ipm": "Micah"
+			"ipm": "Micah",
+			"harvest_mult": 2.0736,
+			"cargo_mult": 2.0736
 		},
 		{
 			"id": "farm_16",
 			"name": "Serrano Farm II",
-			"price": 3000000.0,
+			"price": 12900.0,
 			"crops": {
 				"serrano": 100
 			},
 			"distance": 37.0,
 			"survey": 4,
-			"ipm": "Pranas"
+			"ipm": "Pranas",
+			"harvest_mult": 2.0736,
+			"cargo_mult": 2.0736
 		},
 		{
 			"id": "farm_17",
 			"name": "Jalapeño Farm III",
-			"price": 6000000.0,
+			"price": 15900.0,
 			"crops": {
 				"jalapeno": 40,
 				"cascabel": 35,
@@ -208,71 +232,83 @@
 			},
 			"distance": 40.0,
 			"survey": 5,
-			"ipm": "Castellus"
+			"ipm": "Castellus",
+			"harvest_mult": 2.4883199999999994,
+			"cargo_mult": 2.4883199999999994
 		},
 		{
 			"id": "farm_18",
 			"name": "Árbol Farm",
-			"price": 12000000.0,
+			"price": 19600.0,
 			"crops": {
 				"arbol": 80,
 				"poblano": 20
 			},
 			"distance": 43.0,
 			"survey": 5,
-			"ipm": "Gorgon"
+			"ipm": "Gorgon",
+			"harvest_mult": 2.4883199999999994,
+			"cargo_mult": 2.4883199999999994
 		},
 		{
 			"id": "farm_19",
 			"name": "Serrano Farm III",
-			"price": 25000000.0,
+			"price": 24400.0,
 			"crops": {
 				"serrano": 70,
 				"cayenne": 30
 			},
 			"distance": 45.0,
 			"survey": 5,
-			"ipm": "Parnitha"
+			"ipm": "Parnitha",
+			"harvest_mult": 2.4883199999999994,
+			"cargo_mult": 2.4883199999999994
 		},
 		{
 			"id": "farm_20",
 			"name": "Cayenne Farm",
-			"price": 50000000.0,
+			"price": 30000.0,
 			"crops": {
 				"cayenne": 70,
 				"arbol": 30
 			},
 			"distance": 48.0,
 			"survey": 6,
-			"ipm": "Orisoni"
+			"ipm": "Orisoni",
+			"harvest_mult": 2.9859839999999993,
+			"cargo_mult": 2.9859839999999993
 		},
 		{
 			"id": "farm_21",
 			"name": "Cayenne Farm II",
-			"price": 100000000.0,
+			"price": 37000.0,
 			"crops": {
 				"cayenne": 100
 			},
 			"distance": 51.0,
 			"survey": 6,
-			"ipm": "Theseus"
+			"ipm": "Theseus",
+			"harvest_mult": 2.9859839999999993,
+			"cargo_mult": 2.9859839999999993
 		},
 		{
 			"id": "farm_22",
 			"name": "Hungarian Wax Farm II",
-			"price": 200000000.0,
+			"price": 45500.0,
 			"crops": {
 				"hungarian_wax": 70,
 				"pequin": 30
 			},
 			"distance": 54.0,
 			"survey": 6,
-			"ipm": "Zelene"
+			"ipm": "Zelene",
+			"harvest_mult": 2.9859839999999993,
+			"cargo_mult": 2.9859839999999993
 		},
 		{
 			"id": "farm_23",
 			"name": "Pequin Farm",
-			"price": 400000000.0,
+			"price": 56000.0,
 			"crops": {
 				"pequin": 70,
 				"arbol": 20,
@@ -280,59 +316,69 @@
 			},
 			"distance": 57.0,
 			"survey": 7,
-			"ipm": "Han"
+			"ipm": "Han",
+			"harvest_mult": 3.583180799999999,
+			"cargo_mult": 3.583180799999999
 		},
 		{
 			"id": "farm_24",
 			"name": "Pequin Farm II",
-			"price": 800000000.0,
+			"price": 69000.0,
 			"crops": {
 				"pequin": 70,
 				"cayenne": 30
 			},
 			"distance": 58.0,
 			"survey": 7,
-			"ipm": "Strennus"
+			"ipm": "Strennus",
+			"harvest_mult": 3.583180799999999,
+			"cargo_mult": 3.583180799999999
 		},
 		{
 			"id": "farm_25",
 			"name": "Jalapeño Farm IV",
-			"price": 1600000000.0,
+			"price": 84900.0,
 			"crops": {
 				"jalapeno": 60,
 				"thai_chili": 40
 			},
 			"distance": 60.0,
 			"survey": 7,
-			"ipm": "Osun"
+			"ipm": "Osun",
+			"harvest_mult": 3.583180799999999,
+			"cargo_mult": 3.583180799999999
 		},
 		{
 			"id": "farm_26",
 			"name": "Thai Chili Farm",
-			"price": 3200000000.0,
+			"price": 105000.0,
 			"crops": {
 				"thai_chili": 50,
 				"arbol": 50
 			},
 			"distance": 63.0,
 			"survey": 8,
-			"ipm": "Ploitari"
+			"ipm": "Ploitari",
+			"harvest_mult": 4.2998169599999985,
+			"cargo_mult": 4.2998169599999985
 		},
 		{
 			"id": "farm_27",
 			"name": "Thai Chili Farm II",
-			"price": 6400000000.0,
+			"price": 129000.0,
 			"crops": {
 				"thai_chili": 100
 			},
 			"distance": 67.0,
 			"survey": 8,
-			"ipm": "Elysta"
+			"ipm": "Elysta",
+			"harvest_mult": 4.2998169599999985,
+			"cargo_mult": 4.2998169599999985
 		},
 		{
 			"id": "farm_28",
 			"name": "Thai Chili Farm III",
-			"price": 12500000000.0,
+			"price": 157000.0,
 			"crops": {
 				"thai_chili": 40,
 				"pequin": 35,
@@ -340,71 +386,83 @@
 			},
 			"distance": 70.0,
 			"survey": 8,
-			"ipm": "Tikkun"
+			"ipm": "Tikkun",
+			"harvest_mult": 4.2998169599999985,
+			"cargo_mult": 4.2998169599999985
 		},
 		{
 			"id": "farm_29",
 			"name": "Bonnet Farm",
-			"price": 25000000000.0,
+			"price": 194000.0,
 			"crops": {
 				"bonnet": 60,
 				"pequin": 40
 			},
 			"distance": 72.0,
 			"survey": 9,
-			"ipm": "Satent"
+			"ipm": "Satent",
+			"harvest_mult": 5.1597803519999985,
+			"cargo_mult": 5.1597803519999985
 		},
 		{
 			"id": "farm_30",
 			"name": "Bonnet Farm II",
-			"price": 50000000000.0,
+			"price": 239000.0,
 			"crops": {
 				"bonnet": 90,
 				"arbol": 10
 			},
 			"distance": 73.0,
 			"survey": 9,
-			"ipm": "Urla Rast"
+			"ipm": "Urla Rast",
+			"harvest_mult": 5.1597803519999985,
+			"cargo_mult": 5.1597803519999985
 		},
 		{
 			"id": "farm_31",
 			"name": "Bonnet Farm III",
-			"price": 100000000000.0,
+			"price": 294000.0,
 			"crops": {
 				"bonnet": 70,
 				"fatalii": 30
 			},
 			"distance": 75.0,
 			"survey": 9,
-			"ipm": "Vular"
+			"ipm": "Vular",
+			"harvest_mult": 5.1597803519999985,
+			"cargo_mult": 5.1597803519999985
 		},
 		{
 			"id": "farm_32",
 			"name": "Fatalii Farm",
-			"price": 250000000000.0,
+			"price": 387000.0,
 			"crops": {
 				"fatalii": 60,
 				"thai_chili": 40
 			},
 			"distance": 76.0,
 			"survey": 10,
-			"ipm": "Nibiru"
+			"ipm": "Nibiru",
+			"harvest_mult": 6.191736422399997,
+			"cargo_mult": 6.191736422399997
 		},
 		{
 			"id": "farm_33",
 			"name": "Fatalii Farm II",
-			"price": 600000000000.0,
+			"price": 503000.0,
 			"crops": {
 				"fatalii": 100
 			},
 			"distance": 78.0,
 			"survey": 10,
-			"ipm": "Xena"
+			"ipm": "Xena",
+			"harvest_mult": 6.191736422399997,
+			"cargo_mult": 6.191736422399997
 		},
 		{
 			"id": "farm_34",
 			"name": "Bonnet Farm IV",
-			"price": 1500000000000.0,
+			"price": 662000.0,
 			"crops": {
 				"bonnet": 55,
 				"fatalii": 30,
@@ -412,105 +470,123 @@
 			},
 			"distance": 78.0,
 			"survey": 10,
-			"ipm": "Rupert"
+			"ipm": "Rupert",
+			"harvest_mult": 6.191736422399997,
+			"cargo_mult": 6.191736422399997
 		},
 		{
 			"id": "farm_35",
 			"name": "Caribbean Red Farm",
-			"price": 4000000000000.0,
+			"price": 1760000.0,
 			"crops": {
 				"caribbean_red": 50,
 				"cayenne": 50
 			},
 			"distance": 80.0,
 			"survey": 11,
-			"ipm": "Pax"
+			"ipm": "Pax",
+			"harvest_mult": 7.430083706879997,
+			"cargo_mult": 7.430083706879997
 		},
 		{
 			"id": "farm_36",
 			"name": "Caribbean Red Farm II",
-			"price": 10000000000000.0,
+			"price": 4410000.0,
 			"crops": {
 				"caribbean_red": 100
 			},
 			"distance": 81.0,
 			"survey": 11,
-			"ipm": "Ivyra"
+			"ipm": "Ivyra",
+			"harvest_mult": 7.430083706879997,
+			"cargo_mult": 7.430083706879997
 		},
 		{
 			"id": "farm_37",
 			"name": "Caribbean Red Farm III",
-			"price": 25000000000000.0,
+			"price": 11000000.0,
 			"crops": {
 				"caribbean_red": 75,
 				"chocolate": 25
 			},
 			"distance": 82.0,
 			"survey": 11,
-			"ipm": "Utritis"
+			"ipm": "Utritis",
+			"harvest_mult": 7.430083706879997,
+			"cargo_mult": 7.430083706879997
 		},
 		{
 			"id": "farm_38",
 			"name": "Chocolate Farm",
-			"price": 62000000000000.0,
+			"price": 27400000.0,
 			"crops": {
 				"chocolate": 50,
 				"fatalii": 50
 			},
 			"distance": 84.0,
 			"survey": 12,
-			"ipm": "Dosie"
+			"ipm": "Dosie",
+			"harvest_mult": 8.916100448255996,
+			"cargo_mult": 8.916100448255996
 		},
 		{
 			"id": "farm_39",
 			"name": "Chocolate Farm II",
-			"price": 160000000000000.0,
+			"price": 70600000.0,
 			"crops": {
 				"chocolate": 100
 			},
 			"distance": 84.0,
 			"survey": 12,
-			"ipm": "Zulu"
+			"ipm": "Zulu",
+			"harvest_mult": 8.916100448255996,
+			"cargo_mult": 8.916100448255996
 		},
 		{
 			"id": "farm_40",
 			"name": "Chocolate Farm III",
-			"price": 400000000000000.0,
+			"price": 176000000.0,
 			"crops": {
 				"chocolate": 80,
 				"ghost": 20
 			},
 			"distance": 85.0,
 			"survey": 12,
-			"ipm": "Unicae"
+			"ipm": "Unicae",
+			"harvest_mult": 8.916100448255996,
+			"cargo_mult": 8.916100448255996
 		},
 		{
 			"id": "farm_41",
 			"name": "Fatalii Farm III",
-			"price": 1000000000000000.0,
+			"price": 441000000.0,
 			"crops": {
 				"fatalii": 60,
 				"ghost": 40
 			},
 			"distance": 87.0,
 			"survey": 13,
-			"ipm": "Dune"
+			"ipm": "Dune",
+			"harvest_mult": 10.699320537907195,
+			"cargo_mult": 10.699320537907195
 		},
 		{
 			"id": "farm_42",
 			"name": "Ghost Farm",
-			"price": 2500000000000000.0,
+			"price": 1100000000.0,
 			"crops": {
 				"ghost": 100
 			},
 			"distance": 88.0,
 			"survey": 13,
-			"ipm": "Naraka"
+			"ipm": "Naraka",
+			"harvest_mult": 10.699320537907195,
+			"cargo_mult": 10.699320537907195
 		},
 		{
 			"id": "farm_43",
 			"name": "Ghost Farm II",
-			"price": 6200000000000000.0,
+			"price": 2740000000.0,
 			"crops": {
 				"ghost": 60,
 				"chocolate": 25,
@@ -518,105 +594,123 @@
 			},
 			"distance": 89.0,
 			"survey": 13,
-			"ipm": "Daedalus"
+			"ipm": "Daedalus",
+			"harvest_mult": 10.699320537907195,
+			"cargo_mult": 10.699320537907195
 		},
 		{
 			"id": "farm_44",
 			"name": "7 Pot Farm",
-			"price": 1.5e+16,
+			"price": 6620000000.0,
 			"crops": {
 				"seven_pot": 50,
 				"ghost": 50
 			},
 			"distance": 91.0,
 			"survey": 14,
-			"ipm": "Clovis"
+			"ipm": "Clovis",
+			"harvest_mult": 12.839184645488633,
+			"cargo_mult": 12.839184645488633
 		},
 		{
 			"id": "farm_45",
 			"name": "7 Pot Farm II",
-			"price": 4e+16,
+			"price": 17600000000.0,
 			"crops": {
 				"seven_pot": 100
 			},
 			"distance": 92.0,
 			"survey": 14,
-			"ipm": "Zero"
+			"ipm": "Zero",
+			"harvest_mult": 12.839184645488633,
+			"cargo_mult": 12.839184645488633
 		},
 		{
 			"id": "farm_46",
 			"name": "7 Pot Farm III",
-			"price": 1e+17,
+			"price": 44100000000.0,
 			"crops": {
 				"seven_pot": 75,
 				"naga": 25
 			},
 			"distance": 92.0,
 			"survey": 14,
-			"ipm": "Sotomi"
+			"ipm": "Sotomi",
+			"harvest_mult": 12.839184645488633,
+			"cargo_mult": 12.839184645488633
 		},
 		{
 			"id": "farm_47",
 			"name": "Naga Farm",
-			"price": 2.5e+17,
+			"price": 110000000000.0,
 			"crops": {
 				"naga": 60,
 				"ghost": 40
 			},
 			"distance": 93.0,
 			"survey": 15,
-			"ipm": "Remidian"
+			"ipm": "Remidian",
+			"harvest_mult": 15.40702157458636,
+			"cargo_mult": 15.40702157458636
 		},
 		{
 			"id": "farm_48",
 			"name": "Naga Farm II",
-			"price": 6e+17,
+			"price": 265000000000.0,
 			"crops": {
 				"naga": 100
 			},
 			"distance": 95.0,
 			"survey": 15,
-			"ipm": "Muse"
+			"ipm": "Muse",
+			"harvest_mult": 15.40702157458636,
+			"cargo_mult": 15.40702157458636
 		},
 		{
 			"id": "farm_49",
 			"name": "Naga Farm III",
-			"price": 1.5e+18,
+			"price": 662000000000.0,
 			"crops": {
 				"naga": 50,
 				"moruga": 50
 			},
 			"distance": 97.0,
 			"survey": 15,
-			"ipm": "Arabis"
+			"ipm": "Arabis",
+			"harvest_mult": 15.40702157458636,
+			"cargo_mult": 15.40702157458636
 		},
 		{
 			"id": "farm_50",
 			"name": "Moruga Farm",
-			"price": 3.8e+18,
+			"price": 1680000000000.0,
 			"crops": {
 				"moruga": 60,
 				"seven_pot": 40
 			},
 			"distance": 100.0,
 			"survey": 16,
-			"ipm": "Vesna"
+			"ipm": "Vesna",
+			"harvest_mult": 18.48842588950363,
+			"cargo_mult": 18.48842588950363
 		},
 		{
 			"id": "farm_51",
 			"name": "Moruga Farm II",
-			"price": 1e+19,
+			"price": 4410000000000.0,
 			"crops": {
 				"moruga": 100
 			},
 			"distance": 102.0,
 			"survey": 16,
-			"ipm": "Chandra"
+			"ipm": "Chandra",
+			"harvest_mult": 18.48842588950363,
+			"cargo_mult": 18.48842588950363
 		},
 		{
 			"id": "farm_52",
 			"name": "Moruga Farm III",
-			"price": 2.5e+19,
+			"price": 11000000000000.0,
 			"crops": {
 				"moruga": 70,
 				"grim": 20,
@@ -624,35 +718,41 @@
 			},
 			"distance": 103.0,
 			"survey": 16,
-			"ipm": "Vega"
+			"ipm": "Vega",
+			"harvest_mult": 18.48842588950363,
+			"cargo_mult": 18.48842588950363
 		},
 		{
 			"id": "farm_53",
 			"name": "Grim Farm",
-			"price": 6e+19,
+			"price": 26500000000000.0,
 			"crops": {
 				"grim": 50,
 				"seven_pot": 50
 			},
 			"distance": 105.0,
 			"survey": 17,
-			"ipm": "Crius"
+			"ipm": "Crius",
+			"harvest_mult": 22.186111067404354,
+			"cargo_mult": 22.186111067404354
 		},
 		{
 			"id": "farm_54",
 			"name": "Grim Farm II",
-			"price": 1.5e+20,
+			"price": 66200000000000.0,
 			"crops": {
 				"grim": 100
 			},
 			"distance": 107.0,
 			"survey": 17,
-			"ipm": "Singhana"
+			"ipm": "Singhana",
+			"harvest_mult": 22.186111067404354,
+			"cargo_mult": 22.186111067404354
 		},
 		{
 			"id": "farm_55",
 			"name": "Grim Farm III",
-			"price": 3.6e+20,
+			"price": 159000000000000.0,
 			"crops": {
 				"grim": 70,
 				"moruga": 20,
@@ -660,35 +760,41 @@
 			},
 			"distance": 108.0,
 			"survey": 17,
-			"ipm": "Zumbia"
+			"ipm": "Zumbia",
+			"harvest_mult": 22.186111067404354,
+			"cargo_mult": 22.186111067404354
 		},
 		{
 			"id": "farm_56",
 			"name": "Pepper Y Farm",
-			"price": 9e+20,
+			"price": 397000000000000.0,
 			"crops": {
 				"pepper_y": 60,
 				"naga": 40
 			},
 			"distance": 109.0,
 			"survey": 18,
-			"ipm": "Elysium"
+			"ipm": "Elysium",
+			"harvest_mult": 26.623333280885227,
+			"cargo_mult": 26.623333280885227
 		},
 		{
 			"id": "farm_57",
 			"name": "Pepper Y Farm II",
-			"price": 2.6e+21,
+			"price": 1150000000000000.0,
 			"crops": {
 				"pepper_y": 100
 			},
 			"distance": 110.0,
 			"survey": 18,
-			"ipm": "Nyota"
+			"ipm": "Nyota",
+			"harvest_mult": 26.623333280885227,
+			"cargo_mult": 26.623333280885227
 		},
 		{
 			"id": "farm_58",
 			"name": "Pepper Y Farm III",
-			"price": 7.5e+21,
+			"price": 3310000000000000.0,
 			"crops": {
 				"pepper_y": 40,
 				"grim": 40,
@@ -696,70 +802,82 @@
 			},
 			"distance": 112.0,
 			"survey": 18,
-			"ipm": "Doral"
+			"ipm": "Doral",
+			"harvest_mult": 26.623333280885227,
+			"cargo_mult": 26.623333280885227
 		},
 		{
 			"id": "farm_59",
 			"name": "Lava Lantern Farm",
-			"price": 2.1e+22,
+			"price": 9260000000000000.0,
 			"crops": {
 				"lava_lantern": 70,
 				"moruga": 30
 			},
 			"distance": 114.0,
 			"survey": 19,
-			"ipm": "Nikara"
+			"ipm": "Nikara",
+			"harvest_mult": 31.94799993706227,
+			"cargo_mult": 31.94799993706227
 		},
 		{
 			"id": "farm_60",
 			"name": "Lava Lantern Farm II",
-			"price": 5.9e+22,
+			"price": 2.6e+16,
 			"crops": {
 				"lava_lantern": 100
 			},
 			"distance": 115.0,
 			"survey": 19,
-			"ipm": "Limbo"
+			"ipm": "Limbo",
+			"harvest_mult": 31.94799993706227,
+			"cargo_mult": 31.94799993706227
 		},
 		{
 			"id": "farm_61",
 			"name": "Lava Lantern Farm III",
-			"price": 1.7e+23,
+			"price": 7.5e+16,
 			"crops": {
 				"lava_lantern": 70,
 				"solar_flare": 30
 			},
 			"distance": 116.0,
 			"survey": 19,
-			"ipm": "Bob"
+			"ipm": "Bob",
+			"harvest_mult": 31.94799993706227,
+			"cargo_mult": 31.94799993706227
 		},
 		{
 			"id": "farm_62",
 			"name": "Solar Flare Farm",
-			"price": 4.6e+23,
+			"price": 2.03e+17,
 			"crops": {
 				"solar_flare": 55,
 				"grim": 45
 			},
 			"distance": 118.0,
 			"survey": 20,
-			"ipm": "Midas"
+			"ipm": "Midas",
+			"harvest_mult": 38.33759992447472,
+			"cargo_mult": 38.33759992447472
 		},
 		{
 			"id": "farm_63",
 			"name": "Solar Flare Farm II",
-			"price": 1.3e+24,
+			"price": 5.73e+17,
 			"crops": {
 				"solar_flare": 100
 			},
 			"distance": 120.0,
 			"survey": 20,
-			"ipm": "Antigone"
+			"ipm": "Antigone",
+			"harvest_mult": 38.33759992447472,
+			"cargo_mult": 38.33759992447472
 		},
 		{
 			"id": "farm_64",
 			"name": "Solar Flare Farm III",
-			"price": 3.9e+24,
+			"price": 1.72e+18,
 			"crops": {
 				"solar_flare": 50,
 				"lava_lantern": 25,
@@ -767,12 +885,14 @@
 			},
 			"distance": 122.0,
 			"survey": 20,
-			"ipm": "Hecate"
+			"ipm": "Hecate",
+			"harvest_mult": 38.33759992447472,
+			"cargo_mult": 38.33759992447472
 		},
 		{
 			"id": "farm_65",
 			"name": "Crystal Farm",
-			"price": 1.1e+25,
+			"price": 4.85e+18,
 			"crops": {
 				"capsaicin_crystal": 60,
 				"solar_flare": 20,
@@ -780,23 +900,27 @@
 			},
 			"distance": 124.0,
 			"survey": 21,
-			"ipm": "Sterop"
+			"ipm": "Sterop",
+			"harvest_mult": 46.00511990936967,
+			"cargo_mult": 46.00511990936967
 		},
 		{
 			"id": "farm_66",
 			"name": "Crystal Farm II",
-			"price": 3.3e+25,
+			"price": 1.46e+19,
 			"crops": {
 				"capsaicin_crystal": 100
 			},
 			"distance": 125.0,
 			"survey": 21,
-			"ipm": "Lavinia"
+			"ipm": "Lavinia",
+			"harvest_mult": 46.00511990936967,
+			"cargo_mult": 46.00511990936967
 		},
 		{
 			"id": "farm_67",
 			"name": "Crystal Farm III",
-			"price": 9.5e+25,
+			"price": 4.19e+19,
 			"crops": {
 				"capsaicin_crystal": 70,
 				"solar_flare": 20,
@@ -804,47 +928,55 @@
 			},
 			"distance": 127.0,
 			"survey": 21,
-			"ipm": "Ren"
+			"ipm": "Ren",
+			"harvest_mult": 46.00511990936967,
+			"cargo_mult": 46.00511990936967
 		},
 		{
 			"id": "farm_68",
 			"name": "Brimstone Farm",
-			"price": 2.7e+26,
+			"price": 1.19e+20,
 			"crops": {
 				"brimstone": 60,
 				"lava_lantern": 40
 			},
 			"distance": 129.0,
 			"survey": 22,
-			"ipm": "Gorgons"
+			"ipm": "Gorgons",
+			"harvest_mult": 55.2061438912436,
+			"cargo_mult": 55.2061438912436
 		},
 		{
 			"id": "farm_69",
 			"name": "Brimstone Farm II",
-			"price": 8e+26,
+			"price": 3.53e+20,
 			"crops": {
 				"brimstone": 80,
 				"capsaicin_crystal": 20
 			},
 			"distance": 131.0,
 			"survey": 22,
-			"ipm": "Pontus"
+			"ipm": "Pontus",
+			"harvest_mult": 55.2061438912436,
+			"cargo_mult": 55.2061438912436
 		},
 		{
 			"id": "farm_70",
 			"name": "Brimstone Farm III",
-			"price": 2.4e+27,
+			"price": 1.06e+21,
 			"crops": {
 				"brimstone": 100
 			},
 			"distance": 134.0,
 			"survey": 22,
-			"ipm": "Leto"
+			"ipm": "Leto",
+			"harvest_mult": 55.2061438912436,
+			"cargo_mult": 55.2061438912436
 		},
 		{
 			"id": "farm_71",
 			"name": "Brimstone Farm IV",
-			"price": 6.92e+27,
+			"price": 3.05e+21,
 			"crops": {
 				"brimstone": 40,
 				"capsaicin_crystal": 40,
@@ -852,144 +984,170 @@
 			},
 			"distance": 136.0,
 			"survey": 23,
-			"ipm": "Laconia"
+			"ipm": "Laconia",
+			"harvest_mult": 66.24737266949231,
+			"cargo_mult": 66.24737266949231
 		},
 		{
 			"id": "farm_72",
 			"name": "Supernova Farm",
-			"price": 2.08e+28,
+			"price": 9.18e+21,
 			"crops": {
 				"supernova": 70,
 				"solar_flare": 30
 			},
 			"distance": 138.0,
 			"survey": 23,
-			"ipm": "Awohali"
+			"ipm": "Awohali",
+			"harvest_mult": 66.24737266949231,
+			"cargo_mult": 66.24737266949231
 		},
 		{
 			"id": "farm_73",
 			"name": "Supernova Farm II",
-			"price": 6.229999999999999e+28,
+			"price": 2.75e+22,
 			"crops": {
 				"supernova": 100
 			},
 			"distance": 140.0,
 			"survey": 23,
-			"ipm": "Pegasi"
+			"ipm": "Pegasi",
+			"harvest_mult": 66.24737266949231,
+			"cargo_mult": 66.24737266949231
 		},
 		{
 			"id": "farm_74",
 			"name": "Supernova Farm III",
-			"price": 1.78e+29,
+			"price": 7.85e+22,
 			"crops": {
 				"supernova": 60,
 				"event_horizon": 40
 			},
 			"distance": 142.0,
 			"survey": 24,
-			"ipm": "Typhon"
+			"ipm": "Typhon",
+			"harvest_mult": 79.49684720339077,
+			"cargo_mult": 79.49684720339077
 		},
 		{
 			"id": "farm_75",
 			"name": "Event Horizon Farm",
-			"price": 5.16e+29,
+			"price": 2.28e+23,
 			"crops": {
 				"event_horizon": 70,
 				"brimstone": 30
 			},
 			"distance": 144.0,
 			"survey": 24,
-			"ipm": "Surtur"
+			"ipm": "Surtur",
+			"harvest_mult": 79.49684720339077,
+			"cargo_mult": 79.49684720339077
 		},
 		{
 			"id": "farm_76",
 			"name": "Event Horizon Farm II",
-			"price": 1.81e+30,
+			"price": 7.98e+23,
 			"crops": {
 				"event_horizon": 100
 			},
 			"distance": 146.0,
 			"survey": 24,
-			"ipm": "Vesta"
+			"ipm": "Vesta",
+			"harvest_mult": 79.49684720339077,
+			"cargo_mult": 79.49684720339077
 		},
 		{
 			"id": "farm_77",
 			"name": "Event Horizon Farm III",
-			"price": 5.43e+30,
+			"price": 2.4e+24,
 			"crops": {
 				"event_horizon": 70,
 				"heat_death": 30
 			},
 			"distance": 148.0,
 			"survey": 25,
-			"ipm": "Jolrael"
+			"ipm": "Jolrael",
+			"harvest_mult": 95.39621664406893,
+			"cargo_mult": 95.39621664406893
 		},
 		{
 			"id": "farm_78",
 			"name": "Heat Death Farm",
-			"price": 1.629e+31,
+			"price": 7.19e+24,
 			"crops": {
 				"heat_death": 70,
 				"event_horizon": 30
 			},
 			"distance": 150.0,
 			"survey": 25,
-			"ipm": "Hyperion"
+			"ipm": "Hyperion",
+			"harvest_mult": 95.39621664406893,
+			"cargo_mult": 95.39621664406893
 		},
 		{
 			"id": "farm_79",
 			"name": "Heat Death Farm II",
-			"price": 4.887e+31,
+			"price": 2.16e+25,
 			"crops": {
 				"heat_death": 100
 			},
 			"distance": 152.0,
 			"survey": 25,
-			"ipm": "Astrea"
+			"ipm": "Astrea",
+			"harvest_mult": 95.39621664406893,
+			"cargo_mult": 95.39621664406893
 		},
 		{
 			"id": "vinegar",
 			"name": "Vinegar Cask",
-			"price": 5000.0,
+			"price": 1890.0,
 			"crops": {
 				"vinegar": 100
 			},
 			"distance": 16.0,
 			"survey": 1,
-			"ingredient": true
+			"ingredient": true,
+			"harvest_mult": 1.2,
+			"cargo_mult": 1.2
 		},
 		{
 			"id": "garlic",
 			"name": "Garlic Plot",
-			"price": 150000.0,
+			"price": 5260.0,
 			"crops": {
 				"garlic": 100
 			},
 			"distance": 26.0,
 			"survey": 3,
-			"ingredient": true
+			"ingredient": true,
+			"harvest_mult": 1.7279999999999998,
+			"cargo_mult": 1.7279999999999998
 		},
 		{
 			"id": "pineapple",
 			"name": "Pineapple Grove",
-			"price": 800000.0,
+			"price": 8680.0,
 			"crops": {
 				"pineapple": 100
 			},
 			"distance": 33.0,
 			"survey": 4,
-			"ingredient": true
+			"ingredient": true,
+			"harvest_mult": 2.0736,
+			"cargo_mult": 2.0736
 		},
 		{
 			"id": "oak",
 			"name": "Oak Smokehouse",
-			"price": 50000000.0,
+			"price": 30000.0,
 			"crops": {
 				"oak": 100
 			},
 			"distance": 48.0,
 			"survey": 6,
-			"ingredient": true
+			"ingredient": true,
+			"harvest_mult": 2.9859839999999993,
+			"cargo_mult": 2.9859839999999993
 		}
 	]
 }

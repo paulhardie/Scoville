@@ -24,6 +24,10 @@ var decide_every := 1.0
 const PAYBACK_MAX := 3600.0
 ## Minutes of income a slot for an extra recipe may cost (GUESS).
 const SLOT_MINUTES := 10.0
+## Minutes of income a slot for the goal's own recipe may cost; dearer, the
+## goal's recipes take turns in the slots it has (GUESS, as IPM players switch
+## a smelter between bars).
+const GOAL_SLOT_MINUTES := 30.0
 ## IPM's guide (Upgrade Strategy): unlock a new planet once every planet is at
 ## Mining 12, its level 11 here. GUESS that its players follow it.
 const NEXT_FARM_LEVEL := 11
@@ -52,6 +56,7 @@ var events: Array = []
 var _tap_acc := 0.0
 var _earned := []   # [seconds, cash earned so far], for its income
 var _wanted_now := {}   # what the goal still needs, for weighing farm levels
+var _goal_total := {}   # everything the goal takes, stock included, for keeping
 
 
 ## A casual phone player (GUESS, docs/FACTORY.md): 2 taps a second in
@@ -96,7 +101,7 @@ func decide(g) -> void:
 	if g.fx.stockpile:
 		g.set_pin(goal if not need.is_empty() else "")
 	var plan := _plan_slots(g, wanted)
-	_assign(g, plan)
+	_assign(g, plan, wanted)
 	# The kitchen's nodes are paid in its bottles (D052): it keeps them for
 	# the cheapest it can reach, as the player before v0.7 did.
 	var keep := need.duplicate()
@@ -201,6 +206,7 @@ func _wanted(g, need: Dictionary) -> Dictionary:
 		var inputs: Dictionary = g.recipe_inputs(next)
 		for input in inputs:
 			total[input] = total.get(input, 0) + short * inputs[input]
+	_goal_total = total
 	var out := {}
 	for item in total:
 		if total[item] > g.stock[item]:
@@ -272,11 +278,22 @@ func _grows(g, crop: String) -> bool:
 
 ## Assigns each owned slot its planned recipe, if it owns the recipe; a slot
 ## past the plan, or on a recipe it doesn't own yet, is left as it is.
-func _assign(g, plan: Dictionary) -> void:
+func _assign(g, plan: Dictionary, wanted: Dictionary) -> void:
 	for station in ["vat", "line"]:
-		var picks: Array = plan[station]
+		var n: int = g.slots(station).size()
+		var picks: Array = plan[station].slice(0, n)
+		# A slot mid-cycle on a recipe the plan still wants keeps it: switching
+		# hands its inputs back, and two goal recipes would take turns forever.
+		var kept := {}
+		for i in n:
+			var s: Dictionary = g.slots(station)[i]
+			if s.running and (s.recipe in picks or wanted.has(s.recipe)):
+				kept[i] = true
+				picks.erase(s.recipe)
 		var used := 0
-		for i in g.slots(station).size():
+		for i in n:
+			if kept.has(i):
+				continue
 			var want := ""
 			while used < picks.size():
 				var r: String = picks[used]
@@ -297,6 +314,9 @@ func _assign(g, plan: Dictionary) -> void:
 ## running recipe's inputs and the goal's cost (D041: crops sell raw too).
 func _sell(g, now: float, plan: Dictionary, need: Dictionary) -> void:
 	var keep := need.duplicate()
+	# Everything the goal takes, all the way down, stays until it's used.
+	for item in _goal_total:
+		keep[item] = maxi(keep.get(item, 0), _goal_total[item])
 	for station in ["vat", "line"]:
 		for i in g.slots(station).size():
 			var r: String = g.slots(station)[i].recipe
@@ -422,7 +442,8 @@ func _needs(g, plan: Dictionary, wanted: Dictionary) -> Array:
 			continue
 		var r: String = rest[0]
 		var cheap: bool = g.slot_price(station) <= income() * 60.0 * SLOT_MINUTES
-		if wanted.has(r) or cheap and _can_feed(g, r):
+		var affordable: bool = g.slot_price(station) <= income() * 60.0 * GOAL_SLOT_MINUTES
+		if wanted.has(r) and affordable or cheap and _can_feed(g, r):
 			if not g.recipe_unlocked(r):
 				out.append({"name": "buy recipe " + r, "cost": g.recipe_price(r), "buy": g.buy_recipe.bind(r)})
 			out.append({"name": "buy %s %d (%s)" % [station, n + 1, r], "cost": g.slot_price(station), "buy": g.buy_slot.bind(station)})

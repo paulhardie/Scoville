@@ -3,7 +3,8 @@ from mapping.py's mapping.json (docs/SKELETON.md) and the pre-v0.7 data on
 `main` (for the nodes of ours that stay and their old values, G23).
 
 Usage: python3 -I tools/ipm/build_data.py <mapping.json> [<old data dir>]
-Run from the repository root. The old data dir defaults to `git show main:`.
+Run from the repository root. The old data dir defaults to `git show` of
+OLD_COMMIT, the last commit before v0.7's data (main holds v0.7's now).
 """
 import json, math, os, re, subprocess, sys
 
@@ -11,10 +12,13 @@ MAP = json.load(open(sys.argv[1]))
 OLD_DIR = sys.argv[2] if len(sys.argv) > 2 else None
 
 
+OLD_COMMIT = "4b9d617"
+
+
 def old(name):
     if OLD_DIR:
         return json.load(open(os.path.join(OLD_DIR, name + ".json")))
-    return json.loads(subprocess.check_output(["git", "show", f"main:data/{name}.json"]))
+    return json.loads(subprocess.check_output(["git", "show", f"{OLD_COMMIT}:data/{name}.json"]))
 
 
 OLD_ITEMS = {i["id"]: i for i in old("items")["items"]}
@@ -351,7 +355,39 @@ for r in MAP["rooms"]:
         row.update({"cap": o["cap"], "level_costs": engineering[: o["cap"] - 1]})
     rooms.append(row)
 
-SRC = "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053)."
+# --- PR 3's tweaks (tools/ipm/tweaks.json, SKELETON.md Z2) ---------------------
+def sig3(x):
+    """Three significant figures, as prices read."""
+    if x <= 0:
+        return x
+    return float(f"{x:.3g}")
+
+
+TWEAKS = json.load(open(os.path.join(os.path.dirname(os.path.abspath(__file__)), "tweaks.json")))["tweaks"]
+for t in TWEAKS:
+    if t["op"] == "farm_price_curve":
+        # Each surveyed farm's price p becomes p × (min(p, cap) ÷ anchor)^(gamma − 1),
+        # cap being the dearest price up to `until_survey`: continuous, in order.
+        cap = max(r["price"] for r in plots if 1 <= r["survey"] <= t["until_survey"])
+        for r in plots:
+            if r["survey"] >= 1 and r["price"] > t["anchor"]:
+                r["price"] = sig3(r["price"] * (min(r["price"], cap) / t["anchor"]) ** (t["gamma"] - 1))
+    elif t["op"] == "survey_cost_scale":
+        for n in out:
+            if n["id"].startswith("survey_"):
+                k = min(int(n["id"][7:]), t["until_survey"])
+                # Halves round up, as the game's roundi does (skeleton_tests.gd checks it).
+                n["cost"] = {i: max(1, math.floor(c * t["factor"] ** k + 0.5)) for i, c in n["cost"].items()}
+    elif t["op"] == "farm_rate_per_survey":
+        for r in plots:
+            if r["survey"] >= 1:
+                m = t["factor"] ** r["survey"]
+                r["harvest_mult"] = r.get("harvest_mult", 1.0) * m
+                r["cargo_mult"] = r.get("cargo_mult", 1.0) * m
+    else:
+        raise SystemExit("tweaks.json: unknown op " + t["op"])
+
+SRC = "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053), with tools/ipm/tweaks.json applied (PR 3, Z2)."
 files = {
     "items": {"_source": SRC + " Values are Idle Planet Miner's (ores, alloys, items); the kitchen's two are D004's (D052). `tier` groups crops four rungs a tier, and a made item takes its highest input's.", "items": items},
     "recipes": {"_source": SRC + " IPM's recipes, seconds and cash unlock prices (`unlock`, 0 is free); four sauces also take an ingredient mash (D051). `kitchen` recipes run only in the first vat and line (D052).", "recipes": recipes},

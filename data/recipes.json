@@ -1,5 +1,5 @@
 {
-	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). IPM's recipes, seconds and cash unlock prices (`unlock`, 0 is free); four sauces also take an ingredient mash (D051). `kitchen` recipes run only in the first vat and line (D052).",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053), with tools/ipm/tweaks.json applied (PR 3, Z2). IPM's recipes, seconds and cash unlock prices (`unlock`, 0 is free); four sauces also take an ingredient mash (D051). `kitchen` recipes run only in the first vat and line (D052).",
 	"recipes": [
 		{
 			"id": "sweet_mash",

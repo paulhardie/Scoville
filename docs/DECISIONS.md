@@ -296,6 +296,12 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** making a bottle is the game's core reward, but it got the same weight as any number changing: a text pop, no sound, no picture, and a $330,000 Phantom felt like a $50 Table Mild. The sound and the bottle need no art, and the visual pass (W8) can restyle them.
 
+## D046: The return card says what's waiting to sell
+
+**Decision:** after time away, whenever bottles are held, the "While you were away" card shows what Sell Batch would pay ("+$X of sauce waiting: tap Sell Batch") and drops the cash line when no cash came in. Crops waiting aren't counted. Criteria J1–J2 in [OFFLINE.md](OFFLINE.md#the-return-before-the-delivery-van-d046).
+
+**Why:** before the Delivery Van nothing sells while away, so every return in the first 20 minutes said "+$0.00 cash" though the factory had kept working. Showing the waiting value fixes the feel without changing what the Van is for. The other option, selling bottles while away before the Van, changes the game's rules and the Van's worth; it's the owner's call if the card isn't enough.
+
 ## D047: Pixel art is the game's look; trial a ready-made pixel UI skin first
 
 **Decision (the owner's: "I'd like a pixel art style for this game for sure"; the trial is the agent's recommendation):** the game's visual style is pixel art. The first step is a trial of Pixel UI Free (heyheythere, CC BY 4.0, wood theme) over today's screen, drawn at whole-number scales with its bitmap font ([LOOK.md](LOOK.md)). Whether to keep the kit, buy the full pack or commission custom UI art is the owner's call after seeing the trial.

@@ -146,10 +146,12 @@ func next_research(g) -> String:
 ## or "": Standard Operating Procedures once it can, then the button's basics
 ## (N1–N4, in order), since it taps; otherwise the cheapest.
 func _kitchen_node(g) -> String:
-	# After a sale, Standard Operating Procedures before anything (GUESS: it
-	# researches the rest for free).
-	if g.research_reachable("standard_operating_procedures"):
-		return "standard_operating_procedures"
+	# After a sale, Standard Operating Procedures (and the Van it needs) before
+	# anything (GUESS: it researches the rest for free).
+	if g.account.prestiges > 0 and not g.is_researched("standard_operating_procedures"):
+		for node in ["delivery_van", "standard_operating_procedures"]:
+			if g.research_reachable(node):
+				return node
 	var best := ""
 	for node in g.data.tech_order:
 		if not g.research_reachable(node):

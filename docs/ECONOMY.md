@@ -17,7 +17,7 @@ Set before measuring. A4 and E6 keep their bars; this pass is to meet them, not 
 | Id | Criterion |
 | --- | --- |
 | A7 | The casual player buys its first plot after Bell by 3:30 (the owner's "feels slow"; 4:28 before #20). |
-| A8 | The plots on sale from the start, after Bell, follow Idle Planet Miner's opening: each costs 2–4× the one before, and each pays back from raw sales, unupgraded, in 5–10 minutes (A1's bar). |
+| A8 | The plots on sale from the start, after Bell, follow Idle Planet Miner's opening: each costs 2–4× the one before (`factory_tests.gd`). Each still pays back raw in 5–10 minutes, which A1 checks. |
 | A4 | Unchanged: at most 6:30 between new stations from the first line to 14:00, with at least two new plots. |
 | E6 | Unchanged: at least 10 Sweet Pepper Mash waiting for the casual player's Starter Crate. |
 | A9 | Every other criterion still passes. |

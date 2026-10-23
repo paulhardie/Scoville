@@ -56,15 +56,16 @@ func test_selling_threshold() -> void:
 
 func test_credits() -> void:
 	# Idle Planet Miner's table (D035): 10, 30, 60 at $10M, $100M, $1B, straight
-	# lines between, rounded.
-	for c in [[1e7, 10], [1.25e7, 11], [1.75e7, 12], [1e8, 30], [5.5e8, 45], [1e9, 60], [1e10, 101]]:
+	# lines between, × CREDIT_SCALE (PR 3's T9), rounded.
+	var k: float = T.CREDIT_SCALE
+	for c in [[1e7, 10.0], [1.25e7, 10.0 + 20.0 / 36.0], [1.75e7, 10.0 + 20.0 / 12.0], [1e8, 30.0], [5.5e8, 45.0], [1e9, 60.0], [1e10, 101.0]]:
 		var got: int = worth(c[0]).prestige_credits()
-		check(got == c[1], "Q2: %d credits at $%.0f (got %d)" % [c[1], c[0], got])
+		check(got == roundi(c[1] * k), "Q2: %d credits at $%.0f, IPM's %.2f × %.0f (got %d)" % [roundi(c[1] * k), c[0], c[1], k, got])
 	var lounge := worth(1e8, {"boardroom": 1})
-	check(lounge.prestige_credits() == 35, "Q2: the Boardroom (IPM's Lounge) ×1.15, rounded: 30 × 1.15 = 34.5 → 35 (got %d)" % lounge.prestige_credits())
+	check(lounge.prestige_credits() == roundi(30.0 * k * 1.15), "Q2: the Boardroom (IPM's Lounge) ×1.15, rounded (got %d)" % lounge.prestige_credits())
 	var g := worth(1e8)
 	g.prestige()
-	check(g.account.credits == 30 and g.account.prestiges == 1, "Q2: the sale pays them into the account")
+	check(g.account.credits == roundi(30.0 * k) and g.account.prestiges == 1, "Q2: the sale pays them into the account")
 
 
 func test_reset_scope() -> void:

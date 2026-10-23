@@ -1216,12 +1216,13 @@ func prestige_credits() -> int:
 	var ov := operation_value()
 	if ov < T.PRESTIGE_OV - EPSILON:
 		return 0
-	# Idle Planet Miner's table: straight from one decade's credits to the next.
+	# Idle Planet Miner's table, × CREDIT_SCALE (T9): straight from one
+	# decade's credits to the next.
 	var decade := floori(log(ov / T.PRESTIGE_OV) / log(10.0) + 1e-9)
 	var low: float = T.PRESTIGE_OV * pow(10.0, decade)
 	var share := clampf((ov - low) / (9.0 * low), 0.0, 1.0)
 	var credits := _credits_at(decade) + share * (_credits_at(decade + 1) - _credits_at(decade))
-	return roundi(credits * hq("credits"))
+	return roundi(credits * T.CREDIT_SCALE * hq("credits"))
 
 
 ## Credits at PRESTIGE_OV × 10^decade (Idle Planet Miner's table, D035).

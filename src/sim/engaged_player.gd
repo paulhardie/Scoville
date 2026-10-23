@@ -143,9 +143,13 @@ func next_research(g) -> String:
 
 
 ## The node it can reach that is paid only in the kitchen's mash and bottles,
-## or "": the button's basics (N1–N4, in order) first, since it taps;
-## otherwise the cheapest.
+## or "": Standard Operating Procedures once it can, then the button's basics
+## (N1–N4, in order), since it taps; otherwise the cheapest.
 func _kitchen_node(g) -> String:
+	# After a sale, Standard Operating Procedures before anything (GUESS: it
+	# researches the rest for free).
+	if g.research_reachable("standard_operating_procedures"):
+		return "standard_operating_procedures"
 	var best := ""
 	for node in g.data.tech_order:
 		if not g.research_reachable(node):

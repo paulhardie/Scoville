@@ -1,7 +1,7 @@
 extends SceneTree
 ## The first 110 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
 ## docs/ECONOMY.md's N1–N8 (to 50:00), M1–M7 (to 1:50) and A4 (v0.6d), played by the
-## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E6,
+## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E6 and J3,
 ## played by both the eager pacing player and a casual one.
 ## Prints a timeline and each criterion's measurement.
 
@@ -218,6 +218,7 @@ func run() -> void:
 	criterion("E5", casual.tech <= 15 * 60.0, "casual player: the Tech Tree at %s (by 15:00)" % clock(casual.tech))
 	# Narrowed to the casual player after measuring: the eager one buys the line
 	# 36 s after the vat, so little mash waits (FACTORY.md says so).
+	criterion("J3", casual.late_gap <= 120.0, "longest stretch with nothing new, 15:00–30:00: %.0f s casual (at most 120); %.0f s eager (not judged)" % [casual.late_gap, eager.late_gap])
 	criterion("E6", casual.crate_mash >= 10, "Sweet Pepper Mash waiting for the Starter Crate: %d casual (at least 10); %d eager (not judged)" % [casual.crate_mash, eager.crate_mash])
 
 	# v0.5's criteria (OFFLINE.md).
@@ -303,9 +304,9 @@ func run() -> void:
 ## mash waiting when the line was bought.
 func early(p: Player) -> Dictionary:
 	var g := Game.new()
-	var out := {"deck": INF, "line": INF, "tech": INF, "gap": 0.0, "plot_share": 0.0, "crate_mash": 0}
+	var out := {"deck": INF, "line": INF, "tech": INF, "gap": 0.0, "late_gap": 0.0, "plot_share": 0.0, "crate_mash": 0}
 	var reveals := []
-	for i in minute(20):
+	for i in minute(30):
 		p.step(g)
 		g.tick()
 		var now: float = g.now_seconds()
@@ -334,6 +335,13 @@ func early(p: Player) -> Dictionary:
 			out.gap = maxf(out.gap, t - last)
 			last = t
 	out.gap = maxf(out.gap, 15 * 60.0 - last)
+	# J3: the same, from 15:00 to 30:00.
+	last = 15 * 60.0
+	for t in times:
+		if t > 15 * 60.0 and t <= 30 * 60.0:
+			out.late_gap = maxf(out.late_gap, t - last)
+			last = t
+	out.late_gap = maxf(out.late_gap, 30 * 60.0 - last)
 	return out
 
 

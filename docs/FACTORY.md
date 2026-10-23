@@ -200,7 +200,7 @@ A GUESS at a phone player (`Player.casual()` in `src/sim/engaged_player.gd`):
 - taps 2 times a second in 45-second bursts with 15-second rests (1.5 a second on average);
 - looks at the game every 2 seconds.
 
-Otherwise it plays like the pacing player. Both are measured over the first 20 minutes.
+Otherwise it plays like the pacing player. Both are measured over the first 30 minutes (20 until J3).
 
 ### Criteria (v0.5.1)
 
@@ -226,6 +226,8 @@ E3 stops at 15:00, and N6 (15:00–50:00, at most 120 s) is measured on the flat
 | Id | Criterion |
 | --- | --- |
 | J3 | From 15:00 to 30:00, the casual player never goes longer than 120 s without something new (a purchase, an upgrade or a research; reveals as in E3). |
+
+**Result: J3 PASS**, 48 s (the pacing player 38 s, not judged). Research and Tier 2 stations keep coming every 30–60 seconds through this window, so it needs no tuning. The flat spots in the first half hour are earlier: the vat-to-line saving (E3's 96 s) and the plots in between (W28 on PR #20).
 
 ### What moved
 

@@ -46,10 +46,11 @@ static func load_dir(dir: String = "res://data") -> Dictionary:
 
 ## Checks parsed files and builds the lookup tables the game uses: items,
 ## recipes, plots (the farms, by id), slots, tech (by id), tech_order (ids in
-## file order), rooms (by id) and room_order (the order they're offered).
+## file order), rooms (by id), room_order (the order they're offered) and
+## ladder (the peppers, lowest rung first).
 static func check(raw: Dictionary) -> Dictionary:
 	var errors: Array[String] = []
-	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": [], "rooms": {}, "room_order": []}
+	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": [], "rooms": {}, "room_order": [], "ladder": []}
 
 	var rows := _rows(raw, "items", "items", errors)
 	for i in rows.size():
@@ -67,6 +68,9 @@ static func check(raw: Dictionary) -> Dictionary:
 			if r.get("ingredient", false) and r.kind != "crop":
 				errors.append(where + ": only a crop can be an ingredient")
 			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value), "ingredient": bool(r.get("ingredient", false))}
+			# The pepper ladder (D053) is the peppers in file order, for Crossbreeding.
+			if r.kind == "crop" and not data.items[r.id].ingredient:
+				data.ladder.append(r.id)
 
 	rows = _rows(raw, "recipes", "recipes", errors)
 	for i in rows.size():

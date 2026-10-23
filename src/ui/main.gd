@@ -13,10 +13,13 @@ const Kit = preload("res://src/ui/pixel_kit.gd")
 const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "market": "Market", "roster": "Shift Roster", "hq": "HQ"}
 ## On the nav bar, where six names must fit across the screen in the pixel font.
 const NAV_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "market": "Market", "roster": "Roster", "hq": "HQ"}
-const MONEY_SUFFIXES := ["K", "M", "B", "T", "Qa", "Qi"]
+## To 10^36, for the deep end (SKELETON.md I12); not IPM's case-only letters.
+const MONEY_SUFFIXES := ["K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"]
 const BUY_MODES := ["1", "10", "max"]
 const STATION_NAMES := {"vat": "Vat", "line": "Line"}
-const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "cargo": "Cargo"}
+const UPGRADE_NAMES := {"harvest": "Harvest Rate", "truck": "Truck Speed", "cargo": "Truck Cargo"}
+## Recipes the Recipe Book offers at once: the cheapest not yet bought.
+const RECIPE_ROWS := 4
 ## Steps for the valve's keep amounts.
 const KEEP_STEP := 10
 
@@ -64,7 +67,9 @@ var _farms_col: VBoxContainer
 var _processing_col: VBoxContainer
 ## The vats and lines; it sits on the Farms page until the Processing tab opens.
 var _proc_box: VBoxContainer
-var _plot_cards := {}               # crop → card nodes
+var _plot_cards := {}               # farm id → card nodes
+var _survey_heads := {}             # survey → its header label on Farms
+var _recipe_rows: Array = []        # the Recipe Book's rows: {row, label, button, id}
 var _slot_cards := {"vat": [], "line": []}
 var _slot_lists := {}               # station → its VBoxContainer
 var _buy_slot := {}                 # station → its buy button
@@ -97,6 +102,8 @@ var _sheet: Control
 var _sheet_box: VBoxContainer
 var _sheet_of := {}                  # {kind: "plot"/"slot", crop / station, index}
 var _sheet_buttons := {}             # upgrade → Button
+var _sheet_extra: VBoxContainer       # priority, crossbreeding or the Pressure Cooker
+var _sheet_extra_shown := []
 var _mode_buttons := {}              # buy mode → Button
 var _drawer: Control
 var _drawer_box: VBoxContainer
@@ -170,10 +177,10 @@ class FactoryView extends Control:
 	func _tiles(floor: String) -> Array:
 		var out := []
 		if floor == "plot":
-			for crop in game.plots:
-				var p: Dictionary = game.plots[crop]
+			for id in game.plots:
+				var p: Dictionary = game.plots[id]
 				if p.owned:
-					out.append([p.progress / game.plot_cycle(crop), p.field > 2.0 * game.plot_yield_exact(crop)])
+					out.append([p.trip / game.trip_seconds(id), game.field_total(id) > 2 * game.truck_cargo(id)])
 		else:
 			for i in game.slots(floor).size():
 				var sl: Dictionary = game.slots(floor)[i]
@@ -350,11 +357,21 @@ func _build_deck() -> void:
 	_deck.add_child(holder)
 
 	_farms_col = _page_column(holder, "farms")
-	# Cheapest first, as Idle Planet Miner lists its planets (D041).
-	var crops: Array = game.data.plots.keys()
-	crops.sort_custom(func(a: String, b: String) -> bool: return game.plot_price(a) < game.plot_price(b))
-	for crop in crops:
-		_plot_cards[crop] = _plot_card(_farms_col, crop)
+	# By survey, then cheapest first, as Idle Planet Miner lists its planets
+	# by telescope (D041, I13).
+	var ids: Array = game.data.plots.keys()
+	ids.sort_custom(func(a: String, b: String) -> bool:
+		var sa: int = game.data.plots[a].survey
+		var sb: int = game.data.plots[b].survey
+		return sa < sb or sa == sb and game.plot_price(a) < game.plot_price(b))
+	for id in ids:
+		var survey: int = game.data.plots[id].survey
+		if survey > 0 and not _survey_heads.has(survey):
+			var head := _label("LAND SURVEY %d" % survey, S.SIZE_TINY, S.DIM)
+			head.name = "Survey_%d" % survey
+			_farms_col.add_child(head)
+			_survey_heads[survey] = head
+		_plot_cards[id] = _plot_card(_farms_col, id)
 	_proc_box = VBoxContainer.new()
 	_proc_box.add_theme_constant_override("separation", 12)
 	_farms_col.add_child(_proc_box)
@@ -383,8 +400,8 @@ func _page_column(holder: Control, tab: String) -> VBoxContainer:
 	return col
 
 
-## HQ (brief §6, docs/PRESTIGE.md): selling the franchise, the credits, the
-## room draft and the rooms.
+## HQ (brief §6, docs/PRESTIGE.md, SKELETON.md): selling the franchise, the
+## credits, the two rooms on offer and the rooms owned.
 func _build_hq(col: VBoxContainer) -> void:
 	var sell := _card(col, "SellCard", "Sell the Franchise")
 	sell.bar.visible = false
@@ -398,16 +415,13 @@ func _build_hq(col: VBoxContainer) -> void:
 	sell.col.add_child(sell.button)
 	var rooms := _card(col, "RoomsCard", "HQ Facilities")
 	rooms.bar.visible = false
-	rooms.open = _control_button("", func() -> void: game.open_room())
-	rooms.open.name = "OpenRoom"
-	rooms.col.add_child(rooms.open)
-	rooms.draft = HBoxContainer.new()
-	rooms.draft.add_theme_constant_override("separation", 8)
-	rooms.col.add_child(rooms.draft)
+	rooms.offer = HBoxContainer.new()
+	rooms.offer.add_theme_constant_override("separation", 8)
+	rooms.col.add_child(rooms.offer)
 	rooms.list = VBoxContainer.new()
 	rooms.list.add_theme_constant_override("separation", 6)
 	rooms.col.add_child(rooms.list)
-	_hq = {"sell": sell, "rooms": rooms, "draft_shown": [], "rows": {}}
+	_hq = {"sell": sell, "rooms": rooms, "offer_shown": [], "offer_buttons": {}, "rows": {}}
 
 
 func _refresh_hq() -> void:
@@ -424,21 +438,22 @@ func _refresh_hq() -> void:
 
 	var rooms: Dictionary = _hq.rooms
 	rooms.info.text = "Franchise Credits: %d" % game.account.credits
-	var all_open: bool = game.account.rooms.size() >= game.data.rooms.size()
-	rooms.open.visible = game.account.draft.is_empty() and not all_open
-	rooms.open.text = "Open a new room (%d credits)" % game.room_open_cost()
-	rooms.open.disabled = not game.can_open_room()
-	rooms.status.text = "Pick one:" if not game.account.draft.is_empty() else ""
-	if _hq.draft_shown != game.account.draft:
-		for child in rooms.draft.get_children():
+	var offered := game.rooms_offered()
+	rooms.status.text = "Open a room (%d credits):" % game.room_open_cost() if not offered.is_empty() else "Every room is open."
+	if _hq.offer_shown != offered:
+		for child in rooms.offer.get_children():
 			child.queue_free()
-		for id in game.account.draft:
-			var b := _control_button("%s\n%s" % [game.data.rooms[id].name, _room_text(id, 1)], func() -> void: game.choose_room(id))
-			b.name = "Draft_" + id
+		_hq.offer_buttons = {}
+		for id in offered:
+			var b := _control_button("%s\n%s" % [game.data.rooms[id].name, _room_text(id, 1)], func() -> void: game.open_room(id))
+			b.name = "OpenRoom_" + id
 			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-			rooms.draft.add_child(b)
-		_hq.draft_shown = game.account.draft.duplicate()
+			rooms.offer.add_child(b)
+			_hq.offer_buttons[id] = b
+		_hq.offer_shown = offered.duplicate()
+	for id in _hq.offer_buttons:
+		_hq.offer_buttons[id].disabled = not game.can_open_room(id)
 	for id in game.account.rooms:
 		if not _hq.rows.has(id):
 			var row := HBoxContainer.new()
@@ -468,19 +483,23 @@ func _room_text(id: String, lv: int) -> String:
 		var amount: float = amounts[lv - 1] if lv <= amounts.size() else amounts[-1] * pow(room.growth, lv - amounts.size())
 		return "Start each run with %s." % _money(amount)
 	var v: float = room.base + room.step * (lv - 1)
-	var pct := roundi(v * 100.0)
+	var more := "×%.2f" % v
+	var less := roundi((1.0 - v) * 100.0)
 	match room.effect:
-		"plot_speed": return "Plots harvest %d%% faster." % pct
-		"plot_yield": return "Plots yield %d%% more." % pct
-		"vat_speed": return "Vats run %d%% faster." % pct
-		"line_speed": return "Lines run %d%% faster." % pct
-		"crop_input": return "Vats need %d%% fewer raw crops." % pct
-		"mash_input": return "Lines need %d%% less mash." % pct
-		"tech_cost": return "Tech Tree costs %d%% less." % pct
-		"button_yield": return "The button picks %d%% more." % pct
-		"bottle_value": return "Bottles are worth %d%% more." % pct
-		"credits": return "%d%% more Franchise Credits." % pct
-		"offline_hours": return "Time away counts %d hours longer." % roundi(v)
+		"harvest": return "Farms harvest %s." % more
+		"vat_speed": return "Vats run %s faster." % more
+		"truck_speed": return "Trucks drive %s faster." % more
+		"upgrade_cost": return "Farm upgrades cost %d%% less." % less
+		"cargo": return "Trucks carry %s." % more
+		"line_speed": return "Lines run %s faster." % more
+		"tech_cost": return "Tech Tree costs %d%% less." % less
+		"button_yield": return "The button picks %d%% more." % roundi(v * 100.0)
+		"credits": return "Franchise Credits %s." % more
+		"offline_hours": return "Time away counts %s hours longer." % ("%.1f" % v).trim_suffix(".0")
+		"vat_input": return "Vat recipes take %d%% less." % less
+		"line_input": return "Line recipes take %d%% less." % less
+		"value": return "Mash and sauces worth %s." % more
+		"ticker": return "Demand spikes %s." % more
 	return ""
 
 
@@ -639,6 +658,25 @@ func _build_processing(parent: VBoxContainer) -> void:
 		parent.add_child(b)
 		_buy_slot[station] = b
 
+	# The Recipe Book (D051): recipes are bought with cash, as Idle Planet
+	# Miner's are; the cheapest few not yet owned.
+	var book := _card(parent, "RecipeBook", "Recipe Book")
+	book.bar.visible = false
+	book.info.text = "Buy a recipe to make it in a vat or a line."
+	for i in RECIPE_ROWS:
+		var row := VBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
+		book.col.add_child(row)
+		var l := _label("", S.SIZE_SMALL, S.DIM)
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		row.add_child(l)
+		var entry := {"row": row, "label": l, "id": ""}
+		var b := _control_button("", func() -> void: game.buy_recipe(entry.id))
+		b.name = "BuyRecipe_%d" % i
+		row.add_child(b)
+		entry.button = b
+		_recipe_rows.append(entry)
+
 
 ## The Market tab (LAYOUT.md): every money lever in one place: demand spikes,
 ## the Delivery Van's Auto-Sell and the Raw Overflow Valve.
@@ -759,7 +797,7 @@ func _build_tech(holder: Control) -> void:
 		_web.add_child(b)
 		_web_nodes[id] = b
 	for id in game.data.tech:
-		for need in game.data.tech[id].needs:
+		for need in game.data.tech[id].needs + game.data.tech[id].needs_any:
 			_web.edges.append([_web_nodes[need].position + S.WEB_NODE / 2.0, _web_nodes[id].position + S.WEB_NODE / 2.0, false])
 	_web_frames = WebFrames.new()
 	_web_frames.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1044,6 +1082,11 @@ func close_card() -> void:
 	_return_card.visible = false
 
 
+## A cycle's length: "8.0 s", "12 m", "1 h 32 m".
+static func _duration_short(seconds: float) -> String:
+	return "%.1f s" % seconds if seconds < 60.0 else _duration(seconds)
+
+
 ## "3 h 12 m", "12 m", "40 s".
 static func _duration(seconds: float) -> String:
 	var s := int(seconds)
@@ -1054,19 +1097,21 @@ static func _duration(seconds: float) -> String:
 	return "%d s" % s
 
 
-## A plot's card: what it grows, a cycle bar, then its buy button, or Manage
-## for its upgrades (the station sheet, LAYOUT.md).
-func _plot_card(parent: Container, crop: String) -> Dictionary:
-	var nodes := _card(parent, "Card_plot_" + crop, game.data.plots[crop].name)
-	nodes.buy = _control_button("", func() -> void: game.buy_plot(crop))
-	nodes.buy.name = "Buy_plot_" + crop
+## A farm's card: what it grows, its truck's trip, then its buy button, or
+## selling its crops and Manage for its upgrades (the station sheet, LAYOUT.md).
+func _plot_card(parent: Container, id: String) -> Dictionary:
+	var nodes := _card(parent, "Card_plot_" + id, game.data.plots[id].name)
+	nodes.buy = _control_button("", func() -> void: game.buy_plot(id))
+	nodes.buy.name = "Buy_plot_" + id
 	nodes.col.add_child(nodes.buy)
-	# Every crop sells raw, as ore does (D041).
-	nodes.sell = _control_button("", func() -> void: game.sell_crop(crop))
-	nodes.sell.name = "Sell_plot_" + crop
+	# Every crop sells raw, as ore does (D041): all the farm grows.
+	nodes.sell = _control_button("", func() -> void:
+		for crop in game.plot_crops(id):
+			game.sell_crop(crop))
+	nodes.sell.name = "Sell_plot_" + id
 	nodes.col.add_child(nodes.sell)
-	nodes.manage = _control_button("Manage", func() -> void: open_sheet({"kind": "plot", "crop": crop}))
-	nodes.manage.name = "Manage_plot_" + crop
+	nodes.manage = _control_button("Manage", func() -> void: open_sheet({"kind": "plot", "crop": id}))
+	nodes.manage.name = "Manage_plot_" + id
 	nodes.col.add_child(nodes.manage)
 	return nodes
 
@@ -1189,8 +1234,10 @@ func _refresh(animate: bool) -> void:
 		_page = "farms"
 	for tab in _pages:
 		_pages[tab].visible = tab == _page
-	for crop in _plot_cards:
-		_refresh_plot(crop)
+	for id in _plot_cards:
+		_refresh_plot(id)
+	for survey in _survey_heads:
+		_survey_heads[survey].visible = survey <= game.fx.survey
 	for key in _settings_buttons:
 		_settings_buttons[key].text = "%s: %s" % [key.capitalize(), "On" if settings[key] else "Off"]
 	_refresh_processing()
@@ -1235,40 +1282,47 @@ func _stock_text() -> String:
 	return "  ·  ".join(short)
 
 
-func _refresh_plot(crop: String) -> void:
-	var nodes: Dictionary = _plot_cards[crop]
-	var p: Dictionary = game.plots[crop]
-	var name: String = game.data.items[crop].name
-	var plural: String = game.data.items[crop].plural
-	nodes.card.visible = game.plot_offered(crop)
+func _refresh_plot(id: String) -> void:
+	var nodes: Dictionary = _plot_cards[id]
+	var p: Dictionary = game.plots[id]
+	var crops: Dictionary = game.plot_crops(id)
+	nodes.card.visible = game.plot_offered(id)
+	if not nodes.card.visible:
+		return
+	var parts := []
+	for crop in crops:
+		parts.append("%s %d%%" % [game.data.items[crop].short, roundi(crops[crop] * 100.0)])
 	if p.owned:
-		# Yield levels add fractions (D041): one decimal once it isn't whole.
-		var n := game.plot_yield_exact(crop)
-		var amount := "%d" % roundi(n) if absf(n - roundf(n)) < 0.05 else "%.1f" % n
-		nodes.info.text = "%s %s every %.1f s" % [amount, name if amount == "1" else plural, game.plot_cycle(crop)]
+		nodes.info.text = "%s · %.2f a second" % [", ".join(parts), game.plot_growth(id)]
 	else:
-		nodes.info.text = "Harvests %s by itself." % plural
+		nodes.info.text = "Grows " + ", ".join(parts)
+	# The truck's round trip (D050): what it carries, and what's waiting once
+	# the farm has outgrown it.
 	nodes.bar.visible = p.owned
-	nodes.bar.value = clampf(p.progress / game.plot_cycle(crop), 0.0, 1.0)
-	# The truck (Cargo, D043): what it carries, and what's waiting once the
-	# plot has outgrown it.
 	nodes.status.visible = p.owned
 	if p.owned:
-		var backed_up: bool = p.field > 2.0 * game.plot_yield_exact(crop)
-		nodes.status.text = "Truck carries %.1f a second" % game.cargo_rate(crop)
+		nodes.bar.value = clampf(p.trip / game.trip_seconds(id), 0.0, 1.0)
+		var waiting := game.field_total(id)
+		var backed_up: bool = waiting > 2 * game.truck_cargo(id)
+		nodes.status.text = "Truck: %d every %.0f s" % [game.truck_cargo(id), game.trip_seconds(id)]
 		if backed_up:
-			nodes.status.text += "   ·   %s waiting" % _count(p.field)
+			nodes.status.text += "   ·   %s waiting" % _count(waiting)
 		nodes.status.add_theme_color_override("font_color", S.ORANGE if backed_up else S.MUTED)
 	nodes.buy.visible = not p.owned
-	nodes.buy.text = "Buy   %s" % _money(game.plot_price(crop))
-	nodes.buy.disabled = not game.can_buy_plot(crop)
+	nodes.buy.text = "Buy   %s" % _money(game.plot_price(id))
+	nodes.buy.disabled = not game.can_buy_plot(id)
 	nodes.sell.visible = p.owned
-	nodes.sell.text = "Sell %s   %s" % [_count(game.stock[crop]), _money(game.stock[crop] * game.sale_price(crop) * game.heat_mult())]
-	nodes.sell.disabled = not game.can_sell_crop(crop)
+	var held := 0
+	var worth := 0.0
+	for crop in crops:
+		held += game.stock[crop]
+		worth += game.stock[crop] * game.sale_price(crop) * game.heat_mult()
+	nodes.sell.text = "Sell %s   %s" % [_count(held), _money(worth)]
+	nodes.sell.disabled = held == 0
 	nodes.manage.visible = p.owned
 	var ready := false
 	for upgrade in UPGRADE_NAMES:
-		ready = ready or game.can_upgrade_plot(crop, upgrade)
+		ready = ready or game.can_upgrade_plot(id, upgrade)
 	nodes.manage.text = "Manage   !" if ready else "Manage"
 
 
@@ -1322,13 +1376,39 @@ func _refresh_processing() -> void:
 		var extra := "  ·  with a Starter Crate of %d" % T.STARTER_CRATE_BOTTLES if station == "line" and n == 0 else ""
 		b.text = "Buy %s %d   %s%s" % [STATION_NAMES[station], n + 1, _money(game.slot_price(station)), extra]
 		b.disabled = not game.can_buy_slot(station)
+	# The Recipe Book: the cheapest recipes not yet bought.
+	var unbought := []
+	for id in game.data.recipes:
+		if not game.recipe_unlocked(id):
+			unbought.append(id)
+	unbought.sort_custom(func(a, b): return game.recipe_price(a) < game.recipe_price(b))
+	for i in _recipe_rows.size():
+		var entry: Dictionary = _recipe_rows[i]
+		entry.row.visible = i < unbought.size() and not game.lines.is_empty()
+		if not entry.row.visible:
+			continue
+		entry.id = unbought[i]
+		var r: Dictionary = game.data.recipes[entry.id]
+		var out: Dictionary = game.data.items[r.output]
+		entry.label.text = "%s: %s (%s, %s)" % [out.name, _inputs_text(game.recipe_inputs(entry.id)), _money(out.value), "vat" if r.station == "vat" else "line"]
+		entry.button.text = "Buy recipe   %s" % _money(game.recipe_price(entry.id))
+		entry.button.disabled = not game.can_buy_recipe(entry.id)
+
+
+## "1K Bell Peppers + 2 Sofrito Base".
+func _inputs_text(inputs: Dictionary) -> String:
+	var ins := []
+	for item in inputs:
+		var n: int = inputs[item]
+		ins.append("%s %s" % [_count(n), game.data.items[item].name if n == 1 else game.data.items[item].plural])
+	return " + ".join(ins)
 
 
 func _refresh_slot(station: String, i: int) -> void:
 	var nodes: Dictionary = _slot_cards[station][i]
 	var s: Dictionary = game.slots(station)[i]
 	# The picker's list: Off, then every recipe researched for this station.
-	var recipes := game.recipes_for(station)
+	var recipes := game.recipes_for(station, i)
 	if recipes != nodes.recipes:
 		nodes.recipes = recipes
 		var picker: OptionButton = nodes.picker
@@ -1344,14 +1424,9 @@ func _refresh_slot(station: String, i: int) -> void:
 		nodes.bar.value = 0.0
 	else:
 		var r: Dictionary = game.data.recipes[s.recipe]
-		var inputs := game.recipe_inputs(s.recipe)
-		var ins := []
-		for item in inputs:
-			var n: int = inputs[item]
-			ins.append("%d %s" % [n, game.data.items[item].name if n == 1 else game.data.items[item].plural])
 		var out: Dictionary = game.data.items[r.output]
-		var worth := " (%s)" % _money(out.value) if out.kind == "bottle" else ""
-		nodes.info.text = "%s → 1 %s%s every %.1f s" % [" + ".join(ins), out.name, worth, game.slot_cycle(station, i)]
+		var under := "  (Pressure Cooker)" if s.get("pressure", false) else ""
+		nodes.info.text = "%s → 1 %s (%s) every %s%s" % [_inputs_text(game.slot_inputs(station, i)), out.name, _money(game.sale_price(r.output)), _duration_short(game.slot_cycle(station, i)), under]
 		nodes.bar.value = clampf(s.progress / game.slot_cycle(station, i), 0.0, 1.0)
 	var status := ""
 	if s.recipe != "" and not s.running:
@@ -1384,7 +1459,7 @@ func _refresh_tech() -> void:
 			b.add_theme_color_override(c, ink)
 	var i := 0
 	for id in game.data.tech:
-		for need in game.data.tech[id].needs:
+		for need in game.data.tech[id].needs + game.data.tech[id].needs_any:
 			_web.edges[i][2] = game.is_researched(id)
 			i += 1
 	_web.queue_redraw()
@@ -1416,6 +1491,9 @@ func _refresh_tech() -> void:
 		for need in node.needs:
 			if not game.is_researched(need):
 				needs.append(game.data.tech[need].label)
+		var any: Array = node.needs_any
+		if not any.is_empty() and not any.any(func(n): return game.is_researched(n)):
+			needs.append(" or ".join(any.map(func(n): return game.data.tech[n].label)))
 		_detail.cost.text = "Costs " + ", ".join(costs) + (".  Needs %s first." % ", ".join(needs) if not needs.is_empty() else ".")
 	_detail.button.visible = not game.is_researched(_selected)
 	_detail.button.disabled = not game.can_research(_selected)
@@ -1441,11 +1519,44 @@ func _effect_text(node: Dictionary) -> String:
 		return "The centre of the web."
 	var out := []
 	for e in node.effects:
-		if e.has("unlock_plot"):
-			out.append("The %s can be bought." % game.data.plots[e.unlock_plot].name)
-		elif e.has("unlock_recipe"):
-			var r: Dictionary = game.data.recipes[e.unlock_recipe]
-			out.append("Vats and lines can make %s." % game.data.items[r.output].name if r.station == "vat" else "Lines can bottle %s." % game.data.items[r.output].name)
+		if e.has("survey"):
+			out.append("Opens farms %d to %d." % [3 * int(e.survey) + 2, 3 * int(e.survey) + 4])
+		elif e.has("harvest_mult"):
+			out.append("Every farm harvests ×%.2f." % e.harvest_mult)
+		elif e.has("truck_speed"):
+			out.append("Trucks drive ×%.2f faster." % e.truck_speed)
+		elif e.has("cargo"):
+			out.append("Trucks carry ×%.2f." % e.cargo)
+		elif e.has("crop_priority"):
+			out.append("Choose which crop a farm's truck takes first.")
+		elif e.has("target_bonus"):
+			out.append("A farm's priority crop grows +%d%%." % roundi(e.target_bonus * 100.0))
+		elif e.has("crossbreed"):
+			out.append("Turn one farm's pepper into the pepper %d rung%s higher (Manage a farm)." % [int(e.crossbreed), "" if int(e.crossbreed) == 1 else "s"])
+		elif e.has("vat_speed"):
+			out.append("Vats run ×%.2f faster." % e.vat_speed)
+		elif e.has("line_speed"):
+			out.append("Lines run ×%.2f faster." % e.line_speed)
+		elif e.has("vat_input_cut"):
+			out.append("Vat recipes take %d%% less." % roundi(e.vat_input_cut * 100.0))
+		elif e.has("line_input_cut"):
+			out.append("Line recipes take %d%% less." % roundi(e.line_input_cut * 100.0))
+		elif e.has("mash_value"):
+			out.append("Mash is worth ×%.2f." % e.mash_value)
+		elif e.has("sauce_value"):
+			out.append("Sauces are worth ×%.2f." % e.sauce_value)
+		elif e.has("vat_double"):
+			out.append("%d%% chance a vat makes two." % roundi(e.vat_double * 100.0))
+		elif e.has("line_double"):
+			out.append("%d%% chance a line makes two." % roundi(e.line_double * 100.0))
+		elif e.has("station_discount"):
+			out.append("New vats and lines cost %d%% less." % roundi(e.station_discount * 100.0))
+		elif e.has("pressure"):
+			out.append("One more vat can go under a Pressure Cooker: ×2 speed, inputs +50% (Manage a vat).")
+		elif e.has("pressure_speed"):
+			out.append("Pressure Cookers run ×%d instead." % int(e.pressure_speed))
+		elif e.has("pressure_extra"):
+			out.append("Pressure Cookers take +%d%% inputs instead." % roundi(e.pressure_extra * 100.0))
 		elif e.has("delivery_van"):
 			out.append("Auto-Sell sliders: finished bottles sell the moment they're made.")
 		elif e.has("tap_yield"):
@@ -1463,19 +1574,15 @@ func _effect_text(node: Dictionary) -> String:
 		elif e.has("piston"):
 			out.append("Presses the button once a second, always, with every button perk.")
 		elif e.has("plot_speed"):
-			out.append("The %s runs %d× faster." % [game.data.plots[e.plot_speed.crop].name, int(e.plot_speed.mult)])
+			out.append("%s grows %d× faster." % [game.data.items[e.plot_speed.crop].name, int(e.plot_speed.mult)])
 		elif e.has("plot_yield"):
-			out.append("The %s yields %d× a harvest." % [game.data.plots[e.plot_yield.crop].name, int(e.plot_yield.mult)])
+			out.append("%s harvests %d× as much." % [game.data.items[e.plot_yield.crop].name, int(e.plot_yield.mult)])
 		elif e.has("concentrate"):
 			out.append("Vats need %d%% less %s." % [roundi(e.concentrate.share * 100.0), game.data.items[e.concentrate.item].name])
 		elif e.has("reserve"):
 			out.append("Every sauce made with %s sells for +%d%%." % [game.data.items[e.reserve.item].name, roundi(e.reserve.bonus * 100.0)])
-		elif e.has("slot_cap"):
-			out.append("One more vat slot and one more line slot.")
 		elif e.has("packaging"):
 			out.append("Every bottle is worth %.1f× (packaging, every line)." % e.packaging)
-		elif e.has("input_reduction"):
-			out.append("Vats need %d%% fewer raw crops." % roundi(e.input_reduction * 100.0))
 		elif e.has("overdrive"):
 			out.append("Vats and lines +25% faster, and the Factory Overdrive button: ×2 for 60 s, every 15 minutes.")
 		elif e.has("overflow_valve"):
@@ -1489,7 +1596,7 @@ func _effect_text(node: Dictionary) -> String:
 		elif e.has("forage"):
 			out.append("Each press has a %.1f%% chance to drop a harvest of the ingredient you're shortest of." % (e.forage * 100.0))
 		elif e.has("byproduct_recycling"):
-			out.append("Vat cycles can give your lowest-level plot a free level, up to one a minute.")
+			out.append("Vat cycles can give your lowest-level farm a free level, up to one a minute.")
 		elif e.has("offline"):
 			out.append("Time away counts %d hours longer, and runs %d points faster." % [int(e.offline.hours), roundi(e.offline.speed * 100.0)])
 		elif e.has("stock_value_bonus"):
@@ -1500,10 +1607,7 @@ func _effect_text(node: Dictionary) -> String:
 
 
 func _bottle_unlocked(item: String) -> bool:
-	for r in game.recipes_for("line"):
-		if game.data.recipes[r].output == item:
-			return true
-	return false
+	return game.data.recipes.has(item) and game.recipe_unlocked(item)
 
 
 ## Moves the Blank Button between its full-screen and compact places, sliding
@@ -1609,9 +1713,14 @@ func _place_ring(delta: float) -> void:
 
 ## Dots climbing the factory view: crops reaching stock, mash made.
 func _climb(delta: float) -> void:
+	# Crops harvested less those still waiting at the farms: what trucks brought in.
 	var delivered := 0
-	for crop in game.plots:
-		delivered += game.stats.harvested[crop] - game.plots[crop].field
+	for item in game.data.items:
+		if game.data.items[item].kind == "crop":
+			delivered += game.stats.harvested[item]
+	for id in game.plots:
+		if game.plots[id].owned:
+			delivered -= game.field_total(id)
 	var mash := 0
 	for item in game.data.items:
 		if game.data.items[item].kind == "mash":
@@ -1706,6 +1815,9 @@ func open_sheet(of: Dictionary) -> void:
 		# Full width, so a long price line wraps rather than widening the sheet.
 		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_sheet_buttons[upgrade] = b
+	_sheet_extra = VBoxContainer.new()
+	_sheet_extra.add_theme_constant_override("separation", 8)
+	_sheet_box.add_child(_sheet_extra)
 	var done := _control_button("Done", func() -> void: _sheet.visible = false)
 	done.name = "SheetDone"
 	_sheet_box.add_child(done)
@@ -1764,10 +1876,61 @@ func _refresh_sheet() -> void:
 			cost = game.slot_upgrade_cost_n(_sheet_of.station, _sheet_of.index, shown)
 			name = "Speed"
 		if cost < INF:
-			b.text = "%s   Lv %d → %d   %s" % [name, lv, lv + shown, _money(cost)]
+			b.text = "%s   Lv %d → %d   %s" % [name, lv + 1, lv + 1 + shown, _money(cost)]
 		else:
-			b.text = "%s   Lv %d   max" % [name, lv]
+			b.text = "%s   Lv %d   max" % [name, lv + 1]
 		b.disabled = n == 0
+	_refresh_sheet_extra()
+
+
+## The sheet's other controls, rebuilt when what they offer changes: a farm's
+## Crop Priority and Crossbreeding, a vat's Pressure Cooker.
+func _refresh_sheet_extra() -> void:
+	var want := []
+	if _sheet_of.kind == "plot":
+		var id: String = _sheet_of.crop
+		if game.fx.priority:
+			want.append(["priority", "Truck takes first: %s" % (game.data.items[game.plots[id].priority].name if game.plots[id].priority != "" else "the most valuable")])
+		var left := game.crossbreeds_left()
+		if not left.is_empty() and game.plots[id].bred.is_empty():
+			for crop in game.data.plots[id].crops:
+				var to := game.rung_up(crop, game.fx.crossbreed[left[0]])
+				if to != "":
+					want.append(["breed:" + crop, "Crossbreed %s into %s" % [game.data.items[crop].name, game.data.items[to].name]])
+		if not game.plots[id].bred.is_empty():
+			want.append(["", "Crossbred: %s grows here instead of %s." % [game.data.items[game.plots[id].bred.to].name, game.data.items[game.plots[id].bred.from].name]])
+	elif _sheet_of.station == "vat" and game.fx.pressure > 0:
+		var on: bool = game.vats[_sheet_of.index].pressure
+		want.append(["pressure", "Pressure Cooker: %s (%d of %d in use)" % ["On" if on else "Off", game.pressure_used(), game.fx.pressure]])
+	if want == _sheet_extra_shown:
+		return
+	_sheet_extra_shown = want
+	for c in _sheet_extra.get_children():
+		_sheet_extra.remove_child(c)
+		c.queue_free()
+	for w in want:
+		var key: String = w[0]
+		if key == "":
+			_sheet_extra.add_child(_label(w[1], S.SIZE_SMALL, S.DIM))
+			continue
+		var b := _control_button(w[1], func() -> void: _sheet_action(key))
+		b.name = "Sheet_" + key.replace(":", "_")
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+		_sheet_extra.add_child(b)
+
+
+func _sheet_action(key: String) -> void:
+	if key == "priority":
+		# Cycles through the farm's crops, then back to the most valuable.
+		var id: String = _sheet_of.crop
+		var crops: Array = game.plot_crops(id).keys()
+		var i := crops.find(game.plots[id].priority)
+		game.set_priority(id, crops[i + 1] if i + 1 < crops.size() else "")
+	elif key.begins_with("breed:"):
+		game.crossbreed(game.crossbreeds_left()[0], _sheet_of.crop, key.get_slice(":", 1))
+	elif key == "pressure":
+		game.set_pressure(_sheet_of.index, not game.vats[_sheet_of.index].pressure)
+	_sheet_extra_shown = []
 
 
 ## The warehouse: everything the run has had, by kind, with counts and worth.

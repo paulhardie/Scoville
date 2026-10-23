@@ -50,16 +50,32 @@ const COST_SCALE_POWER := 0.6
 const VAT_VALUE_REFERENCE := "sweet_mash"
 const LINE_VALUE_REFERENCE := "table_mild"
 
-## Plot upgrades (D041, Idle Planet Miner's curve): every plot upgrade's first
-## level costs this share of the plot's price, each level after it × growth.
+## Farm upgrades (D041, D050; Idle Planet Miner's curve): every level of each
+## upgrade costs this share of the farm's price, × growth a level.
 const PLOT_UPGRADE_SHARE := 0.05
 const PLOT_UPGRADE_GROWTH := 1.3
-## Plot Harvest Speed: +step a level (GUESS, tuned in v0.6d).
+## Idle Planet Miner's planet upgrades (SKELETON.md, the wiki's Planetary
+## Upgrades): at level L (1 when bought), a + b(L−1) + c(L−1)². Harvest Rate in
+## crops a second, Truck Speed, and Truck Cargo in crops (rounded half to even).
+const HARVEST_RATE := [0.25, 0.1, 0.017]
+const TRUCK_SPEED := [1.0, 0.2, 1.0 / 75.0]
+const TRUCK_CARGO := [5.0, 2.0, 0.1]
+## Seconds between a farm's harvests, fractions carried (SKELETON.md: so Bumper
+## Crop has a harvest to double; GUESS).
+const HARVEST_SECONDS := 1.0
+## Pressure Cookers (IPM's Furnace Overdrive): speed × and inputs + share,
+## before Pressure Cooker II and the Pressure Valve.
+const PRESSURE_SPEED := 2.0
+const PRESSURE_EXTRA := 0.5
+## Forager's Luck: a drop is what the shortest ingredient's station grows in
+## this many seconds, upgrades included (GUESS, v0.7: its stations grow 0.25 a
+## second, as farms do).
+const FORAGE_SECONDS := 10.0
+
+## Old saves' steps, for converting their levels (D041, D043); v12 refunds
+## plots, so only the migrations before it read these.
 const PLOT_SPEED_STEP := 0.03
-## Plot Yield per Cycle: + this share of the plot's base yield a level (GUESS,
-## tuned in v0.6d); a fraction carries to the next harvest.
 const PLOT_YIELD_STEP := 0.06
-## v8's steps, for converting a v8 save's levels (D041).
 const V8_PLOT_SPEED_STEP := 0.15
 const V8_CROP_QUALITY_STEP := 0.03
 ## Vat slot speed.
@@ -115,10 +131,6 @@ const TICKER_MULTS := [2.0, 3.0]
 ## Byproduct Recycling (D013): seconds between free levels at most.
 const BYPRODUCT_COOLDOWN := 60.0
 
-## Cargo (D043): an unupgraded plot's truck carries CARGO_START times its base
-## growth, and each level adds CARGO_STEP of that (GUESS, tuned in v0.6e).
-const CARGO_START := 2.0
-const CARGO_STEP := 0.10
 ## v10's Crop Quality (D041), for converting a v8 save's levels on the way to
 ## Cargo (D043).
 const V10_CROP_QUALITY_STEP := 0.01
@@ -147,15 +159,16 @@ const RETURN_CARD_SECONDS := 60.0
 ## first galaxy sale (D035; the brief's £1M before).
 const PRESTIGE_OV := 10000000.0
 ## Franchise Credits at PRESTIGE_OV × 10^n: Idle Planet Miner's credit table
-## (D035), straight lines between, rounded, × the Executive Lounge. Past the
-## table each decade adds 10 more than the last step did.
+## (D035), straight lines between, rounded, × the Boardroom. Past the table
+## each decade adds 10 more than the last step did.
 const CREDIT_TABLE := [10, 30, 60, 101, 150, 210, 285, 367, 459]
-## Opening the n-th room costs ROOM_OPEN_COST × n credits, and levelling a room
-## from level L costs ROOM_LEVEL_COST × L (GUESSES, G8).
+## v11's room prices (G8), for refunding a v11 save's rooms in credits: the
+## n-th room cost ROOM_OPEN_COST × n, a level from L cost ROOM_LEVEL_COST × L.
 const ROOM_OPEN_COST := 5
 const ROOM_LEVEL_COST := 2
-## Rooms dealt in a draft (brief §6: a 2-card draft).
-const DRAFT_SIZE := 2
+## Rooms offered at a time, the first unowned ones in rooms.json's order
+## (Idle Planet Miner's, SKELETON.md; was the brief's random 2-card draft).
+const ROOMS_OFFERED := 2
 
 ## Standard Operating Procedures (brief §4, D034): a node researches itself
 ## when its cost is worth under SOP_SHARE of SOP_WINDOW seconds of the bottles

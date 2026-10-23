@@ -1,28 +1,33 @@
 extends RefCounted
 ## The whole simulation: state and rules, no nodes. Screens call the actions and
 ## tick(), then read the state; they never change it themselves
-## (docs/ONBOARDING.md, FACTORY.md, ECONOMY.md, TECH_TREE.md). Deterministic:
-## time only moves through tick(), and every chance draws from one seeded stream
-## whose state is saved (D017).
+## (docs/ONBOARDING.md, FACTORY.md, ECONOMY.md, TECH_TREE.md, SKELETON.md).
+## Deterministic: time only moves through tick(), and every chance draws from
+## one seeded stream whose state is saved (D017).
 ##
 ## The run (everything a Prestige resets) is kept apart from the account (what
 ## survives it): `account` holds the best Operation Value so far (which opens
-## tabs), Franchise Credits, the HQ rooms, the draft waiting to be picked, and
-## how many times the franchise has been sold (docs/PRESTIGE.md).
+## tabs), Franchise Credits, the HQ rooms and how many times the franchise has
+## been sold (docs/PRESTIGE.md).
+##
+## Since v0.7 the plots are Idle Planet Miner's planets as farms (D050): each
+## grows a mix of crops, and its truck carries them to stock in round trips.
+## `plots` and `data.plots` keep their old names; the Bell Plot is still "bell".
 
 const T = preload("res://src/core/tuning.gd")
 const DataLoader = preload("res://src/core/data_loader.gd")
 
 ## Save schema version. Bump it and add a migration in load_state() whenever the
 ## shape of to_state() changes.
-const SAVE_VERSION := 11
+const SAVE_VERSION := 12
 
 ## Slack when comparing summed ticks with a cycle length, so 8 × 0.1 s counts
 ## as 0.8 s despite float rounding.
 const EPSILON := 1e-6
 
 const TABS := ["farms", "processing", "tech", "market", "roster", "hq"]
-const PLOT_UPGRADES := ["speed", "yield", "cargo"]
+## Harvest Rate, Truck Speed and Truck Cargo (Idle Planet Miner's three).
+const PLOT_UPGRADES := ["harvest", "truck", "cargo"]
 
 var data: Dictionary
 
@@ -31,10 +36,15 @@ var cash := 0.0
 var stock := {}                 # item id → count
 ## Kept in saves for older versions; since D044 everything shows from the start.
 var revealed := {"counter": true, "status_bar": true, "deck": true}
-var plots := {}                 # crop → {owned, speed, yield, cargo, progress, spare, field, haul}
-var vats: Array = []            # slots in buying order: {recipe, speed, progress, running, taken}
+## farm id → {owned, harvest, truck, cargo (levels from 0), field {crop: count},
+## spare {crop: fraction}, grow (seconds to the next harvest), trip (seconds
+## into the truck's round trip), priority (crop or ""), bred {from, to} or {}}
+var plots := {}
+var vats: Array = []            # slots in buying order: {recipe, speed, progress, running, taken, pressure}
 var lines: Array = []           # the same, plus crate: Starter Crate bottles left
 var research := {}              # node id → true
+var bought := {}                # recipe id → true: recipes bought with cash (D051)
+var bred := {}                  # Crossbreeding node id → farm id it was used on
 var autosell := {}              # bottle id → percent sold at once (Delivery Van)
 var autosell_acc := {}          # bottle id → percent carried towards the next sale
 var heat := 0.0                 # 0–100 (D011)
@@ -49,7 +59,7 @@ var stats := {}
 var rng := RandomNumberGenerator.new()
 
 # --- The account ---
-var account := {"best_ov": 0.0, "credits": 0, "prestiges": 0, "rooms": {}, "draft": []}
+var account := {"best_ov": 0.0, "credits": 0, "prestiges": 0, "rooms": {}}
 
 ## What research adds up to, worked out when research changes (_refresh_fx).
 var fx := {}
@@ -68,10 +78,12 @@ func _reset_run() -> void:
 	for item in data.items:
 		stock[item] = 0
 	plots = {}
-	for crop in data.plots:
-		plots[crop] = {"owned": false, "speed": 0, "yield": 0, "cargo": 0, "progress": 0.0, "spare": 0.0, "field": 0, "haul": 0.0}
+	for id in data.plots:
+		plots[id] = _new_plot(id)
 	vats = []
 	lines = []
+	bought = {}
+	bred = {}
 	autosell = {}
 	autosell_acc = {}
 	for item in data.items:
@@ -92,8 +104,17 @@ func _reset_run() -> void:
 	_refresh_fx()
 
 
+func _new_plot(id: String) -> Dictionary:
+	var field := {}
+	var spare := {}
+	for crop in data.plots[id].crops:
+		field[crop] = 0
+		spare[crop] = 0.0
+	return {"owned": false, "harvest": 0, "truck": 0, "cargo": 0, "field": field, "spare": spare, "grow": 0.0, "trip": 0.0, "priority": "", "bred": {}}
+
+
 func _new_stats() -> Dictionary:
-	var s := {"presses": 0, "doubles": 0, "bell_picked": 0, "cash_earned": 0.0, "ticks": 0, "researched": 0,
+	var s := {"presses": 0, "doubles": 0, "bell_picked": 0, "cash_earned": 0.0, "spent": 0.0, "ticks": 0, "researched": 0,
 		"free_levels": 0, "spikes": 0, "foraged": 0, "harvested": {}, "made": {}, "sold": {}, "consumed": {}}
 	for item in data.items:
 		for k in ["harvested", "made", "sold", "consumed"]:
@@ -104,16 +125,37 @@ func _new_stats() -> Dictionary:
 ## Sums every researched node's effects (D010). Called whenever research changes.
 func _refresh_fx() -> void:
 	fx = {"van": false, "tap_bonus": 0, "double": 0.0, "grip": 0.0, "heat": false, "heat_drain": 1.0,
-		"overclock": 0.0, "piston": 0.0, "plot_speed": {}, "plot_yield": {}, "concentrate": {}, "reserve": {}, "slot_cap": {"vat": 0, "line": 0}, "packaging": 1.0,
-		"reduction": 0.0, "overdrive": false, "valve": false, "stockpile": false, "ticker": false,
-		"byproduct": 0.0, "forage": 0.0, "bumper": 0.0, "sop": false, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0, "plots": {}, "recipes": {}}
+		"overclock": 0.0, "piston": 0.0, "crop_mult": {}, "concentrate": {}, "reserve": {}, "packaging": 1.0,
+		"overdrive": false, "valve": false, "stockpile": false, "ticker": false,
+		"byproduct": 0.0, "forage": 0.0, "bumper": 0.0, "sop": false, "stock_bonus": 0.0, "offline_hours": 0.0, "offline_speed": 0.0,
+		# Idle Planet Miner's projects (SKELETON.md).
+		"survey": 0, "harvest_mult": 1.0, "truck_speed": 1.0, "cargo": 1.0, "priority": false, "target": 0.0, "crossbreed": {},
+		"vat_speed": 1.0, "line_speed": 1.0, "vat_cut": 0.0, "line_cut": 0.0, "mash_value": 1.0, "sauce_value": 1.0,
+		"vat_double": 0.0, "line_double": 0.0, "discount": 0.0, "pressure": 0, "pressure_speed": T.PRESSURE_SPEED, "pressure_extra": T.PRESSURE_EXTRA}
 	for node in research:
 		for e in data.tech[node].effects:
 			var kind: String = e.keys()[0]
 			var v: Variant = e[kind]
 			match kind:
-				"unlock_plot": fx.plots[v] = true
-				"unlock_recipe": fx.recipes[v] = true
+				"survey": fx.survey = maxi(fx.survey, int(v))
+				"harvest_mult": fx.harvest_mult *= v
+				"truck_speed": fx.truck_speed *= v
+				"cargo": fx.cargo *= v
+				"crop_priority": fx.priority = true
+				"target_bonus": fx.target = maxf(fx.target, v)
+				"crossbreed": fx.crossbreed[node] = int(v)
+				"vat_speed": fx.vat_speed *= v
+				"line_speed": fx.line_speed *= v
+				"vat_input_cut": fx.vat_cut = 1.0 - (1.0 - fx.vat_cut) * (1.0 - v)
+				"line_input_cut": fx.line_cut = 1.0 - (1.0 - fx.line_cut) * (1.0 - v)
+				"mash_value": fx.mash_value *= v
+				"sauce_value": fx.sauce_value *= v
+				"vat_double": fx.vat_double = maxf(fx.vat_double, v)
+				"line_double": fx.line_double = maxf(fx.line_double, v)
+				"station_discount": fx.discount = maxf(fx.discount, v)
+				"pressure": fx.pressure += int(v)
+				"pressure_speed": fx.pressure_speed = maxf(fx.pressure_speed, v)
+				"pressure_extra": fx.pressure_extra = minf(fx.pressure_extra, v)
 				"delivery_van": fx.van = true
 				"tap_yield": fx.tap_bonus += int(v)
 				"double_tap": fx.double = maxf(fx.double, v)
@@ -122,15 +164,11 @@ func _refresh_fx() -> void:
 				"heat_drain": fx.heat_drain = minf(fx.heat_drain, v)
 				"overclock": fx.overclock = maxf(fx.overclock, v)
 				"piston": fx.piston = maxf(fx.piston, v)
-				"plot_speed": fx.plot_speed[v.crop] = fx.plot_speed.get(v.crop, 1.0) * v.mult
-				"plot_yield": fx.plot_yield[v.crop] = fx.plot_yield.get(v.crop, 1.0) * v.mult
+				# The Pantry's boosters and Bulk: one crop's harvest, wherever it grows.
+				"plot_speed", "plot_yield": fx.crop_mult[v.crop] = fx.crop_mult.get(v.crop, 1.0) * v.mult
 				"concentrate": fx.concentrate[v.item] = maxf(fx.concentrate.get(v.item, 0.0), v.share)
 				"reserve": fx.reserve[v.item] = fx.reserve.get(v.item, 0.0) + v.bonus
-				"slot_cap":
-					for st in v:
-						fx.slot_cap[st] += int(v[st])
 				"packaging": fx.packaging = maxf(fx.packaging, v)
-				"input_reduction": fx.reduction = maxf(fx.reduction, v)
 				"overdrive": fx.overdrive = true
 				"overflow_valve": fx.valve = true
 				"smart_stockpiling": fx.stockpile = true
@@ -143,14 +181,15 @@ func _refresh_fx() -> void:
 				"offline":
 					fx.offline_hours += v.hours
 					fx.offline_speed += v.speed
-	# HQ rooms (docs/PRESTIGE.md), folded in with research.
+	# HQ rooms (SKELETON.md), folded in with research: each room's value at
+	# its level, base + step × (level − 1); Seed Capital's is start_cash().
 	fx.hq = {}
 	for id in account.rooms:
 		var room: Dictionary = data.rooms[id]
 		if room.effect != "start_cash":
-			fx.hq[room.effect] = fx.hq.get(room.effect, 0.0) + room.base + room.step * (account.rooms[id] - 1)
-	# Worked out once per research change: recipe inputs after Zero-Waste
-	# Piping, and the valve's default keep amounts.
+			fx.hq[room.effect] = room.base + room.step * (account.rooms[id] - 1)
+	# Worked out once per research change: recipe inputs after the cuts, and
+	# the valve's default keep amounts.
 	fx.inputs = {}
 	for id in data.recipes:
 		fx.inputs[id] = _inputs_after_reduction(id)
@@ -171,8 +210,8 @@ func _refresh_fx() -> void:
 			if recipe_unlocked(id):
 				n += fx.inputs[id].get(item, 0) * T.OVERFLOW_KEEP_CYCLES
 		fx.default_keep[item] = n
-	# Forager's Luck (D025): the most any researched recipe takes of each
-	# ingredient a cycle; an ingredient no researched recipe uses isn't short.
+	# Forager's Luck (D025): the most any unlocked recipe takes of each
+	# ingredient a cycle; an ingredient no unlocked recipe uses isn't short.
 	fx.ingredient_need = {}
 	for item in data.items:
 		if data.items[item].ingredient:
@@ -181,28 +220,39 @@ func _refresh_fx() -> void:
 					fx.ingredient_need[item] = maxi(fx.ingredient_need.get(item, 0), fx.inputs[id][item])
 
 
+## A room's value at its level, or `none` when it isn't owned (SKELETON.md).
+func hq(effect: String, none: float = 1.0) -> float:
+	return fx.hq.get(effect, none)
+
+
 # --- Reading: value and reveals ------------------------------------------------
 
-## An item's base value (ECONOMY.md, D004).
+## An item's base value (Idle Planet Miner's, D053; the kitchen's D004).
 func value(item: String) -> float:
 	return data.items[item].value
 
 
-## What an item counts for in Operation Value: bottles with packaging, and stock
-## with Franchise Auditors.
+## Research and the Tasting Room on what a mash or sauce is worth (IPM's alloy
+## and item values); crops sell at their value.
+func _made_mult(item: String) -> float:
+	match data.items[item].kind:
+		"mash": return fx.mash_value * hq("value")
+		"bottle": return fx.sauce_value * fx.packaging * hq("value")
+	return 1.0
+
+
+## What an item counts for in Operation Value: made items with their research
+## and room, and stock with Franchise Auditors.
 func appraisal(item: String) -> float:
-	var v := value(item)
-	if data.items[item].kind == "bottle":
-		v *= fx.packaging * (1.0 + fx.hq.get("bottle_value", 0.0))
-	return v * (1.0 + fx.stock_bonus)
+	return value(item) * _made_mult(item) * (1.0 + fx.stock_bonus)
 
 
-## What an item sells for before Heat: bottles with packaging, Reserve (D026)
-## and any spike.
+## What an item sells for before Heat: made items with research and rooms,
+## sauces with Reserve (D026) and any spike.
 func sale_price(item: String) -> float:
-	var v := value(item)
+	var v := value(item) * _made_mult(item)
 	if data.items[item].kind == "bottle":
-		v *= fx.packaging * (1.0 + fx.sale_bonus.get(item, 0.0)) * (1.0 + fx.hq.get("bottle_value", 0.0))
+		v *= 1.0 + fx.sale_bonus.get(item, 0.0)
 		if ticker.sauce == item:
 			v *= ticker.mult
 	return v
@@ -213,16 +263,20 @@ func heat_mult() -> float:
 	return 1.0 + T.HEAT_BONUS * heat / T.HEAT_MAX
 
 
-## Cash earned this run plus everything in stock at its appraisal (ECONOMY.md).
+## Idle Planet Miner's Galaxy Value (SKELETON.md): cash, everything spent this
+## run (farms, upgrades, vats, lines, recipes, and research at its items'
+## values), stock at its appraisal and crops waiting at the farms.
 func operation_value() -> float:
-	var v: float = stats.cash_earned
+	var v: float = cash + stats.spent
 	for item in stock:
 		if stock[item] > 0:
 			v += stock[item] * appraisal(item)
-	# Crops waiting in a field for the truck count too (D043).
-	for crop in plots:
-		if plots[crop].field > 0:
-			v += plots[crop].field * appraisal(crop)
+	for id in plots:
+		var p: Dictionary = plots[id]
+		if p.owned:
+			for crop in p.field:
+				if p.field[crop] > 0:
+					v += p.field[crop] * appraisal(crop)
 	return v
 
 
@@ -258,80 +312,112 @@ func _ticks(seconds: float) -> int:
 
 ## Bell Peppers a press picks: the base plus the North Wing's bonuses.
 func tap_yield() -> int:
-	return roundi((T.BUTTON_BASE_YIELD + fx.tap_bonus) * (1.0 + fx.hq.get("button_yield", 0.0)))
+	return roundi((T.BUTTON_BASE_YIELD + fx.tap_bonus) * (1.0 + hq("button_yield", 0.0)))
 
 
-# --- Reading: plots ------------------------------------------------------------
+# --- Reading: farms (D050) -----------------------------------------------------
 
-func plot_unlocked(crop: String) -> bool:
-	return data.plots[crop].unlocked or fx.plots.has(crop)
-
-
-func plot_offered(crop: String) -> bool:
-	return plot_unlocked(crop)
+## On sale: farms 1–4 from the start, the rest once their Land Survey is done.
+func plot_offered(id: String) -> bool:
+	return data.plots.has(id) and data.plots[id].survey <= fx.survey
 
 
-func plot_price(crop: String) -> float:
-	return data.plots[crop].price
+func plot_unlocked(id: String) -> bool:
+	return plot_offered(id)
 
 
-func plot_cycle(crop: String) -> float:
-	return data.plots[crop].seconds / (1.0 + T.PLOT_SPEED_STEP * plots[crop].speed) / fx.plot_speed.get(crop, 1.0) / (1.0 + fx.hq.get("plot_speed", 0.0))
+func plot_price(id: String) -> float:
+	return data.plots[id].price
 
 
-## A harvest's crops, to the nearest whole one (what the card shows).
-func plot_yield(crop: String) -> int:
-	return roundi(plot_yield_exact(crop))
+## a + b(L−1) + c(L−1)² at a farm's level (IPM's formulas; levels here count from 0).
+static func ipm_curve(k: Array, level: int) -> float:
+	return k[0] + k[1] * level + k[2] * level * level
 
 
-## A harvest's crops with the fraction: each yield level adds a share of the
-## plot's base yield (D041), and the fraction carries to the next harvest.
-func plot_yield_exact(crop: String) -> float:
-	return data.plots[crop]["yield"] * (1.0 + T.PLOT_YIELD_STEP * plots[crop]["yield"]) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_yield", 0.0))
+## The crops a farm grows now, in shares: its data's, with a Crossbreeding
+## applied (the bred crop's share grows the higher rung instead).
+func plot_crops(id: String) -> Dictionary:
+	var out: Dictionary = data.plots[id].crops.duplicate()
+	var b: Dictionary = plots[id].bred
+	if not b.is_empty() and out.has(b.from):
+		var share: float = out[b.from]
+		out.erase(b.from)
+		out[b.to] = out.get(b.to, 0.0) + share
+	return out
 
 
-## The chance a harvest gives double: Bumper Crop's, for every plot (D043; it
-## was each plot's Crop Quality, D016).
-func double_chance() -> float:
-	return fx.bumper
+## Crops a second a farm harvests in all: IPM's Harvest Rate × research × the
+## Seed Vault (the Bell Plot × 4, D052). One crop's share is boosted on top by
+## the Pantry and Targeted Fertiliser (crop_rate).
+func harvest_rate(id: String) -> float:
+	return ipm_curve(T.HARVEST_RATE, plots[id].harvest) * data.plots[id].harvest_mult * fx.harvest_mult * hq("harvest")
 
 
-## Research and HQ boosts to a plot's harvests, which raise its truck alike
-## (D043): only Harvest Speed and Yield levels can outgrow it.
-func plot_boost(crop: String) -> float:
-	return fx.plot_speed.get(crop, 1.0) * fx.plot_yield.get(crop, 1.0) * (1.0 + fx.hq.get("plot_speed", 0.0)) * (1.0 + fx.hq.get("plot_yield", 0.0))
+## Crops a second of one crop at a farm.
+func crop_rate(id: String, crop: String) -> float:
+	var share: float = plot_crops(id).get(crop, 0.0)
+	var m: float = fx.crop_mult.get(crop, 1.0)
+	if fx.target > 0.0 and plots[id].priority == crop:
+		m *= 1.0 + fx.target
+	return harvest_rate(id) * share * m
 
 
-## Crops a second the plot grows (its harvests, without Bumper Crop's doubles).
-func plot_growth(crop: String) -> float:
-	return plot_yield_exact(crop) / plot_cycle(crop)
+## Every crop's rate at a farm, summed (what the card shows as its harvest).
+func plot_growth(id: String) -> float:
+	var total := 0.0
+	for crop in plot_crops(id):
+		total += crop_rate(id, crop)
+	return total
 
 
-## Crops a second the plot's truck carries to stock (Cargo, D043): CARGO_START
-## times its base growth, plus CARGO_STEP of that a level, times its boosts.
-func cargo_rate(crop: String) -> float:
-	var base: float = data.plots[crop]["yield"] / data.plots[crop].seconds
-	return T.CARGO_START * base * (1.0 + T.CARGO_STEP * plots[crop].cargo) * plot_boost(crop)
+func truck_speed(id: String) -> float:
+	return ipm_curve(T.TRUCK_SPEED, plots[id].truck) * fx.truck_speed * hq("truck_speed")
 
 
-## "speed", "yield" or "cargo".
-## A plot upgrade's price, `ahead` levels past its current one (for buying
-## several at once, LAYOUT.md).
-## Every plot upgrade is on Idle Planet Miner's curve (D041): its first level
-## costs a share of the plot's price, each level after it × growth.
-func plot_upgrade_cost(crop: String, upgrade: String, ahead: int = 0) -> float:
+## Crops a trip carries: IPM's cargo after boosts, rounded half to even.
+func truck_cargo(id: String) -> int:
+	var c: float = ipm_curve(T.TRUCK_CARGO, plots[id].cargo) * data.plots[id].cargo_mult * fx.cargo * hq("cargo")
+	var whole := floori(c)
+	if absf(c - whole - 0.5) < EPSILON:
+		return whole + (whole % 2)   # a half goes to the even neighbour
+	return roundi(c)
+
+
+## Seconds a round trip takes: there and back at Truck Speed (G21, assumed).
+func trip_seconds(id: String) -> float:
+	return 2.0 * data.plots[id].distance / truck_speed(id)
+
+
+## Crops a second the truck can carry (cargo every trip).
+func cargo_rate(id: String) -> float:
+	return truck_cargo(id) / trip_seconds(id)
+
+
+## Crops waiting at a farm for the truck.
+func field_total(id: String) -> int:
+	var n := 0
+	for crop in plots[id].field:
+		n += plots[id].field[crop]
+	return n
+
+
+## A farm upgrade's price, `ahead` levels past its current one (for buying
+## several at once, LAYOUT.md): IPM's price ÷ 20 × 1.3^level (D041), the Bell
+## Plot's on Balor's $100, × the Land Office.
+func plot_upgrade_cost(id: String, upgrade: String, ahead: int = 0) -> float:
 	if not upgrade in PLOT_UPGRADES:
 		return INF
-	var lv: int = plots[crop][upgrade] + ahead
-	return plot_price(crop) * T.PLOT_UPGRADE_SHARE * pow(T.PLOT_UPGRADE_GROWTH, lv)
+	var lv: int = plots[id][upgrade] + ahead
+	return data.plots[id].upgrade_price * T.PLOT_UPGRADE_SHARE * pow(T.PLOT_UPGRADE_GROWTH, lv) * hq("upgrade_cost")
 
 
-func can_buy_plot(crop: String) -> bool:
-	return plots.has(crop) and plot_offered(crop) and not plots[crop].owned and cash >= plot_price(crop)
+func can_buy_plot(id: String) -> bool:
+	return plots.has(id) and plot_offered(id) and not plots[id].owned and cash >= plot_price(id)
 
 
-func can_upgrade_plot(crop: String, upgrade: String) -> bool:
-	return plots.has(crop) and plots[crop].owned and upgrade in PLOT_UPGRADES and cash >= plot_upgrade_cost(crop, upgrade)
+func can_upgrade_plot(id: String, upgrade: String) -> bool:
+	return plots.has(id) and plots[id].owned and upgrade in PLOT_UPGRADES and cash >= plot_upgrade_cost(id, upgrade)
 
 
 # --- Reading: slots and recipes ------------------------------------------------
@@ -340,9 +426,9 @@ func slots(station: String) -> Array:
 	return vats if station == "vat" else lines
 
 
-## Run 1's base cap plus Slot Expansion.
+## Ten of each (IPM's smelters and crafters), no other cap.
 func slot_cap(station: String) -> int:
-	return mini(data.slots[station].base_cap + fx.slot_cap[station], data.slots[station].prices.size())
+	return data.slots[station].prices.size()
 
 
 ## The next slot is offered: the first vat with the deck, the first line once a
@@ -356,9 +442,10 @@ func slot_offered(station: String) -> bool:
 	return tab_open("processing")
 
 
+## A new slot's price: IPM's, halved by the Bulk Buyer's Club.
 func slot_price(station: String) -> float:
 	var owned := slots(station).size()
-	return data.slots[station].prices[owned] if owned < slot_cap(station) else INF
+	return data.slots[station].prices[owned] * (1.0 - fx.discount) if owned < slot_cap(station) else INF
 
 
 func can_buy_slot(station: String) -> bool:
@@ -369,7 +456,7 @@ func slot_upgrade_cost(station: String, index: int, ahead: int = 0) -> float:
 	var ref := T.VAT_PRICE_REFERENCE if station == "vat" else T.LINE_PRICE_REFERENCE
 	var scale := pow(maxf(data.slots[station].prices[index], ref) / ref, T.COST_SCALE_POWER)
 	# D031: a slot's upgrades are also priced by what it makes, so a slot
-	# bottling Phantom Smokehouse upgrades at Phantom prices; whichever is dearer.
+	# bottling a top sauce upgrades at its prices; whichever is dearer.
 	var recipe: String = slots(station)[index].recipe
 	if recipe != "":
 		var ref_item: String = T.VAT_VALUE_REFERENCE if station == "vat" else T.LINE_VALUE_REFERENCE
@@ -386,11 +473,11 @@ func can_upgrade_slot(station: String, index: int) -> bool:
 
 # --- Reading: buying several levels at once (LAYOUT.md L2) ---------------------
 
-## The price of the next `n` levels of a plot upgrade together (INF past a cap).
-func plot_upgrade_cost_n(crop: String, upgrade: String, n: int) -> float:
+## The price of the next `n` levels of a farm upgrade together.
+func plot_upgrade_cost_n(id: String, upgrade: String, n: int) -> float:
 	var total := 0.0
 	for i in n:
-		total += plot_upgrade_cost(crop, upgrade, i)
+		total += plot_upgrade_cost(id, upgrade, i)
 	return total
 
 
@@ -401,14 +488,14 @@ func slot_upgrade_cost_n(station: String, index: int, n: int) -> float:
 	return total
 
 
-## How many levels of a plot upgrade cash covers now (Max), up to BULK_MAX.
-func plot_levels_affordable(crop: String, upgrade: String) -> int:
-	if not plots.has(crop) or not plots[crop].owned:
+## How many levels of a farm upgrade cash covers now (Max), up to BULK_MAX.
+func plot_levels_affordable(id: String, upgrade: String) -> int:
+	if not plots.has(id) or not plots[id].owned:
 		return 0
 	var n := 0
 	var total := 0.0
 	while n < T.BULK_MAX:
-		total += plot_upgrade_cost(crop, upgrade, n)
+		total += plot_upgrade_cost(id, upgrade, n)
 		if total > cash + EPSILON:
 			break
 		n += 1
@@ -428,43 +515,63 @@ func slot_levels_affordable(station: String, index: int) -> int:
 	return n
 
 
+## Free recipes, and the ones bought with cash (D051).
 func recipe_unlocked(recipe: String) -> bool:
-	return data.recipes.has(recipe) and (data.recipes[recipe].unlocked or fx.recipes.has(recipe))
+	return data.recipes.has(recipe) and (data.recipes[recipe].unlock <= 0.0 or bought.has(recipe))
 
 
-## Recipes a slot of this station can run now, in data order.
-func recipes_for(station: String) -> Array:
+func recipe_price(recipe: String) -> float:
+	return data.recipes[recipe].unlock
+
+
+## A recipe can be bought: not yet owned, and cash covers it. Like IPM's, any
+## recipe is on sale from the start; its inputs are what gate it.
+func can_buy_recipe(recipe: String) -> bool:
+	return data.recipes.has(recipe) and not recipe_unlocked(recipe) and cash >= recipe_price(recipe)
+
+
+## Recipes a slot can run now, in data order: kitchen recipes only in the
+## first vat and line (D052).
+func recipes_for(station: String, index: int = 0) -> Array:
 	var out := []
 	for id in data.recipes:
-		if data.recipes[id].station == station and recipe_unlocked(id):
+		var r: Dictionary = data.recipes[id]
+		if r.station == station and recipe_unlocked(id) and (index == 0 or not r.kitchen):
 			out.append(id)
 	return out
 
 
-## A recipe's inputs now: a vat's raw crops cut by Zero-Waste Piping, rounded
-## down, at least 1 (brief §6's Cooperage rule). Cached in fx.
+## A recipe's inputs now, after Zero-Waste Piping, the Pantry's Concentrate and
+## the Cooperage or Glassworks: multiplied, rounded down, at least 1 (brief
+## §6's anti-exploit rule). Cached in fx.
 func recipe_inputs(recipe: String) -> Dictionary:
 	return fx.inputs[recipe]
 
 
+## A slot's inputs: its recipe's, and a Pressure Cooker's extra (rounded up).
+func slot_inputs(station: String, index: int) -> Dictionary:
+	var s: Dictionary = slots(station)[index]
+	var base := recipe_inputs(s.recipe)
+	if station != "vat" or not s.get("pressure", false):
+		return base
+	var out := {}
+	for item in base:
+		out[item] = ceili(base[item] * (1.0 + fx.pressure_extra) - EPSILON)
+	return out
+
+
 func _inputs_after_reduction(recipe: String) -> Dictionary:
 	var r: Dictionary = data.recipes[recipe]
-	var crop_cut: float = fx.hq.get("crop_input", 0.0)
-	var mash_cut: float = fx.hq.get("mash_input", 0.0)
-	if r.station == "vat" and fx.reduction <= 0.0 and fx.concentrate.is_empty() and crop_cut <= 0.0:
+	var vat: bool = r.station == "vat"
+	var cut: float = (1.0 - (fx.vat_cut if vat else fx.line_cut)) * hq("vat_input" if vat else "line_input")
+	if cut >= 1.0 and (not vat or fx.concentrate.is_empty()):
 		return r.inputs
-	if r.station == "line" and mash_cut <= 0.0:
-		return r.inputs
-	# Discounts multiply, rounded down, at least 1 (brief §6's anti-exploit rule).
 	var out := {}
 	for item in r.inputs:
 		var n: int = r.inputs[item]
-		var kind: String = data.items[item].kind
-		var keep_share := 1.0
-		if r.station == "vat" and kind == "crop":
-			keep_share = (1.0 - fx.reduction) * (1.0 - fx.concentrate.get(item, 0.0)) * (1.0 - crop_cut)
-		elif r.station == "line" and kind == "mash":
-			keep_share = 1.0 - mash_cut
+		var keep_share := cut
+		if vat:
+			keep_share *= 1.0 - fx.concentrate.get(item, 0.0)
 		if keep_share < 1.0:
 			n = maxi(1, floori(n * keep_share + 1e-9))
 		out[item] = n
@@ -481,16 +588,26 @@ func factory_speed() -> float:
 	return m
 
 
-## Seconds a slot's cycle takes now, Starter Crate and Overdrive included. INF
-## when it's off.
+## Seconds a slot's cycle takes now, Starter Crate, Overdrive, research,
+## rooms and a Pressure Cooker included. INF when it's off.
 func slot_cycle(station: String, index: int) -> float:
 	var s: Dictionary = slots(station)[index]
 	if s.recipe == "":
 		return INF
 	var step := T.VAT_SPEED_STEP if station == "vat" else T.LINE_SPEED_STEP
 	var crate := T.STARTER_CRATE_SPEED if station == "line" and s.crate > 0 else 1.0
-	var hq: float = fx.hq.get("vat_speed" if station == "vat" else "line_speed", 0.0)
-	return data.recipes[s.recipe].seconds / (1.0 + step * s.speed) / crate / factory_speed() / (1.0 + hq)
+	var research_speed: float = fx.vat_speed if station == "vat" else fx.line_speed
+	var pressure: float = fx.pressure_speed if station == "vat" and s.get("pressure", false) else 1.0
+	return data.recipes[s.recipe].seconds / (1.0 + step * s.speed) / crate / factory_speed() / research_speed / pressure / hq("vat_speed" if station == "vat" else "line_speed")
+
+
+## Pressure Cookers in use, and whether another vat can go under pressure.
+func pressure_used() -> int:
+	var n := 0
+	for s in vats:
+		if s.get("pressure", false):
+			n += 1
+	return n
 
 
 func overdrive_active() -> bool:
@@ -507,8 +624,8 @@ func is_researched(node: String) -> bool:
 	return research.has(node)
 
 
-## Every parent researched, and the tab open; an after-sale node only once
-## the franchise has been sold (D034).
+## Every parent researched (and one of `needs_any`), and the tab open; an
+## after-sale node only once the franchise has been sold (D034: now only SOP).
 func research_reachable(node: String) -> bool:
 	if not data.tech.has(node) or is_researched(node) or not tab_open("tech"):
 		return false
@@ -517,6 +634,9 @@ func research_reachable(node: String) -> bool:
 	for need in data.tech[node].needs:
 		if not is_researched(need):
 			return false
+	var any: Array = data.tech[node].needs_any
+	if not any.is_empty() and not any.any(func(n): return is_researched(n)):
+		return false
 	return not fork_taken(node)
 
 
@@ -529,17 +649,16 @@ func fork_taken(node: String) -> String:
 	return ""
 
 
-## A node's cost after the Test Kitchen: max(1, round(base × (1 − discount)))
-## per item (brief §6's anti-exploit formula; the Tech and Manager discounts
-## join it when they exist).
+## A node's cost after the Test Kitchen: max(1, round(base × its factor)) per
+## item (brief §6's anti-exploit formula).
 func tech_cost(node: String) -> Dictionary:
-	var cut: float = fx.hq.get("tech_cost", 0.0)
+	var keep_share: float = hq("tech_cost")
 	var base: Dictionary = data.tech[node].cost
-	if cut <= 0.0:
+	if keep_share >= 1.0:
 		return base
 	var out := {}
 	for item in base:
-		out[item] = maxi(1, roundi(base[item] * (1.0 - cut)))
+		out[item] = maxi(1, roundi(base[item] * keep_share))
 	return out
 
 
@@ -648,41 +767,92 @@ func sell_batch(item: String = "") -> bool:
 	return sold
 
 
-func buy_plot(crop: String) -> bool:
-	if not can_buy_plot(crop):
+func buy_plot(id: String) -> bool:
+	if not can_buy_plot(id):
 		return false
-	cash -= plot_price(crop)
-	plots[crop].owned = true
+	_spend(plot_price(id))
+	plots[id].owned = true
 	return true
 
 
-func upgrade_plot(crop: String, upgrade: String) -> bool:
-	if not can_upgrade_plot(crop, upgrade):
+func upgrade_plot(id: String, upgrade: String) -> bool:
+	if not can_upgrade_plot(id, upgrade):
 		return false
-	cash -= plot_upgrade_cost(crop, upgrade)
-	plots[crop][upgrade] += 1
+	_spend(plot_upgrade_cost(id, upgrade))
+	plots[id][upgrade] += 1
 	return true
 
 
 ## Buys `n` levels at once, or none if cash doesn't cover all of them. Returns
 ## the levels bought.
-func upgrade_plot_n(crop: String, upgrade: String, n: int) -> int:
-	if n < 1 or n > plot_levels_affordable(crop, upgrade):
+func upgrade_plot_n(id: String, upgrade: String, n: int) -> int:
+	if n < 1 or n > plot_levels_affordable(id, upgrade):
 		return 0
 	# One payment for all of them, so rounding can't stop the last level.
-	cash = maxf(0.0, cash - plot_upgrade_cost_n(crop, upgrade, n))
-	plots[crop][upgrade] += n
+	_spend(minf(cash, plot_upgrade_cost_n(id, upgrade, n)))
+	plots[id][upgrade] += n
 	return n
 
 
-## Buys the next vat or line slot. It starts on the station's first recipe
-## (Sweet Pepper Mash, Table Mild); the first line comes with the Starter Crate.
+## Crop Priority (IPM's Cargo Logistics): the crop a farm's truck takes first,
+## and the one Targeted Fertiliser boosts; "" for the most valuable first.
+func set_priority(id: String, crop: String) -> bool:
+	if not fx.priority or not plots.has(id) or not plots[id].owned:
+		return false
+	if crop != "" and not plot_crops(id).has(crop):
+		return false
+	plots[id].priority = crop
+	return true
+
+
+## The Crossbreeding nodes researched and not yet used.
+func crossbreeds_left() -> Array:
+	var out := []
+	for node in fx.crossbreed:
+		if not bred.has(node):
+			out.append(node)
+	return out
+
+
+## The pepper `steps` rungs above another on the ladder (D053), "" past the top
+## or for an ingredient.
+func rung_up(crop: String, steps: int) -> String:
+	var i: int = data.ladder.find(crop)
+	if i < 0 or i + steps >= data.ladder.size():
+		return ""
+	return data.ladder[i + steps]
+
+
+## Crossbreeding (IPM's Alchemy): a node turns one of a farm's peppers into the
+## pepper its rungs higher, once; a farm can only be crossbred once.
+func crossbreed(node: String, id: String, crop: String) -> bool:
+	if not fx.crossbreed.has(node) or bred.has(node) or not plots.has(id) or not plots[id].owned:
+		return false
+	if not plots[id].bred.is_empty() or not data.plots[id].crops.has(crop):
+		return false
+	var to := rung_up(crop, fx.crossbreed[node])
+	if to == "":
+		return false
+	plots[id].bred = {"from": crop, "to": to}
+	if not plots[id].field.has(to):
+		plots[id].field[to] = 0
+		plots[id].spare[to] = 0.0
+	bred[node] = id
+	return true
+
+
+## Buys the next vat or line slot. The kitchen's (the first of each) starts on
+## its recipe (Sweet Pepper Mash, Table Mild) and the first line brings the
+## Starter Crate; later ones start switched off.
 func buy_slot(station: String) -> bool:
 	if not can_buy_slot(station):
 		return false
-	cash -= slot_price(station)
-	var s := {"recipe": recipes_for(station)[0], "speed": 0, "progress": 0.0, "running": false, "taken": {}}
-	if station == "line":
+	var index := slots(station).size()
+	_spend(slot_price(station))
+	var s := {"recipe": recipes_for(station, 0)[0] if index == 0 else "", "speed": 0, "progress": 0.0, "running": false, "taken": {}}
+	if station == "vat":
+		s.pressure = false
+	else:
 		s.crate = T.STARTER_CRATE_BOTTLES if lines.is_empty() else 0
 	slots(station).append(s)
 	_start_cycles()
@@ -692,7 +862,7 @@ func buy_slot(station: String) -> bool:
 func upgrade_slot(station: String, index: int) -> bool:
 	if not can_upgrade_slot(station, index):
 		return false
-	cash -= slot_upgrade_cost(station, index)
+	_spend(slot_upgrade_cost(station, index))
 	slots(station)[index].speed += 1
 	return true
 
@@ -700,7 +870,7 @@ func upgrade_slot(station: String, index: int) -> bool:
 func upgrade_slot_n(station: String, index: int, n: int) -> int:
 	if n < 1 or n > slot_levels_affordable(station, index):
 		return 0
-	cash = maxf(0.0, cash - slot_upgrade_cost_n(station, index, n))
+	_spend(minf(cash, slot_upgrade_cost_n(station, index, n)))
 	slots(station)[index].speed += n
 	return n
 
@@ -710,24 +880,56 @@ func upgrade_slot_n(station: String, index: int, n: int) -> int:
 func assign(station: String, index: int, recipe: String) -> bool:
 	if index < 0 or index >= slots(station).size():
 		return false
-	if recipe != "" and not recipe in recipes_for(station):
+	if recipe != "" and not recipe in recipes_for(station, index):
 		return false
 	var s: Dictionary = slots(station)[index]
 	if s.recipe == recipe:
 		return true
-	if s.running:
-		for item in s.taken:
-			stock[item] += s.taken[item]
-			stats.consumed[item] -= s.taken[item]
+	_return_taken(s)
 	s.recipe = recipe
-	s.running = false
-	s.progress = 0.0
-	s.taken = {}
 	_start_cycles()
 	return true
 
 
-## Researches a node by turning in its cost (brief §4: instant).
+func _return_taken(s: Dictionary) -> void:
+	if s.running:
+		for item in s.taken:
+			stock[item] += s.taken[item]
+			stats.consumed[item] -= s.taken[item]
+	s.running = false
+	s.progress = 0.0
+	s.taken = {}
+
+
+## Puts a vat under a Pressure Cooker, or takes it off; its cycle restarts
+## either way, as switching its recipe does.
+func set_pressure(index: int, on: bool) -> bool:
+	if index < 0 or index >= vats.size():
+		return false
+	var s: Dictionary = vats[index]
+	if s.pressure == on:
+		return true
+	if on and pressure_used() >= fx.pressure:
+		return false
+	_return_taken(s)
+	s.pressure = on
+	_start_cycles()
+	return true
+
+
+## Buys a recipe with cash (D051, as Idle Planet Miner's alloys and items).
+func buy_recipe(recipe: String) -> bool:
+	if not can_buy_recipe(recipe):
+		return false
+	_spend(recipe_price(recipe))
+	bought[recipe] = true
+	_refresh_fx()
+	_start_cycles()
+	return true
+
+
+## Researches a node by turning in its cost (brief §4: instant). What it took
+## stays in Operation Value (IPM's Galaxy Value).
 func research_node(node: String) -> bool:
 	if not can_research(node):
 		return false
@@ -735,6 +937,7 @@ func research_node(node: String) -> bool:
 	for item in cost:
 		stock[item] -= cost[item]
 		stats.consumed[item] += cost[item]
+		stats.spent += cost[item] * appraisal(item)
 	_grant(node)
 	return true
 
@@ -760,8 +963,8 @@ func tech_cost_value(node: String) -> float:
 
 ## The early run's steps, in order, for the screen to ring one at a time
 ## (LAYOUT.md step 2, D044).
-const NEXT_STEPS := [["plot", "bell"], ["slot", "vat"], ["slot", "line"], ["sell_batch", ""], ["plot", "poblano"],
-	["plot", "jalapeno"], ["tab", "tech"]]
+const NEXT_STEPS := [["plot", "bell"], ["slot", "vat"], ["slot", "line"], ["sell_batch", ""], ["plot", "farm_02"],
+	["plot", "farm_03"], ["tab", "tech"]]
 
 
 ## The next action in the early run: {"do": "press" | "sell_raw" | "sell_batch"
@@ -881,7 +1084,7 @@ func set_keep(item: String, amount: int) -> bool:
 
 ## How much time away counts, in seconds, and the speed it runs at (D018).
 func offline_cap() -> float:
-	return (T.OFFLINE_HOURS + fx.offline_hours + fx.hq.get("offline_hours", 0.0)) * 3600.0
+	return (T.OFFLINE_HOURS + fx.offline_hours + hq("offline_hours", 0.0)) * 3600.0
 
 
 func offline_speed() -> float:
@@ -947,21 +1150,21 @@ func _step(k: int) -> void:
 	if heat > 0.0:
 		heat = maxf(0.0, heat - T.HEAT_DRAIN * fx.heat_drain * dt)
 
-	for crop in plots:
-		var p: Dictionary = plots[crop]
+	for id in plots:
+		var p: Dictionary = plots[id]
 		if not p.owned:
 			continue
-		p.progress += dt
-		if k == 1:
-			while p.progress >= plot_cycle(crop) - EPSILON:
-				p.progress -= plot_cycle(crop)
-				var harvests := 2 if fx.bumper > 0.0 and rng.randf() < fx.bumper else 1
-				var n := _harvest(crop, harvests)
-				p.field += n
-				stats.harvested[crop] += n
-		else:
-			_harvest_batch(crop)
-		_haul(crop, dt)
+		p.grow += dt
+		var n := floori((p.grow + EPSILON) / T.HARVEST_SECONDS)
+		if n > 0:
+			p.grow -= n * T.HARVEST_SECONDS
+			# Bumper Crop doubles a harvest: one draw a harvest, or a binomial
+			# for a long step's many (D020).
+			var harvests := n
+			if fx.bumper > 0.0:
+				harvests += (1 if rng.randf() < fx.bumper else 0) if n == 1 else _binomial(n, fx.bumper)
+			_harvest(id, harvests * T.HARVEST_SECONDS)
+		_haul(id, dt)
 	_start_cycles()
 	for i in vats.size():
 		if k == 1:
@@ -1002,7 +1205,7 @@ func prestige_credits() -> int:
 	var low: float = T.PRESTIGE_OV * pow(10.0, decade)
 	var share := clampf((ov - low) / (9.0 * low), 0.0, 1.0)
 	var credits := _credits_at(decade) + share * (_credits_at(decade + 1) - _credits_at(decade))
-	return roundi(credits * (1.0 + fx.hq.get("credits", 0.0)))
+	return roundi(credits * hq("credits"))
 
 
 ## Credits at PRESTIGE_OV × 10^decade (Idle Planet Miner's table, D035).
@@ -1042,42 +1245,43 @@ func start_cash() -> float:
 	return 0.0
 
 
+## The rooms on offer: the first unowned ones in rooms.json's order, two at a
+## time (Idle Planet Miner's, SKELETON.md).
+func rooms_offered() -> Array:
+	var out := []
+	for id in data.room_order:
+		if not account.rooms.has(id):
+			out.append(id)
+			if out.size() >= T.ROOMS_OFFERED:
+				break
+	return out
+
+
+## The n-th room bought costs the n-th row's opening price, whichever room it is.
 func room_open_cost() -> int:
-	return T.ROOM_OPEN_COST * (account.rooms.size() + 1)
+	var n: int = account.rooms.size()
+	return data.rooms[data.room_order[n]].open_cost if n < data.room_order.size() else 1 << 30
 
 
-func can_open_room() -> bool:
-	return account.draft.is_empty() and account.rooms.size() < data.rooms.size() and account.credits >= room_open_cost()
+func can_open_room(id: String) -> bool:
+	return id in rooms_offered() and account.credits >= room_open_cost()
 
 
-## Pays for a new room and deals the draft from the rooms not yet owned.
-func open_room() -> bool:
-	if not can_open_room():
+## Pays for an offered room; it opens at Level 1.
+func open_room(id: String) -> bool:
+	if not can_open_room(id):
 		return false
 	account.credits -= room_open_cost()
-	var pool: Array = []
-	for id in data.rooms:
-		if not account.rooms.has(id):
-			pool.append(id)
-	var draft: Array = []
-	while draft.size() < T.DRAFT_SIZE and not pool.is_empty():
-		draft.append(pool.pop_at(rng.randi_range(0, pool.size() - 1)))
-	account.draft = draft
-	return true
-
-
-## Picks a room from the draft; it opens at Level 1.
-func choose_room(id: String) -> bool:
-	if not account.draft.has(id):
-		return false
 	account.rooms[id] = 1
-	account.draft = []
 	_refresh_fx()
 	return true
 
 
+## Credits from a room's level to the next (its IPM table).
 func room_level_cost(id: String) -> int:
-	return T.ROOM_LEVEL_COST * int(account.rooms.get(id, 0))
+	var lv: int = account.rooms.get(id, 0)
+	var costs: Array = data.rooms[id].level_costs
+	return costs[lv - 1] if lv >= 1 and lv <= costs.size() else 1 << 30
 
 
 func can_level_room(id: String) -> bool:
@@ -1151,7 +1355,7 @@ func _press_batch(n: int) -> void:
 			_forage_drop()
 
 
-## Forager's Luck (D025): of the owned ingredient stations that a researched
+## Forager's Luck (D025): of the owned ingredient stations that an unlocked
 ## recipe uses, the one whose stock covers the fewest cycles of that use (ties
 ## in data order); "" when there is none.
 func _shortest_ingredient() -> String:
@@ -1166,15 +1370,12 @@ func _shortest_ingredient() -> String:
 	return best
 
 
-## One harvest of the shortest ingredient at its base cycle: what the plot grows
-## in its base cycle's time, upgrades included.
-## Speed levels count too (D041: they're many and cheap now), so the drop keeps
-## its share of the plot (D025). It goes straight to stock, not the field.
+## A drop of the shortest ingredient: what its station grows in FORAGE_SECONDS,
+## upgrades included, straight to stock. Bumper Crop can double it (D043).
 func _forage_drop() -> void:
 	var crop := _shortest_ingredient()
-	# A drop is a harvest, so Bumper Crop can double it too (D043).
 	var harvests := 2.0 if fx.bumper > 0.0 and rng.randf() < fx.bumper else 1.0
-	var n := _harvest(crop, harvests * data.plots[crop].seconds / plot_cycle(crop))
+	var n := roundi(crop_rate(crop, crop) * T.FORAGE_SECONDS * harvests)
 	stock[crop] += n
 	stats.harvested[crop] += n
 	stats.foraged += 1
@@ -1192,44 +1393,45 @@ func _binomial(n: int, p: float) -> int:
 	return clampi(roundi(rng.randfn(n * p, sqrt(n * p * (1.0 - p)))), 0, n)
 
 
-## The whole crops `harvests` harvests give, carrying the fraction to the next.
-func _harvest(crop: String, harvests: float) -> int:
-	var p: Dictionary = plots[crop]
-	var exact: float = harvests * plot_yield_exact(crop) + p.spare
-	var n := floori(exact + EPSILON)
-	p.spare = maxf(0.0, exact - n)
-	return n
+## `seconds` of a farm's growth into its field, each crop's fraction carried.
+func _harvest(id: String, seconds: float) -> void:
+	var p: Dictionary = plots[id]
+	for crop in plot_crops(id):
+		var exact: float = crop_rate(id, crop) * seconds + p.spare.get(crop, 0.0)
+		var n := floori(exact + EPSILON)
+		p.spare[crop] = maxf(0.0, exact - n)
+		p.field[crop] = p.field.get(crop, 0) + n
+		stats.harvested[crop] += n
 
 
-## A long step's harvests at once (the catch-up, D020): every whole cycle in the
-## step, with one draw for how many come up double (a binomial, by its normal
-## approximation once there are enough).
-func _harvest_batch(crop: String) -> void:
-	var p: Dictionary = plots[crop]
-	var cycle := plot_cycle(crop)
-	var n := floori((p.progress + EPSILON) / cycle)
-	if n <= 0:
+## The truck (D050, G21): every round trip it brings up to its cargo from the
+## field, the priority crop first, then the most valuable.
+func _haul(id: String, dt: float) -> void:
+	var p: Dictionary = plots[id]
+	p.trip += dt
+	var trip := trip_seconds(id)
+	var trips := floori((p.trip + EPSILON) / trip)
+	if trips <= 0:
 		return
-	p.progress -= n * cycle
-	var doubled := _binomial(n, fx.bumper) if fx.bumper > 0.0 else 0
-	var got := _harvest(crop, n + doubled)
-	p.field += got
-	stats.harvested[crop] += got
+	p.trip -= trips * trip
+	var room: int = trips * truck_cargo(id)
+	for crop in _load_order(id):
+		if room <= 0:
+			break
+		var n := mini(room, p.field[crop])
+		p.field[crop] -= n
+		stock[crop] += n
+		room -= n
 
 
-## The truck carries what it can from the field to stock (D043). Its spare
-## capacity carries over while it's busy; idle, it holds at most a base cycle's
-## load, so a fresh harvest goes straight in but nothing banks up for later.
-func _haul(crop: String, dt: float) -> void:
-	var p: Dictionary = plots[crop]
-	var rate := cargo_rate(crop)
-	p.haul += rate * dt
-	var n := mini(p.field, floori(p.haul + EPSILON))
-	p.field -= n
-	p.haul = maxf(0.0, p.haul - n)
-	stock[crop] += n
-	if p.field == 0:
-		p.haul = minf(p.haul, rate * data.plots[crop].seconds)
+func _load_order(id: String) -> Array:
+	var crops: Array = plots[id].field.keys()
+	crops.sort_custom(func(a, b): return value(a) > value(b))
+	var first: String = plots[id].priority
+	if first != "" and crops.has(first):
+		crops.erase(first)
+		crops.push_front(first)
+	return crops
 
 
 ## A long step for a vat or line (the catch-up, D020): as many cycles as the
@@ -1246,7 +1448,7 @@ func _run_batch(station: String, index: int, dt: float) -> void:
 	var due := floori((s.progress + EPSILON) / cycle)
 	if due <= 0:
 		return
-	var inputs := recipe_inputs(s.recipe)
+	var inputs := slot_inputs(station, index)
 	var more := due - 1
 	for item in inputs:
 		more = mini(more, stock[item] / inputs[item])
@@ -1258,12 +1460,14 @@ func _run_batch(station: String, index: int, dt: float) -> void:
 	s.running = false
 	s.taken = {}
 	var out: String = data.recipes[s.recipe].output
-	stats.made[out] += done
+	var double: float = fx.line_double if station == "line" else fx.vat_double
+	var made := done + (_binomial(done, double) if double > 0.0 else 0)
+	stats.made[out] += made
 	if station == "line":
-		for i in done:
+		for i in made:
 			_bottle_made(out)
 	else:
-		stock[out] += done
+		stock[out] += made
 		for i in done:
 			_byproduct()
 		# As in a tick, slots waiting for this mash take it at once, before
@@ -1289,13 +1493,17 @@ func _run(station: String, index: int, dt: float) -> void:
 		s.running = false
 		s.taken = {}
 		var out: String = data.recipes[s.recipe].output
-		stats.made[out] += 1
+		# Double Batch and Double Fill (IPM's Specialists): a chance of two.
+		var double: float = fx.line_double if station == "line" else fx.vat_double
+		var made := 2 if double > 0.0 and rng.randf() < double else 1
+		stats.made[out] += made
 		if station == "line":
 			if s.crate > 0:
 				s.crate -= 1
-			_bottle_made(out)
+			for i in made:
+				_bottle_made(out)
 		else:
-			stock[out] += 1
+			stock[out] += made
 			_byproduct()
 		_start_cycles()
 	if not s.running:
@@ -1326,16 +1534,16 @@ func _byproduct() -> void:
 		byproduct_ready = stats.ticks + _ticks(T.BYPRODUCT_COOLDOWN)
 
 
-## Gives the owned plot with the fewest levels a free level, on whichever of its
-## upgrades is cheapest (D013). Returns false with no plot owned.
+## Gives the owned farm with the fewest levels a free level, on whichever of
+## its upgrades is cheapest (D013). Returns false with no farm owned.
 func _free_level() -> bool:
 	var lowest := ""
 	var lowest_levels := 1 << 30
-	for crop in plots:
-		var p: Dictionary = plots[crop]
-		if p.owned and p.speed + p["yield"] + p.cargo < lowest_levels:
-			lowest = crop
-			lowest_levels = p.speed + p["yield"] + p.cargo
+	for id in plots:
+		var p: Dictionary = plots[id]
+		if p.owned and p.harvest + p.truck + p.cargo < lowest_levels:
+			lowest = id
+			lowest_levels = p.harvest + p.truck + p.cargo
 	if lowest == "":
 		return false
 	var best := ""
@@ -1370,7 +1578,7 @@ func _market() -> void:
 		return
 	var sauces := unlocked_bottles()
 	ticker.sauce = sauces[rng.randi_range(0, sauces.size() - 1)]
-	ticker.mult = T.TICKER_MULTS[rng.randi_range(0, T.TICKER_MULTS.size() - 1)]
+	ticker.mult = T.TICKER_MULTS[rng.randi_range(0, T.TICKER_MULTS.size() - 1)] * hq("ticker")
 	ticker.ends = stats.ticks + _ticks(T.TICKER_SECONDS)
 	ticker.next = stats.ticks + _ticks(rng.randi_range(T.TICKER_GAP[0], T.TICKER_GAP[1]))
 	stats.spikes += 1
@@ -1380,10 +1588,11 @@ func _market() -> void:
 ## lines, each in buying order.
 func _start_cycles() -> void:
 	for station in ["vat", "line"]:
-		for s in slots(station):
+		for i in slots(station).size():
+			var s: Dictionary = slots(station)[i]
 			if s.running or s.recipe == "":
 				continue
-			var inputs := recipe_inputs(s.recipe)
+			var inputs := slot_inputs(station, i)
 			if has_items(inputs):
 				for item in inputs:
 					stock[item] -= inputs[item]
@@ -1396,6 +1605,13 @@ func _sell(item: String, count: int) -> void:
 	stock[item] -= count
 	stats.sold[item] += count
 	_earn(count * sale_price(item) * heat_mult())
+
+
+## Pays cash out; it stays in Operation Value (IPM's Galaxy Value counts what
+## was spent).
+func _spend(amount: float) -> void:
+	cash = maxf(0.0, cash - amount)
+	stats.spent += amount
 
 
 ## Adds sale cash. The account's best Operation Value is noted by the step or
@@ -1482,7 +1698,7 @@ func _replay_market() -> void:
 		var start: int = ticker.next
 		var sauces := unlocked_bottles()
 		ticker.sauce = sauces[rng.randi_range(0, sauces.size() - 1)]
-		ticker.mult = T.TICKER_MULTS[rng.randi_range(0, T.TICKER_MULTS.size() - 1)]
+		ticker.mult = T.TICKER_MULTS[rng.randi_range(0, T.TICKER_MULTS.size() - 1)] * hq("ticker")
 		ticker.ends = start + _ticks(T.TICKER_SECONDS)
 		ticker.next = start + _ticks(rng.randi_range(T.TICKER_GAP[0], T.TICKER_GAP[1]))
 		stats.spikes += 1
@@ -1504,6 +1720,8 @@ func to_state() -> Dictionary:
 			"vats": vats.duplicate(true),
 			"lines": lines.duplicate(true),
 			"research": research.keys(),
+			"bought": bought.keys(),
+			"bred": bred.duplicate(),
 			"autosell": autosell.duplicate(),
 			"autosell_acc": autosell_acc.duplicate(),
 			"heat": heat,
@@ -1578,13 +1796,20 @@ func load_state(s: Variant) -> String:
 		if problem != "":
 			return problem
 		s = _migrate_10_to_11(s)
+	if from_version < 12:
+		problem = _check(s.run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY, "vats": TYPE_ARRAY, "lines": TYPE_ARRAY,
+			"research": TYPE_ARRAY, "stats": TYPE_DICTIONARY})
+		if problem != "":
+			return problem
+		s = _migrate_11_to_12(s)
 	# v5 only adds `saved_at` beside the run, for the screen (OFFLINE.md); v6
 	# only adds stats.foraged (Forager's Luck), read below with a default of 0;
 	# v7 only adds the account's Prestige fields, read below with defaults.
 	var run: Dictionary = s.run
 	# `revealed` isn't required since D044: nothing reads it.
 	problem = _check(run, {"cash": TYPE_FLOAT, "stock": TYPE_DICTIONARY, "plots": TYPE_DICTIONARY,
-		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,
+		"vats": TYPE_ARRAY, "lines": TYPE_ARRAY, "research": TYPE_ARRAY, "bought": TYPE_ARRAY, "bred": TYPE_DICTIONARY,
+		"autosell": TYPE_DICTIONARY, "autosell_acc": TYPE_DICTIONARY,
 		"heat": TYPE_FLOAT, "press_acc": TYPE_DICTIONARY, "overdrive": TYPE_DICTIONARY, "keep": TYPE_DICTIONARY, "pin": TYPE_STRING,
 		"ticker": TYPE_DICTIONARY, "byproduct_ready": TYPE_FLOAT, "rng": TYPE_DICTIONARY, "stats": TYPE_DICTIONARY})
 	if problem != "":
@@ -1595,22 +1820,31 @@ func load_state(s: Variant) -> String:
 	for item in run.keep:
 		if not data.items.has(item):
 			return "save keeps unknown item " + str(item)
-	for crop in run.plots:
-		if not data.plots.has(crop) or typeof(run.plots[crop]) != TYPE_DICTIONARY:
-			return "save has a bad plot " + str(crop)
+	for id in run.plots:
+		var p: Variant = run.plots[id]
+		if not data.plots.has(id) or typeof(p) != TYPE_DICTIONARY or typeof(p.get("field", {})) != TYPE_DICTIONARY:
+			return "save has a bad plot " + str(id)
+		for crop in p.get("field", {}):
+			if not data.items.has(crop) or data.items[crop].kind != "crop":
+				return "save's plot %s holds unknown crop %s" % [id, str(crop)]
+		var b: Variant = p.get("bred", {})
+		if typeof(b) != TYPE_DICTIONARY or (not b.is_empty() and (not data.items.has(b.get("to")) or not data.plots[id].crops.has(b.get("from")))):
+			return "save's plot %s has a bad crossbreed" % id
 	for node in run.research:
 		if not data.tech.has(node):
 			return "save has unknown research " + str(node)
+	for r in run.bought:
+		if not data.recipes.has(r):
+			return "save bought unknown recipe " + str(r)
+	for node in run.bred:
+		if not data.tech.has(node) or not data.plots.has(run.bred[node]):
+			return "save has a bad crossbreed " + str(node)
 	if run.pin != "" and not data.tech.has(run.pin):
 		return "save pins unknown node " + run.pin
 	var t_sauce := str(run.ticker.get("sauce", ""))
 	if t_sauce != "" and (not data.items.has(t_sauce) or data.items[t_sauce].kind != "bottle"):
 		return "save's market spike is on unknown sauce " + t_sauce
-	# Slot caps depend on research, so work that out first.
 	var fresh = get_script().new(data)
-	for node in run.research:
-		fresh.research[node] = true
-	fresh._refresh_fx()
 	for station in ["vat", "line"]:
 		var saved: Array = run.vats if station == "vat" else run.lines
 		if saved.size() > fresh.slot_cap(station):
@@ -1627,19 +1861,13 @@ func load_state(s: Variant) -> String:
 				if not data.items.has(item):
 					return "save's %s slot took unknown item %s" % [station, item]
 
-	# v7 adds credits, sales, rooms and the draft to the account; a v6 save
-	# has none of them, which is an account that has never sold.
 	var acc: Dictionary = s.account
 	var rooms: Variant = acc.get("rooms", {})
-	var draft: Variant = acc.get("draft", [])
-	if typeof(rooms) != TYPE_DICTIONARY or typeof(draft) != TYPE_ARRAY:
-		return "save's HQ rooms or draft are the wrong type"
+	if typeof(rooms) != TYPE_DICTIONARY:
+		return "save's HQ rooms are the wrong type"
 	for id in rooms:
 		if not data.rooms.has(id) or int(rooms[id]) < 1 or int(rooms[id]) > data.rooms[id].cap:
 			return "save has a bad HQ room " + str(id)
-	for id in draft:
-		if not data.rooms.has(id) or rooms.has(id):
-			return "save's draft holds a bad room " + str(id)
 
 	# Everything checked: now load.
 	cash = float(run.cash)
@@ -1649,11 +1877,25 @@ func load_state(s: Variant) -> String:
 	# Since D044 nothing waits to be revealed, whatever an older save says.
 	revealed = fresh.revealed
 	plots = fresh.plots
-	for crop in run.plots:
-		var p: Dictionary = run.plots[crop]
-		plots[crop] = {"owned": bool(p.get("owned", false)), "speed": int(p.get("speed", 0)), "yield": int(p.get("yield", 0)),
-			"cargo": maxi(0, int(p.get("cargo", 0))), "progress": float(p.get("progress", 0.0)), "spare": float(p.get("spare", 0.0)),
-			"field": maxi(0, int(p.get("field", 0))), "haul": maxf(0.0, float(p.get("haul", 0.0)))}
+	for id in run.plots:
+		var p: Dictionary = run.plots[id]
+		var q: Dictionary = plots[id]
+		q.owned = bool(p.get("owned", false))
+		for k in PLOT_UPGRADES:
+			q[k] = maxi(0, int(p.get(k, 0)))
+		for crop in p.get("field", {}):
+			q.field[crop] = maxi(0, int(p.field[crop]))
+		for crop in p.get("spare", {}):
+			if q.field.has(crop):
+				q.spare[crop] = maxf(0.0, float(p.spare[crop]))
+		q.grow = maxf(0.0, float(p.get("grow", 0.0)))
+		q.trip = maxf(0.0, float(p.get("trip", 0.0)))
+		q.priority = str(p.get("priority", ""))
+		var b: Dictionary = p.get("bred", {})
+		q.bred = {} if b.is_empty() else {"from": str(b.from), "to": str(b.to)}
+		if not q.bred.is_empty() and not q.field.has(q.bred.to):
+			q.field[q.bred.to] = 0
+			q.spare[q.bred.to] = 0.0
 	vats = []
 	lines = []
 	for station in ["vat", "line"]:
@@ -1665,8 +1907,18 @@ func load_state(s: Variant) -> String:
 				"running": bool(slot.get("running", false)), "taken": taken}
 			if station == "line":
 				loaded.crate = int(slot.get("crate", 0))
+			else:
+				loaded.pressure = bool(slot.get("pressure", false))
 			slots(station).append(loaded)
 	research = fresh.research
+	for node in run.research:
+		research[node] = true
+	bought = {}
+	for r in run.bought:
+		bought[str(r)] = true
+	bred = {}
+	for node in run.bred:
+		bred[str(node)] = str(run.bred[node])
 	autosell = fresh.autosell
 	autosell_acc = fresh.autosell_acc
 	for b in autosell:
@@ -1689,21 +1941,107 @@ func load_state(s: Variant) -> String:
 	for k in ["presses", "doubles", "bell_picked", "ticks", "researched", "free_levels", "spikes", "foraged"]:
 		stats[k] = int(run.stats.get(k, 0))
 	stats.cash_earned = float(run.stats.get("cash_earned", 0.0))
+	stats.spent = float(run.stats.get("spent", 0.0))
 	for k in ["harvested", "made", "sold", "consumed"]:
 		var saved: Variant = run.stats.get(k, {})
 		if typeof(saved) == TYPE_DICTIONARY:
 			for item in saved:
 				if stats[k].has(item):
 					stats[k][item] = int(saved[item])
-	account = {"best_ov": float(acc.get("best_ov", 0.0)), "credits": int(acc.get("credits", 0)), "prestiges": int(acc.get("prestiges", 0)),
-		"rooms": {}, "draft": []}
+	account = {"best_ov": float(acc.get("best_ov", 0.0)), "credits": int(acc.get("credits", 0)), "prestiges": int(acc.get("prestiges", 0)), "rooms": {}}
 	for id in rooms:
 		account.rooms[id] = int(rooms[id])
-	for id in draft:
-		account.draft.append(str(id))
 	_refresh_fx()
 	_note_value()
 	return ""
+
+
+## The nodes v12 removes (the blueprints, Slot Expansion, the cultivation
+## nodes) with what they cost in v11: their items come back (I11).
+const REMOVED_V12 := {
+	"jalapeno_blueprint": {"table_mild": 3}, "verde_blueprint": {"table_mild": 10}, "vinegar_blueprint": {"table_mild": 10, "sweet_mash": 5},
+	"brine_blueprint": {"table_mild": 10, "sweet_mash": 5}, "bistro_blueprint": {"table_mild": 20}, "slot_expansion_1": {"sweet_mash": 40, "verde_mash":
+	20}, "slot_expansion_2": {"verde_mash": 25, "pickled_brine": 25}, "cayenne_blueprint": {"serrano_fire": 4, "verde_mash": 5}, "garlic_blueprint":
+	{"serrano_fire": 4, "pickled_brine": 5}, "paste_blueprint": {"serrano_fire": 6}, "cayenne_mash_blueprint": {"serrano_fire": 5, "pickled_brine": 5},
+	"louisiana_blueprint": {"serrano_fire": 5}, "poblano_blueprint": {"table_mild": 5}, "ancho_blueprint": {"table_mild": 8, "sweet_mash": 3},
+	"smoky_ancho_blueprint": {"table_mild": 12}, "serrano_blueprint": {"bistro_verde": 10}, "serrano_mash_blueprint": {"bistro_verde": 10, "verde_mash":
+	5}, "serrano_fire_blueprint": {"bistro_verde": 15}, "thai_chili_blueprint": {"classic_louisiana": 10}, "thai_chili_mash_blueprint":
+	{"classic_louisiana": 10, "garlic_paste": 5}, "cajun_red_blueprint": {"classic_louisiana": 15}, "pineapple_blueprint": {"cajun_red": 5},
+	"glaze_blueprint": {"cajun_red": 5, "garlic_paste": 5}, "bonnet_blueprint": {"cajun_red": 10}, "bonnet_mash_blueprint": {"cajun_red": 10, "glaze": 5},
+	"island_heat_blueprint": {"cajun_red": 15}, "caribbean_red_blueprint": {"island_heat": 20}, "caribbean_red_mash_blueprint": {"island_heat": 20,
+	"glaze": 10}, "sweet_heat_blueprint": {"island_heat": 30}, "chocolate_blueprint": {"sweet_heat": 20}, "chocolate_mash_blueprint": {"sweet_heat": 20,
+	"caribbean_red_mash": 10}, "cocoa_loco_blueprint": {"sweet_heat": 30}, "oak_blueprint": {"cocoa_loco": 20}, "smoke_blueprint": {"cocoa_loco": 20,
+	"glaze": 10}, "ghost_blueprint": {"cocoa_loco": 20}, "ghost_mash_blueprint": {"cocoa_loco": 20, "chocolate_mash": 10}, "phantom_blueprint":
+	{"cocoa_loco": 30}, "hydroponic_cayenne": {"cocoa_loco": 30}, "slot_expansion_3": {"cayenne_mash": 40, "garlic_paste": 40}, "slot_expansion_4":
+	{"caribbean_red_mash": 30, "glaze": 30}, "moruga_blueprint": {"phantom": 20}, "moruga_mash_blueprint": {"phantom": 20, "ghost_mash": 10},
+	"scorpion_sting_blueprint": {"phantom": 30}, "grim_blueprint": {"scorpion_sting": 20}, "grim_mash_blueprint": {"scorpion_sting": 20, "moruga_mash":
+	10}, "widowmaker_blueprint": {"scorpion_sting": 30}, "pepper_y_blueprint": {"widowmaker": 20}, "pepper_y_mash_blueprint": {"widowmaker": 20,
+	"grim_mash": 10}, "extinction_event_blueprint": {"widowmaker": 30}
+}
+
+
+## v12 (D049–D053): the skeleton. Nothing of a v11 run's factory carries over
+## as it was, so it comes back as what was spent on it (I11): cash becomes every
+## dollar the run earned plus what it started with (all cash spent went on
+## plots, upgrades and slots), crops waiting in fields and inputs held by slots
+## go to stock, removed nodes give back their items, and every HQ room comes
+## back as the credits it cost. Items keep their counts at their new values.
+func _migrate_11_to_12(s: Dictionary) -> Dictionary:
+	var out := s.duplicate(true)
+	var run: Dictionary = out.run
+	var acc: Dictionary = out.account
+	var stock_v: Dictionary = run.stock
+	var add := func(item: Variant, n: Variant) -> void:
+		if data.items.has(str(item)) and (typeof(n) == TYPE_INT or typeof(n) == TYPE_FLOAT) and n > 0:
+			stock_v[str(item)] = int(stock_v.get(str(item), 0)) + int(n)
+	for crop in run.plots:
+		var p: Variant = run.plots[crop]
+		if typeof(p) == TYPE_DICTIONARY:
+			add.call(crop, p.get("field", 0))
+	for station in ["vats", "lines"]:
+		for slot in run[station]:
+			if typeof(slot) == TYPE_DICTIONARY and bool(slot.get("running", false)) and typeof(slot.get("taken")) == TYPE_DICTIONARY:
+				for item in slot.taken:
+					add.call(item, slot.taken[item])
+	var kept := []
+	for node in run.research:
+		if REMOVED_V12.has(node):
+			for item in REMOVED_V12[node]:
+				add.call(item, REMOVED_V12[node][item])
+		elif data.tech.has(node):
+			kept.append(node)
+	run.research = kept
+	# Seed Capital's amount at the account's level (same room, same amounts).
+	var start := 0.0
+	var rooms_v: Variant = acc.get("rooms", {})
+	if typeof(rooms_v) == TYPE_DICTIONARY and rooms_v.has("seed_capital") and data.rooms.has("seed_capital"):
+		var room: Dictionary = data.rooms.seed_capital
+		var lv := int(rooms_v.seed_capital)
+		start = room.amounts[lv - 1] if lv <= room.amounts.size() else room.amounts[-1] * pow(room.growth, lv - room.amounts.size())
+	run.cash = float(run.stats.get("cash_earned", 0.0)) + start
+	run.plots = {}
+	run.vats = []
+	run.lines = []
+	run.bought = []
+	run.bred = {}
+	# The rooms back as credits: the n-th room cost 5n, a level from L 2L, and
+	# a draft waiting had been paid for (v11's prices, G8).
+	var refund := 0
+	if typeof(rooms_v) == TYPE_DICTIONARY:
+		var n := 0
+		for id in rooms_v:
+			n += 1
+			refund += T.ROOM_OPEN_COST * n
+			for lv in range(1, int(rooms_v[id])):
+				refund += T.ROOM_LEVEL_COST * lv
+		var draft: Variant = acc.get("draft", [])
+		if typeof(draft) == TYPE_ARRAY and not draft.is_empty():
+			refund += T.ROOM_OPEN_COST * (n + 1)
+	acc.credits = int(acc.get("credits", 0)) + refund
+	acc.rooms = {}
+	acc.erase("draft")
+	out.version = 12
+	return out
 
 
 ## v11 (D043): Crop Quality becomes Cargo, level for level (they cost the
@@ -1748,8 +2086,8 @@ func _migrate_8_to_9(s: Dictionary) -> Dictionary:
 		var p: Dictionary = out.run.plots[crop]
 		p.speed = ceili(_level(p, "speed") * T.V8_PLOT_SPEED_STEP / T.PLOT_SPEED_STEP - EPSILON)
 		p.quality = mini(T.V10_CROP_QUALITY_MAX, ceili(_level(p, "quality") * T.V8_CROP_QUALITY_STEP / T.V10_CROP_QUALITY_STEP - EPSILON))
-		if data.plots.has(crop):
-			p["yield"] = ceili(_level(p, "yield") / (data.plots[crop]["yield"] * T.PLOT_YIELD_STEP) - EPSILON)
+		# v9 knew each plot's base yield; v12 refunds plots, so 1 does here.
+		p["yield"] = ceili(_level(p, "yield") / T.PLOT_YIELD_STEP - EPSILON)
 	out.version = 9
 	return out
 

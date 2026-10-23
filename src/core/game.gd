@@ -756,6 +756,16 @@ func sell_crop(crop: String) -> bool:
 	return true
 
 
+## Sells `count` of any item held (all of it with -1), as Idle Planet Miner sells
+## any ore, bar or item (SKELETON.md). Returns false with none to sell.
+func sell_item(item: String, count: int = -1) -> bool:
+	if not stock.has(item) or stock[item] <= 0:
+		return false
+	_sell(item, stock[item] if count < 0 else mini(count, stock[item]))
+	_note_value()
+	return true
+
+
 ## Sells every bottle held, or every bottle of one sauce (brief §3, Sell Batch).
 func sell_batch(item: String = "") -> bool:
 	var sold := false

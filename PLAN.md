@@ -30,3 +30,10 @@ Written before coding. The repo's own memory (`docs/HANDOVER.md`, `docs/BACKLOG.
 - **Auto-selling bottles while away before the Van:** would make the return pay cash, but it changes what the Delivery Van is for (a research reward). The card fix gets most of the feel for none of the design change; flagged as an option.
 - **Pinning the first sale to about an hour:** see step 3.
 - **New dependencies or architecture:** none planned.
+
+## What came of it
+
+1. Done: D046, J1–J2 PASS.
+2. Done: J3 PASS (48 s against 120), so no tuning.
+3. Written up as W31 in PRESTIGE.md, for the owner.
+4. PR opened and reviewed (see the PR).

@@ -1272,14 +1272,26 @@ func _stock_text() -> String:
 		for p in parts:
 			long.append("%s: %d" % [game.data.items[p[0]].plural, p[1]])
 		return "   ".join(long)
-	# A crowded factory: Bell Peppers and the bottles in stock, on one line;
-	# everything else is in the warehouse drawer (LAYOUT.md).
-	var short := []
+	# A crowded factory: Bell Peppers and the bottles in stock, on one line, as
+	# many as fit, the most valuable first; everything else is in the warehouse
+	# drawer (LAYOUT.md).
+	var bottles := []
 	for p in parts:
 		if p[1] > 0 and game.data.items[p[0]].kind == "bottle":
-			short.append("%s %s" % [game.data.items[p[0]].short, _count(p[1])])
-	short.push_front("%s %s" % [game.data.items.bell.short, _count(game.stock.bell)])
-	return "  ·  ".join(short)
+			bottles.append(p)
+	bottles.sort_custom(func(a, b): return game.value(a[0]) > game.value(b[0]))
+	var line := "%s %s" % [game.data.items.bell.short, _count(game.stock.bell)]
+	var room: float = _counter.size.x if _counter.size.x > 0.0 else INF
+	var font: Font = _counter.get_theme_font(&"font")
+	for i in bottles.size():
+		var p: Array = bottles[i]
+		var more := line + "  ·  %s %s" % [game.data.items[p[0]].short, _count(p[1])]
+		var rest := bottles.size() - i - 1
+		var tail := "  ·  +%d" % rest if rest > 0 else ""
+		if font.get_string_size(more + tail, HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_BODY).x > room:
+			return line + "  ·  +%d" % (bottles.size() - i)
+		line = more
+	return line
 
 
 func _refresh_plot(id: String) -> void:

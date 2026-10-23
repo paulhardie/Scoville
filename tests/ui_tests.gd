@@ -516,6 +516,13 @@ func test_layout() -> void:
 	await settle()
 	var strip: Label = screen.find_child("Counter", true, false)
 	check(strip.max_lines_visible == 1 and not strip.text.contains("Sweet") and strip.text.contains("Table Mild"), "L7: one line of Bell Peppers and bottles: %s" % strip.text)
+	for bottle in ["pimento_spread", "garden_hot_sauce", "sweet_pepper_relish", "cascabel_salsa", "extinction_event"]:
+		g.stock[bottle] = 123456
+	await settle()
+	check(strip.get_line_count() == 1 and strip.text.contains("+") and strip.text.begins_with("Bell"), "L7: a crowded strip stays one line, the rest counted: %s" % strip.text)
+	for bottle in ["pimento_spread", "garden_hot_sauce", "sweet_pepper_relish", "cascabel_salsa", "extinction_event"]:
+		g.stock[bottle] = 0
+	await settle()
 	var tap := InputEventMouseButton.new()
 	tap.pressed = true
 	tap.button_index = MOUSE_BUTTON_LEFT

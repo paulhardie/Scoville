@@ -2,7 +2,7 @@
 
 The owner asked for Idle Planet Miner's progression to come into the game whole, then be tweaked from there, with more peppers ordered by Scoville and fictional ones past Pepper Y for the deep endgame ([D049–D053](DECISIONS.md)). This doc owns that version: the mapping from every Idle Planet Miner row to ours, what's left out, what of ours stays, the criteria, and what's assumed.
 
-Status: **design (PR 1 of 3).** PR 2 builds the copy as it stands and measures it against the criteria below, reporting every FAIL. PR 3 tweaks, saying which result each change answers. Nothing here is in the game yet.
+Status: **built and measured (PR 2 of 3).** The copy is in the game as mapped here; [Results](#results-pr-2) has every criterion's measurement, FAILs included. PR 3 tweaks, saying which result each change answers.
 
 **Source.** Every Idle Planet Miner number below is from the community wiki (idle-planet-miner.fandom.com, CC BY-SA), read 2026-10-23 through its MediaWiki API, and kept as data in [`ipm_snapshot.json`](ipm_snapshot.json): ores, alloys, items, the 79-planet table, projects, smelters and crafters, rooms with their level tables, and the credit table. The wiki is fan-made; a few of its rows are estimates or don't add up, and those are marked. Scoville ranges are [PepperScale's hot pepper list](https://pepperscale.com/hot-pepper-list/), read 2026-10-23.
 
@@ -423,6 +423,36 @@ These measure the curve or rules the skeleton replaces. Retiring them now, befor
 - **Replaced by I14:** A6, A9, C8 and T5 (each "every earlier criterion still passes").
 - **Rewritten:** Q10 keeps its Standard Operating Procedures clause (SOP opens only after a sale) and drops Tier 6's gate.
 - **Kept as they stand:** everything else, including A3, A5, A7 (the casual player's second farm by 3:30: the early feel, W28, not the curve; farm 2 is $200), C4–C6, E1–E6 (E6 is still W30), F1–F6, F8, H1–H3, J1–J2, K1–K9, L1–L15, M5, N8, O1–O10 as D044 left them, P1–P2, PX1–PX8, Q1–Q3, Q6–Q9, Q12–Q14, Y2 (SOP's node count in run 2), R1–R2, R4–R8, R12–R17, S1–S2, S4, S6, S9–S10, T1–T3, U8–U9, V4–V7 and X1–X8. Where one names an item or price that's gone (P2's "1:40 state", U8's $10M), it is read with the new items, the bar unchanged.
+
+## Results (PR 2)
+
+Measured on the copy as it stands, played by the pacing player (D003, its v0.7 policy below). Nothing was retuned to pass.
+
+| Id | Result |
+| --- | --- |
+| I1 | **PASS.** Every farm, pepper, mash, sauce, ingredient, survey, adopted node, room and slot price in `data/` equals `tools/ipm/mapping.json`; `run_tests.sh` checks that file is what `mapping.py` makes of the snapshot; and the snapshot's own planets (price, shares, distance), ore values, smelters, crafters and credit table are checked directly, apart from the rows marked assumed (`skeleton_tests.gd`). |
+| I2 | **PASS.** Levels 1–60 of Harvest Rate, Truck Speed and Truck Cargo (half to even) and every level's price, on farm 2 and the Bell Plot. |
+| I3 | **PASS.** Over 10 minutes a truck-bound farm delivers its carrying rate within 1%, Pimento (worth more) or the Crop Priority pick first, the rest waiting; a truck that keeps up brings everything. |
+| I4 | **FAIL** on F6 (184 s against 90), E3 (184 s eager against 75, 110 s casual against 100) and E6 (2 against 10; W30). The waits are on IPM's farms 3–4 and their levels after the kitchen is bought; E6 falls because the Bell Plot's truck brings peppers 20 at a time. O2–O7, O9–O10, E1, E2 (1:46 and 2:32), E4, E5, F1–F5, K1–K9 and L10–L13 pass. W42, W30. |
+| I5 | **PASS.** Farms 1–4 from the start, every other farm with its survey, the four ingredient stations with Surveys 1, 3, 4 and 6. |
+| I6 | **FAIL.** $10M at **7:54** (2:00–2:30; `second_run_tests.gd`). $150K at 34:07, $1M at 1:59, $2.3M at 3:15. Land Survey 3 wants 10 Pimento Spread, 50,000 Pimento, on farms growing about 5 a second: from 1:35 to 2:46 the player only levels farms. W37. |
+| I7 | **FAIL.** 1:11:06 without a farm, vat, line, recipe or research (1:35:27 to Land Survey 3 at 2:46:33), against 6:30. W38. |
+| I8 | **FAIL.** Tapping adds 13% at 15:00 (25%), 10% at 30:00 (10%, passes) and 6% at 1:30 (30%). W39. |
+| I9 | **FAIL.** Run 2's sale at 6:44, 85% of run 1's 7:54 (60–75%). The first sale pays 10 credits: Seed Vault and Fermentation Cellar. W40. |
+| I10 | I10_RESULT |
+| I11 | **PASS.** Saves v1–v11 load as v12 with cash at least the run's earnings, stock and the best Operation Value kept, removed nodes' items back, rooms back as credits; an unreadable save is kept as `.bad` (`factory_tests.gd`, `skeleton_tests.gd`). |
+| I12 | **PASS.** $1.00 and $999 of each suffix K to Dc, $500Dc, never an exponent or `inf` (`layout_tests.gd`). |
+| I13 | **PASS.** Every farm owned and upgraded: all 83 cards show under their survey headings, nothing past the edges (PX6, `look_tests.gd`), and the captures looked at (`capture_ui.gd`'s `i13_*`). Two fixes found on the way: the pixel font gains é and Á (Purée, Árbol), and Crossbreeding I–III became **Crossbreed I–III** so the word fits a Tech Tree node. |
+| I14 | **FAIL** on P2 (8 hours away from 1:40 raise $1.25M, two hours' tapping $1.28M; W43) and Y2 (Standard Operating Procedures, researched at 19:04 in run 2, grants no node: its bar, 1% of an hour's bottles, is under every node's cost with one line bottling; W41). Everything else kept passes. |
+
+**What changed while building, said here:**
+
+- **S4, S9, A5 and C5** can't hold as worded ("goes on producing as before", plot levels carried over): v12 refunds the factory as cash (I11). S4 and S9 now check that v2 and v3 saves load with their stats, sliders and surviving research; A5 and C5 are left to I11.
+- **HQ rooms open at 3, 6, 12…** credits: the second room is 6, not 3 as PR 1's table read it (IPM's minimum costs).
+- **Forager's Luck** drops what its station grows in 10 seconds (`FORAGE_SECONDS`), since a station's harvest is now a rate, not a yield per cycle.
+- **Selling any item** (`sell_item`), IPM's way; Sell Batch and the plot card's Sell stay.
+- **`run_tests.sh`** runs every suite and fails at the end, so a measured FAIL doesn't hide the suites after it.
+- **The pacing player's policy** (GUESS, `engaged_player.gd`): its goal is the next Land Survey; it buys the recipes, slots and farms the goal needs and sells the rest; a Harvest Rate level is priced with the truck levels that carry it, and trucks are kept up first; with nothing to save for, it buys the best farm level however slow the payback; it keeps Table Mild for the cheapest kitchen node, holds back what it saves from Auto-Sell, and sells bottles with Sell Batch. Measuring found three stalls in it (a vat bought for the kitchen's mash, which only runs in the first vat; cash hoarded when every level paid back slower than an hour; Auto-Sell selling the survey's sauce), each fixed before the numbers above. A better player could find a quicker run; PR 3 should weigh the player with the curve.
 
 ## Assumed
 

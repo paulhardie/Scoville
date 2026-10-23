@@ -18,8 +18,9 @@ var burst_seconds := 60.0
 var rest_seconds := 0.0
 ## Seconds between looks at the game (selling, buying, research).
 var decide_every := 1.0
-## Seconds a farm level may take to pay for itself (GUESS: an hour; IPM's
-## levels cost ×1.3 each, so paybacks lengthen as a run goes on).
+## Seconds a farm level may take to pay for itself while it saves for
+## something (GUESS: an hour; IPM's levels cost ×1.3 each, so paybacks
+## lengthen as a run goes on). With nothing to save for, any level goes.
 const PAYBACK_MAX := 3600.0
 ## Minutes of income a slot for an extra recipe may cost (GUESS).
 const SLOT_MINUTES := 10.0
@@ -96,7 +97,19 @@ func decide(g) -> void:
 		g.set_pin(goal if not need.is_empty() else "")
 	var plan := _plan_slots(g, wanted)
 	_assign(g, plan)
-	_sell(g, plan, need)
+	# The kitchen's nodes are paid in its bottles (D052): it keeps them for
+	# the cheapest it can reach, as the player before v0.7 did.
+	var keep := need.duplicate()
+	var kitchen := _kitchen_node(g)
+	if kitchen != "":
+		var cost: Dictionary = g.tech_cost(kitchen)
+		for item in cost:
+			keep[item] = maxi(keep.get(item, 0), cost[item])
+	# With the Delivery Van, Auto-Sell holds back the bottles it is saving.
+	if g.has_van():
+		for bottle in g.autosell:
+			g.set_autosell(bottle, 0 if keep.has(bottle) else 100)
+	_sell(g, now, plan, keep)
 	if not buys:
 		return
 	if g.activate_overdrive():
@@ -119,6 +132,22 @@ func next_research(g) -> String:
 			best = node
 			best_value = g.tech_cost_value(node)
 	return best if best != "" else (survey if g.data.tech.has(survey) and not g.is_researched(survey) else "")
+
+
+## The cheapest node it can reach that is paid only in the kitchen's mash and
+## bottles, or "".
+func _kitchen_node(g) -> String:
+	var best := ""
+	for node in g.data.tech_order:
+		if not g.research_reachable(node):
+			continue
+		var cost: Dictionary = g.tech_cost(node)
+		var kitchen_only := not cost.is_empty()
+		for item in cost:
+			kitchen_only = kitchen_only and g.data.recipes.has(item) and g.data.recipes[item].get("kitchen", false)
+		if kitchen_only and (best == "" or g.tech_cost_value(node) < g.tech_cost_value(best)):
+			best = node
+	return best
 
 
 ## Other nodes it can afford without touching what the goal needs.
@@ -270,7 +299,7 @@ func _assign(g, plan: Dictionary) -> void:
 
 ## Sells what no running recipe or the goal needs, keeping KEEP_CYCLES of each
 ## running recipe's inputs and the goal's cost (D041: crops sell raw too).
-func _sell(g, plan: Dictionary, need: Dictionary) -> void:
+func _sell(g, now: float, plan: Dictionary, need: Dictionary) -> void:
 	var keep := need.duplicate()
 	for station in ["vat", "line"]:
 		for i in g.slots(station).size():
@@ -290,7 +319,13 @@ func _sell(g, plan: Dictionary, need: Dictionary) -> void:
 				keep[item] = maxi(keep.get(item, 0), KEEP_CYCLES * g.data.recipes[r].inputs[item])
 	for item in g.stock:
 		var extra: int = g.stock[item] - keep.get(item, 0)
-		if extra > 0:
+		if extra <= 0:
+			continue
+		# Bottles all go: Sell Batch, the kitchen's own button (F5).
+		if g.data.items[item].kind == "bottle" and extra == g.stock[item]:
+			g.sell_batch(item)
+			_note(now, "sell_batch")
+		else:
 			g.sell_item(item, extra)
 
 
@@ -315,6 +350,7 @@ func _will_run(g, station: String, recipe: String, plan: Dictionary) -> bool:
 ## pays back before the saving would be done (the guide's rule 3).
 func _buy(g, now: float, plan: Dictionary, wanted: Dictionary) -> void:
 	var wait := 0.0
+	var saving := false
 	for step in _needs(g, plan, wanted):
 		if step.cost <= g.cash:
 			if step.buy.call():
@@ -322,9 +358,12 @@ func _buy(g, now: float, plan: Dictionary, wanted: Dictionary) -> void:
 			return
 		var rate := income()
 		wait = (step.cost - g.cash) / rate if rate > 0.0 else INF
+		saving = true
 		break
+	# With nothing to save for, cash doesn't sit idle: the best level goes
+	# however long it takes to pay back.
 	for n in 50:
-		var best := _best_payback(g)
+		var best := _best_payback(g, PAYBACK_MAX if saving else INF)
 		if best.is_empty() or best.cost > g.cash or wait > 0.0 and best.payback > wait:
 			return
 		if not best.buy.call():
@@ -345,11 +384,9 @@ func _needs(g, plan: Dictionary, wanted: Dictionary) -> Array:
 	var out := []
 	if not g.plots.bell.owned:
 		out.append({"name": "buy plot bell", "cost": g.plot_price("bell"), "buy": g.buy_plot.bind("bell")})
-	for station in ["vat", "line"]:
-		if g.slots(station).is_empty() and g.slot_offered(station):
-			out.append({"name": "buy %s 1" % station, "cost": g.slot_price(station), "buy": g.buy_slot.bind(station)})
 	# The guide's shipping rule: a truck falling behind its farm gets the
-	# cheaper of Truck Speed and Truck Cargo, cheapest farm first.
+	# cheaper of Truck Speed and Truck Cargo, cheapest farm first. First, so
+	# a harvest level bought while saving doesn't pile up in the field.
 	var behind := []
 	for id in g.plots:
 		if g.plots[id].owned and g.cargo_rate(id) < g.plot_growth(id) - 1e-9:
@@ -357,6 +394,9 @@ func _needs(g, plan: Dictionary, wanted: Dictionary) -> Array:
 			behind.append({"name": "upgrade %s.%s" % [id, up], "cost": g.plot_upgrade_cost(id, up), "buy": g.upgrade_plot.bind(id, up)})
 	behind.sort_custom(func(a, b): return a.cost < b.cost)
 	out.append_array(behind)
+	for station in ["vat", "line"]:
+		if g.slots(station).is_empty() and g.slot_offered(station):
+			out.append({"name": "buy %s 1" % station, "cost": g.slot_price(station), "buy": g.buy_slot.bind(station)})
 	# Crops the goal wants that its farms would take longer than SLOW_SUPPLY
 	# to grow: the farm on offer growing most of that crop for its price.
 	for item in wanted:
@@ -372,17 +412,17 @@ func _needs(g, plan: Dictionary, wanted: Dictionary) -> Array:
 	for item in wanted:
 		if g.data.recipes.has(item) and not g.recipe_unlocked(item):
 			out.append({"name": "buy recipe " + item, "cost": g.recipe_price(item), "buy": g.buy_recipe.bind(item)})
-	# Another slot for the next recipe in the plan: one the goal wants, the
-	# kitchen's when the goal has taken its slot, or an extra it can feed for
-	# under SLOT_MINUTES of income.
+	# Another slot for the next recipe in the plan: one the goal wants or an
+	# extra it can feed for under SLOT_MINUTES of income. Not the kitchen's,
+	# which runs only in the first slot (D052).
 	for station in ["vat", "line"]:
 		var n: int = g.slots(station).size()
-		var picks: Array = plan[station]
-		if n >= picks.size() or not g.slot_offered(station):
+		var rest: Array = plan[station].slice(n).filter(func(x): return not g.data.recipes[x].kitchen)
+		if n == 0 or rest.is_empty() or not g.slot_offered(station):
 			continue
-		var r: String = picks[n]
+		var r: String = rest[0]
 		var cheap: bool = g.slot_price(station) <= income() * 60.0 * SLOT_MINUTES
-		if wanted.has(r) or g.data.recipes[r].kitchen or cheap and _can_feed(g, r):
+		if wanted.has(r) or cheap and _can_feed(g, r):
 			if not g.recipe_unlocked(r):
 				out.append({"name": "buy recipe " + r, "cost": g.recipe_price(r), "buy": g.buy_recipe.bind(r)})
 			out.append({"name": "buy %s %d (%s)" % [station, n + 1, r], "cost": g.slot_price(station), "buy": g.buy_slot.bind(station)})
@@ -426,9 +466,9 @@ func _supply(g, crop: String) -> float:
 	return rate
 
 
-## The farm level that pays back soonest, under PAYBACK_MAX: {name, cost,
+## The farm level that pays back soonest, within `cap` seconds: {name, cost,
 ## payback, buy}, or {} if none does.
-func _best_payback(g) -> Dictionary:
+func _best_payback(g, cap: float = PAYBACK_MAX) -> Dictionary:
 	var best := {}
 	var best_payback := INF
 	for id in g.plots:
@@ -438,8 +478,10 @@ func _best_payback(g) -> Dictionary:
 		for upgrade in g.PLOT_UPGRADES:
 			var gain := _level_gain(g, id, upgrade)
 			var cost: float = g.plot_upgrade_cost(id, upgrade)
-			var pb := cost / gain if gain > 0.0 else INF
-			if pb <= PAYBACK_MAX and pb < best_payback:
+			# A harvest level's price includes the truck levels to carry it.
+			var bundle: float = cost + (_shipping_cost(g, id) if upgrade == "harvest" else 0.0)
+			var pb := bundle / gain if gain > 0.0 else INF
+			if pb <= cap and pb < best_payback:
 				best_payback = pb
 				best = {"name": "upgrade %s.%s" % [id, upgrade], "cost": cost, "payback": pb, "buy": g.upgrade_plot.bind(id, upgrade)}
 	return best
@@ -447,19 +489,40 @@ func _best_payback(g) -> Dictionary:
 
 ## Dollars a second a farm level adds (IPM's guide: "focus your money on
 ## mining", and ship only as far as it needs): a harvest level counts in full,
-## as if the truck keeps up; a truck or cargo level only for the crops it
-## brings that were waiting.
+## its price taking in the truck levels that carry it (_shipping_cost); trucks
+## are kept up by the shipping rule in _needs, so only harvest levels are
+## weighed by payback.
 func _level_gain(g, id: String, upgrade: String) -> float:
 	var p: Dictionary = g.plots[id]
 	var lv := {"harvest": p.harvest, "truck": p.truck, "cargo": p.cargo}
 	var now_grow := _rates(g, id, lv)
 	lv[upgrade] += 1
 	var next := _rates(g, id, lv)
-	# Trucks are kept up by the shipping rule in _needs, so only harvest
-	# levels are weighed by payback.
 	if upgrade == "harvest":
-		return (next.grow - now_grow.grow) * now_grow.mean
+		return (next.grow - minf(now_grow.grow, now_grow.carry)) * now_grow.mean
 	return 0.0
+
+
+## What the truck levels cost that carry a farm's growth after one more harvest
+## level: the cheaper of Truck Speed and Truck Cargo each time, as the shipping
+## rule buys them.
+func _shipping_cost(g, id: String) -> float:
+	var p: Dictionary = g.plots[id]
+	var lv := {"harvest": p.harvest + 1, "truck": p.truck, "cargo": p.cargo}
+	var cost := 0.0
+	for n in 100:
+		var r := _rates(g, id, lv)
+		if r.carry >= r.grow:
+			break
+		var t: float = g.plot_upgrade_cost(id, "truck", lv.truck - p.truck)
+		var c: float = g.plot_upgrade_cost(id, "cargo", lv.cargo - p.cargo)
+		if t <= c:
+			cost += t
+			lv.truck += 1
+		else:
+			cost += c
+			lv.cargo += 1
+	return cost
 
 
 ## A farm's growth and carrying in crops a second, and its crops' mean value,

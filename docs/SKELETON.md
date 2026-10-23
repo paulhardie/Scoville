@@ -439,7 +439,7 @@ Measured on the copy as it stands, played by the pacing player (D003, its v0.7 p
 | I7 | **FAIL.** 1:11:06 without a farm, vat, line, recipe or research (1:35:27 to Land Survey 3 at 2:46:33), against 6:30. W38. |
 | I8 | **FAIL.** Tapping adds 13% at 15:00 (25%), 10% at 30:00 (10%, passes) and 6% at 1:30 (30%). W39. |
 | I9 | **FAIL.** Run 2's sale at 6:46, 85% of run 1's 7:56 (60–75%). The first sale pays 10 credits: Seed Vault and Fermentation Cellar. W40. |
-| I10 | I10_RESULT |
+| I10 | **FAIL.** `tools/deep_run.gd`: run 1 sells at 8:00 for 10 credits; run 2, needing 100 credits (about $10B), is at Land Survey 5 with 20 farms and 5 of 48 sauces made after 48 hours ($344M), where the tool stops. Farm 79 and every sauce: never. At about $500–900 a second mid-run, IPM's $10M fourth vat alone takes 4 hours to save. W44. |
 | I11 | **PASS.** Saves v1–v11 load as v12 with cash at least the run's earnings, stock and the best Operation Value kept, removed nodes' items back, rooms back as credits; an unreadable save is kept as `.bad` (`factory_tests.gd`, `skeleton_tests.gd`). |
 | I12 | **PASS.** $1.00 and $999 of each suffix K to Dc, $500Dc, never an exponent or `inf` (`layout_tests.gd`). |
 | I13 | **PASS.** Every farm owned and upgraded: all 83 cards show under their survey headings, nothing past the edges (PX6, `look_tests.gd`), and the captures looked at (`capture_ui.gd`'s `i13_*`). Two fixes found on the way: the pixel font gains é and Á (Purée, Árbol), and Crossbreeding I–III became **Crossbreed I–III** so the word fits a Tech Tree node. |

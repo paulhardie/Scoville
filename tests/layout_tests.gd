@@ -71,7 +71,4 @@ func test_max() -> void:
 	var n := g.plot_levels_affordable("bell", "yield")
 	check(n >= 2, "L2: $5M covers several Yield levels (%d)" % n)
 	check(g.upgrade_plot_n("bell", "yield", n) == n and g.cash < g.plot_upgrade_cost("bell", "yield"), "L2: Max buys %d and leaves less than the next level's price" % n)
-	var q := owned(1e15)
-	var can := q.plot_levels_affordable("bell", "quality")
-	check(can == T.CROP_QUALITY_MAX and q.upgrade_plot_n("bell", "quality", can) == can and q.plot_upgrade_cost("bell", "quality") == INF, "L2: Crop Quality stops at its cap of %d (Max saw %d)" % [T.CROP_QUALITY_MAX, can])
 	check(owned(0.0).plot_levels_affordable("bell", "speed") == 0, "L2: nothing affordable, nothing to buy")

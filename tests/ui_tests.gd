@@ -39,48 +39,55 @@ func run() -> void:
 	root.add_child(screen)
 	await process_frame
 
+	# L10 (D044): the full dashboard from the first second.
 	var blank: Button = screen.find_child("BlankButton", true, false)
-	check(blank != null and blank.visible, "O1: the Blank Button is shown")
-	check(blank != null and blank.text == "" and blank.icon == null, "O1: the Blank Button has no label")
-	check(visible_text(screen).is_empty(), "O1: no text at the start: %s" % str(visible_text(screen)))
+	check(blank != null and blank.visible and blank.text == "" and blank.icon == null, "L10: the Blank Button is shown, unlabelled")
+	var bar: Control = screen.find_child("StatusBar", true, false)
+	var nav: Control = screen.find_child("Nav", true, false)
+	var deck: Control = screen.find_child("Deck", true, false)
+	var factory: Control = screen.find_child("Factory", true, false)
+	check(bar.visible and nav.visible and deck.visible and factory.visible, "L10: status bar, tab selectors, panel and factory view all show at the start")
+	check(absf(nav.get_global_rect().position.y - screen.size.y * S.UPPER_FRACTION) < 1.0 and nav.get_global_rect().position.y >= blank.get_global_rect().end.y and deck.get_global_rect().position.y >= nav.get_global_rect().end.y - 1.0, "L10: the selectors sit directly under the viewport, the panel under them")
+	var tabs := []
+	for tab in ["farms", "processing", "tech", "market", "roster", "hq"]:
+		tabs.append((screen.find_child("Tab_" + tab, true, false) as Button).text)
+	check(tabs == ["Farms", "Processing\n$4K", "Tech Tree\n$7.5K", "Market\nVan", "Roster\n$150K", "HQ\n$10M"], "L11: every tab shows, the locked ones with what opens them: %s" % str(tabs))
+	var goal: Label = screen.find_child("Goal", true, false)
+	var ring: Control = screen.find_child("Ring", true, false)
+	await settle()
+	check(goal.text == "Next: tap the button" and ring.visible and ring.get_global_rect().encloses(blank.get_global_rect()), "L13: the button is ringed and named: %s" % goal.text)
 
 	blank.pressed.emit()
 	await process_frame
 	var counter: Label = screen.find_child("Counter", true, false)
 	check(counter.visible and counter.text == "Bell Peppers: 1", "O3: the counter reads 'Bell Peppers: 1': %s" % counter.text)
-	var bar: Control = screen.find_child("StatusBar", true, false)
-	check(not bar.visible, "O4: no status bar after one press")
-
-	for i in T.STAGE_1_PEPPERS - 1:
+	for i in 19:
 		blank.pressed.emit()
 	await process_frame
-	check(bar.visible, "O4: the status bar shows at 20 peppers")
 	var texts := visible_text(screen)
-	check("Cash: $0.00" in texts, "O4: it shows 'Cash: $0.00': %s" % str(texts))
-	check("Sell Raw Peppers\n($1.00/ea)" in texts, "O4: it shows the sell button (on two lines since LOOK.md): %s" % str(texts))
+	check("Cash: $0.00" in texts and "Sell Raw Peppers\n($1.00/ea)" in texts, "O4: Cash and the sell button (on two lines since LOOK.md): %s" % str(texts))
 
 	var sell: Button = screen.find_child("SellRaw", true, false)
 	sell.pressed.emit()
 	await process_frame
 	check("Cash: $20.00" in visible_text(screen) and counter.text == "Bell Peppers: 0", "selling updates cash and the counter")
 	check(sell.disabled, "the sell button is disabled with no peppers")
-
-	# Stage 2 (docs/FACTORY.md): the deck opens at $100 earned (T.STAGE_2_CASH).
-	var deck: Control = screen.find_child("Deck", true, false)
-	check(not deck.visible, "no deck at $20 earned")
-	var big := blank.size
 	for i in 80:
 		blank.pressed.emit()
+	await process_frame
+	await settle()
+	check(goal.text.begins_with("Next: sell") and ring.get_global_rect().encloses(sell.get_global_rect()), "L13: with enough peppers for the plot, Sell Raw Peppers is ringed: %s" % goal.text)
 	sell.pressed.emit()
-	await create_timer(1.2).timeout
-	check(deck.visible, "the deck shows at $100 earned")
-	check(blank.size.x < big.x, "the Blank Button shrinks into the upper viewport: %s" % str(blank.size))
-	check(blank.get_global_rect().end.y <= deck.get_global_rect().position.y + 1.0, "it sits above the deck")
+	await create_timer(0.5).timeout
+	var buy_plot: Button = screen.find_child("Buy_plot_bell", true, false)
+	check(goal.text.begins_with("Next: buy the Bell Pepper Plot") and ring.get_global_rect().encloses(buy_plot.get_global_rect()), "L13: then the plot's Buy is ringed: %s" % goal.text)
+	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
+	await process_frame
+	check(not (screen.find_child("Page_tech", true, false) as Control).visible, "L11: a locked tab doesn't open")
 	var plot_card: Control = screen.find_child("Card_plot_bell", true, false)
 	var buy_vat: Control = screen.find_child("BuySlot_vat", true, false)
 	var buy_line: Control = screen.find_child("BuySlot_line", true, false)
 	check(plot_card.visible and buy_vat.visible and not buy_line.visible, "the plot and vat are offered, not the line")
-	var buy_plot: Button = screen.find_child("Buy_plot_bell", true, false)
 	check(not buy_plot.disabled, "$100 buys the plot")
 	buy_plot.pressed.emit()
 	await process_frame
@@ -94,19 +101,12 @@ func run() -> void:
 	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 	await process_frame
 
-	# Stage 3 (O8): the nav bar at $4,000 Operation Value.
-	var nav: Control = screen.find_child("Nav", true, false)
-	check(not nav.visible, "O8: no nav bar before $%.0f" % T.TAB_THRESHOLDS.processing)
+	# Processing opens at $4,000 Operation Value, as it did.
 	screen.game.cash = 10000.0
 	(screen.find_child("BuySlot_vat", true, false) as Button).pressed.emit()
 	screen.game.account.best_ov = T.TAB_THRESHOLDS.processing
 	await create_timer(0.6).timeout
-	check(nav.visible, "O8: the nav bar shows at $%.0f" % T.TAB_THRESHOLDS.processing)
-	var tabs := []
-	for tab in ["farms", "processing", "tech", "market", "roster", "hq"]:
-		tabs.append((screen.find_child("Tab_" + tab, true, false) as Button).text)
-	check(tabs == ["Farms", "Processing", "[ ? ]", "[ ? ]", "[ ? ]", "[ ? ]"], "O8: Farms and Processing open, the rest [ ? ] (Market since LAYOUT.md): %s" % str(tabs))
-	check(deck.get_global_rect().end.y <= nav.get_global_rect().position.y + 1.0, "the deck ends above the nav bar")
+	check((screen.find_child("Tab_processing", true, false) as Button).text == "Processing", "L11: Processing opens at $%.0f" % T.TAB_THRESHOLDS.processing)
 	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
 	await process_frame
 	var vat_card: Control = screen.find_child("Card_vat_0", true, false)
@@ -183,7 +183,7 @@ func run() -> void:
 	await process_frame
 	(screen.find_child("Manage_plot_bell", true, false) as Button).pressed.emit()
 	await process_frame
-	check((screen.find_child("Upgrade_plot_bell_quality", true, false) as Button).text.begins_with("Crop Quality"), "plots offer Crop Quality")
+	check((screen.find_child("Upgrade_plot_bell_cargo", true, false) as Button).text.begins_with("Cargo") and screen.find_child("Upgrade_plot_bell_quality", true, false) == null, "C1: plots offer Cargo, not Crop Quality")
 	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 	await process_frame
 
@@ -194,6 +194,8 @@ func run() -> void:
 	await test_after_sale()
 	await test_layout()
 	await test_raw_sales()
+	await test_dashboard()
+	await test_bottling()
 	await test_feel()
 	for failure in failures:
 		printerr("FAIL: ", failure)
@@ -418,8 +420,12 @@ func test_layout() -> void:
 	await create_timer(S.COUNT_UP + 0.15).timeout
 	check(screen._cash.text == "Cash: $6,000.00", "L5: and shows it all after %.2f s: %s" % [S.COUNT_UP, screen._cash.text])
 
-	# L6: the goal bar.
+	# L6: the goal bar, once the early sequence is done (L14, D044).
 	var goal: Label = screen.find_child("Goal", true, false)
+	g.stats.sold.table_mild = 1
+	g.plots.poblano.owned = true
+	g.plots.jalapeno.owned = true
+	g.stats.researched = 1
 	g.account.best_ov = T.TAB_THRESHOLDS.processing
 	await settle()
 	check(goal.visible and goal.text.begins_with("Tech Tree at"), "L6: before the Tech Tree, it shows the way there: %s" % goal.text)
@@ -481,6 +487,97 @@ func test_raw_sales() -> void:
 	await settle()
 
 
+## L12–L13 (D044): the factory view, and the ring on another tab's selector.
+func test_dashboard() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	root.add_child(screen)
+	await settle()
+	var g = screen.game
+	var factory = screen.find_child("Factory", true, false)
+	check(factory._tiles("plot").is_empty() and factory._tiles("vat").is_empty(), "L12: no stations, no tiles (each floor names what goes there)")
+	g.cash = 1e6
+	g.buy_plot("bell")
+	g.buy_slot("vat")
+	await settle()
+	check(factory._tiles("plot").size() == 1 and factory._tiles("vat").size() == 1 and factory._tiles("line").is_empty(), "L12: a tile per owned station on its floor")
+	g.plots.bell["yield"] = 100
+	var dots_before: int = screen.dots_shown
+	var seconds := 3.0
+	await create_timer(seconds).timeout
+	var dots: int = screen.dots_shown - dots_before
+	check(dots > 0 and dots <= ceili(seconds * S.DOTS_PER_SECOND) + 1, "L12: dots climb as crops reach stock, at most %d a second (%d in %.0f s)" % [S.DOTS_PER_SECOND, dots, seconds])
+	check(factory._tiles("plot")[0][1], "L12: a backed-up plot's tile shows orange")
+	# The next action on another tab: its selector is ringed.
+	g.account.best_ov = T.TAB_THRESHOLDS.processing
+	g.buy_slot("line")
+	g.stats.sold.table_mild = 1
+	for item in g.stock:
+		g.stock[item] = 0
+	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
+	await settle()
+	await settle()
+	var ring: Control = screen.find_child("Ring", true, false)
+	var farms_tab: Control = screen.find_child("Tab_farms", true, false)
+	check(g.next_action() == {"do": "buy_plot", "id": "poblano"} and ring.visible and ring.get_global_rect().encloses(farms_tab.get_global_rect()), "L13: the Poblano Plot is on Farms, so the Farms selector is ringed")
+	screen.queue_free()
+	await settle()
+
+
+## K6–K9 (FEEL.md, D045): bottling's clink, the first-bottle buzz and the
+## bottle in the factory view.
+func test_bottling() -> void:
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	root.add_child(screen)
+	await settle()
+	var g = screen.game
+	g.cash = 1e6
+	g.buy_plot("bell")
+	g.buy_slot("vat")
+	g.buy_slot("line")
+	await settle()
+	var factory = screen.find_child("Factory", true, false)
+	var clinks: int = screen.clinks_played
+	var dropped: int = factory.bottles_dropped
+	g.stats.made.table_mild += 1
+	await create_timer(0.4).timeout
+	check(screen.clinks_played == clinks + 1 and factory.bottles_dropped == dropped + 1, "K6/K9: a bottle pop clinks once and drops one bottle (%d, %d)" % [screen.clinks_played - clinks, factory.bottles_dropped - dropped])
+	check(is_equal_approx(screen.last_clink_pitch, 1.0), "K7: Tier 1 clinks at 1.0 (%.2f)" % screen.last_clink_pitch)
+	check(screen.bottle_buzzes == 1, "K8: the first Table Mild buzzes once")
+	check(factory.bottles.size() == 1 and factory.bottles[0][2] == S.TIER_TINTS[0], "K9: the bottle is tinted Tier 1's colour")
+	g.stats.made.table_mild += 1
+	await create_timer(0.4).timeout
+	check(screen.bottle_buzzes == 1, "K8: the second doesn't buzz")
+	await create_timer(S.BOTTLE_SECONDS).timeout
+	check(factory.bottles.is_empty(), "K9: bottles are gone within %.1f s" % S.BOTTLE_SECONDS)
+	var tier: int = g.data.items.bistro_verde.tier
+	screen.settings.vibration = false
+	g.stats.made.bistro_verde += 1
+	await create_timer(0.4).timeout
+	check(is_equal_approx(screen.last_clink_pitch, 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1)) and screen.last_clink_pitch < 1.0, "K7: a Tier %d sauce clinks lower (%.2f)" % [tier, screen.last_clink_pitch])
+	check(screen.bottle_buzzes == 1, "K8: with Vibration off a first bottle doesn't buzz")
+	screen.settings.sound = false
+	clinks = screen.clinks_played
+	dropped = factory.bottles_dropped
+	g.stats.made.table_mild += 1
+	await create_timer(0.4).timeout
+	check(screen.clinks_played == clinks and factory.bottles_dropped == dropped + 1, "K6: with Sound off no clink, the bottle still drops")
+	screen.settings.sound = true
+	clinks = screen.clinks_played
+	var seconds := 2.0
+	var until: int = Time.get_ticks_msec() + int(seconds * 1000.0)
+	while Time.get_ticks_msec() < until:
+		g.stats.made.table_mild += 5
+		await process_frame
+	var n: int = screen.clinks_played - clinks
+	check(n >= 1 and n <= ceili(seconds * S.POPS_PER_SECOND) + 1, "K6: bottling flat out, at most %d clinks a second (%d in %.0f s)" % [S.POPS_PER_SECOND, n, seconds])
+	screen.queue_free()
+	await settle()
+
+
 ## Two frames: the tree signals a frame before the screen's _process runs,
 ## so one isn't enough for the screen to have shown a change.
 func settle() -> void:
@@ -495,8 +592,6 @@ func test_feel() -> void:
 	screen.settings_path = ""
 	root.add_child(screen)
 	await process_frame
-	check(visible_text(screen).is_empty(), "K5: Stage 0 still shows no text")
-	check(not (screen.find_child("SettingsCard", true, false) as Control).is_visible_in_tree(), "K5: no Settings card before the deck")
 	var g = screen.game
 	var blank: Button = screen.find_child("BlankButton", true, false)
 	blank.pressed.emit()

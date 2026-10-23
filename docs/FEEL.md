@@ -28,4 +28,42 @@ With v0.6a's 30 items, the stock line under the status bar wrapped to six lines 
 ## Assumed
 
 - The click's sound, 15 ms and the pitch ranges are defaults (UI polish); say if you want different.
-- Only the Blank Button makes a sound for now. Purchases and research stay silent until the visual pass (W8) sets the overall feel.
+- The Blank Button clicks and, since D045, bottles clink. Purchases and research stay silent until the visual pass (W8) sets the overall feel.
+
+## Bottling: a sound, a buzz and a bottle (D045)
+
+The owner asked what bottling a sauce looks and feels like. The honest answer was a text pop and nothing else, so it gets a sound and a picture: options 1 and 2 of the three offered. The first-bottle ceremony waits for layout step 3. Screen-only, like the click: nothing in the simulation changes.
+
+### Rules
+
+- **A clink with every bottle pop.** The bottling sound is made in code: a glass clink, two bright partials that ring briefly. It plays with each bottle pop (LAYOUT.md), so it inherits the pop's limit of POPS_PER_SECOND and never drones. Sound off silences it.
+- **Richer sauces sound fuller.** The clink's pitch drops a step for each tier of the sauce in the pop (its most valuable bottle): Tier 1 at 1.0, each tier BOTTLE_TIER_PITCH lower.
+- **The first bottle of a sauce buzzes.** The first bottle of each sauce in a run asks for one short vibration, FIRST_BOTTLE_MS; later bottles don't. Vibration off silences it. Two sauces' first bottles in the same frame give one buzz, since a phone plays one vibration at a time. First bottles made while away (the catch-up) don't buzz.
+- **A bottle in the factory view.** Each pop drops a small bottle shape onto the Bottling floor, tinted by the sauce's tier (`style.gd`, TIER_TINTS), which slides right towards Sell Batch and fades. Placeholder shapes, for W8 to restyle.
+
+### Criteria
+
+| Id | Criterion |
+| --- | --- |
+| K6 | Each bottle pop plays exactly one bottling sound with Sound on, and none with Sound off. However fast lines run, there are at most POPS_PER_SECOND a second. |
+| K7 | The bottling sound's pitch is 1.0 for Tier 1 and falls with each tier. |
+| K8 | The first bottle of a sauce in a run asks for one FIRST_BOTTLE_MS vibration with Vibration on; the next bottles of it ask for none, and Vibration off asks for none. |
+| K9 | Each bottle pop adds one bottle to the factory view's Bottling floor, tinted by the sauce's tier, which moves right and is gone within BOTTLE_SECONDS. |
+
+### Results (bottling)
+
+**K6–K9 PASS** (`tests/ui_tests.gd`):
+- **K6:** each pop clinks once. With Sound off it doesn't clink but the bottle still drops. Bottling flat out stays within POPS_PER_SECOND.
+- **K7:** Table Mild clinks at 1.0 and Bistro Verde (Tier 2) at 0.93.
+- **K8:** the first Table Mild buzzes, the second doesn't, and with Vibration off a first Bistro Verde doesn't.
+- **K9:** one bottle per pop, tinted by tier, gone within 0.9 s.
+
+Seen in the captures: a red Table Mild bottle on the Bottling floor, sliding right.
+
+**Not checked:** how the clink sounds and the buzz feels on a real phone (W16).
+
+### Assumed (bottling)
+
+- The clink's partials (2.35 and 3.42 kHz), its length (0.22 s) and volume (−14 dB, quieter than the button's click), and each tier's pitch step (7%).
+- The 30 ms first-bottle buzz.
+- The tier tints (`style.gd`, TIER_TINTS) and the bottle's placeholder shape. All are defaults; say if you want different.

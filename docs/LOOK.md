@@ -1,6 +1,6 @@
-# The look: pixel art (W8, D043)
+# The look: pixel art (W8, D047)
 
-After the first phone test the owner said the game "looks like a 2010 web game rather than a mobile app in 2026" (W8). The owner has now chosen **pixel art** as the game's style (D043). This doc is the first step: a **trial** of a ready-made pixel UI skin over today's screen, to see whether it carries the game before any art is drawn for it.
+After the first phone test the owner said the game "looks like a 2010 web game rather than a mobile app in 2026" (W8). The owner has now chosen **pixel art** as the game's style (D047). This doc is the first step: a **trial** of a ready-made pixel UI skin over today's screen, to see whether it carries the game before any art is drawn for it.
 
 Status: **built.** PX1–PX7 PASS (PX6 was tightened after the first captures, below); PX8 is the owner's.
 
@@ -43,7 +43,7 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 - Headlines at 3× text next to 2× borders. Mixing scales is a pixel-art sin ("mixels"), but 16 px for Cash and titles is too small. Say if you'd rather everything at 2×.
 - Wood, the only free theme. Ember or royal from the paid pack may suit hot sauce better.
 - Cards as the sunken inset, the status bar, nav and sheets as the raised panel.
-- The phone's screen isn't a whole multiple of 540 wide, so the final stretch to the phone can still make pixels slightly uneven (W28).
+- The phone's screen isn't a whole multiple of 540 wide, so the final stretch to the phone can still make pixels slightly uneven (W32).
 - Measured into place (each found by the checks or the captures): the panel art darkened to 0.6 (PANEL_SHADE) so text on it reads; Tech Tree nodes 164×100 on a 180×116 grid, so "Concentrate" fits (they were 90×70, so less of the web shows at once); the nav says "Roster" for Shift Roster; Sell Raw Peppers on two lines, same words; card titles, the goal line, and valve and Auto-Sell labels wrap rather than widen the screen; valve and Auto-Sell rows put their label above their controls; the stock strip 16 px lower to make room for a two-line goal; the bottle pop rises 24 px, not 36; the compact Blank Button 140 px, not 150 (2× its disc).
 - The kit's demo isn't copied in; its art and theme are unchanged. Five glyphs (ñ × · → −) are ours, drawn by `tools/make_pixel_glyphs.gd`.
 - The selected Tech Tree node gets a cream frame and the pinned one a red frame, since the kit has no outlined button.
@@ -52,7 +52,7 @@ The paid pack (same files and names) adds five colour themes, ember among them, 
 
 `tests/look_tests.gd` checks PX1–PX6 on the real screen, laid out at 540×960, at 17 stages from the bare button to HQ after a sale (7,537 checks). Every suite passes and the headless boot is clean.
 
-**The Web build** (`tools/export_web.sh`), opened in a browser: the kit, the font and the disc load with no console errors, so scaling the kit's art at start-up works in the export. At a phone's size (375×812 at 2× density) the layout is right, but W28 shows. The screen is drawn at 1.39×, so some art pixels are one device pixel wide and some two: uneven steps on the disc's edge and in the letters.
+**The Web build** (`tools/export_web.sh`), opened in a browser: the kit, the font and the disc load with no console errors, so scaling the kit's art at start-up works in the export. At a phone's size (375×812 at 2× density) the layout is right, but W32 shows. The screen is drawn at 1.39×, so some art pixels are one device pixel wide and some two: uneven steps on the disc's edge and in the letters.
 
 | Id | Result |
 | --- | --- |
@@ -72,3 +72,17 @@ Found on the way:
 - **Wrapping every button was worse.** A wrapped button in a row shrank to one letter a line and stretched the status bar to half the screen. Now only full-width buttons wrap, and PX6 checks that no word breaks.
 
 The agent's view for PX8: it reads as a game now rather than a web page, and the chunky disc suits the Blank Button. But wood is a fantasy-RPG material, not a hot sauce one; the grey "can't afford" buttons are cold against the wood; and 3× headlines beside 2× borders show. The full pack's ember theme, or our own palette over the same parts, would fix the first two.
+
+## After merging #20 (D043–D045 on `main`)
+
+`main` gained Cargo, the dashboard from the first launch and bottling feel while this trial waited, so the trial was merged with it. To keep the merge clear, this branch's D043 is now **D047** and its W28 and W29 are now **W32** and **W33** (`main` uses D043 and W28–W30 for its own).
+
+The kit now dresses the dashboard. What had to change:
+- **The factory view** (drawn in code) uses the wood palette and the kit font at 16 px. Floor names sit at the right, because the pixel font is too tall to sit above the tiles. Its dots are gold and its tile outlines whole pixels.
+- **The tab selectors** are 64 px tall, not `main`'s 56, so a locked tab's two lines ("Roster", "$150K") stay a 44 px tap target (PX6). The nav keeps "Roster".
+- **Sell Batch** is 48 px tall: on the dashboard it's one line.
+- **The next action's ring** is an outline with square corners, 4 px wide. **PX4 was narrowed after measuring:** it now fails only flat boxes that are filled or rounded, since an outline is drawn pixel-crisp. The ring is the only box this lets through.
+- **Heat** uses the kit's red bar under the button, 12 px tall.
+- L10 checks that the selectors sit at the upper viewport's foot (`UPPER_FRACTION` of the screen) instead of a fixed gap under the button. L11 expects "Roster" in the nav.
+
+**Results after the merge:** PX1–PX7 PASS (`look_tests.gd`, 8,078 checks), and the captures were looked at. A4 and E6 fail by one unit, as they do on `main` (W29, W30).

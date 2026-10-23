@@ -1,6 +1,6 @@
 extends RefCounted
 ## The screen's whole palette, sizes and motion. Screens use only these.
-## The look is pixel art (D043): the Pixel UI kit's wood theme at PIXEL_SCALE
+## The look is pixel art (D047): the Pixel UI kit's wood theme at PIXEL_SCALE
 ## (src/ui/pixel_kit.gd, docs/LOOK.md). These are our colours, picked to sit
 ## with the kit's and to reach LOOK.md's contrast (PX5) on its surfaces.
 
@@ -44,23 +44,25 @@ const SIZE_TINY := 16
 const GUTTER := 20
 ## Ordinary buttons are at least this tall, so tap targets don't shrink (PX6).
 const BUTTON_HEIGHT := 44.0
-## Side of the Blank Button at the start (brief §2: "large").
-const BLANK_BUTTON_SIZE := 280.0
-## Its side once compressed into the upper viewport (Stage 2).
+## Corners: square in the pixel look; the next-action ring uses it (D044).
+const RADIUS := 0
+## The Blank Button's side, in the upper viewport (D044: from the start).
 const BLANK_BUTTON_COMPACT := 140.0
 const STATUS_BAR_HEIGHT := 84.0
-## The stock line under the status bar wraps to at most this many lines, so it
-## never runs into the Blank Button.
-const STOCK_LINES := 3
-## Sell Batch, beside the compact button.
+## Sell Batch, under the factory view. Its width sizes the bottle pop.
 const SELL_BATCH_WIDTH := 140.0
-const SELL_BATCH_HEIGHT := 72.0
-## The upper viewport's share of the screen height (brief §2: 35%).
-const UPPER_FRACTION := 0.35
+## Sell Batch, one line under the factory view (D044), at the tap-target height.
+const SELL_BATCH_HEIGHT := 48.0
+## The upper viewport's share of the screen height (brief §2 says 35%; D044's
+## factory view needs a little more).
+const UPPER_FRACTION := 0.38
 ## Cycle progress bars (the kit's gold bar).
 const PROGRESS_HEIGHT := 12.0
+## The factory view's tiles (D044), drawn in code.
+const PROGRESS_FILL := Color("#ffa040")
+const PROGRESS_TRACK := Color("#120a07")
 
-## The bottom navigation bar (Stage 3).
+## The tab selectors, directly under the upper viewport (D044).
 const NAV_HEIGHT := 64.0
 ## The Tech Tree web: grid step between nodes, and each node's size.
 const WEB_STEP := Vector2(180, 116)
@@ -91,11 +93,23 @@ const STRIP_TOP := 52.0
 ## The station sheet and the warehouse drawer, over the bottom of the screen.
 const SHEET_FRACTION := 0.55
 
+# --- Layout step 2 (docs/LAYOUT.md, D044) -------------------------------------
+## The factory view: three floors, each a band with its stations as tiles.
+const FLOOR := Color("#1a0e0a")
+const TILE := 22.0
+const TILE_GAP := 5.0
+## A dot climbing a floor: at most this many a second, each this long.
+const DOTS_PER_SECOND := 6.0
+const DOT_SECONDS := 0.6
+const DOT_SIZE := 5.0
+## The ring round the next action, and how fast it pulses.
+const RING_WIDTH := 4
+const RING_PULSE := 1.1
+
 ## Motion, in seconds.
 const PRESS_SQUASH := 0.12
 const FADE_IN := 0.6
 const SLIDE_IN := 0.45
-const COMPRESS := 0.5
 
 # --- Feel: the Blank Button's click and buzz (docs/FEEL.md) --------------------
 ## The click: a decaying tone of this pitch and length, at this volume.
@@ -107,3 +121,18 @@ const CLICK_PITCH_SPREAD := 0.08
 const CLICK_HEAT_PITCH := 0.2
 ## A finger press's vibration, in milliseconds.
 const HAPTIC_MS := 15
+
+# --- Bottling (docs/FEEL.md, D045) ---------------------------------------------
+## The clink: two glassy partials ringing this long, at this volume.
+const BOTTLE_HZ := [2350.0, 3420.0]
+const BOTTLE_SOUND_SECONDS := 0.22
+const BOTTLE_VOLUME_DB := -14.0
+## Each tier of sauce plays the clink this much lower (Tier 1 at 1.0).
+const BOTTLE_TIER_PITCH := 0.07
+## The first bottle of a sauce in a run: one vibration this long.
+const FIRST_BOTTLE_MS := 30
+## A bottle in the factory view slides for this long; its tint by tier (GUESS:
+## Table Mild's red, Verde's green, Louisiana's orange, Sweet Heat's gold,
+## Phantom's smoke, Tier 6's purple).
+const BOTTLE_SECONDS := 0.9
+const TIER_TINTS := [Color("#f87171"), Color("#84cc16"), Color("#fb923c"), Color("#facc15"), Color("#a8a29e"), Color("#a78bfa")]

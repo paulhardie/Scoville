@@ -132,7 +132,7 @@ func test_screens() -> void:
 	var blank: Button = screen.find_child("BlankButton", true, false)
 	check(_whole_disc(blank.size), "PX1: the Blank Button is a whole multiple of its %d px disc at the start (%s)" % [S.BLANK_DISC_PX, blank.size])
 
-	for p in T.STAGE_1_PEPPERS:
+	for p in 20:
 		blank.pressed.emit()
 	await look("the status bar")
 	for p in 80:
@@ -256,7 +256,10 @@ func _walk(node: Node, where: String, width: float, web: Control) -> void:
 				var tw := f.get_multiline_string_size(c.text, HORIZONTAL_ALIGNMENT_LEFT, -1, px).x
 				check(tw <= c.size.x + 0.5, "PX6: %s, %s's text is cut off (%.0f px in %.0f)" % [where, c.name, tw, c.size.x])
 		for n in BOXES:
-			if c.has_theme_stylebox(n) and c.get_theme_stylebox(n) is StyleBoxFlat:
+			# An outline with square corners (the next action's ring, D044) is
+			# drawn pixel-crisp, so only filled or rounded flat boxes fail.
+			var sb = c.get_theme_stylebox(n) if c.has_theme_stylebox(n) else null
+			if sb is StyleBoxFlat and (sb.draw_center or sb.corner_radius_top_left > 0):
 				check(false, "PX4: %s, %s (%s) draws a flat %s box" % [where, c.name, c.get_class(), n])
 		if not in_web:
 			var r := c.get_global_rect()

@@ -180,7 +180,7 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0:
 						errors.append(where + ": tap_yield needs a whole number of at least 1")
 						ok = false
-				"double_tap", "forage", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
+				"double_tap", "forage", "bumper_crop", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0 or e[kind] >= 1.0:
 						errors.append(where + ": %s needs a share between 0 and 1" % kind)
 						ok = false

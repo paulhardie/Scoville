@@ -200,7 +200,7 @@ A GUESS at a phone player (`Player.casual()` in `src/sim/engaged_player.gd`):
 - taps 2 times a second in 45-second bursts with 15-second rests (1.5 a second on average);
 - looks at the game every 2 seconds.
 
-Otherwise it plays like the pacing player. Both are measured over the first 30 minutes (20 until J3).
+Otherwise it plays like the pacing player. Both are measured over the first 30 minutes.
 
 ### Criteria (v0.5.1)
 

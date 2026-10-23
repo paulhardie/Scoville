@@ -311,6 +311,13 @@ func test_return_waiting() -> void:
 	check(r.cash_earned > 0.0 and text.call("cash").visible and text.call("cash").text == "+%s cash" % screen._money(r.cash_earned),
 		"J2: with the Van, the cash line: %s" % text.call("cash").text)
 	check(not text.call("waiting").visible, "J2: and no waiting line (%d bottles held)" % g.bottles_held())
+	screen.close_card()
+	# After the Van, bottles held back from Auto-Sell still show as waiting.
+	g.set_autosell("table_mild", 50)
+	fake.t += 3 * 3600.0
+	await process_frame
+	check(text.call("waiting").visible and is_equal_approx(screen.last_return.bottles_waiting, g.bottles_value()) and g.bottles_held() > 0,
+		"J2: Auto-Sell at 50%%, the held bottles show as waiting: %s" % text.call("waiting").text)
 	screen.queue_free()
 	await process_frame
 

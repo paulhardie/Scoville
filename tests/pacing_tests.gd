@@ -218,8 +218,8 @@ func run() -> void:
 	criterion("E5", casual.tech <= 15 * 60.0, "casual player: the Tech Tree at %s (by 15:00)" % clock(casual.tech))
 	# Narrowed to the casual player after measuring: the eager one buys the line
 	# 36 s after the vat, so little mash waits (FACTORY.md says so).
-	criterion("J3", casual.late_gap <= 120.0, "longest stretch with nothing new, 15:00–30:00: %.0f s casual (at most 120); %.0f s eager (not judged)" % [casual.late_gap, eager.late_gap])
 	criterion("E6", casual.crate_mash >= 10, "Sweet Pepper Mash waiting for the Starter Crate: %d casual (at least 10); %d eager (not judged)" % [casual.crate_mash, eager.crate_mash])
+	criterion("J3", casual.late_gap <= 120.0, "longest stretch with nothing new, 15:00–30:00: %.0f s casual (at most 120); %.0f s eager (not judged)" % [casual.late_gap, eager.late_gap])
 
 	# v0.5's criteria (OFFLINE.md).
 	var checker := set_up(at_30)
@@ -297,7 +297,7 @@ func run() -> void:
 	quit(0 if failures.is_empty() else 1)
 
 
-## Plays the first 20 minutes with a player and returns what the early-game
+## Plays the first 30 minutes with a player and returns what the early-game
 ## criteria need: when the deck, the first line and the Tech Tree came, the
 ## longest stretch with nothing new (a purchase, research or reveal) from the
 ## deck to 15:00, the plot's share of peppers in the first 5 minutes, and the

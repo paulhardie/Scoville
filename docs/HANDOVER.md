@@ -2,7 +2,7 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6d, layout step 1, the second run, D036–D042 (PRs #1–#19). **Open and not merged:** #20 (D043 Cargo, D044 the dashboard from the first launch, D045 bottling feel) and #21 (the pixel-art skin trial). Both use D043, and W28–W29 for different things, so whichever merges second needs renumbering.
+Merged: v0.1–v0.6d, layout step 1, the second run, D036–D042 (PRs #1–#19). **Open and not merged:** #20 (D043 Cargo, D044 the dashboard from the first launch, D045 bottling feel) and #21 (the pixel-art skin trial). Both use D043, and W28–W29 for different things (#20 also adds W30), so whichever merges second needs renumbering.
 
 This branch, cut from `main`, is an autonomous first-session pass ([PLAN.md](../PLAN.md)):
 
@@ -10,13 +10,13 @@ This branch, cut from `main`, is an autonomous first-session pass ([PLAN.md](../
 - **J3, the 15–30 minute window for the casual player:** longest wait 48 s against a bar of 120. PASS; nothing to tune ([FACTORY.md](FACTORY.md#the-1530-minute-window-j3-this-session)).
 - **W31, when the first sale comes:** measured and written up with options, not built ([PRESTIGE.md](PRESTIGE.md#when-the-first-sale-comes-w31-a-proposal-not-built)).
 
-**Results:** every suite passes, the headless boot is clean, and the new card was looked at in `tools/capture_ui.gd`'s `j1_return.png`. Code merges cleanly with #20 and #21; `docs/BACKLOG.md` and `docs/DECISIONS.md` conflict only where both append rows (keep both).
+**Results:** every suite passes, the headless boot is clean, and the new card was looked at in `tools/capture_ui.gd`'s `j1_return.png`. Code merges cleanly with #20 and #21; `docs/BACKLOG.md` and `docs/DECISIONS.md` conflict only where both append rows (keep both), and `docs/HANDOVER.md` conflicts because each branch rewrites it (merge the "Where it's at" and "Open decisions" sections).
 
 ## Open decisions
 
-- **W31:** first sale at about 2:00 (D035) or about an hour (the owner's pacing guide). Recommend an early sale at about $400K for 5 credits if the hour stands.
+- **W31:** first sale at about 2:00 (D035) or about an hour (the owner's message for this session, not in the repo; it contradicts D005). Recommend an early sale at about $400K for 5 credits if the hour stands.
 - **Before the Van, sell while away?** D046 shows the waiting sauce; actually selling it while away would change what the Delivery Van is for. Recommend the card alone.
-- Still open: W28 (the second plot feels slow; on #20), W21 late growth, W24 a floor for repeat runs, thin margins (E3 casual 96 s of 100, the sale 1:56 inside its floor).
+- Still open: W28 (the second plot feels slow; on #20), W21 late growth, W24 a floor for repeat runs, thin margins (E3 casual 96 s of 100, the sale only 1:56 past its 2:00 floor).
 
 ## Next
 

@@ -66,6 +66,8 @@ Brief §4: "Extends the current run's Offline production cap (+2 hours per node)
 | J1 | Before the Delivery Van, a return of more than 60 s that made bottles shows what Sell Batch would pay, matching `bottles_value()` after the catch-up, and doesn't show a "+$0.00 cash" line. |
 | J2 | With the Delivery Van selling everything, the card is as before: the cash line shows, and no waiting line (nothing is held). |
 
+After the Van the waiting line still shows whenever bottles are held (Auto-Sell under 100%, or a pin), which is what Sell Batch would pay then too. The figure is taken as the catch-up ends, Heat included; Heat is 0 after any real night, so it can only be a little high after a short return with Piston presses.
+
 **Results: J1 and J2 PASS** (`tests/ui_tests.gd`). In the capture (`tools/capture_ui.gd`, `j1_return.png`) a night at the Tier 1 factory reads "+$42.8K of sauce waiting: tap Sell Batch" where it used to read "+$0.00 cash". A late return with sauce stockpiled for research shows both lines.
 
 ## Saves

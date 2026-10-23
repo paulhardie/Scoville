@@ -2,7 +2,7 @@
 
 The owner asked for Idle Planet Miner's progression to come into the game whole, then be tweaked from there, with more peppers ordered by Scoville and fictional ones past Pepper Y for the deep endgame ([D049–D053](DECISIONS.md)). This doc owns that version: the mapping from every Idle Planet Miner row to ours, what's left out, what of ours stays, the criteria, and what's assumed.
 
-Status: **built and measured (PR 2 of 3).** The copy is in the game as mapped here; [Results](#results-pr-2) has every criterion's measurement, FAILs included. PR 3 tweaks, saying which result each change answers.
+Status: **built and measured (PR 2 of 3); PR 3 tuning.** The copy is in the game as mapped here; [Results](#results-pr-2) has every criterion's measurement, FAILs included. PR 3 tweaks against [its criteria](#pr-3-tuning-criteria-set-before-tuning), each tweak naming the result it answers.
 
 **Source.** Every Idle Planet Miner number below is from the community wiki (idle-planet-miner.fandom.com, CC BY-SA), read 2026-10-23 through its MediaWiki API, and kept as data in [`ipm_snapshot.json`](ipm_snapshot.json): ores, alloys, items, the 79-planet table, projects, smelters and crafters, rooms with their level tables, and the credit table. The wiki is fan-made; a few of its rows are estimates or don't add up, and those are marked. Scoville ranges are [PepperScale's hot pepper list](https://pepperscale.com/hot-pepper-list/), read 2026-10-23.
 
@@ -453,6 +453,19 @@ Measured on the copy as it stands, played by the pacing player (D003, its v0.7 p
 - **Selling any item** (`sell_item`), IPM's way; Sell Batch and the plot card's Sell stay.
 - **`run_tests.sh`** runs every suite and fails at the end, so a measured FAIL doesn't hide the suites after it.
 - **The pacing player's policy** (GUESS, `engaged_player.gd`): its goal is the next Land Survey; it buys the recipes, slots and farms the goal needs and sells the rest; a Harvest Rate level is priced with the truck levels that carry it, and trucks are kept up first; with nothing to save for, it buys the best farm level however slow the payback; it keeps Table Mild for the cheapest kitchen node, holds back what it saves from Auto-Sell, and sells bottles with Sell Batch. Measuring found three stalls in it (a vat bought for the kitchen's mash, which only runs in the first vat; cash hoarded when every level paid back slower than an hour; Auto-Sell selling the survey's sauce), each fixed before the numbers above. A better player could find a quicker run; PR 3 should weigh the player with the curve.
+
+## PR 3: tuning (criteria set before tuning)
+
+The owner chose to pull the first sale back to I6's 2:00–2:30 (2026-10-23) rather than move the bar. PR 3 tweaks the copy against PR 2's FAILs; these are the bars, set before any tweak.
+
+| Id | Criterion |
+| --- | --- |
+| Z1 | **Every I criterion passes as written**, I2–I14, with I1 replaced by Z2. That includes I6 (the sale at 2:00–2:30), I7, I8, I9, I10 and I4's F6, E3 and E6. |
+| Z2 | **Tweaks are listed, not hidden.** `data/` equals `tools/ipm/mapping.json` with `tools/ipm/tweaks.json` applied, nothing else. Each tweak row names the FAIL it answers. Every number not in the table still equals the snapshot through the mapping (`skeleton_tests.gd`, replacing I1). |
+| Z3 | **Checkpoints on the way.** The pacing player reaches $150K Operation Value at 0:25–0:50, $1M at 1:00–1:30 and $4M at 1:35–2:00: roughly even ratios between the kitchen and I6's band. |
+| Z4 | **Still Idle Planet Miner's shape.** The order of surveys, farms, recipes and rooms is unchanged; tweaks change amounts, prices, rates and our own rules, not the graph. |
+
+Z1 keeps E6 at 10 (W30 is still the owner's to settle). If a bar can't be met without breaking another, that's reported, not quietly traded.
 
 ## Assumed
 

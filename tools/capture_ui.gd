@@ -30,7 +30,7 @@ func run() -> void:
 		blank.pressed.emit()
 	await _shot(out.path_join("counter.png"), 1.0)
 
-	for p in T.STAGE_1_PEPPERS:
+	for p in 20:
 		blank.pressed.emit()
 	await _shot(out.path_join("status_bar.png"), 1.0)
 

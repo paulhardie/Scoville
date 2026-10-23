@@ -2,29 +2,35 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6c, D036, layout step 1, W17's second run and D040 (Standard Operating Procedures free at 1%; PRs #1–#18). This branch carries **D041, Idle Planet Miner's early flow**, and D042, the pepper ladder and Pineapple:
+Merged: v0.1–v0.6c, D036–D042 (PRs #1–#19): Standard Operating Procedures free at 1%, Idle Planet Miner's early flow (starting plots, raw sales, 5% ×1.3 plot upgrades), and the pepper ladder by real heat with generic names (Alabama Grim, Pepper Y, Pineapple).
 
-- **The Poblano and Jalapeño Plots are on sale from the start** at $800 and $1,900 (each pays back raw in 8–10 minutes, as Idle Planet Miner's first planets do). Blueprints gate crops from White Vinegar on. E1 and E12 are now Cultivation nodes (×1.5 plot speed), with the same ids.
-- **Every crop sells raw** from its plot's card, and the cards list cheapest first.
-- **Plot upgrades cost 5% of the plot's price, then ×1.3 a level**, with smaller gains: speed +3%, yield +6% of base (fractions carry), Crop Quality 1% to 30. Save v9 converts old levels to at least the same effect.
-- Measured into place: Ancho Mash 18 s (V3), Forager's Luck drops one base cycle's growth, the Savina plot at $2.0M and the Moruga plot at $5M, and the pacing player's new habits ([ECONOMY.md](ECONOMY.md#built-v06d)).
+This branch carries **D043: Cargo replaces Crop Quality**, as the owner asked.
+- **Plots grow and a truck carries.** A plot's upgrades are Harvest Speed, Yield and Cargo. Harvests land in the plot's field, and the truck carries them to stock at its cargo rate. An unupgraded truck carries twice the plot's base growth, and Tech and HQ boosts raise it alike, so only the player's own Speed and Yield levels can outgrow it.
+- **Waiting crops show on the card** ("64 waiting", in orange). They count in Operation Value and are never lost.
+- **The double-harvest chance moved to the Tech Tree:** Bumper Crop I–III, 10% each.
+- **Saves:** save v11 turns Crop Quality levels into Cargo levels.
 
-**Results:** A1–A3, A5 PASS; every earlier criterion PASS (pacing, second run, all suites). The early flow now goes: line 1:35, Poblano Plot 3:15, Jalapeño Plot 7:14, Ancho vat 13:36. The run is about 14 minutes faster late on (Phantom at 2:38, the sale at 2:01:56).
+**Results:** C1–C7 PASS. Cargo first comes into play at 7:56. Every earlier criterion passes except **A4, by one second** (6:31 against 6:30, W29). The sale lands at 2:07, Phantom at 2:39, and the second run passes 4/4.
 
-**A4** measured 6:22 against its first bar of 6:00; the owner moved the bar to 6:30 (W26), so every suite passes.
+This branch also carries **D044: the dashboard from the first launch**, as the owner asked.
+- **No progressive disclosure:** the status bar, the upper viewport (the button, a factory view of Bottling, Vats and Fields with dots climbing between them, and Sell Batch), the six tab selectors directly under the viewport, and the Farms panel all show from the first second.
+- **Locked tabs show what opens them** ("Tech Tree $7.5K"); the thresholds are unchanged.
+- **One next action at a time** (`Game.next_action()`) is ringed in orange and named on the goal line through the early run: tap, sell, buy the plot, Vat 1, Line 1, Sell Batch, the starting plots, then open the Tech Tree.
+- **Results:** L10–L14 PASS. Two misses by one unit: A4 (6:31, W29) and E6 (9 mash for the casual player's Starter Crate, against 10, W30).
 
-**D042, built:** the pepper ladder by real heat with generic names: Thai Chili, Caribbean Red Habanero, Chocolate Habanero (its sauce Cocoa Loco), and the parodies Alabama Grim and Pepper Y in Tier 6. Pineapple replaces Cane Sugar, grown in a Pineapple Grove and made into Charred Pineapple Glaze. Save v10 renames the ids. Pacing is identical, since every rung keeps its value.
+And **D045, bottling feel**. Every bottle pop now plays a glass clink, pitched lower for richer tiers, and drops a tier-tinted bottle onto the factory view's Bottling floor. The first bottle of each sauce in a run gives a short buzz. K6–K9 PASS; how it feels on a real phone is W16's test. The first-bottle ceremony waits for layout step 3.
 
 ## Open decisions
 
-- **Thin margins:** the sale lands 1:56 inside its 2:00 floor, and E3 is at 74 s against 75. Anything that speeds up the early or middle game will tip them.
-- **W21, late growth:** run 2 is worth $659M at 3:00 and $846M at 3:15. Recommend leaving it until the Cook-Off (v0.8).
-- **W24, how much faster a repeat run may be:** run 2 now takes 64% of run 1 (was 73%). Recommend a floor, say 50%.
-- **Layout step 2** (W22) waits on W8's visual direction.
+- **W29 (A4) and W30 (E6):** both miss by one unit after the early game sped up. Recommend settling them in W28's early-game pass.
+- **W28:** the second plot feels slow to unlock on a phone; revisit the starting plots with the next early-game pass.
+- **W27:** fermentation, as its own version.
+- **W21, late growth; W24, a floor on how fast run 2 may be.**
+- **Layout step 3** (W22) waits on W8's visual direction, which can also restyle step 2's factory view.
 
 ## Next
 
-1. The owner merges this PR.
-2. Fermentation (W27) when the owner picks it up; layout step 2 waits on W8.
+1. The owner tries the dashboard on a phone, settles W29/W30 and merges this PR.
+2. W28's early-game pass, or fermentation (W27), whichever the owner picks.
 
-Touches: `data/plots.json`, `data/recipes.json` (Ancho Mash), `data/tech.json` (E1, E12), `tuning.gd`, `game.gd` (upgrade curve, fractional yield, `sell_crop`, Forager's drop, save v9), `main.gd` (Sell on plot cards, order), `engaged_player.gd`, tests (A1–A5, updated upgrade and migration checks), docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27, G1, G12–G20.
+Touches: `game.gd` (field, truck, `cargo_rate`, `plot_boost`, Bumper Crop, save v11), `tuning.gd` (`CARGO_START`, `CARGO_STEP`), `data/tech.json` (E48–E50), `data_loader.gd`, `main.gd` (truck line, Cargo on the sheet), `engaged_player.gd`, tests, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27–W30, G1, G12–G20.

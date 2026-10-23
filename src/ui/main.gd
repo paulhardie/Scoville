@@ -13,7 +13,7 @@ const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech 
 const MONEY_SUFFIXES := ["K", "M", "B", "T", "Qa", "Qi"]
 const BUY_MODES := ["1", "10", "max"]
 const STATION_NAMES := {"vat": "Vat", "line": "Line"}
-const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "quality": "Crop Quality"}
+const UPGRADE_NAMES := {"speed": "Harvest Speed", "yield": "Yield per Cycle", "cargo": "Cargo"}
 ## Steps for the valve's keep amounts.
 const KEEP_STEP := 10
 
@@ -28,6 +28,10 @@ var clicks_played := 0
 var vibrations := 0
 var last_pitch := 1.0
 var _click: AudioStreamPlayer
+var _clink: AudioStreamPlayer
+var clinks_played := 0
+var last_clink_pitch := 1.0
+var bottle_buzzes := 0
 var _settings_buttons := {}
 ## Wall-clock time (D021). Tests set their own before the screen is added.
 var clock = RealClock.new()
@@ -42,7 +46,6 @@ var _return_text := {}
 
 var _acc := 0.0
 var _since_save := 0.0
-var _shown := {}
 var _page := "farms"
 
 var _blank: Button
@@ -102,6 +105,14 @@ var _pop_wait := 0.0
 var _coin_wait := 0.0
 var pops_shown := 0
 var coins_flown := 0
+var dots_shown := 0
+var _factory: FactoryView
+var _ring: Panel
+var _ring_t := 0.0
+var _ring_target: Control
+var _dot_wait := 0.0
+var _seen_delivered := -1
+var _seen_mash := -1
 
 
 ## The Tech Tree's connecting lines, drawn under the node buttons.
@@ -111,6 +122,83 @@ class WebLines extends Control:
 	func _draw() -> void:
 		for e in edges:
 			draw_line(e[0], e[1], S.WEB_LINE_DONE if e[2] else S.WEB_LINE, 3.0, true)
+
+
+## The factory view (LAYOUT.md step 2, D044): Bottling over Vats over Fields,
+## each owned station a tile filling with its cycle, and dots climbing a floor
+## as crops reach stock and mash is made.
+class FactoryView extends Control:
+	const FLOORS := ["line", "vat", "plot"]
+	const NAMES := {"line": "Bottling", "vat": "Vats", "plot": "Fields"}
+	const EMPTY := {"line": "Lines bottle here", "vat": "Vats make mash here", "plot": "Plots grow here"}
+	var game
+	var dots: Array = []    # [from floor index, x, age]
+	var bottles: Array = [] # [start x, age, tint] (D045)
+	var bottles_dropped := 0
+
+	func _process(delta: float) -> void:
+		for d in dots:
+			d[2] += delta
+		dots = dots.filter(func(d) -> bool: return d[2] < S.DOT_SECONDS)
+		for b in bottles:
+			b[1] += delta
+		bottles = bottles.filter(func(b) -> bool: return b[1] < S.BOTTLE_SECONDS)
+		queue_redraw()
+
+	## A bottle dropping onto the Bottling floor, sliding towards Sell Batch.
+	func bottle(tint: Color) -> void:
+		bottles.append([randf_range(0.1, 0.45) * size.x, 0.0, tint])
+		bottles_dropped += 1
+
+	## A dot climbing from a floor (2 Fields, 1 Vats) to the one above.
+	func climb(from: int) -> void:
+		dots.append([from, randf_range(0.15, 0.95) * size.x, 0.0])
+
+	func _tiles(floor: String) -> Array:
+		var out := []
+		if floor == "plot":
+			for crop in game.plots:
+				var p: Dictionary = game.plots[crop]
+				if p.owned:
+					out.append([p.progress / game.plot_cycle(crop), p.field > 2.0 * game.plot_yield_exact(crop)])
+		else:
+			for i in game.slots(floor).size():
+				var sl: Dictionary = game.slots(floor)[i]
+				var f: float = sl.progress / game.slot_cycle(floor, i) if sl.recipe != "" else 0.0
+				out.append([f, false])
+		return out
+
+	func _draw() -> void:
+		var font := get_theme_default_font()
+		var h := size.y / FLOORS.size()
+		for f in FLOORS.size():
+			var top := f * h
+			draw_rect(Rect2(0, top + 2, size.x, h - 4), S.FLOOR)
+			draw_string(font, Vector2(8, top + 18), NAMES[FLOORS[f]], HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_TINY - 3, S.MUTED)
+			var tiles := _tiles(FLOORS[f])
+			if tiles.is_empty():
+				draw_string(font, Vector2(8, top + h - 10), EMPTY[FLOORS[f]], HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_TINY - 2, S.DIM)
+				continue
+			var side := minf(S.TILE, (size.x - 16.0) / tiles.size() - S.TILE_GAP)
+			for i in tiles.size():
+				var r := Rect2(8 + i * (side + S.TILE_GAP), top + h - side - 8, side, side)
+				draw_rect(r, S.PROGRESS_TRACK)
+				var fill: float = clampf(tiles[i][0], 0.0, 1.0)
+				draw_rect(Rect2(r.position.x, r.end.y - r.size.y * fill, r.size.x, r.size.y * fill), S.PROGRESS_FILL)
+				draw_rect(r, S.ORANGE if tiles[i][1] else S.LINE, false, 2.0 if tiles[i][1] else 1.0)
+		for b in bottles:
+			var t: float = b[1] / S.BOTTLE_SECONDS
+			var x: float = b[0] + t * size.x * 0.5
+			var floor_y := h - 8.0
+			var c: Color = b[2]
+			c.a = 1.0 if t < 0.7 else (1.0 - t) / 0.3
+			draw_rect(Rect2(x, floor_y - 20.0, 12.0, 20.0), c)
+			draw_rect(Rect2(x + 3.5, floor_y - 27.0, 5.0, 7.0), c)
+		for d in dots:
+			var t: float = d[2] / S.DOT_SECONDS
+			var from_y: float = (d[0] + 0.5) * h
+			var y: float = lerpf(from_y, from_y - h, t)
+			draw_circle(Vector2(d[1], y), S.DOT_SIZE, Color(S.COIN, 1.0 - t * 0.6))
 
 
 func _ready() -> void:
@@ -143,6 +231,8 @@ func _process(delta: float) -> void:
 		_save()
 	_frame_delta = delta
 	_juice(delta)
+	_climb(delta)
+	_place_ring(delta)
 	_refresh(true)
 	_frame_delta = 0.0
 
@@ -209,10 +299,23 @@ func _build() -> void:
 	_drawer = _build_overlay("Drawer")
 	_drawer_box = _drawer.get_meta("box")
 	_build_card()
+	# The ring round the next action (D044), over everything but the overlays.
+	_ring = Panel.new()
+	_ring.name = "Ring"
+	_ring.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var ring_box := StyleBoxFlat.new()
+	ring_box.draw_center = false
+	ring_box.border_color = S.ORANGE
+	ring_box.set_border_width_all(S.RING_WIDTH)
+	ring_box.set_corner_radius_all(S.RADIUS)
+	_ring.add_theme_stylebox_override("panel", ring_box)
+	_ring.visible = false
+	add_child(_ring)
+	move_child(_ring, _sheet.get_index())
 
 
-## Stage 2: the Operation Deck, the lower 65%, which slides up from below. Its
-## pages are the tabs; until Stage 3 only Farms exists.
+## The panel of the open tab, under the tab selectors (D044). Its pages are the
+## tabs.
 func _build_deck() -> void:
 	_deck = PanelContainer.new()
 	_deck.name = "Deck"
@@ -227,6 +330,7 @@ func _build_deck() -> void:
 	_deck.anchor_right = 1.0
 	_deck.anchor_top = S.UPPER_FRACTION
 	_deck.anchor_bottom = 1.0
+	_deck.offset_top = S.NAV_HEIGHT
 	add_child(_deck)
 	var holder := Control.new()
 	_deck.add_child(holder)
@@ -402,6 +506,46 @@ func _feel_press() -> void:
 	if settings.vibration:
 		Input.vibrate_handheld(S.HAPTIC_MS)
 		vibrations += 1
+
+
+## Each bottle pop (D045): a clink, lower for richer tiers, and a bottle in the
+## factory view tinted by tier.
+func _bottle_feel(item: String) -> void:
+	var tier: int = game.data.items[item].tier
+	_factory.bottle(S.TIER_TINTS[clampi(tier - 1, 0, S.TIER_TINTS.size() - 1)])
+	if not settings.sound:
+		return
+	if _clink == null:
+		_clink = AudioStreamPlayer.new()
+		_clink.stream = _clink_sound()
+		_clink.volume_db = S.BOTTLE_VOLUME_DB
+		_clink.max_polyphony = 4
+		add_child(_clink)
+	last_clink_pitch = maxf(0.3, 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1))
+	_clink.pitch_scale = last_clink_pitch
+	_clink.play()
+	clinks_played += 1
+
+
+## A glass clink made in code: two bright partials, struck and ringing out.
+static func _clink_sound() -> AudioStreamWAV:
+	var rate := 22050
+	var n := int(rate * S.BOTTLE_SOUND_SECONDS)
+	var data := PackedByteArray()
+	data.resize(n * 2)
+	for i in n:
+		var t := float(i) / rate
+		var v := 0.0
+		for k in S.BOTTLE_HZ.size():
+			v += sin(TAU * S.BOTTLE_HZ[k] * t) * exp(-t / (S.BOTTLE_SOUND_SECONDS * (0.35 - 0.12 * k)))
+		v *= 0.5 * minf(1.0, t / 0.002)
+		data.encode_s16(i * 2, int(clampf(v, -1.0, 1.0) * 30000.0))
+	var wav := AudioStreamWAV.new()
+	wav.format = AudioStreamWAV.FORMAT_16_BITS
+	wav.mix_rate = rate
+	wav.stereo = false
+	wav.data = data
+	return wav
 
 
 ## A short click made in code: a tone that dies away fast, with a little
@@ -621,7 +765,7 @@ func _build_tech(holder: Control) -> void:
 	buttons.add_child(_detail.pin)
 
 
-## Stage 3: the bottom navigation bar, one button per tab.
+## The tab selectors, one button per tab, under the upper viewport (D044).
 func _build_nav() -> void:
 	_nav = PanelContainer.new()
 	_nav.name = "Nav"
@@ -630,9 +774,13 @@ func _build_nav() -> void:
 	bar.border_width_top = 1
 	bar.content_margin_left = 6
 	bar.content_margin_right = 6
+	bar.border_width_bottom = 1
 	_nav.add_theme_stylebox_override("panel", bar)
-	_nav.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_nav.offset_top = -S.NAV_HEIGHT
+	# Directly under the upper viewport (D044), every tab from the start.
+	_nav.anchor_right = 1.0
+	_nav.anchor_top = S.UPPER_FRACTION
+	_nav.anchor_bottom = S.UPPER_FRACTION
+	_nav.offset_bottom = S.NAV_HEIGHT
 	add_child(_nav)
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", 4)
@@ -647,18 +795,20 @@ func _build_nav() -> void:
 		b.pressed.connect(_on_tab.bind(tab))
 		row.add_child(b)
 		_tab_buttons[tab] = b
-	# Tapping a locked tab says what opens it, just above the bar.
+	# Tapping a locked tab says what opens it, just under the selectors.
 	_hint = _label("", S.SIZE_SMALL, S.TEXT)
 	_hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_hint.set_anchors_and_offsets_preset(Control.PRESET_BOTTOM_WIDE)
-	_hint.offset_top = -S.NAV_HEIGHT - 40
-	_hint.offset_bottom = -S.NAV_HEIGHT - 8
+	_hint.anchor_right = 1.0
+	_hint.anchor_top = S.UPPER_FRACTION
+	_hint.anchor_bottom = S.UPPER_FRACTION
+	_hint.offset_top = S.NAV_HEIGHT + 8
+	_hint.offset_bottom = S.NAV_HEIGHT + 40
 	_hint.modulate.a = 0.0
 	add_child(_hint)
 
 
 func _build_upper() -> void:
-	# Stage 0: the Blank Button, centred, with no label at all.
+	# The Blank Button, unlabelled, on the left of the upper viewport (D044).
 	_blank = Button.new()
 	_blank.name = "BlankButton"
 	_blank.focus_mode = Control.FOCUS_NONE
@@ -676,7 +826,7 @@ func _build_upper() -> void:
 	_blank.button_down.connect(func() -> void: game.set_holding(true))
 	_blank.button_up.connect(func() -> void: game.set_holding(false))
 	add_child(_blank)
-	_place_blank(false)
+	_place_blank()
 
 	# The Heat Meter (D011): a bar under the button and the bonus beside it.
 	_heat_bar = ProgressBar.new()
@@ -685,61 +835,70 @@ func _build_upper() -> void:
 	_heat_bar.show_percentage = false
 	_heat_bar.add_theme_stylebox_override("background", _box(S.CONTROL_DISABLED, 3))
 	_heat_bar.add_theme_stylebox_override("fill", _box(S.HEAT, 3))
-	_heat_bar.anchor_left = 0.5
-	_heat_bar.anchor_right = 0.5
 	_heat_bar.anchor_top = S.UPPER_FRACTION
 	_heat_bar.anchor_bottom = S.UPPER_FRACTION
-	_heat_bar.offset_left = -S.BLANK_BUTTON_COMPACT / 2.0
-	_heat_bar.offset_right = S.BLANK_BUTTON_COMPACT / 2.0
-	_heat_bar.offset_top = -13.0
-	_heat_bar.offset_bottom = -6.0
+	_heat_bar.offset_left = S.GUTTER
+	_heat_bar.offset_right = S.GUTTER + S.BLANK_BUTTON_COMPACT
+	_heat_bar.offset_top = -30.0
+	_heat_bar.offset_bottom = -24.0
 	add_child(_heat_bar)
-	_heat_label = _label("", S.SIZE_SMALL, S.HEAT)
+	_heat_label = _label("", S.SIZE_TINY, S.HEAT)
 	_heat_label.name = "HeatLabel"
 	_heat_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_heat_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_heat_label.anchor_top = S.UPPER_FRACTION
 	_heat_label.anchor_bottom = S.UPPER_FRACTION
 	_heat_label.offset_left = S.GUTTER
-	_heat_label.offset_right = S.GUTTER + S.SELL_BATCH_WIDTH
-	_heat_label.offset_bottom = -18.0 - (S.BLANK_BUTTON_COMPACT - S.SELL_BATCH_HEIGHT) / 2.0
-	_heat_label.offset_top = _heat_label.offset_bottom - S.SELL_BATCH_HEIGHT
+	_heat_label.offset_right = S.GUTTER + S.BLANK_BUTTON_COMPACT
+	_heat_label.offset_top = -22.0
+	_heat_label.offset_bottom = -2.0
 	add_child(_heat_label)
 
-	# Sell Batch sits beside the compact button, always in reach.
+	# The factory view, right of the button, and Sell Batch under it (D044).
+	var right := S.GUTTER + S.BLANK_BUTTON_COMPACT + 14.0
+	_factory = FactoryView.new()
+	_factory.name = "Factory"
+	_factory.game = game
+	_factory.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_factory.anchor_right = 1.0
+	_factory.anchor_bottom = S.UPPER_FRACTION
+	_factory.offset_left = right
+	_factory.offset_right = -S.GUTTER
+	_factory.offset_top = S.STATUS_BAR_HEIGHT + S.STRIP_TOP + 30.0
+	_factory.offset_bottom = -S.SELL_BATCH_HEIGHT - 16.0
+	add_child(_factory)
 	_sell_batch = _control_button("", func() -> void: game.sell_batch())
 	_sell_batch.name = "SellBatch"
-	_sell_batch.anchor_left = 1.0
 	_sell_batch.anchor_right = 1.0
 	_sell_batch.anchor_top = S.UPPER_FRACTION
 	_sell_batch.anchor_bottom = S.UPPER_FRACTION
+	_sell_batch.offset_left = right
 	_sell_batch.offset_right = -S.GUTTER
-	_sell_batch.offset_left = -S.GUTTER - S.SELL_BATCH_WIDTH
-	_sell_batch.offset_bottom = -18.0 - (S.BLANK_BUTTON_COMPACT - S.SELL_BATCH_HEIGHT) / 2.0
-	_sell_batch.offset_top = _sell_batch.offset_bottom - S.SELL_BATCH_HEIGHT
+	_sell_batch.offset_bottom = -8.0
+	_sell_batch.offset_top = -8.0 - S.SELL_BATCH_HEIGHT
 	add_child(_sell_batch)
 
-	# Stage 0, after the first press: the counter (later, the stock) at the top.
+	# The stock line, under the goal line.
 	_counter = Label.new()
 	_counter.name = "Counter"
 	_counter.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_counter.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	_counter.max_lines_visible = S.STOCK_LINES
 	_counter.add_theme_font_size_override("font_size", S.SIZE_BODY)
 	_counter.add_theme_color_override("font_color", S.TEXT)
 	_counter.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_counter.offset_left = S.GUTTER
 	_counter.offset_right = -S.GUTTER
-	_counter.offset_top = S.STATUS_BAR_HEIGHT + 14
-	_counter.offset_bottom = _counter.offset_top + 64
-	# Once the nav bar is out, tapping the stock opens the warehouse drawer.
+	_counter.offset_top = S.STATUS_BAR_HEIGHT + S.STRIP_TOP
+	_counter.offset_bottom = _counter.offset_top + 26
+	_counter.max_lines_visible = 1
+	_counter.add_theme_font_size_override("font_size", S.SIZE_TINY)
+	# Tapping the stock opens the warehouse drawer.
 	_counter.mouse_filter = Control.MOUSE_FILTER_STOP
 	_counter.gui_input.connect(func(e: InputEvent) -> void:
-		if game.nav_shown() and (e is InputEventMouseButton or e is InputEventScreenTouch) and e.pressed:
+		if (e is InputEventMouseButton or e is InputEventScreenTouch) and e.pressed:
 			open_drawer())
 	add_child(_counter)
 
-	# The goal bar (LAYOUT.md): what the run is working towards, from Stage 3.
+	# The goal line (LAYOUT.md): the next action early on, then the goal bar.
 	_goal = _label("", S.SIZE_TINY, S.ORANGE)
 	_goal.name = "Goal"
 	_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -753,7 +912,7 @@ func _build_upper() -> void:
 
 
 func _build_status_bar() -> void:
-	# Stage 1: the status bar, which slides down from above the screen.
+	# The status bar, from the start (D044).
 	_status_bar = PanelContainer.new()
 	_status_bar.name = "StatusBar"
 	var bar := _box(S.PANEL, 0)
@@ -775,7 +934,7 @@ func _build_status_bar() -> void:
 	row.add_child(money)
 	_cash = _label("", S.SIZE_BODY, S.GREEN)
 	money.add_child(_cash)
-	# Stage 3: Operation Value under Cash.
+	# Operation Value under Cash.
 	_ov = _label("", S.SIZE_TINY, S.DIM)
 	_ov.name = "OperationValue"
 	_ov.clip_text = true
@@ -932,26 +1091,18 @@ func _card(parent: Container, name: String, title: String) -> Dictionary:
 	return nodes
 
 
-## Puts the Blank Button in the middle of the screen, or (compact) at the foot
-## of the upper viewport once the deck is open.
-func _place_blank(compact: bool) -> void:
-	var side := S.BLANK_BUTTON_COMPACT if compact else S.BLANK_BUTTON_SIZE
-	var half := side / 2.0
-	_blank.anchor_left = 0.5
-	_blank.anchor_right = 0.5
-	if compact:
-		_blank.anchor_top = S.UPPER_FRACTION
-		_blank.anchor_bottom = S.UPPER_FRACTION
-		_blank.offset_top = -side - 18.0
-		_blank.offset_bottom = -18.0
-	else:
-		_blank.anchor_top = 0.5
-		_blank.anchor_bottom = 0.5
-		_blank.offset_top = -half
-		_blank.offset_bottom = half
-	_blank.offset_left = -half
-	_blank.offset_right = half
-	_blank.pivot_offset = Vector2.ONE * half
+## Puts the Blank Button at the left of the upper viewport (D044: always).
+func _place_blank() -> void:
+	var side := S.BLANK_BUTTON_COMPACT
+	_blank.anchor_left = 0.0
+	_blank.anchor_right = 0.0
+	_blank.anchor_top = S.UPPER_FRACTION
+	_blank.anchor_bottom = S.UPPER_FRACTION
+	_blank.offset_left = S.GUTTER
+	_blank.offset_right = S.GUTTER + side
+	_blank.offset_bottom = -36.0
+	_blank.offset_top = -36.0 - side
+	_blank.pivot_offset = Vector2.ONE * side / 2.0
 
 
 func _on_blank_pressed() -> void:
@@ -979,18 +1130,12 @@ func _on_tab(tab: String) -> void:
 
 # --- Showing ---------------------------------------------------------------
 
-## Shows the state. `animate` plays a reveal's entrance the moment it happens.
+## Shows the state. `animate` is from before D044, when reveals had entrances; nothing reads it now.
 func _refresh(animate: bool) -> void:
 	_counter.text = _stock_text()
-	_counter.add_theme_font_size_override("font_size", S.SIZE_TINY if game.nav_shown() else S.SIZE_BODY)
-	# From Stage 3 the stock is one line under the goal bar.
-	_counter.max_lines_visible = 1 if game.nav_shown() else S.STOCK_LINES
-	_counter.offset_top = S.STATUS_BAR_HEIGHT + (S.STRIP_TOP if game.nav_shown() else 14.0)
-	_goal.visible = game.nav_shown()
 	_goal.text = _goal_text()
 	_count_cash()
 	_cash.text = "Cash: " + _money(_shown_cash)
-	_ov.visible = game.nav_shown()
 	_ov.text = "Operation Value " + _money(game.operation_value())
 	_spike.visible = game.ticker.sauce != ""
 	if _spike.visible:
@@ -998,14 +1143,14 @@ func _refresh(animate: bool) -> void:
 		_spike.text = "%s ×%d · %d min left" % [game.data.items[game.ticker.sauce].short, int(game.ticker.mult), ceili(left / 60.0)]
 	_demand.text = ("%s sells for ×%d now." % [game.data.items[game.ticker.sauce].name, int(game.ticker.mult)]) if _spike.visible \
 		else ("Calm: no spike now. Spikes come about once an hour." if game.fx.ticker else "The Market Ticker (Tech Tree) brings demand spikes.")
-	var heat_on: bool = game.fx.heat and game.revealed.deck
+	var heat_on: bool = game.fx.heat
 	_heat_bar.visible = heat_on
 	_heat_label.visible = heat_on
 	_heat_bar.value = game.heat
-	_heat_label.text = "HEAT\n+%d%%" % roundi((game.heat_mult() - 1.0) * 100.0)
+	_heat_label.text = "Heat +%d%%" % roundi((game.heat_mult() - 1.0) * 100.0)
 	_sell.disabled = not game.can_sell_raw()
 	_sell_batch.visible = not game.lines.is_empty()
-	_sell_batch.text = "Sell Batch\n%s" % _money(game.bottles_value())
+	_sell_batch.text = "Sell Batch   %s" % _money(game.bottles_value())
 	_sell_batch.disabled = game.bottles_held() == 0
 
 	# The vats and lines live on Farms until Processing opens.
@@ -1034,28 +1179,9 @@ func _refresh(animate: bool) -> void:
 	for tab in _tab_buttons:
 		var b: Button = _tab_buttons[tab]
 		var open := game.tab_open(tab)
-		b.text = TAB_NAMES[tab] if open else "[ ? ]"
+		# A locked tab says what opens it (D044): its price, or the Van.
+		b.text = TAB_NAMES[tab] if open else "%s\n%s" % [TAB_NAMES[tab], "Van" if tab == "market" else _short_money(T.TAB_THRESHOLDS.get(tab, INF))]
 		b.add_theme_color_override("font_color", S.ORANGE if tab == _page else (S.TEXT if open else S.MUTED))
-
-	_reveal("counter", _counter, game.revealed.counter, animate, func() -> void:
-		_counter.modulate.a = 0.0
-		create_tween().tween_property(_counter, "modulate:a", 1.0, S.FADE_IN))
-	_reveal("status_bar", _status_bar, game.revealed.status_bar, animate, func() -> void:
-		_status_bar.position.y = -S.STATUS_BAR_HEIGHT
-		create_tween().tween_property(_status_bar, "position:y", 0.0, S.SLIDE_IN).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT))
-	var compact: bool = game.revealed.deck
-	if compact != _shown.get("compact", false):
-		_compress_blank(compact and animate)
-		_shown.compact = compact
-	_reveal("deck", _deck, game.revealed.deck, animate, func() -> void:
-		var target := _deck.position.y
-		_deck.position.y = size.y
-		create_tween().tween_property(_deck, "position:y", target, S.SLIDE_IN).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT).set_delay(S.COMPRESS * 0.4))
-	_deck.offset_bottom = -S.NAV_HEIGHT if game.nav_shown() else 0.0
-	_reveal("nav", _nav, game.nav_shown(), animate, func() -> void:
-		var target := _nav.position.y
-		_nav.position.y = size.y
-		create_tween().tween_property(_nav, "position:y", target, S.SLIDE_IN).set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_OUT))
 
 
 ## The stock line: Bell Peppers first, then everything the player has had. Short
@@ -1096,7 +1222,15 @@ func _refresh_plot(crop: String) -> void:
 		nodes.info.text = "Harvests %s by itself." % plural
 	nodes.bar.visible = p.owned
 	nodes.bar.value = clampf(p.progress / game.plot_cycle(crop), 0.0, 1.0)
-	nodes.status.visible = false
+	# The truck (Cargo, D043): what it carries, and what's waiting once the
+	# plot has outgrown it.
+	nodes.status.visible = p.owned
+	if p.owned:
+		var backed_up: bool = p.field > 2.0 * game.plot_yield_exact(crop)
+		nodes.status.text = "Truck carries %.1f a second" % game.cargo_rate(crop)
+		if backed_up:
+			nodes.status.text += "   ·   %s waiting" % _count(p.field)
+		nodes.status.add_theme_color_override("font_color", S.ORANGE if backed_up else S.MUTED)
 	nodes.buy.visible = not p.owned
 	nodes.buy.text = "Buy   %s" % _money(game.plot_price(crop))
 	nodes.buy.disabled = not game.can_buy_plot(crop)
@@ -1345,33 +1479,15 @@ func _bottle_unlocked(item: String) -> bool:
 
 ## Moves the Blank Button between its full-screen and compact places, sliding
 ## from where it was when `animate`.
-func _compress_blank(animate: bool) -> void:
-	var from_pos := _blank.position
-	var from_size := _blank.size
-	_place_blank(game.revealed.deck)
-	if not animate:
-		return
-	var to_pos := _blank.position
-	var to_size := _blank.size
-	_blank.position = from_pos
-	_blank.size = from_size
-	var t := create_tween().set_parallel().set_trans(Tween.TRANS_CUBIC).set_ease(Tween.EASE_IN_OUT)
-	t.tween_property(_blank, "position", to_pos, S.COMPRESS)
-	t.tween_property(_blank, "size", to_size, S.COMPRESS)
-
-
-func _reveal(key: String, node: Control, on: bool, animate: bool, entrance: Callable) -> void:
-	node.visible = on
-	if on and not _shown.get(key, false) and animate:
-		entrance.call()
-	_shown[key] = on
-
-
 # --- Layout step 1 (docs/LAYOUT.md) ------------------------------------------
 
 ## The goal bar: the next tab before the Tech Tree, then the next node; the
 ## sale's progress from half way.
 func _goal_text() -> String:
+	# Early on, the one next action (D044).
+	var next := game.next_action()
+	if not next.is_empty():
+		return "Next: " + _next_text(next)
 	var parts := []
 	if not game.tab_open("tech"):
 		var at: float = T.TAB_THRESHOLDS.tech
@@ -1391,6 +1507,95 @@ func _goal_text() -> String:
 	elif sale >= 0.5:
 		parts.append("Sale %d%%" % floori(sale * 100.0))
 	return "  ·  ".join(parts)
+
+
+## A threshold on a tab selector, as short as it goes: $4K, $7.5K, $10M.
+static func _short_money(amount: float) -> String:
+	var v := amount
+	var i := -1
+	while v >= 1000.0 and i < MONEY_SUFFIXES.size() - 1:
+		v /= 1000.0
+		i += 1
+	var n := ("%.1f" % v).trim_suffix(".0")
+	return "$" + n + (MONEY_SUFFIXES[i] if i >= 0 else "")
+
+
+## The next action in words, for the goal line.
+func _next_text(next: Dictionary) -> String:
+	match next.do:
+		"press":
+			return "tap the button"
+		"sell_raw":
+			return "sell your Bell Peppers"
+		"sell_batch":
+			return "Sell Batch"
+		"buy_plot":
+			return "buy the %s (%s)" % [game.data.plots[next.id].name, _money(game.plot_price(next.id))]
+		"buy_slot":
+			return "buy %s %d (%s)" % [STATION_NAMES[next.id], game.slots(next.id).size() + 1, _money(game.slot_price(next.id))]
+		"tab":
+			return "open the %s" % TAB_NAMES[next.id]
+	return ""
+
+
+## The control the next action is on, and the tab it lives on ("" for one
+## always on screen).
+func _next_target(next: Dictionary) -> Array:
+	match next.get("do", ""):
+		"press":
+			return [_blank, ""]
+		"sell_raw":
+			return [_sell, ""]
+		"sell_batch":
+			return [_sell_batch, ""]
+		"buy_plot":
+			return [_plot_cards[next.id].buy, "farms"]
+		"buy_slot":
+			return [_buy_slot[next.id], "processing" if game.tab_open("processing") else "farms"]
+		"tab":
+			return [_tab_buttons[next.id], ""]
+	return [null, ""]
+
+
+## Rings the next action, or its tab's selector while another tab is open, and
+## scrolls a long page to it when it changes.
+func _place_ring(delta: float) -> void:
+	var found := _next_target(game.next_action())
+	var target: Control = found[0]
+	var page: String = found[1]
+	if target != null and page != "" and page != _page:
+		target = _tab_buttons[page]
+	elif target != null and page != "" and target != _ring_target:
+		(_pages[page] as ScrollContainer).ensure_control_visible(target)
+	_ring_target = target
+	_ring.visible = target != null and target.is_visible_in_tree() and not _sheet.visible and not _drawer.visible
+	if not _ring.visible:
+		return
+	_ring_t += delta
+	var r := target.get_global_rect().grow(4.0)
+	_ring.position = r.position - global_position
+	_ring.size = r.size
+	_ring.modulate.a = 0.55 + 0.45 * sin(_ring_t * TAU / S.RING_PULSE)
+
+
+## Dots climbing the factory view: crops reaching stock, mash made.
+func _climb(delta: float) -> void:
+	var delivered := 0
+	for crop in game.plots:
+		delivered += game.stats.harvested[crop] - game.plots[crop].field
+	var mash := 0
+	for item in game.data.items:
+		if game.data.items[item].kind == "mash":
+			mash += game.stats.made[item]
+	_dot_wait = maxf(0.0, _dot_wait - delta)
+	# Between dots the counts build up; the next dot stands for all of them.
+	if _seen_delivered < 0 or _dot_wait <= 0.0:
+		if _seen_delivered >= 0 and (mash > _seen_mash or delivered > _seen_delivered):
+			_factory.climb(1 if mash > _seen_mash else 2)
+			dots_shown += 1
+			_dot_wait = 1.0 / S.DOTS_PER_SECOND
+		_seen_delivered = delivered
+		_seen_mash = mash
 
 
 ## Cash on screen counts up to a rise of COUNT_UP_FROM or more over COUNT_UP
@@ -1525,12 +1730,8 @@ func _refresh_sheet() -> void:
 			name = "Speed"
 		if cost < INF:
 			b.text = "%s   Lv %d → %d   %s" % [name, lv, lv + shown, _money(cost)]
-		elif upgrade == "quality" and lv < T.CROP_QUALITY_MAX:
-			b.text = "%s   Lv %d   only %d left" % [name, lv, T.CROP_QUALITY_MAX - lv]
 		else:
 			b.text = "%s   Lv %d   max" % [name, lv]
-		if upgrade == "quality" and lv > 0:
-			b.text += "   (%d%% double)" % roundi(game.quality_chance(_sheet_of.crop) * 100.0)
 		b.disabled = n == 0
 
 
@@ -1573,6 +1774,7 @@ func _refresh_drawer() -> void:
 
 ## Counts from now on: nothing made or earned before this pops or flies.
 func _rebase_juice() -> void:
+	_seen_delivered = -1
 	_made_seen = {}
 	_pending_pop = {}
 	_earned_seen = -1.0
@@ -1583,6 +1785,7 @@ func _rebase_juice() -> void:
 func _juice(delta: float) -> void:
 	_pop_wait = maxf(0.0, _pop_wait - delta)
 	_coin_wait = maxf(0.0, _coin_wait - delta)
+	var first_bottle := false
 	for item in game.data.items:
 		if game.data.items[item].kind != "bottle":
 			continue
@@ -1590,7 +1793,15 @@ func _juice(delta: float) -> void:
 		var before: int = _made_seen.get(item, made)
 		if made > before:
 			_pending_pop[item] = _pending_pop.get(item, 0) + made - before
+			# The first bottle of a sauce this run buzzes once (D045).
+			if before == 0:
+				first_bottle = true
 		_made_seen[item] = made
+	# One buzz a frame, however many sauces' first bottles land in it: a phone
+	# only plays one vibration at a time.
+	if first_bottle and settings.vibration:
+		Input.vibrate_handheld(S.FIRST_BOTTLE_MS)
+		bottle_buzzes += 1
 	if not _pending_pop.is_empty() and _pop_wait <= 0.0 and _sell_batch.visible:
 		_pop(_pending_pop)
 		_pending_pop = {}
@@ -1625,6 +1836,7 @@ func _pop(made: Dictionary) -> void:
 	var start := _sell_batch.position + Vector2((_sell_batch.size.x - l.size.x) / 2.0, -l.size.y)
 	start.x = clampf(start.x, S.GUTTER, size.x - S.GUTTER - l.size.x)
 	l.position = start
+	_bottle_feel(best)
 	var t := create_tween().set_parallel()
 	t.tween_property(l, "position:y", start.y - S.POP_RISE, S.POP_SECONDS).set_ease(Tween.EASE_OUT).set_trans(Tween.TRANS_CUBIC)
 	t.tween_property(l, "modulate:a", 0.0, S.POP_SECONDS).set_ease(Tween.EASE_IN)

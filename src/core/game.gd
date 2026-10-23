@@ -1341,7 +1341,7 @@ func catch_up(seconds: float) -> Dictionary:
 	var counted := minf(away, offline_cap())
 	var offline := counted * offline_speed()
 	var report := {"away": away, "counted": counted, "capped": away > offline_cap() + EPSILON, "offline": offline,
-		"cash_earned": 0.0, "ov": 0.0, "made": {}, "step": T.TICK_SECONDS, "steps": 0}
+		"cash_earned": 0.0, "ov": 0.0, "bottles_waiting": 0.0, "made": {}, "step": T.TICK_SECONDS, "steps": 0}
 	if away <= 0.0:
 		return report
 	var ov_before := operation_value()
@@ -1378,6 +1378,9 @@ func catch_up(seconds: float) -> Dictionary:
 
 	report.cash_earned = stats.cash_earned - earned_before
 	report.ov = operation_value() - ov_before
+	# Before the Delivery Van nothing sells while away: what Sell Batch would
+	# pay now is the return's real worth (D046).
+	report.bottles_waiting = bottles_value()
 	for item in stats.made:
 		var n: int = stats.made[item] - made_before.get(item, 0) + stats.harvested[item] - harvested_before.get(item, 0)
 		if item == "bell":

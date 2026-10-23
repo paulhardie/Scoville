@@ -53,6 +53,10 @@ func run() -> void:
 	g.stock.sweet_mash = 3
 	g.stock.table_mild = 17
 	await _shot(out.path_join("factory.png"), 0.6)
+	# Back after a night before the Delivery Van: sauce waiting, no cash (D046).
+	screen._return_from(8 * 3600.0)
+	await _shot(out.path_join("j1_return.png"), 0.2)
+	screen.close_card()
 
 	# 30 minutes of the pacing player: Tier 2 running, the Van researched.
 	var played := Game.new()

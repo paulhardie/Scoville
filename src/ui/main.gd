@@ -822,8 +822,8 @@ func _build_card() -> void:
 	col.add_theme_constant_override("separation", 10)
 	panel.add_child(col)
 	col.add_child(_label("While you were away", S.SIZE_SMALL, S.DIM))
-	for key in ["time", "cap", "cash", "ov", "made"]:
-		var l := _label("", S.SIZE_BODY if key == "time" else S.SIZE_SMALL, S.GREEN if key == "cash" else S.TEXT)
+	for key in ["time", "cap", "cash", "waiting", "ov", "made"]:
+		var l := _label("", S.SIZE_BODY if key == "time" else S.SIZE_SMALL, S.GREEN if key in ["cash", "waiting"] else S.TEXT)
 		l.name = "Return_" + key
 		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		col.add_child(l)
@@ -840,7 +840,11 @@ func _show_card(r: Dictionary) -> void:
 			if e.has("offline") and not game.is_researched(id):
 				more = true
 	_return_text.cap.text = "Counted up to %s at %d%%.%s" % [_duration(r.counted), roundi(game.offline_speed() * 100.0), " Night Shift Protocols raise it." if more else ""]
+	# Before the Delivery Van a return earns no cash, only sauce to sell (D046).
+	_return_text.cash.visible = r.cash_earned > 0.0
 	_return_text.cash.text = "+%s cash" % _money(r.cash_earned)
+	_return_text.waiting.visible = r.bottles_waiting > 0.0
+	_return_text.waiting.text = "+%s of sauce waiting: tap Sell Batch" % _money(r.bottles_waiting)
 	_return_text.ov.text = "Operation Value +%s" % _money(r.ov)
 	var made: Array = r.made.keys()
 	# The three worth most, so sauces aren't crowded out by heaps of crops.

@@ -190,6 +190,7 @@ func run() -> void:
 	screen.queue_free()
 	await process_frame
 	await test_return_card()
+	await test_return_waiting()
 	await test_hq()
 	await test_after_sale()
 	await test_layout()
@@ -266,6 +267,51 @@ func test_return_card() -> void:
 	check(card2.visible and again.last_return.away >= 7200.0 - 1.0, "X8: reopening 2 hours after saving shows the card")
 	again.queue_free()
 	DirAccess.remove_absolute("user://offline_test_save.json")
+	await process_frame
+
+
+## J1–J2 (D046): before the Delivery Van a return shows the sauce waiting to
+## sell, not "+$0.00 cash"; with the Van selling everything, the cash line.
+func test_return_waiting() -> void:
+	var fake := FakeClock.new()
+	var screen := Main.instantiate()
+	screen.save_path = ""
+	screen.settings_path = ""
+	screen.clock = fake
+	root.add_child(screen)
+	await process_frame
+	var g = screen.game
+	g.revealed.deck = true
+	g.revealed.status_bar = true
+	g.cash = 1e6
+	g.buy_plot("bell")
+	g.buy_slot("vat")
+	g.buy_slot("line")
+	var text := func(key): return (screen.find_child("Return_" + key, true, false) as Label)
+	fake.t += 3 * 3600.0
+	await process_frame
+	var r: Dictionary = screen.last_return
+	check(r.cash_earned == 0.0 and r.bottles_waiting > 0.0 and is_equal_approx(r.bottles_waiting, g.bottles_value()),
+		"J1: no Van, 3 hours away: $%.0f of bottles waiting, matching Sell Batch's $%.0f; $%.0f cash" % [r.bottles_waiting, g.bottles_value(), r.cash_earned])
+	check(text.call("waiting").visible and text.call("waiting").text == "+%s of sauce waiting: tap Sell Batch" % screen._money(g.bottles_value()),
+		"J1: the card says so: %s" % text.call("waiting").text)
+	check(not text.call("cash").visible, "J1: and no +$0.00 cash line")
+	screen.close_card()
+
+	g.sell_batch()
+	for item in g.stock:
+		g.stock[item] = 100000
+	Helpers.research_with_parents(g, "delivery_van")
+	for item in g.stock:
+		g.stock[item] = 0
+	check(g.has_van(), "J2: the Delivery Van researched")
+	fake.t += 3 * 3600.0
+	await process_frame
+	r = screen.last_return
+	check(r.cash_earned > 0.0 and text.call("cash").visible and text.call("cash").text == "+%s cash" % screen._money(r.cash_earned),
+		"J2: with the Van, the cash line: %s" % text.call("cash").text)
+	check(not text.call("waiting").visible, "J2: and no waiting line (%d bottles held)" % g.bottles_held())
+	screen.queue_free()
 	await process_frame
 
 

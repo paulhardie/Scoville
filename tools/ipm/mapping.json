@@ -1,0 +1,4504 @@
+{
+ "peppers": [
+  {
+   "rung": 1,
+   "id": "bell",
+   "name": "Bell Pepper",
+   "shu": "0",
+   "ore": "Copper",
+   "value": 1.0
+  },
+  {
+   "rung": 2,
+   "id": "pimento",
+   "name": "Pimento",
+   "shu": "100–500",
+   "ore": "Iron",
+   "value": 2.0
+  },
+  {
+   "rung": 3,
+   "id": "poblano",
+   "name": "Poblano",
+   "shu": "1,000–1,500",
+   "ore": "Lead",
+   "value": 4.0
+  },
+  {
+   "rung": 4,
+   "id": "cascabel",
+   "name": "Cascabel",
+   "shu": "1,000–3,000",
+   "ore": "Silicon",
+   "value": 8.0
+  },
+  {
+   "rung": 5,
+   "id": "jalapeno",
+   "name": "Jalapeño",
+   "shu": "2,500–8,000",
+   "ore": "Aluminum",
+   "value": 17.0
+  },
+  {
+   "rung": 6,
+   "id": "hungarian_wax",
+   "name": "Hungarian Wax",
+   "shu": "5,000–10,000",
+   "ore": "Silver",
+   "value": 36.0
+  },
+  {
+   "rung": 7,
+   "id": "serrano",
+   "name": "Serrano",
+   "shu": "10,000–23,000",
+   "ore": "Gold",
+   "value": 75.0
+  },
+  {
+   "rung": 8,
+   "id": "arbol",
+   "name": "Chile de Árbol",
+   "shu": "15,000–30,000",
+   "ore": "Diamond",
+   "value": 160.0
+  },
+  {
+   "rung": 9,
+   "id": "cayenne",
+   "name": "Cayenne",
+   "shu": "30,000–50,000",
+   "ore": "Platinum",
+   "value": 340.0
+  },
+  {
+   "rung": 10,
+   "id": "pequin",
+   "name": "Pequin",
+   "shu": "40,000–60,000",
+   "ore": "Titanium",
+   "value": 730.0
+  },
+  {
+   "rung": 11,
+   "id": "thai_chili",
+   "name": "Thai Chili",
+   "shu": "50,000–100,000",
+   "ore": "Iridium",
+   "value": 1600.0
+  },
+  {
+   "rung": 12,
+   "id": "bonnet",
+   "name": "Scotch Bonnet",
+   "shu": "100,000–350,000",
+   "ore": "Palladium",
+   "value": 3500.0
+  },
+  {
+   "rung": 13,
+   "id": "fatalii",
+   "name": "Fatalii",
+   "shu": "125,000–400,000",
+   "ore": "Osmium",
+   "value": 7800.0
+  },
+  {
+   "rung": 14,
+   "id": "caribbean_red",
+   "name": "Caribbean Red Habanero",
+   "shu": "300,000–445,000",
+   "ore": "Rhodium",
+   "value": 17500.0
+  },
+  {
+   "rung": 15,
+   "id": "chocolate",
+   "name": "Chocolate Habanero",
+   "shu": "425,000–577,000",
+   "ore": "Inerton",
+   "value": 40000.0
+  },
+  {
+   "rung": 16,
+   "id": "ghost",
+   "name": "Ghost Pepper",
+   "shu": "855,000–1,041,427",
+   "ore": "Quadium",
+   "value": 92000.0
+  },
+  {
+   "rung": 17,
+   "id": "seven_pot",
+   "name": "Trinidad 7 Pot",
+   "shu": "1,000,000–1,200,000",
+   "ore": "Scrith",
+   "value": 215000.0
+  },
+  {
+   "rung": 18,
+   "id": "naga",
+   "name": "Naga Morich",
+   "shu": "1,000,000–1,500,000",
+   "ore": "Uru",
+   "value": 510000.0
+  },
+  {
+   "rung": 19,
+   "id": "moruga",
+   "name": "Trinidad Moruga Scorpion",
+   "shu": "1,200,000–2,000,000",
+   "ore": "Vibranium",
+   "value": 1250000.0
+  },
+  {
+   "rung": 20,
+   "id": "grim",
+   "name": "Alabama Grim",
+   "shu": "the Reaper's band, 1,400,000–2,200,000",
+   "ore": "Aether",
+   "value": 3200000.0
+  },
+  {
+   "rung": 21,
+   "id": "pepper_y",
+   "name": "Pepper Y",
+   "shu": "2,693,001",
+   "ore": "Viterium",
+   "value": 9000000.0
+  },
+  {
+   "rung": 22,
+   "id": "lava_lantern",
+   "name": "Lava Lantern",
+   "shu": "5,000,000",
+   "ore": "Xynium",
+   "value": 28000000.0
+  },
+  {
+   "rung": 23,
+   "id": "solar_flare",
+   "name": "Solar Flare",
+   "shu": "10,000,000",
+   "ore": "Quolium",
+   "value": 90000000.0
+  },
+  {
+   "rung": 24,
+   "id": "capsaicin_crystal",
+   "name": "Capsaicin Crystal",
+   "shu": "16,000,000 (pure capsaicin)",
+   "ore": "Luterium",
+   "value": 300000000.0
+  },
+  {
+   "rung": 25,
+   "id": "brimstone",
+   "name": "Brimstone Jolokia",
+   "shu": "50,000,000",
+   "ore": "Wraith",
+   "value": 1100000000.0
+  },
+  {
+   "rung": 26,
+   "id": "supernova",
+   "name": "Supernova Scorpion",
+   "shu": "500,000,000",
+   "ore": "Aqualite",
+   "value": 4300000000.0
+  },
+  {
+   "rung": 27,
+   "id": "event_horizon",
+   "name": "Event Horizon",
+   "shu": "16,000,000,000 (resiniferatoxin)",
+   "ore": "Opalite",
+   "value": 18000000000.0
+  },
+  {
+   "rung": 28,
+   "id": "heat_death",
+   "name": "Heat Death",
+   "shu": "past measuring",
+   "ore": "Celestite",
+   "value": 78000000000.0
+  }
+ ],
+ "mashes": [
+  {
+   "id": "bell_puree",
+   "name": "Bell Pepper Purée",
+   "ipm": "Copper Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Bell Pepper"
+    ]
+   ],
+   "seconds": 20,
+   "unlock": 0,
+   "value": 1450.0
+  },
+  {
+   "id": "pimento_mash",
+   "name": "Pimento Mash",
+   "ipm": "Iron Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Pimento"
+    ]
+   ],
+   "seconds": 30,
+   "unlock": 3000.0,
+   "value": 3000.0
+  },
+  {
+   "id": "ancho_mash",
+   "name": "Ancho Mash",
+   "ipm": "Lead Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Poblano"
+    ]
+   ],
+   "seconds": 40,
+   "unlock": 9000.0,
+   "value": 6100.0
+  },
+  {
+   "id": "cascabel_mash",
+   "name": "Cascabel Mash",
+   "ipm": "Silicon Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Cascabel"
+    ]
+   ],
+   "seconds": 60,
+   "unlock": 25000.0,
+   "value": 12500.0
+  },
+  {
+   "id": "verde_mash",
+   "name": "Verde Mash",
+   "ipm": "Aluminum Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Jalapeño"
+    ]
+   ],
+   "seconds": 80,
+   "unlock": 75000.0,
+   "value": 27600.0
+  },
+  {
+   "id": "hungarian_wax_mash",
+   "name": "Hungarian Wax Mash",
+   "ipm": "Silver Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Hungarian Wax"
+    ]
+   ],
+   "seconds": 120,
+   "unlock": 225000.0,
+   "value": 60000.0
+  },
+  {
+   "id": "serrano_mash",
+   "name": "Serrano Mash",
+   "ipm": "Gold Bar",
+   "inputs": [
+    [
+     1000.0,
+     "Serrano"
+    ]
+   ],
+   "seconds": 180,
+   "unlock": 500000.0,
+   "value": 120000.0
+  },
+  {
+   "id": "sofrito_base",
+   "name": "Sofrito Base",
+   "ipm": "Bronze Bar",
+   "inputs": [
+    [
+     2.0,
+     "Hungarian Wax Mash"
+    ],
+    [
+     10.0,
+     "Bell Pepper Purée"
+    ]
+   ],
+   "seconds": 240,
+   "unlock": 1000000.0,
+   "value": 234000.0
+  },
+  {
+   "id": "mole_base",
+   "name": "Mole Base",
+   "ipm": "Steel Bar",
+   "inputs": [
+    [
+     15.0,
+     "Ancho Mash"
+    ],
+    [
+     30.0,
+     "Pimento Mash"
+    ]
+   ],
+   "seconds": 480,
+   "unlock": 2000000.0,
+   "value": 340000.0
+  },
+  {
+   "id": "cayenne_mash",
+   "name": "Cayenne Mash",
+   "ipm": "Platinum Bar",
+   "inputs": [
+    [
+     2.0,
+     "Serrano Mash"
+    ],
+    [
+     1000.0,
+     "Cayenne"
+    ]
+   ],
+   "seconds": 600,
+   "unlock": 4000000.0,
+   "value": 780000.0
+  },
+  {
+   "id": "pequin_mash",
+   "name": "Pequin Mash",
+   "ipm": "Titanium Bar",
+   "inputs": [
+    [
+     2.0,
+     "Sofrito Base"
+    ],
+    [
+     1000.0,
+     "Pequin"
+    ]
+   ],
+   "seconds": 720,
+   "unlock": 8000000.0,
+   "value": 1630000.0
+  },
+  {
+   "id": "thai_chili_mash",
+   "name": "Thai Chili Mash",
+   "ipm": "Iridium Bar",
+   "inputs": [
+    [
+     2.0,
+     "Mole Base"
+    ],
+    [
+     1000.0,
+     "Thai Chili"
+    ]
+   ],
+   "seconds": 840,
+   "unlock": 15000000.0,
+   "value": 3110000.0
+  },
+  {
+   "id": "bonnet_mash",
+   "name": "Bonnet Mash",
+   "ipm": "Palladium Bar",
+   "inputs": [
+    [
+     2.0,
+     "Cayenne Mash"
+    ],
+    [
+     1000.0,
+     "Scotch Bonnet"
+    ]
+   ],
+   "seconds": 960,
+   "unlock": 30000000.0,
+   "value": 7000000.0
+  },
+  {
+   "id": "fatalii_mash",
+   "name": "Fatalii Mash",
+   "ipm": "Osmium Bar",
+   "inputs": [
+    [
+     2.0,
+     "Pequin Mash"
+    ],
+    [
+     1000.0,
+     "Fatalii"
+    ]
+   ],
+   "seconds": 1080,
+   "unlock": 60000000.0,
+   "value": 14500000.0
+  },
+  {
+   "id": "caribbean_red_mash",
+   "name": "Caribbean Red Mash",
+   "ipm": "Rhodium Bar",
+   "inputs": [
+    [
+     2.0,
+     "Thai Chili Mash"
+    ],
+    [
+     1000.0,
+     "Caribbean Red Habanero"
+    ]
+   ],
+   "seconds": 1200,
+   "unlock": 120000000.0,
+   "value": 31000000.0
+  },
+  {
+   "id": "chocolate_mash",
+   "name": "Chocolate Habanero Mash",
+   "ipm": "Inerton Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Bonnet Mash"
+    ],
+    [
+     1000.0,
+     "Chocolate Habanero"
+    ]
+   ],
+   "seconds": 1440,
+   "unlock": 250000000.0,
+   "value": 68000000.0
+  },
+  {
+   "id": "ghost_mash",
+   "name": "Ghost Mash",
+   "ipm": "Quadium Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Fatalii Mash"
+    ],
+    [
+     1000.0,
+     "Ghost Pepper"
+    ]
+   ],
+   "seconds": 1680,
+   "unlock": 500000000.0,
+   "value": 152000000.0
+  },
+  {
+   "id": "seven_pot_mash",
+   "name": "Seven Pot Mash",
+   "ipm": "Scrith Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Caribbean Red Mash"
+    ],
+    [
+     1000.0,
+     "Trinidad 7 Pot"
+    ]
+   ],
+   "seconds": 1920,
+   "unlock": 1000000000.0,
+   "value": 352000000.0
+  },
+  {
+   "id": "naga_mash",
+   "name": "Naga Mash",
+   "ipm": "Uru Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Chocolate Habanero Mash"
+    ],
+    [
+     1000.0,
+     "Naga Morich"
+    ]
+   ],
+   "seconds": 2160,
+   "unlock": 2000000000.0,
+   "value": 832000000.0
+  },
+  {
+   "id": "moruga_mash",
+   "name": "Moruga Mash",
+   "ipm": "Vibranium Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Ghost Mash"
+    ],
+    [
+     1000.0,
+     "Trinidad Moruga Scorpion"
+    ]
+   ],
+   "seconds": 2400,
+   "unlock": 4000000000.0,
+   "value": 2049999999.9999998
+  },
+  {
+   "id": "grim_mash",
+   "name": "Grim Mash",
+   "ipm": "Aether Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Seven Pot Mash"
+    ],
+    [
+     1000.0,
+     "Alabama Grim"
+    ]
+   ],
+   "seconds": 2640,
+   "unlock": 8000000000.0,
+   "value": 5120000000.0
+  },
+  {
+   "id": "pepper_y_mash",
+   "name": "Pepper Y Mash",
+   "ipm": "Viterium Alloy",
+   "inputs": [
+    [
+     2.0,
+     "Naga Mash"
+    ],
+    [
+     1000.0,
+     "Pepper Y"
+    ]
+   ],
+   "seconds": 2880,
+   "unlock": 16000000000.0,
+   "value": 15500000000.0
+  },
+  {
+   "id": "lava_lantern_mash",
+   "name": "Lava Lantern Mash",
+   "ipm": "Xynium Alloy",
+   "inputs": [
+    [
+     5.0,
+     "Moruga Mash"
+    ],
+    [
+     1500.0,
+     "Lava Lantern"
+    ]
+   ],
+   "seconds": 3300,
+   "unlock": 84000000000.0,
+   "value": 48000000000.0
+  },
+  {
+   "id": "solar_flare_mash",
+   "name": "Solar Flare Mash",
+   "ipm": "Quolium Alloy",
+   "inputs": [
+    [
+     5.0,
+     "Grim Mash"
+    ],
+    [
+     1500.0,
+     "Solar Flare"
+    ]
+   ],
+   "seconds": 3720,
+   "unlock": 275000000000.0,
+   "value": 160000000000.0
+  },
+  {
+   "id": "crystal_extract",
+   "name": "Crystal Extract",
+   "ipm": "Luterium Alloy",
+   "inputs": [
+    [
+     5.0,
+     "Pepper Y Mash"
+    ],
+    [
+     1500.0,
+     "Capsaicin Crystal"
+    ]
+   ],
+   "seconds": 4140,
+   "unlock": 1000000000000.0,
+   "value": 600000000000.0
+  },
+  {
+   "id": "brimstone_mash",
+   "name": "Brimstone Mash",
+   "ipm": "Wraith Alloy",
+   "inputs": [
+    [
+     5.0,
+     "Lava Lantern Mash"
+    ],
+    [
+     1500.0,
+     "Brimstone Jolokia"
+    ]
+   ],
+   "seconds": 4560,
+   "unlock": 4200000000000.0,
+   "value": 2400000000000.0
+  },
+  {
+   "id": "supernova_mash",
+   "name": "Supernova Mash",
+   "ipm": "Aqualite Alloy",
+   "inputs": [
+    [
+     5.0,
+     "Solar Flare Mash"
+    ],
+    [
+     1500.0,
+     "Supernova Scorpion"
+    ]
+   ],
+   "seconds": 4980,
+   "unlock": 12000000000000.0,
+   "value": 17500000000000.0
+  },
+  {
+   "id": "event_horizon_mash",
+   "name": "Event Horizon Mash",
+   "ipm": "Opalite Alloy",
+   "inputs": [
+    [
+     5.0,
+     "Brimstone Mash"
+    ],
+    [
+     1500.0,
+     "Event Horizon"
+    ]
+   ],
+   "seconds": 5520,
+   "unlock": 30000000000000.0,
+   "value": 277000000000000.0
+  },
+  {
+   "id": "heat_death_mash",
+   "name": "Heat Death Mash",
+   "ipm": "Celestite Alloy",
+   "inputs": [
+    [
+     10.0,
+     "Supernova Mash"
+    ],
+    [
+     1500.0,
+     "Heat Death"
+    ]
+   ],
+   "seconds": 6000,
+   "unlock": 70000000000000.0,
+   "value": 1200000000000000.0
+  }
+ ],
+ "sauces": [
+  {
+   "id": "sweet_pepper_relish",
+   "name": "Sweet Pepper Relish",
+   "ipm": "Copper Wire",
+   "inputs": [
+    [
+     5.0,
+     "Bell Pepper Purée"
+    ]
+   ],
+   "seconds": 60,
+   "unlock": 0,
+   "value": 10000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "pimento_spread",
+   "name": "Pimento Spread",
+   "ipm": "Iron Nails",
+   "inputs": [
+    [
+     5.0,
+     "Pimento Mash"
+    ]
+   ],
+   "seconds": 120,
+   "unlock": 20000.0,
+   "value": 20000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "garden_hot_sauce",
+   "name": "Garden Hot Sauce",
+   "ipm": "Battery",
+   "inputs": [
+    [
+     2.0,
+     "Sweet Pepper Relish"
+    ],
+    [
+     10.0,
+     "Bell Pepper Purée"
+    ]
+   ],
+   "seconds": 240,
+   "unlock": 50000.0,
+   "value": 70000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "smoky_ancho",
+   "name": "Smoky Ancho",
+   "ipm": "Hammer",
+   "inputs": [
+    [
+     2.0,
+     "Pimento Spread"
+    ],
+    [
+     5.0,
+     "Ancho Mash"
+    ],
+    [
+     2,
+     "Pickled Brine"
+    ]
+   ],
+   "seconds": 480,
+   "unlock": 100000.0,
+   "value": 146000,
+   "value_assumed": false
+  },
+  {
+   "id": "cascabel_salsa",
+   "name": "Cascabel Salsa",
+   "ipm": "Glass",
+   "inputs": [
+    [
+     10.0,
+     "Cascabel Mash"
+    ]
+   ],
+   "seconds": 720,
+   "unlock": 200000.0,
+   "value": 220000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "bistro_verde",
+   "name": "Bistro Verde",
+   "ipm": "Circuit",
+   "inputs": [
+    [
+     5.0,
+     "Cascabel Mash"
+    ],
+    [
+     5.0,
+     "Verde Mash"
+    ],
+    [
+     10.0,
+     "Sweet Pepper Relish"
+    ],
+    [
+     10,
+     "Pickled Brine"
+    ]
+   ],
+   "seconds": 1200,
+   "unlock": 400000.0,
+   "value": 682000,
+   "value_assumed": false
+  },
+  {
+   "id": "garlic_gold",
+   "name": "Garlic Gold",
+   "ipm": "Lens",
+   "inputs": [
+    [
+     1.0,
+     "Cascabel Salsa"
+    ],
+    [
+     5.0,
+     "Hungarian Wax Mash"
+    ],
+    [
+     2,
+     "Roasted Garlic Paste"
+    ]
+   ],
+   "seconds": 2400,
+   "unlock": 1000000.0,
+   "value": 1220000,
+   "value_assumed": false
+  },
+  {
+   "id": "serrano_fire",
+   "name": "Serrano Fire",
+   "ipm": "Laser",
+   "inputs": [
+    [
+     5.0,
+     "Serrano Mash"
+    ],
+    [
+     1.0,
+     "Garlic Gold"
+    ],
+    [
+     10.0,
+     "Pimento Mash"
+    ]
+   ],
+   "seconds": 3600,
+   "unlock": 2000000.0,
+   "value": 3200000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "salsa_verde_reserve",
+   "name": "Salsa Verde Reserve",
+   "ipm": "Basic Computer",
+   "inputs": [
+    [
+     5.0,
+     "Bistro Verde"
+    ],
+    [
+     5.0,
+     "Hungarian Wax Mash"
+    ]
+   ],
+   "seconds": 4800,
+   "unlock": 5000000.0,
+   "value": 7600000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "sunshine_sauce",
+   "name": "Sunshine Sauce",
+   "ipm": "Solar Panel",
+   "inputs": [
+    [
+     5.0,
+     "Bistro Verde"
+    ],
+    [
+     10.0,
+     "Cascabel Salsa"
+    ]
+   ],
+   "seconds": 6000,
+   "unlock": 10000000.0,
+   "value": 12500000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "pineapple_picante",
+   "name": "Pineapple Picante",
+   "ipm": "Laser Torch",
+   "inputs": [
+    [
+     5.0,
+     "Sofrito Base"
+    ],
+    [
+     2.0,
+     "Serrano Fire"
+    ],
+    [
+     5.0,
+     "Garlic Gold"
+    ],
+    [
+     11,
+     "Charred Pineapple Glaze"
+    ]
+   ],
+   "seconds": 7200,
+   "unlock": 20000000.0,
+   "value": 34100000,
+   "value_assumed": false
+  },
+  {
+   "id": "mole_poblano",
+   "name": "Mole Poblano",
+   "ipm": "Advanced Battery",
+   "inputs": [
+    [
+     20.0,
+     "Mole Base"
+    ],
+    [
+     30.0,
+     "Garden Hot Sauce"
+    ]
+   ],
+   "seconds": 9000,
+   "unlock": 30000000.0,
+   "value": 35000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "classic_louisiana",
+   "name": "Classic Louisiana",
+   "ipm": "Thermal Scanner",
+   "inputs": [
+    [
+     5.0,
+     "Cayenne Mash"
+    ],
+    [
+     2.0,
+     "Serrano Fire"
+    ],
+    [
+     5.0,
+     "Cascabel Salsa"
+    ],
+    [
+     41,
+     "Roasted Garlic Paste"
+    ]
+   ],
+   "seconds": 10800,
+   "unlock": 50000000.0,
+   "value": 78600000,
+   "value_assumed": false
+  },
+  {
+   "id": "phantom",
+   "name": "Phantom Smokehouse",
+   "ipm": "Advanced Computer",
+   "inputs": [
+    [
+     5.0,
+     "Pequin Mash"
+    ],
+    [
+     5.0,
+     "Salsa Verde Reserve"
+    ],
+    [
+     5,
+     "Liquid Smoke"
+    ]
+   ],
+   "seconds": 12600,
+   "unlock": 120000000.0,
+   "value": 199000000,
+   "value_assumed": false
+  },
+  {
+   "id": "cajun_red",
+   "name": "Cajun Red",
+   "ipm": "Navigation Module",
+   "inputs": [
+    [
+     1.0,
+     "Classic Louisiana"
+    ],
+    [
+     2.0,
+     "Pineapple Picante"
+    ]
+   ],
+   "seconds": 13500,
+   "unlock": 250000000.0,
+   "value": 1000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "bangkok_burn",
+   "name": "Bangkok Burn",
+   "ipm": "Plasma Torch",
+   "inputs": [
+    [
+     15.0,
+     "Thai Chili Mash"
+    ],
+    [
+     5.0,
+     "Pineapple Picante"
+    ]
+   ],
+   "seconds": 15000,
+   "unlock": 550000000.0,
+   "value": 1150000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "pitmaster_bbq",
+   "name": "Pitmaster BBQ",
+   "ipm": "Radio Tower",
+   "inputs": [
+    [
+     75.0,
+     "Cayenne Mash"
+    ],
+    [
+     150.0,
+     "Verde Mash"
+    ],
+    [
+     50.0,
+     "Pequin Mash"
+    ],
+    [
+     15,
+     "Liquid Smoke"
+    ]
+   ],
+   "seconds": 15600,
+   "unlock": 1500000000.0,
+   "value": 1600000000,
+   "value_assumed": false
+  },
+  {
+   "id": "smoked_paprika",
+   "name": "Smoked Paprika Reserve",
+   "ipm": "Telescope",
+   "inputs": [
+    [
+     20.0,
+     "Garlic Gold"
+    ],
+    [
+     1.0,
+     "Phantom Smokehouse"
+    ]
+   ],
+   "seconds": 16800,
+   "unlock": 5000000000.0,
+   "value": 2700000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "island_heat",
+   "name": "Island Heat",
+   "ipm": "Satellite Dish",
+   "inputs": [
+    [
+     150.0,
+     "Mole Base"
+    ],
+    [
+     30.0,
+     "Bonnet Mash"
+    ],
+    [
+     218,
+     "Charred Pineapple Glaze"
+    ]
+   ],
+   "seconds": 18000,
+   "unlock": 17500000000.0,
+   "value": 3740000000,
+   "value_assumed": false
+  },
+  {
+   "id": "ranchero",
+   "name": "Ranchero",
+   "ipm": "Motor",
+   "inputs": [
+    [
+     500.0,
+     "Sofrito Base"
+    ],
+    [
+     200.0,
+     "Smoky Ancho"
+    ]
+   ],
+   "seconds": 19200,
+   "unlock": 60000000000.0,
+   "value": 7000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "fatalii_fire",
+   "name": "Fatalii Fire",
+   "ipm": "Accumulator",
+   "inputs": [
+    [
+     20.0,
+     "Fatalii Mash"
+    ],
+    [
+     3.0,
+     "Mole Poblano"
+    ]
+   ],
+   "seconds": 20400,
+   "unlock": 100000000000.0,
+   "value": 12000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "sweet_heat",
+   "name": "Sweet Heat Reserve",
+   "ipm": "Nuclear Capsule",
+   "inputs": [
+    [
+     5.0,
+     "Caribbean Red Mash"
+    ],
+    [
+     1.0,
+     "Bangkok Burn"
+    ]
+   ],
+   "seconds": 21000,
+   "unlock": 200000000000.0,
+   "value": 26000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "jalapeno_ranch",
+   "name": "Jalapeño Ranch",
+   "ipm": "Wind Turbine",
+   "inputs": [
+    [
+     300.0,
+     "Verde Mash"
+    ],
+    [
+     1.0,
+     "Ranchero"
+    ]
+   ],
+   "seconds": 21600,
+   "unlock": 500000000000.0,
+   "value": 140000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "tropical_storm",
+   "name": "Tropical Storm",
+   "ipm": "Space Probe",
+   "inputs": [
+    [
+     1.0,
+     "Island Heat"
+    ],
+    [
+     1.0,
+     "Smoked Paprika Reserve"
+    ],
+    [
+     25.0,
+     "Sunshine Sauce"
+    ]
+   ],
+   "seconds": 22200,
+   "unlock": 1000000000000.0,
+   "value": 180000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "volcano_sauce",
+   "name": "Volcano Sauce",
+   "ipm": "Nuclear Reactor",
+   "inputs": [
+    [
+     1.0,
+     "Sweet Heat Reserve"
+    ],
+    [
+     300.0,
+     "Thai Chili Mash"
+    ]
+   ],
+   "seconds": 22800,
+   "unlock": 2000000000000.0,
+   "value": 1000000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "cocoa_loco",
+   "name": "Cocoa Loco",
+   "ipm": "Collider",
+   "inputs": [
+    [
+     500.0,
+     "Chocolate Habanero Mash"
+    ],
+    [
+     100.0,
+     "Ghost Mash"
+    ]
+   ],
+   "seconds": 23100,
+   "unlock": 3000000000000.0,
+   "value": 2000000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "black_hole",
+   "name": "Black Hole Sauce",
+   "ipm": "Gravity Chamber",
+   "inputs": [
+    [
+     60.0,
+     "Phantom Smokehouse"
+    ],
+    [
+     1.0,
+     "Volcano Sauce"
+    ]
+   ],
+   "seconds": 24300,
+   "unlock": 6000000000000.0,
+   "value": 15000000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "seven_pot_stew",
+   "name": "Seven Pot Stew",
+   "ipm": "Robot",
+   "inputs": [
+    [
+     300.0,
+     "Seven Pot Mash"
+    ],
+    [
+     90.0,
+     "Fatalii Fire"
+    ]
+   ],
+   "seconds": 26000,
+   "unlock": 15000000000000.0,
+   "value": 50000000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "naga_sunrise",
+   "name": "Naga Sunrise",
+   "ipm": "Fusion Capsule",
+   "inputs": [
+    [
+     200.0,
+     "Naga Mash"
+    ],
+    [
+     100.0,
+     "Moruga Mash"
+    ],
+    [
+     100.0,
+     "Sweet Heat Reserve"
+    ]
+   ],
+   "seconds": 27000,
+   "unlock": 75000000000000.0,
+   "value": 240000000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "ghost_town",
+   "name": "Ghost Town",
+   "ipm": "Teleporter",
+   "inputs": [
+    [
+     250.0,
+     "Cajun Red"
+    ],
+    [
+     1.0,
+     "Black Hole Sauce"
+    ]
+   ],
+   "seconds": 29000,
+   "unlock": 500000000000000.0,
+   "value": 1800000000000000.0,
+   "value_assumed": false
+  },
+  {
+   "id": "scorpion_sting",
+   "name": "Scorpion Sting",
+   "ipm": "Fusion Reactor",
+   "inputs": [
+    [
+     1.0,
+     "Naga Sunrise"
+    ],
+    [
+     40.0,
+     "Cocoa Loco"
+    ],
+    [
+     50.0,
+     "Volcano Sauce"
+    ]
+   ],
+   "seconds": 31000,
+   "unlock": 2500000000000000.0,
+   "value": 4e+16,
+   "value_assumed": false
+  },
+  {
+   "id": "hurricane_reserve",
+   "name": "Hurricane Reserve",
+   "ipm": "Subspace Relay",
+   "inputs": [
+    [
+     70.0,
+     "Tropical Storm"
+    ],
+    [
+     100.0,
+     "Island Heat"
+    ],
+    [
+     1.0,
+     "Ghost Town"
+    ]
+   ],
+   "seconds": 32300,
+   "unlock": 1.5e+16,
+   "value": 1e+18,
+   "value_assumed": false
+  },
+  {
+   "id": "widowmaker",
+   "name": "Widowmaker Reserve",
+   "ipm": "Advanced Robot",
+   "inputs": [
+    [
+     100.0,
+     "Seven Pot Stew"
+    ],
+    [
+     5.0,
+     "Scorpion Sting"
+    ]
+   ],
+   "seconds": 62300,
+   "unlock": 1.42e+17,
+   "value": 2.95e+19,
+   "value_assumed": false
+  },
+  {
+   "id": "lava_flow",
+   "name": "Lava Flow",
+   "ipm": "Advanced Teleporter",
+   "inputs": [
+    [
+     5.0,
+     "Hurricane Reserve"
+    ],
+    [
+     100.0,
+     "Ghost Town"
+    ],
+    [
+     1000.0,
+     "Lava Lantern Mash"
+    ]
+   ],
+   "seconds": 115200,
+   "unlock": 1.49e+18,
+   "value": 6.5e+20,
+   "value_assumed": false
+  },
+  {
+   "id": "solar_wind",
+   "name": "Solar Wind",
+   "ipm": "Quantum CPU",
+   "inputs": [
+    [
+     4.0,
+     "Widowmaker Reserve"
+    ],
+    [
+     500.0,
+     "Solar Flare Mash"
+    ]
+   ],
+   "seconds": 120000,
+   "unlock": 2e+19,
+   "value": 1.4e+22,
+   "value_assumed": false
+  },
+  {
+   "id": "crystal_clear",
+   "name": "Crystal Clear",
+   "ipm": "Deflector Shield",
+   "inputs": [
+    [
+     4.0,
+     "Lava Flow"
+    ],
+    [
+     400.0,
+     "Crystal Extract"
+    ]
+   ],
+   "seconds": 125000,
+   "unlock": 2.7e+20,
+   "value": 3.2e+23,
+   "value_assumed": false
+  },
+  {
+   "id": "hyperdrive",
+   "name": "Hyperdrive",
+   "ipm": "Warp Core",
+   "inputs": [
+    [
+     160.0,
+     "Jalapeño Ranch"
+    ],
+    [
+     40.0,
+     "Scorpion Sting"
+    ],
+    [
+     4.0,
+     "Solar Wind"
+    ]
+   ],
+   "seconds": 180000,
+   "unlock": 3.65e+21,
+   "value": 6.8e+24,
+   "value_assumed": false
+  },
+  {
+   "id": "cosmic_drizzle",
+   "name": "Cosmic Drizzle",
+   "ipm": "Deep Space Scanner",
+   "inputs": [
+    [
+     250.0,
+     "Mole Poblano"
+    ],
+    [
+     1000.0,
+     "Supernova Mash"
+    ],
+    [
+     4.0,
+     "Crystal Clear"
+    ]
+   ],
+   "seconds": 188000,
+   "unlock": 4.9299999999999995e+22,
+   "value": 1.45e+26,
+   "value_assumed": false
+  },
+  {
+   "id": "dark_star",
+   "name": "Dark Star",
+   "ipm": "Antimatter Cell",
+   "inputs": [
+    [
+     50.0,
+     "Volcano Sauce"
+    ],
+    [
+     10000.0,
+     "Bonnet Mash"
+    ],
+    [
+     4.0,
+     "Hyperdrive"
+    ]
+   ],
+   "seconds": 194000,
+   "unlock": 6.65e+23,
+   "value": 3.2e+27,
+   "value_assumed": false
+  },
+  {
+   "id": "stratosphere",
+   "name": "Stratosphere",
+   "ipm": "Atmospheric Processor",
+   "inputs": [
+    [
+     10000.0,
+     "Thai Chili Mash"
+    ],
+    [
+     4.0,
+     "Cosmic Drizzle"
+    ],
+    [
+     15.0,
+     "Solar Wind"
+    ]
+   ],
+   "seconds": 244000,
+   "unlock": 5e+26,
+   "value": 6.8e+28,
+   "value_assumed": false
+  },
+  {
+   "id": "brimstone_reserve",
+   "name": "Brimstone Reserve",
+   "ipm": "Orbital Dock",
+   "inputs": [
+    [
+     6000.0,
+     "Brimstone Mash"
+    ],
+    [
+     4.0,
+     "Dark Star"
+    ],
+    [
+     10.0,
+     "Hyperdrive"
+    ]
+   ],
+   "seconds": 399000,
+   "unlock": 1.0000000000000001e+29,
+   "value": 2.8e+30,
+   "value_assumed": false
+  },
+  {
+   "id": "supernova_glaze",
+   "name": "Supernova Glaze",
+   "ipm": "Solar Collector",
+   "inputs": [
+    [
+     1000.0,
+     "Sunshine Sauce"
+    ],
+    [
+     20.0,
+     "Crystal Clear"
+    ],
+    [
+     132.0,
+     "Cosmic Drizzle"
+    ]
+   ],
+   "seconds": 399000,
+   "unlock": 1.0000000000000001e+29,
+   "value": 2.8e+30,
+   "value_assumed": false
+  },
+  {
+   "id": "wormhole",
+   "name": "Wormhole",
+   "ipm": "Phase Gate",
+   "inputs": [
+    [
+     100.0,
+     "Cosmic Drizzle"
+    ],
+    [
+     350.0,
+     "Lava Flow"
+    ],
+    [
+     1.0,
+     "Brimstone Reserve"
+    ]
+   ],
+   "seconds": 699000,
+   "unlock": 5e+31,
+   "value": 4.5200000000000004e+32,
+   "value_assumed": false
+  },
+  {
+   "id": "mind_melt",
+   "name": "Mind Melt",
+   "ipm": "Neural Matrix",
+   "inputs": [
+    [
+     20.0,
+     "Dark Star"
+    ],
+    [
+     1.0,
+     "Supernova Glaze"
+    ],
+    [
+     16000.0,
+     "Fatalii Mash"
+    ]
+   ],
+   "seconds": 699000,
+   "unlock": 5e+31,
+   "value": 4.5200000000000004e+32,
+   "value_assumed": false
+  },
+  {
+   "id": "big_bang",
+   "name": "Big Bang",
+   "ipm": "Stellar Capacitor",
+   "inputs": [
+    [
+     9.0,
+     "Stratosphere"
+    ],
+    [
+     3.0,
+     "Wormhole"
+    ],
+    [
+     16800,
+     "Event Horizon Mash"
+    ]
+   ],
+   "seconds": 19976068,
+   "unlock": 8e+34,
+   "value": 5e+35,
+   "value_assumed": true
+  },
+  {
+   "id": "extinction_event",
+   "name": "Extinction Event",
+   "ipm": "Plasma Conduit",
+   "inputs": [
+    [
+     9.0,
+     "Stratosphere"
+    ],
+    [
+     3.0,
+     "Wormhole"
+    ],
+    [
+     16800,
+     "Heat Death Mash"
+    ]
+   ],
+   "seconds": 19976068,
+   "unlock": 8e+34,
+   "value": 5e+35,
+   "value_assumed": true
+  },
+  {
+   "id": "singularity",
+   "name": "Singularity",
+   "ipm": "Graviton Lance",
+   "inputs": [
+    [
+     9.0,
+     "Stratosphere"
+    ],
+    [
+     3.0,
+     "Mind Melt"
+    ],
+    [
+     16800,
+     "Event Horizon Mash"
+    ]
+   ],
+   "seconds": 19976068,
+   "unlock": 8e+34,
+   "value": 5e+35,
+   "value_assumed": true
+  },
+  {
+   "id": "last_drop",
+   "name": "The Last Drop",
+   "ipm": "System Regulator",
+   "inputs": [
+    [
+     9.0,
+     "Stratosphere"
+    ],
+    [
+     3.0,
+     "Mind Melt"
+    ],
+    [
+     16800,
+     "Heat Death Mash"
+    ]
+   ],
+   "seconds": 19976068,
+   "unlock": 8e+34,
+   "value": 5e+35,
+   "value_assumed": true
+  }
+ ],
+ "farms": [
+  {
+   "n": 1,
+   "name": "Bell Plot",
+   "price": 50.0,
+   "price_assumed": false,
+   "crops": {
+    "bell": 100
+   },
+   "distance": 10.0,
+   "distance_assumed": false,
+   "survey": 0,
+   "ipm": "Balor"
+  },
+  {
+   "n": 2,
+   "name": "Bell Farm",
+   "price": 200.0,
+   "price_assumed": false,
+   "crops": {
+    "bell": 80,
+    "pimento": 20
+   },
+   "distance": 12.0,
+   "distance_assumed": false,
+   "survey": 0,
+   "ipm": "Drasta"
+  },
+  {
+   "n": 3,
+   "name": "Bell Farm II",
+   "price": 500.0,
+   "price_assumed": false,
+   "crops": {
+    "bell": 50,
+    "pimento": 50
+   },
+   "distance": 14.0,
+   "distance_assumed": false,
+   "survey": 0,
+   "ipm": "Anadius"
+  },
+  {
+   "n": 4,
+   "name": "Pimento Farm",
+   "price": 1250.0,
+   "price_assumed": false,
+   "crops": {
+    "pimento": 80,
+    "poblano": 20
+   },
+   "distance": 15.0,
+   "distance_assumed": false,
+   "survey": 0,
+   "ipm": "Dholen"
+  },
+  {
+   "n": 5,
+   "name": "Poblano Farm",
+   "price": 5000.0,
+   "price_assumed": false,
+   "crops": {
+    "poblano": 50,
+    "pimento": 30,
+    "bell": 20
+   },
+   "distance": 16.0,
+   "distance_assumed": false,
+   "survey": 1,
+   "ipm": "Verr"
+  },
+  {
+   "n": 6,
+   "name": "Poblano Farm II",
+   "price": 9000.0,
+   "price_assumed": false,
+   "crops": {
+    "poblano": 100
+   },
+   "distance": 18.0,
+   "distance_assumed": false,
+   "survey": 1,
+   "ipm": "Newton"
+  },
+  {
+   "n": 7,
+   "name": "Pimento Farm II",
+   "price": 15000.0,
+   "price_assumed": false,
+   "crops": {
+    "pimento": 40,
+    "bell": 40,
+    "cascabel": 20
+   },
+   "distance": 20.0,
+   "distance_assumed": false,
+   "survey": 1,
+   "ipm": "Widow"
+  },
+  {
+   "n": 8,
+   "name": "Cascabel Farm",
+   "price": 25000.0,
+   "price_assumed": false,
+   "crops": {
+    "cascabel": 60,
+    "bell": 40
+   },
+   "distance": 22.0,
+   "distance_assumed": false,
+   "survey": 2,
+   "ipm": "Acheron"
+  },
+  {
+   "n": 9,
+   "name": "Cascabel Farm II",
+   "price": 40000.0,
+   "price_assumed": false,
+   "crops": {
+    "cascabel": 80,
+    "jalapeno": 20
+   },
+   "distance": 23.0,
+   "distance_assumed": false,
+   "survey": 2,
+   "ipm": "Yangtze"
+  },
+  {
+   "n": 10,
+   "name": "Jalapeño Farm",
+   "price": 75000.0,
+   "price_assumed": false,
+   "crops": {
+    "jalapeno": 50,
+    "cascabel": 30,
+    "poblano": 20
+   },
+   "distance": 25.0,
+   "distance_assumed": false,
+   "survey": 2,
+   "ipm": "Solveig"
+  },
+  {
+   "n": 11,
+   "name": "Jalapeño Farm II",
+   "price": 150000.0,
+   "price_assumed": false,
+   "crops": {
+    "jalapeno": 100
+   },
+   "distance": 26.0,
+   "distance_assumed": false,
+   "survey": 3,
+   "ipm": "Imir"
+  },
+  {
+   "n": 12,
+   "name": "Poblano Farm III",
+   "price": 250000.0,
+   "price_assumed": false,
+   "crops": {
+    "poblano": 45,
+    "cascabel": 35,
+    "hungarian_wax": 20
+   },
+   "distance": 28.0,
+   "distance_assumed": false,
+   "survey": 3,
+   "ipm": "Relic"
+  },
+  {
+   "n": 13,
+   "name": "Hungarian Wax Farm",
+   "price": 400000.0,
+   "price_assumed": false,
+   "crops": {
+    "hungarian_wax": 80,
+    "jalapeno": 20
+   },
+   "distance": 30.0,
+   "distance_assumed": false,
+   "survey": 3,
+   "ipm": "Nith"
+  },
+  {
+   "n": 14,
+   "name": "Bell Farm III",
+   "price": 800000.0,
+   "price_assumed": false,
+   "crops": {
+    "bell": 40,
+    "pimento": 40,
+    "serrano": 20
+   },
+   "distance": 33.0,
+   "distance_assumed": false,
+   "survey": 4,
+   "ipm": "Batalla"
+  },
+  {
+   "n": 15,
+   "name": "Serrano Farm",
+   "price": 1500000.0,
+   "price_assumed": false,
+   "crops": {
+    "serrano": 50,
+    "hungarian_wax": 50
+   },
+   "distance": 35.0,
+   "distance_assumed": false,
+   "survey": 4,
+   "ipm": "Micah"
+  },
+  {
+   "n": 16,
+   "name": "Serrano Farm II",
+   "price": 3000000.0,
+   "price_assumed": false,
+   "crops": {
+    "serrano": 100
+   },
+   "distance": 37.0,
+   "distance_assumed": false,
+   "survey": 4,
+   "ipm": "Pranas"
+  },
+  {
+   "n": 17,
+   "name": "Jalapeño Farm III",
+   "price": 6000000.0,
+   "price_assumed": false,
+   "crops": {
+    "jalapeno": 40,
+    "cascabel": 35,
+    "arbol": 25
+   },
+   "distance": 40.0,
+   "distance_assumed": false,
+   "survey": 5,
+   "ipm": "Castellus"
+  },
+  {
+   "n": 18,
+   "name": "Árbol Farm",
+   "price": 12000000.0,
+   "price_assumed": false,
+   "crops": {
+    "arbol": 80,
+    "poblano": 20
+   },
+   "distance": 43.0,
+   "distance_assumed": false,
+   "survey": 5,
+   "ipm": "Gorgon"
+  },
+  {
+   "n": 19,
+   "name": "Serrano Farm III",
+   "price": 25000000.0,
+   "price_assumed": false,
+   "crops": {
+    "serrano": 70,
+    "cayenne": 30
+   },
+   "distance": 45.0,
+   "distance_assumed": false,
+   "survey": 5,
+   "ipm": "Parnitha"
+  },
+  {
+   "n": 20,
+   "name": "Cayenne Farm",
+   "price": 50000000.0,
+   "price_assumed": false,
+   "crops": {
+    "cayenne": 70,
+    "arbol": 30
+   },
+   "distance": 48.0,
+   "distance_assumed": false,
+   "survey": 6,
+   "ipm": "Orisoni"
+  },
+  {
+   "n": 21,
+   "name": "Cayenne Farm II",
+   "price": 100000000.0,
+   "price_assumed": false,
+   "crops": {
+    "cayenne": 100
+   },
+   "distance": 51.0,
+   "distance_assumed": false,
+   "survey": 6,
+   "ipm": "Theseus"
+  },
+  {
+   "n": 22,
+   "name": "Hungarian Wax Farm II",
+   "price": 200000000.0,
+   "price_assumed": false,
+   "crops": {
+    "hungarian_wax": 70,
+    "pequin": 30
+   },
+   "distance": 54.0,
+   "distance_assumed": false,
+   "survey": 6,
+   "ipm": "Zelene"
+  },
+  {
+   "n": 23,
+   "name": "Pequin Farm",
+   "price": 400000000.0,
+   "price_assumed": false,
+   "crops": {
+    "pequin": 70,
+    "arbol": 20,
+    "serrano": 10
+   },
+   "distance": 57.0,
+   "distance_assumed": false,
+   "survey": 7,
+   "ipm": "Han"
+  },
+  {
+   "n": 24,
+   "name": "Pequin Farm II",
+   "price": 800000000.0,
+   "price_assumed": false,
+   "crops": {
+    "pequin": 70,
+    "cayenne": 30
+   },
+   "distance": 58.0,
+   "distance_assumed": false,
+   "survey": 7,
+   "ipm": "Strennus"
+  },
+  {
+   "n": 25,
+   "name": "Jalapeño Farm IV",
+   "price": 1600000000.0,
+   "price_assumed": false,
+   "crops": {
+    "jalapeno": 60,
+    "thai_chili": 40
+   },
+   "distance": 60.0,
+   "distance_assumed": false,
+   "survey": 7,
+   "ipm": "Osun"
+  },
+  {
+   "n": 26,
+   "name": "Thai Chili Farm",
+   "price": 3200000000.0,
+   "price_assumed": false,
+   "crops": {
+    "thai_chili": 50,
+    "arbol": 50
+   },
+   "distance": 63.0,
+   "distance_assumed": false,
+   "survey": 8,
+   "ipm": "Ploitari"
+  },
+  {
+   "n": 27,
+   "name": "Thai Chili Farm II",
+   "price": 6400000000.0,
+   "price_assumed": false,
+   "crops": {
+    "thai_chili": 100
+   },
+   "distance": 67.0,
+   "distance_assumed": false,
+   "survey": 8,
+   "ipm": "Elysta"
+  },
+  {
+   "n": 28,
+   "name": "Thai Chili Farm III",
+   "price": 12500000000.0,
+   "price_assumed": false,
+   "crops": {
+    "thai_chili": 40,
+    "pequin": 35,
+    "bonnet": 25
+   },
+   "distance": 70.0,
+   "distance_assumed": false,
+   "survey": 8,
+   "ipm": "Tikkun"
+  },
+  {
+   "n": 29,
+   "name": "Bonnet Farm",
+   "price": 25000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "bonnet": 60,
+    "pequin": 40
+   },
+   "distance": 72.0,
+   "distance_assumed": false,
+   "survey": 9,
+   "ipm": "Satent"
+  },
+  {
+   "n": 30,
+   "name": "Bonnet Farm II",
+   "price": 50000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "bonnet": 90,
+    "arbol": 10
+   },
+   "distance": 73.0,
+   "distance_assumed": false,
+   "survey": 9,
+   "ipm": "Urla Rast"
+  },
+  {
+   "n": 31,
+   "name": "Bonnet Farm III",
+   "price": 100000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "bonnet": 70,
+    "fatalii": 30
+   },
+   "distance": 75.0,
+   "distance_assumed": false,
+   "survey": 9,
+   "ipm": "Vular"
+  },
+  {
+   "n": 32,
+   "name": "Fatalii Farm",
+   "price": 250000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "fatalii": 60,
+    "thai_chili": 40
+   },
+   "distance": 76.0,
+   "distance_assumed": false,
+   "survey": 10,
+   "ipm": "Nibiru"
+  },
+  {
+   "n": 33,
+   "name": "Fatalii Farm II",
+   "price": 600000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "fatalii": 100
+   },
+   "distance": 78.0,
+   "distance_assumed": false,
+   "survey": 10,
+   "ipm": "Xena"
+  },
+  {
+   "n": 34,
+   "name": "Bonnet Farm IV",
+   "price": 1500000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "bonnet": 55,
+    "fatalii": 30,
+    "caribbean_red": 15
+   },
+   "distance": 78.0,
+   "distance_assumed": false,
+   "survey": 10,
+   "ipm": "Rupert"
+  },
+  {
+   "n": 35,
+   "name": "Caribbean Red Farm",
+   "price": 4000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "caribbean_red": 50,
+    "cayenne": 50
+   },
+   "distance": 80.0,
+   "distance_assumed": false,
+   "survey": 11,
+   "ipm": "Pax"
+  },
+  {
+   "n": 36,
+   "name": "Caribbean Red Farm II",
+   "price": 10000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "caribbean_red": 100
+   },
+   "distance": 81.0,
+   "distance_assumed": false,
+   "survey": 11,
+   "ipm": "Ivyra"
+  },
+  {
+   "n": 37,
+   "name": "Caribbean Red Farm III",
+   "price": 25000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "caribbean_red": 75,
+    "chocolate": 25
+   },
+   "distance": 82.0,
+   "distance_assumed": false,
+   "survey": 11,
+   "ipm": "Utritis"
+  },
+  {
+   "n": 38,
+   "name": "Chocolate Farm",
+   "price": 62000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "chocolate": 50,
+    "fatalii": 50
+   },
+   "distance": 84.0,
+   "distance_assumed": false,
+   "survey": 12,
+   "ipm": "Dosie"
+  },
+  {
+   "n": 39,
+   "name": "Chocolate Farm II",
+   "price": 160000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "chocolate": 100
+   },
+   "distance": 84.0,
+   "distance_assumed": false,
+   "survey": 12,
+   "ipm": "Zulu"
+  },
+  {
+   "n": 40,
+   "name": "Chocolate Farm III",
+   "price": 400000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "chocolate": 80,
+    "ghost": 20
+   },
+   "distance": 85.0,
+   "distance_assumed": false,
+   "survey": 12,
+   "ipm": "Unicae"
+  },
+  {
+   "n": 41,
+   "name": "Fatalii Farm III",
+   "price": 1000000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "fatalii": 60,
+    "ghost": 40
+   },
+   "distance": 87.0,
+   "distance_assumed": false,
+   "survey": 13,
+   "ipm": "Dune"
+  },
+  {
+   "n": 42,
+   "name": "Ghost Farm",
+   "price": 2500000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "ghost": 100
+   },
+   "distance": 88.0,
+   "distance_assumed": false,
+   "survey": 13,
+   "ipm": "Naraka"
+  },
+  {
+   "n": 43,
+   "name": "Ghost Farm II",
+   "price": 6200000000000000.0,
+   "price_assumed": false,
+   "crops": {
+    "ghost": 60,
+    "chocolate": 25,
+    "seven_pot": 15
+   },
+   "distance": 89.0,
+   "distance_assumed": false,
+   "survey": 13,
+   "ipm": "Daedalus"
+  },
+  {
+   "n": 44,
+   "name": "7 Pot Farm",
+   "price": 1.5e+16,
+   "price_assumed": false,
+   "crops": {
+    "seven_pot": 50,
+    "ghost": 50
+   },
+   "distance": 91.0,
+   "distance_assumed": false,
+   "survey": 14,
+   "ipm": "Clovis"
+  },
+  {
+   "n": 45,
+   "name": "7 Pot Farm II",
+   "price": 4e+16,
+   "price_assumed": false,
+   "crops": {
+    "seven_pot": 100
+   },
+   "distance": 92.0,
+   "distance_assumed": false,
+   "survey": 14,
+   "ipm": "Zero"
+  },
+  {
+   "n": 46,
+   "name": "7 Pot Farm III",
+   "price": 1e+17,
+   "price_assumed": false,
+   "crops": {
+    "seven_pot": 75,
+    "naga": 25
+   },
+   "distance": 92.0,
+   "distance_assumed": false,
+   "survey": 14,
+   "ipm": "Sotomi"
+  },
+  {
+   "n": 47,
+   "name": "Naga Farm",
+   "price": 2.5e+17,
+   "price_assumed": false,
+   "crops": {
+    "naga": 60,
+    "ghost": 40
+   },
+   "distance": 93.0,
+   "distance_assumed": false,
+   "survey": 15,
+   "ipm": "Remidian"
+  },
+  {
+   "n": 48,
+   "name": "Naga Farm II",
+   "price": 6e+17,
+   "price_assumed": false,
+   "crops": {
+    "naga": 100
+   },
+   "distance": 95.0,
+   "distance_assumed": false,
+   "survey": 15,
+   "ipm": "Muse"
+  },
+  {
+   "n": 49,
+   "name": "Naga Farm III",
+   "price": 1.5e+18,
+   "price_assumed": false,
+   "crops": {
+    "naga": 50,
+    "moruga": 50
+   },
+   "distance": 97.0,
+   "distance_assumed": false,
+   "survey": 15,
+   "ipm": "Arabis"
+  },
+  {
+   "n": 50,
+   "name": "Moruga Farm",
+   "price": 3.8e+18,
+   "price_assumed": false,
+   "crops": {
+    "moruga": 60,
+    "seven_pot": 40
+   },
+   "distance": 100.0,
+   "distance_assumed": false,
+   "survey": 16,
+   "ipm": "Vesna"
+  },
+  {
+   "n": 51,
+   "name": "Moruga Farm II",
+   "price": 1e+19,
+   "price_assumed": false,
+   "crops": {
+    "moruga": 100
+   },
+   "distance": 102.0,
+   "distance_assumed": false,
+   "survey": 16,
+   "ipm": "Chandra"
+  },
+  {
+   "n": 52,
+   "name": "Moruga Farm III",
+   "price": 2.5e+19,
+   "price_assumed": false,
+   "crops": {
+    "moruga": 70,
+    "grim": 20,
+    "caribbean_red": 10
+   },
+   "distance": 103.0,
+   "distance_assumed": false,
+   "survey": 16,
+   "ipm": "Vega"
+  },
+  {
+   "n": 53,
+   "name": "Grim Farm",
+   "price": 6e+19,
+   "price_assumed": false,
+   "crops": {
+    "grim": 50,
+    "seven_pot": 50
+   },
+   "distance": 105.0,
+   "distance_assumed": false,
+   "survey": 17,
+   "ipm": "Crius"
+  },
+  {
+   "n": 54,
+   "name": "Grim Farm II",
+   "price": 1.5e+20,
+   "price_assumed": false,
+   "crops": {
+    "grim": 100
+   },
+   "distance": 107.0,
+   "distance_assumed": false,
+   "survey": 17,
+   "ipm": "Singhana"
+  },
+  {
+   "n": 55,
+   "name": "Grim Farm III",
+   "price": 3.6e+20,
+   "price_assumed": false,
+   "crops": {
+    "grim": 70,
+    "moruga": 20,
+    "pepper_y": 10
+   },
+   "distance": 108.0,
+   "distance_assumed": false,
+   "survey": 17,
+   "ipm": "Zumbia"
+  },
+  {
+   "n": 56,
+   "name": "Pepper Y Farm",
+   "price": 9e+20,
+   "price_assumed": false,
+   "crops": {
+    "pepper_y": 60,
+    "naga": 40
+   },
+   "distance": 109.0,
+   "distance_assumed": false,
+   "survey": 18,
+   "ipm": "Elysium"
+  },
+  {
+   "n": 57,
+   "name": "Pepper Y Farm II",
+   "price": 2.6e+21,
+   "price_assumed": false,
+   "crops": {
+    "pepper_y": 100
+   },
+   "distance": 110.0,
+   "distance_assumed": false,
+   "survey": 18,
+   "ipm": "Nyota"
+  },
+  {
+   "n": 58,
+   "name": "Pepper Y Farm III",
+   "price": 7.5e+21,
+   "price_assumed": false,
+   "crops": {
+    "pepper_y": 40,
+    "grim": 40,
+    "lava_lantern": 20
+   },
+   "distance": 112.0,
+   "distance_assumed": false,
+   "survey": 18,
+   "ipm": "Doral"
+  },
+  {
+   "n": 59,
+   "name": "Lava Lantern Farm",
+   "price": 2.1e+22,
+   "price_assumed": false,
+   "crops": {
+    "lava_lantern": 70,
+    "moruga": 30
+   },
+   "distance": 114.0,
+   "distance_assumed": false,
+   "survey": 19,
+   "ipm": "Nikara"
+  },
+  {
+   "n": 60,
+   "name": "Lava Lantern Farm II",
+   "price": 5.9e+22,
+   "price_assumed": false,
+   "crops": {
+    "lava_lantern": 100
+   },
+   "distance": 115.0,
+   "distance_assumed": false,
+   "survey": 19,
+   "ipm": "Limbo"
+  },
+  {
+   "n": 61,
+   "name": "Lava Lantern Farm III",
+   "price": 1.7e+23,
+   "price_assumed": false,
+   "crops": {
+    "lava_lantern": 70,
+    "solar_flare": 30
+   },
+   "distance": 116.0,
+   "distance_assumed": false,
+   "survey": 19,
+   "ipm": "Bob"
+  },
+  {
+   "n": 62,
+   "name": "Solar Flare Farm",
+   "price": 4.6e+23,
+   "price_assumed": false,
+   "crops": {
+    "solar_flare": 55,
+    "grim": 45
+   },
+   "distance": 118.0,
+   "distance_assumed": false,
+   "survey": 20,
+   "ipm": "Midas"
+  },
+  {
+   "n": 63,
+   "name": "Solar Flare Farm II",
+   "price": 1.3e+24,
+   "price_assumed": false,
+   "crops": {
+    "solar_flare": 100
+   },
+   "distance": 120.0,
+   "distance_assumed": false,
+   "survey": 20,
+   "ipm": "Antigone"
+  },
+  {
+   "n": 64,
+   "name": "Solar Flare Farm III",
+   "price": 3.9e+24,
+   "price_assumed": false,
+   "crops": {
+    "solar_flare": 50,
+    "lava_lantern": 25,
+    "capsaicin_crystal": 25
+   },
+   "distance": 122.0,
+   "distance_assumed": false,
+   "survey": 20,
+   "ipm": "Hecate"
+  },
+  {
+   "n": 65,
+   "name": "Crystal Farm",
+   "price": 1.1e+25,
+   "price_assumed": false,
+   "crops": {
+    "capsaicin_crystal": 60,
+    "solar_flare": 20,
+    "pepper_y": 17
+   },
+   "distance": 124.0,
+   "distance_assumed": false,
+   "survey": 21,
+   "ipm": "Sterop"
+  },
+  {
+   "n": 66,
+   "name": "Crystal Farm II",
+   "price": 3.3e+25,
+   "price_assumed": false,
+   "crops": {
+    "capsaicin_crystal": 100
+   },
+   "distance": 125.0,
+   "distance_assumed": false,
+   "survey": 21,
+   "ipm": "Lavinia"
+  },
+  {
+   "n": 67,
+   "name": "Crystal Farm III",
+   "price": 9.5e+25,
+   "price_assumed": false,
+   "crops": {
+    "capsaicin_crystal": 70,
+    "solar_flare": 20,
+    "brimstone": 10
+   },
+   "distance": 127.0,
+   "distance_assumed": false,
+   "survey": 21,
+   "ipm": "Ren"
+  },
+  {
+   "n": 68,
+   "name": "Brimstone Farm",
+   "price": 2.7e+26,
+   "price_assumed": false,
+   "crops": {
+    "brimstone": 60,
+    "lava_lantern": 40
+   },
+   "distance": 129.0,
+   "distance_assumed": false,
+   "survey": 22,
+   "ipm": "Gorgons"
+  },
+  {
+   "n": 69,
+   "name": "Brimstone Farm II",
+   "price": 8e+26,
+   "price_assumed": false,
+   "crops": {
+    "brimstone": 80,
+    "capsaicin_crystal": 20
+   },
+   "distance": 131.0,
+   "distance_assumed": false,
+   "survey": 22,
+   "ipm": "Pontus"
+  },
+  {
+   "n": 70,
+   "name": "Brimstone Farm III",
+   "price": 2.4e+27,
+   "price_assumed": false,
+   "crops": {
+    "brimstone": 100
+   },
+   "distance": 134.0,
+   "distance_assumed": false,
+   "survey": 22,
+   "ipm": "Leto"
+  },
+  {
+   "n": 71,
+   "name": "Brimstone Farm IV",
+   "price": 6.92e+27,
+   "price_assumed": false,
+   "crops": {
+    "brimstone": 40,
+    "capsaicin_crystal": 40,
+    "supernova": 20
+   },
+   "distance": 136.0,
+   "distance_assumed": true,
+   "survey": 23,
+   "ipm": "Laconia"
+  },
+  {
+   "n": 72,
+   "name": "Supernova Farm",
+   "price": 2.08e+28,
+   "price_assumed": false,
+   "crops": {
+    "supernova": 70,
+    "solar_flare": 30
+   },
+   "distance": 138.0,
+   "distance_assumed": true,
+   "survey": 23,
+   "ipm": "Awohali"
+  },
+  {
+   "n": 73,
+   "name": "Supernova Farm II",
+   "price": 6.229999999999999e+28,
+   "price_assumed": false,
+   "crops": {
+    "supernova": 100
+   },
+   "distance": 140.0,
+   "distance_assumed": true,
+   "survey": 23,
+   "ipm": "Pegasi"
+  },
+  {
+   "n": 74,
+   "name": "Supernova Farm III",
+   "price": 1.78e+29,
+   "price_assumed": false,
+   "crops": {
+    "supernova": 60,
+    "event_horizon": 40
+   },
+   "distance": 142.0,
+   "distance_assumed": true,
+   "survey": 24,
+   "ipm": "Typhon"
+  },
+  {
+   "n": 75,
+   "name": "Event Horizon Farm",
+   "price": 5.16e+29,
+   "price_assumed": false,
+   "crops": {
+    "event_horizon": 70,
+    "brimstone": 30
+   },
+   "distance": 144.0,
+   "distance_assumed": true,
+   "survey": 24,
+   "ipm": "Surtur"
+  },
+  {
+   "n": 76,
+   "name": "Event Horizon Farm II",
+   "price": 1.81e+30,
+   "price_assumed": false,
+   "crops": {
+    "event_horizon": 100
+   },
+   "distance": 146.0,
+   "distance_assumed": true,
+   "survey": 24,
+   "ipm": "Vesta"
+  },
+  {
+   "n": 77,
+   "name": "Event Horizon Farm III",
+   "price": 5.43e+30,
+   "price_assumed": true,
+   "crops": {
+    "event_horizon": 70,
+    "heat_death": 30
+   },
+   "distance": 148.0,
+   "distance_assumed": true,
+   "survey": 25,
+   "ipm": "Jolrael"
+  },
+  {
+   "n": 78,
+   "name": "Heat Death Farm",
+   "price": 1.629e+31,
+   "price_assumed": true,
+   "crops": {
+    "heat_death": 70,
+    "event_horizon": 30
+   },
+   "distance": 150.0,
+   "distance_assumed": true,
+   "survey": 25,
+   "ipm": "Hyperion"
+  },
+  {
+   "n": 79,
+   "name": "Heat Death Farm II",
+   "price": 4.887e+31,
+   "price_assumed": true,
+   "crops": {
+    "heat_death": 100
+   },
+   "distance": 152.0,
+   "distance_assumed": true,
+   "survey": 25,
+   "ipm": "Astrea"
+  }
+ ],
+ "surveys": [
+  {
+   "n": 1,
+   "cost": [
+    [
+     1500.0,
+     "Pimento"
+    ],
+    [
+     5.0,
+     "Bell Pepper Purée"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 2,
+   "cost": [
+    [
+     10.0,
+     "Ancho Mash"
+    ],
+    [
+     500.0,
+     "Cascabel"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 3,
+   "cost": [
+    [
+     10.0,
+     "Pimento Spread"
+    ],
+    [
+     15.0,
+     "Cascabel Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 4,
+   "cost": [
+    [
+     5.0,
+     "Smoky Ancho"
+    ],
+    [
+     20.0,
+     "Verde Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 5,
+   "cost": [
+    [
+     3.0,
+     "Bistro Verde"
+    ],
+    [
+     10.0,
+     "Serrano Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 6,
+   "cost": [
+    [
+     3.0,
+     "Serrano Fire"
+    ],
+    [
+     25.0,
+     "Sofrito Base"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 7,
+   "cost": [
+    [
+     3.0,
+     "Sunshine Sauce"
+    ],
+    [
+     20.0,
+     "Cayenne Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 8,
+   "cost": [
+    [
+     3.0,
+     "Pineapple Picante"
+    ],
+    [
+     10.0,
+     "Pequin Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 9,
+   "cost": [
+    [
+     3.0,
+     "Mole Poblano"
+    ],
+    [
+     10.0,
+     "Thai Chili Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 10,
+   "cost": [
+    [
+     3.0,
+     "Classic Louisiana"
+    ],
+    [
+     10.0,
+     "Bonnet Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 11,
+   "cost": [
+    [
+     3.0,
+     "Phantom Smokehouse"
+    ],
+    [
+     10.0,
+     "Fatalii Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 12,
+   "cost": [
+    [
+     3.0,
+     "Cajun Red"
+    ],
+    [
+     10.0,
+     "Caribbean Red Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 13,
+   "cost": [
+    [
+     3.0,
+     "Pitmaster BBQ"
+    ],
+    [
+     10.0,
+     "Chocolate Habanero Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 14,
+   "cost": [
+    [
+     3.0,
+     "Island Heat"
+    ],
+    [
+     10.0,
+     "Ghost Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 15,
+   "cost": [
+    [
+     5.0,
+     "Ranchero"
+    ],
+    [
+     10.0,
+     "Seven Pot Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 16,
+   "cost": [
+    [
+     3.0,
+     "Fatalii Fire"
+    ],
+    [
+     10.0,
+     "Naga Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 17,
+   "cost": [
+    [
+     3.0,
+     "Sweet Heat Reserve"
+    ],
+    [
+     10.0,
+     "Moruga Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 18,
+   "cost": [
+    [
+     4.0,
+     "Jalapeño Ranch"
+    ],
+    [
+     10.0,
+     "Grim Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 19,
+   "cost": [
+    [
+     4.0,
+     "Volcano Sauce"
+    ],
+    [
+     12.0,
+     "Pepper Y Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 20,
+   "cost": [
+    [
+     5.0,
+     "Cocoa Loco"
+    ],
+    [
+     15.0,
+     "Lava Lantern Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 21,
+   "cost": [
+    [
+     5.0,
+     "Black Hole Sauce"
+    ],
+    [
+     20.0,
+     "Solar Flare Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 22,
+   "cost": [
+    [
+     6.0,
+     "Seven Pot Stew"
+    ],
+    [
+     24.0,
+     "Crystal Extract"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 23,
+   "cost": [
+    [
+     6.0,
+     "Naga Sunrise"
+    ],
+    [
+     30.0,
+     "Brimstone Mash"
+    ]
+   ],
+   "assumed": false
+  },
+  {
+   "n": 24,
+   "cost": [
+    [
+     7.0,
+     "Ghost Town"
+    ],
+    [
+     36.0,
+     "Supernova Mash"
+    ]
+   ],
+   "assumed": true
+  },
+  {
+   "n": 25,
+   "cost": [
+    [
+     7.0,
+     "Scorpion Sting"
+    ],
+    [
+     42.0,
+     "Event Horizon Mash"
+    ]
+   ],
+   "assumed": true
+  }
+ ],
+ "ingredients": [
+  {
+   "id": "vinegar",
+   "name": "White Vinegar",
+   "station": "Vinegar Cask",
+   "value": 2.0,
+   "survey": 1,
+   "mash": {
+    "id": "pickled_brine",
+    "name": "Pickled Brine",
+    "inputs": [
+     [
+      1000,
+      "White Vinegar"
+     ]
+    ],
+    "seconds": 30,
+    "unlock": 3000.0,
+    "value": 3000.0
+   }
+  },
+  {
+   "id": "garlic",
+   "name": "Garlic",
+   "station": "Garlic Plot",
+   "value": 17.0,
+   "survey": 3,
+   "mash": {
+    "id": "garlic_paste",
+    "name": "Roasted Garlic Paste",
+    "inputs": [
+     [
+      1000,
+      "Garlic"
+     ]
+    ],
+    "seconds": 80,
+    "unlock": 75000.0,
+    "value": 27600.0
+   }
+  },
+  {
+   "id": "pineapple",
+   "name": "Pineapple",
+   "station": "Pineapple Grove",
+   "value": 75.0,
+   "survey": 4,
+   "mash": {
+    "id": "glaze",
+    "name": "Charred Pineapple Glaze",
+    "inputs": [
+     [
+      1000,
+      "Pineapple"
+     ]
+    ],
+    "seconds": 180,
+    "unlock": 500000.0,
+    "value": 120000.0
+   }
+  },
+  {
+   "id": "oak",
+   "name": "Smoked Oak",
+   "station": "Oak Smokehouse",
+   "value": 730.0,
+   "survey": 6,
+   "mash": {
+    "id": "liquid_smoke",
+    "name": "Liquid Smoke",
+    "inputs": [
+     [
+      1000,
+      "Smoked Oak"
+     ]
+    ],
+    "seconds": 720,
+    "unlock": 8000000.0,
+    "value": 990000.0
+   }
+  }
+ ],
+ "projects": [
+  {
+   "node": "Hydroponic Bell Peppers",
+   "ipm": "Advanced Mining",
+   "cost": [
+    [
+     5.0,
+     "Garden Hot Sauce"
+    ],
+    [
+     20.0,
+     "Verde Mash"
+    ]
+   ],
+   "needs": "Kitchen Table (IPM's Rover, left out)",
+   "effect": "every farm harvests ×1.25"
+  },
+  {
+   "node": "Hydroponic Jalapeños",
+   "ipm": "Superior Mining",
+   "cost": [
+    [
+     10.0,
+     "Pineapple Picante"
+    ],
+    [
+     25.0,
+     "Cayenne Mash"
+    ]
+   ],
+   "needs": "Truck Tune-Up OR Bigger Crates",
+   "effect": "every farm harvests ×1.25 more (the wiki says it may only add to ×1.2: assumed ×1.25 multiplied)"
+  },
+  {
+   "node": "Truck Tune-Up",
+   "ipm": "Advanced Thrusters",
+   "cost": [
+    [
+     2.0,
+     "Cascabel Salsa"
+    ],
+    [
+     10.0,
+     "Serrano Mash"
+    ]
+   ],
+   "needs": "Hydroponic Bell Peppers",
+   "effect": "trucks ×1.25 faster"
+  },
+  {
+   "node": "Highway Route",
+   "ipm": "Superior Thrusters",
+   "cost": [
+    [
+     4.0,
+     "Mole Poblano"
+    ]
+   ],
+   "needs": "Hydroponic Jalapeños",
+   "effect": "trucks ×1.25 faster again"
+  },
+  {
+   "node": "Bigger Crates",
+   "ipm": "Advanced Cargo Handling",
+   "cost": [
+    [
+     5.0,
+     "Smoky Ancho"
+    ],
+    [
+     25.0,
+     "Hungarian Wax Mash"
+    ]
+   ],
+   "needs": "Hydroponic Bell Peppers",
+   "effect": "truck cargo ×1.25"
+  },
+  {
+   "node": "Pallet Racking",
+   "ipm": "Superior Cargo Handling",
+   "cost": [
+    [
+     50.0,
+     "Pequin Mash"
+    ]
+   ],
+   "needs": "Hydroponic Jalapeños",
+   "effect": "truck cargo ×1.25 again"
+  },
+  {
+   "node": "Crop Priority",
+   "ipm": "Cargo Logistics",
+   "cost": [
+    [
+     10.0,
+     "Verde Mash"
+    ],
+    [
+     3.0,
+     "Bistro Verde"
+    ]
+   ],
+   "needs": "Land Survey 4",
+   "effect": "choose which crop a farm's truck takes first"
+  },
+  {
+   "node": "Targeted Fertiliser",
+   "ipm": "Ore Targeting",
+   "cost": [
+    [
+     100.0,
+     "Smoky Ancho"
+    ],
+    [
+     50.0,
+     "Garden Hot Sauce"
+    ]
+   ],
+   "needs": "Crop Priority",
+   "effect": "a farm's priority crop +15%"
+  },
+  {
+   "node": "Precision Fertiliser",
+   "ipm": "Advanced Ore Targeting",
+   "cost": [
+    [
+     100.0,
+     "Salsa Verde Reserve"
+    ],
+    [
+     15.0,
+     "Classic Louisiana"
+    ]
+   ],
+   "needs": "Targeted Fertiliser",
+   "effect": "+30% instead (not added to the 15%)"
+  },
+  {
+   "node": "Crossbreed I",
+   "ipm": "Alchemy",
+   "cost": [
+    [
+     50.0,
+     "Serrano Mash"
+    ],
+    [
+     6.0,
+     "Garlic Gold"
+    ]
+   ],
+   "needs": "Land Survey 4",
+   "effect": "one farm's crop becomes the next rung up (you pick the farm)"
+  },
+  {
+   "node": "Crossbreed II",
+   "ipm": "Advanced Alchemy",
+   "cost": [
+    [
+     50000.0,
+     "Hungarian Wax"
+    ],
+    [
+     25000.0,
+     "Pequin"
+    ],
+    [
+     6.0,
+     "Salsa Verde Reserve"
+    ]
+   ],
+   "needs": "Crossbreed I",
+   "effect": "two rungs up, a farm not already crossbred"
+  },
+  {
+   "node": "Crossbreed III",
+   "ipm": "Superior Alchemy",
+   "cost": [
+    [
+     400.0,
+     "Bonnet Mash"
+    ],
+    [
+     200.0,
+     "Fatalii Mash"
+    ],
+    [
+     5.0,
+     "Phantom Smokehouse"
+    ]
+   ],
+   "needs": "Crossbreed II",
+   "effect": "three rungs up"
+  },
+  {
+   "node": "Hotter Burners",
+   "ipm": "Advanced Furnace",
+   "cost": [
+    [
+     3.0,
+     "Cascabel Salsa"
+    ],
+    [
+     10.0,
+     "Verde Mash"
+    ]
+   ],
+   "needs": "Kitchen Table (IPM's Smelter: our first vat is the kitchen's)",
+   "effect": "vats ×1.2 faster"
+  },
+  {
+   "node": "Steam Jackets",
+   "ipm": "Superior Furnace",
+   "cost": [
+    [
+     5.0,
+     "Thai Chili Mash"
+    ],
+    [
+     20.0,
+     "Pequin Mash"
+    ],
+    [
+     50.0,
+     "Cayenne Mash"
+    ]
+   ],
+   "needs": "Zero-Waste Piping I OR Slow Roasting",
+   "effect": "vats ×1.2 faster again"
+  },
+  {
+   "node": "Zero-Waste Piping I",
+   "ipm": "Smelting Efficiency",
+   "cost": [
+    [
+     200.0,
+     "Sofrito Base"
+    ]
+   ],
+   "needs": "Hotter Burners",
+   "effect": "vat recipes take 20% fewer inputs"
+  },
+  {
+   "node": "Slow Roasting",
+   "ipm": "Advanced Alloy Value",
+   "cost": [
+    [
+     3.0,
+     "Bistro Verde"
+    ],
+    [
+     10.0,
+     "Hungarian Wax Mash"
+    ]
+   ],
+   "needs": "Hotter Burners",
+   "effect": "mashes worth ×1.2"
+  },
+  {
+   "node": "Wood-Fired Roasting",
+   "ipm": "Superior Alloy Value",
+   "cost": [
+    [
+     250000.0,
+     "Chile de Árbol"
+    ],
+    [
+     30.0,
+     "Serrano Fire"
+    ]
+   ],
+   "needs": "Slow Roasting",
+   "effect": "mashes worth ×1.2 again"
+  },
+  {
+   "node": "Double Batch",
+   "ipm": "Smelting Specialist",
+   "cost": [
+    [
+     5.0,
+     "Salsa Verde Reserve"
+    ],
+    [
+     2.0,
+     "Mole Poblano"
+    ]
+   ],
+   "needs": "Slow Roasting",
+   "effect": "10% chance a vat makes two"
+  },
+  {
+   "node": "Faster Cappers",
+   "ipm": "Advanced Crafter",
+   "cost": [
+    [
+     5.0,
+     "Garlic Gold"
+    ],
+    [
+     50.0,
+     "Serrano Mash"
+    ]
+   ],
+   "needs": "Kitchen Table (IPM's Crafter: our first line)",
+   "effect": "lines ×1.2 faster"
+  },
+  {
+   "node": "Rotary Filler",
+   "ipm": "Superior Crafting",
+   "cost": [
+    [
+     2.0,
+     "Classic Louisiana"
+    ],
+    [
+     10.0,
+     "Mole Poblano"
+    ],
+    [
+     20.0,
+     "Pineapple Picante"
+    ]
+   ],
+   "needs": "Zero-Waste Piping II OR Heavy Flint Glass",
+   "effect": "lines ×1.2 faster again"
+  },
+  {
+   "node": "Zero-Waste Piping II",
+   "ipm": "Crafting Efficiency",
+   "cost": [
+    [
+     30.0,
+     "Sunshine Sauce"
+    ]
+   ],
+   "needs": "Faster Cappers",
+   "effect": "line recipes take 20% fewer inputs"
+  },
+  {
+   "node": "Heavy Flint Glass",
+   "ipm": "Advanced Item Value",
+   "cost": [
+    [
+     1.0,
+     "Garlic Gold"
+    ],
+    [
+     5.0,
+     "Hungarian Wax Mash"
+    ]
+   ],
+   "needs": "Faster Cappers",
+   "effect": "sauces worth ×1.2"
+  },
+  {
+   "node": "Foil Neck Wraps",
+   "ipm": "Superior Item Value",
+   "cost": [
+    [
+     200.0,
+     "Bonnet Mash"
+    ],
+    [
+     25.0,
+     "Pineapple Picante"
+    ]
+   ],
+   "needs": "Heavy Flint Glass",
+   "effect": "sauces worth ×1.2 again"
+  },
+  {
+   "node": "Double Fill",
+   "ipm": "Crafting Specialist",
+   "cost": [
+    [
+     3.0,
+     "Mole Poblano"
+    ],
+    [
+     2.0,
+     "Phantom Smokehouse"
+    ]
+   ],
+   "needs": "Heavy Flint Glass",
+   "effect": "10% chance a line makes two"
+  },
+  {
+   "node": "Bulk Buyer's Club",
+   "ipm": "Preferred Vendor",
+   "cost": [
+    [
+     200.0,
+     "Pimento Spread"
+    ],
+    [
+     75.0,
+     "Smoky Ancho"
+    ],
+    [
+     40.0,
+     "Bistro Verde"
+    ]
+   ],
+   "needs": "Steam Jackets",
+   "effect": "new vats and lines cost half"
+  },
+  {
+   "node": "Pressure Cooker",
+   "ipm": "Furnace Overdrive",
+   "cost": [
+    [
+     20.0,
+     "Fatalii Mash"
+    ],
+    [
+     1.0,
+     "Bangkok Burn"
+    ]
+   ],
+   "needs": "Steam Jackets",
+   "effect": "one vat ×2 speed, inputs +50%"
+  },
+  {
+   "node": "Pressure Cooker II",
+   "ipm": "Advanced Furnace Overdrive",
+   "cost": [
+    [
+     40.0,
+     "Caribbean Red Mash"
+    ],
+    [
+     20.0,
+     "Chocolate Habanero Mash"
+    ],
+    [
+     10.0,
+     "Classic Louisiana"
+    ]
+   ],
+   "needs": "Pressure Cooker",
+   "effect": "the Pressure Cooker ×4 instead"
+  },
+  {
+   "node": "Pressure Valve",
+   "ipm": "Furnace Overdrive Efficiency",
+   "cost": [
+    [
+     200.0,
+     "Thai Chili Mash"
+    ],
+    [
+     1.0,
+     "Ranchero"
+    ]
+   ],
+   "needs": "Pressure Cooker",
+   "effect": "its extra inputs +20% instead of +50%"
+  },
+  {
+   "node": "Second Pressure Cooker",
+   "ipm": "Furnace Overdrive 2",
+   "cost": [
+    [
+     200.0,
+     "Naga Mash"
+    ],
+    [
+     20.0,
+     "Bangkok Burn"
+    ],
+    [
+     2.0,
+     "Sweet Heat Reserve"
+    ]
+   ],
+   "needs": "Pressure Cooker",
+   "effect": "a second vat under pressure"
+  },
+  {
+   "node": "Third Pressure Cooker",
+   "ipm": "Furnace Overdrive 3",
+   "cost": [
+    [
+     300.0,
+     "Grim Mash"
+    ],
+    [
+     100.0,
+     "Bangkok Burn"
+    ],
+    [
+     2.0,
+     "Naga Sunrise"
+    ]
+   ],
+   "needs": "Second Pressure Cooker",
+   "effect": "a third"
+  }
+ ],
+ "rooms": [
+  {
+   "name": "Seed Vault",
+   "ipm": "Engineering",
+   "base": "x1.25",
+   "per_level": "+.15",
+   "max": 60,
+   "level_costs": [
+    5,
+    8,
+    12,
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231,
+    296,
+    377,
+    479,
+    607,
+    767,
+    966,
+    1215,
+    1524,
+    1908,
+    2385,
+    2976,
+    3709,
+    4616,
+    5737,
+    7121,
+    8830,
+    10938,
+    13536,
+    16736,
+    20673,
+    25517,
+    31471,
+    38786,
+    47768,
+    58791,
+    72313,
+    102226,
+    125592,
+    154215,
+    189264,
+    232163,
+    355816,
+    436062,
+    534178,
+    654095,
+    800612,
+    979572,
+    1198092,
+    1464839,
+    1790359,
+    2187492,
+    2671868,
+    3262490,
+    3982488,
+    4859985,
+    5929181
+   ],
+   "open_cost": 3
+  },
+  {
+   "name": "Fermentation Cellar",
+   "ipm": "Forge",
+   "base": "x1.20",
+   "per_level": "+.10",
+   "max": 60,
+   "level_costs": [
+    5,
+    8,
+    12,
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231,
+    296,
+    377,
+    479,
+    607,
+    767,
+    966,
+    1215,
+    1524,
+    1908,
+    2385,
+    2976,
+    3709,
+    4616,
+    5737,
+    7121,
+    8830,
+    10938,
+    13536,
+    16736,
+    20673,
+    25517,
+    31471,
+    38768,
+    47768,
+    58791,
+    72313,
+    124449,
+    152894,
+    187740,
+    230408,
+    282633,
+    554454,
+    679499,
+    832389,
+    1019251,
+    1247593,
+    1526430,
+    1866941,
+    2282600,
+    2789846,
+    3408685,
+    4163466,
+    5083810,
+    6205754,
+    7573124,
+    9239211
+   ],
+   "open_cost": 6
+  },
+  {
+   "name": "Motor Pool",
+   "ipm": "Aeronautical",
+   "base": "x1.50",
+   "per_level": "+.25",
+   "max": 60,
+   "level_costs": [
+    5,
+    8,
+    12,
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231,
+    296,
+    377,
+    479,
+    607,
+    767,
+    966,
+    1215,
+    1524,
+    1908,
+    2385,
+    2976,
+    3709,
+    4616,
+    5737,
+    7121,
+    8830,
+    10938,
+    13536,
+    16736,
+    20673,
+    25517,
+    31471,
+    38786,
+    47768,
+    58791,
+    72313,
+    102226,
+    125592,
+    154215,
+    189264,
+    232163,
+    355816,
+    436062,
+    534178,
+    654095,
+    800612,
+    979572,
+    1198092,
+    1464839,
+    1790359,
+    2187492,
+    2671808,
+    3262490,
+    3982488,
+    4859985,
+    5929181
+   ],
+   "open_cost": 12
+  },
+  {
+   "name": "Land Office",
+   "ipm": "Astronomy",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max": 11,
+   "level_costs": [
+    26,
+    46,
+    74,
+    111,
+    160,
+    224,
+    307,
+    414,
+    552,
+    729
+   ],
+   "open_cost": 21
+  },
+  {
+   "name": "Crate Yard",
+   "ipm": "Packaging",
+   "base": "x1.50",
+   "per_level": "+.25",
+   "max": 60,
+   "level_costs": [
+    5,
+    8,
+    12,
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231,
+    296,
+    377,
+    479,
+    607,
+    767,
+    966,
+    1215,
+    1524,
+    1908,
+    2385,
+    2976,
+    3709,
+    4616,
+    5737,
+    7121,
+    8830,
+    10938,
+    13536,
+    16736,
+    20673,
+    25517,
+    31471,
+    38786,
+    47768,
+    58791,
+    72313,
+    102226,
+    125592,
+    154215,
+    189264,
+    232163,
+    355816,
+    436062,
+    534178,
+    654095,
+    800612,
+    979572,
+    1198092,
+    1464839,
+    1790359,
+    2187492,
+    2671808,
+    3262490,
+    3982488,
+    4859985,
+    5929181
+   ],
+   "open_cost": 35
+  },
+  {
+   "name": "High-Speed Cannery",
+   "ipm": "Workshop",
+   "base": "x1.20",
+   "per_level": "+.10",
+   "max": 60,
+   "level_costs": [
+    5,
+    8,
+    12,
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231,
+    296,
+    377,
+    479,
+    607,
+    767,
+    966,
+    1215,
+    1524,
+    1908,
+    2385,
+    2976,
+    3709,
+    4616,
+    5737,
+    7121,
+    8830,
+    10938,
+    13536,
+    16736,
+    20673,
+    25517,
+    31471,
+    38768,
+    47768,
+    58791,
+    72313,
+    124449,
+    152894,
+    187740,
+    230408,
+    282633,
+    554454,
+    679499,
+    832389,
+    1019251,
+    1247593,
+    1526430,
+    1866941,
+    2282600,
+    2789846,
+    3408685,
+    4163466,
+    5083810,
+    6205754,
+    7573124,
+    9239211
+   ],
+   "open_cost": 56
+  },
+  {
+   "name": "Test Kitchen",
+   "ipm": "Laboratory",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max": 11,
+   "level_costs": [
+    26,
+    46,
+    74,
+    111,
+    160,
+    224,
+    307,
+    414,
+    552,
+    729
+   ],
+   "open_cost": 87
+  },
+  {
+   "name": "Ergonomics Lab",
+   "ipm": null,
+   "open_cost": 133,
+   "level_costs": "Engineering's (assumed)"
+  },
+  {
+   "name": "Boardroom",
+   "ipm": "Lounge",
+   "base": "x1.15",
+   "per_level": "+.05",
+   "max": 60,
+   "level_costs": [
+    8,
+    12,
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231,
+    296,
+    377,
+    479,
+    607,
+    767,
+    966,
+    1215,
+    1524,
+    1908,
+    2385,
+    2976,
+    3709,
+    4616,
+    5737,
+    7121,
+    8830,
+    10938,
+    13536,
+    16736,
+    20673,
+    25517,
+    31471,
+    38786,
+    47768,
+    70459,
+    86776,
+    106670,
+    131052,
+    160920,
+    197492,
+    242257,
+    297029,
+    436822,
+    535106,
+    655234,
+    802006,
+    981276,
+    1200176,
+    1467386,
+    1793472,
+    2191297,
+    2676514,
+    3268164,
+    3989413,
+    4868438,
+    5939494,
+    7244234
+   ],
+   "open_cost": 200
+  },
+  {
+   "name": "Night Watchman's Desk",
+   "ipm": "Backup Generator",
+   "base": "+0:30",
+   "per_level": "+0:30",
+   "max": 44,
+   "level_costs": [
+    21,
+    29,
+    39,
+    52,
+    68,
+    89,
+    116,
+    150,
+    193,
+    247,
+    314,
+    399,
+    506,
+    639,
+    805,
+    1012,
+    1270,
+    1590,
+    1987,
+    2480,
+    3091,
+    3846,
+    4781,
+    5934,
+    7359,
+    9115,
+    11280,
+    13946,
+    17228,
+    21264,
+    24226,
+    32321,
+    39806,
+    48992,
+    60261,
+    74077,
+    91008,
+    111750,
+    137148,
+    168234,
+    206270,
+    252790,
+    309668
+   ],
+   "open_cost": 298
+  },
+  {
+   "name": "Seed Capital Office",
+   "ipm": null,
+   "open_cost": 439,
+   "level_costs": "Engineering's (assumed)"
+  },
+  {
+   "name": "Cooperage",
+   "ipm": "Underforge",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max": 11,
+   "level_costs": [
+    18,
+    25,
+    34,
+    46,
+    62,
+    82,
+    107,
+    139,
+    180,
+    231
+   ],
+   "open_cost": 642
+  },
+  {
+   "name": "Glassworks",
+   "ipm": "Dorm",
+   "base": "x90%",
+   "per_level": "- 4%",
+   "max": 11,
+   "level_costs": [
+    21,
+    29,
+    39,
+    52,
+    68,
+    89,
+    116,
+    150,
+    193,
+    247
+   ],
+   "open_cost": 934
+  },
+  {
+   "name": "Tasting Room",
+   "ipm": "Sales",
+   "base": "x1.15",
+   "per_level": "+.05",
+   "max": 60,
+   "level_costs": [
+    30,
+    40,
+    53,
+    68,
+    88,
+    114,
+    145,
+    185,
+    235,
+    298,
+    377,
+    474,
+    596,
+    748,
+    937,
+    1171,
+    1462,
+    1822,
+    2267,
+    2817,
+    3497,
+    4337,
+    5372,
+    6648,
+    8219,
+    10153,
+    12532,
+    15456,
+    19049,
+    23460,
+    28874,
+    35515,
+    43657,
+    53636,
+    65860,
+    80828,
+    99149,
+    121565,
+    148982,
+    209878,
+    256995,
+    314562,
+    384875,
+    470732,
+    661866,
+    808948,
+    988387,
+    1207246,
+    1474110,
+    1799430,
+    2195916,
+    2679017,
+    3267522,
+    3984270,
+    4857014,
+    5919487,
+    7212668,
+    8786340,
+    10700976
+   ],
+   "open_cost": 1351
+  },
+  {
+   "name": "Ad Agency",
+   "ipm": "Marketing",
+   "base": "x1.30",
+   "per_level": "+.10",
+   "max": 60,
+   "level_costs": [
+    69,
+    86,
+    107,
+    134,
+    167,
+    208,
+    259,
+    321,
+    398,
+    493,
+    610,
+    754,
+    932,
+    1150,
+    1418,
+    1748,
+    2153,
+    2650,
+    3259,
+    4007,
+    4922,
+    6044,
+    7418,
+    9099,
+    11157,
+    13673,
+    16749,
+    20509,
+    25109,
+    30715,
+    37567,
+    45930,
+    56137,
+    68589,
+    83777,
+    102296,
+    124872,
+    152386,
+    185911,
+    306114,
+    373262,
+    455023,
+    554558,
+    675709,
+    1275862,
+    1553884,
+    1892082,
+    2303405,
+    2803573,
+    3411672,
+    4150869,
+    5049278,
+    6141013,
+    7467472,
+    9078874,
+    11036138,
+    13413152,
+    16299528,
+    19803926
+   ],
+   "open_cost": 1946
+  }
+ ],
+ "vats": [
+  150.0,
+  50000.0,
+  500000.0,
+  10000000.0,
+  5000000000.0,
+  100000000000.0,
+  50000000000000.0,
+  1000000000000000.0,
+  5e+17,
+  1e+19
+ ],
+ "lines": [
+  100.0,
+  1000000.0,
+  100000000.0,
+  50000000000.0,
+  1000000000000.0,
+  500000000000000.0,
+  1e+16,
+  5e+18,
+  1e+20,
+  5e+22
+ ]
+}

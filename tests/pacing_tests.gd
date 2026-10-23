@@ -1,26 +1,17 @@
 extends SceneTree
-## The first 110 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
-## docs/ECONOMY.md's N1–N8 (to 50:00), M1–M7 (to 1:50) and A4 (v0.6d), played by the
-## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E6 and J3,
-## played by both the eager pacing player and a casual one.
-## Prints a timeline and each criterion's measurement.
+## The pacing player (D003) on v0.7's copy of Idle Planet Miner (SKELETON.md):
+## I6 (the first sale on time), I7 (no dead air) and I8 (the button still
+## matters: F8, N8 and M5's bars), and the criteria SKELETON.md keeps as they
+## stand: FACTORY.md's F1–F6 and the early-game E1–E6 and A7 (played by both
+## the eager pacing player and a casual one), OFFLINE.md's P1–P2 and FULL_RUN.md's
+## U8. Prints a timeline and each criterion's measurement.
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
 const Player = preload("res://src/sim/engaged_player.gd")
 
+## Long enough to see I6's band and past it, so a late sale is still timed.
 const MINUTES := 195
-## The sauce ladder (FULL_RUN.md), with each rung's expected time in minutes (U3).
-const LADDER := {"smoky_ancho": 19, "bistro_verde": 21, "serrano_fire": 35, "classic_louisiana": 50, "cajun_red": 68,
-	"island_heat": 95, "sweet_heat": 115, "cocoa_loco": 138, "phantom": 160}
-## Mashes made from an ingredient: what U5's waits are on (D026).
-const INGREDIENT_MASH := ["pickled_brine", "garlic_paste", "glaze", "liquid_smoke"]
-## U6's swaps: each track's fork to its other side, one run each.
-const SWAPS := [{"pantry_vinegar_bulk": "pantry_vinegar_reserve"}, {"pantry_garlic_bulk": "pantry_garlic_reserve"},
-	{"pantry_pineapple_reserve": "pantry_pineapple_bulk"}, {"pantry_oak_reserve": "pantry_oak_bulk"}]
-## T4's window. Ten minutes, not one: a minute holds only about five drops, so
-## one minute's measurement swings by ±40% with the random stream.
-const FORAGE_MINUTES := 10.0
 
 var failures: Array[String] = []
 var checks := 0
@@ -49,6 +40,14 @@ func minute(m: float) -> int:
 	return roundi(m * 60.0 / T.TICK_SECONDS)
 
 
+## When the player first did something starting with `what`.
+static func first_like(p: Player, what: String) -> float:
+	for entry in p.events:
+		if String(entry[1]).begins_with(what):
+			return entry[0]
+	return INF
+
+
 func run() -> void:
 	var g := Game.new()
 	var p := Player.new()
@@ -58,29 +57,18 @@ func run() -> void:
 		"deck": func(): return g.revealed.deck,
 		"nav": func(): return g.nav_shown(),
 		"tech": func(): return g.tab_open("tech"),
-		"bistro": func(): return g.stats.made.bistro_verde > 0,
-		"ov_1k": func(): return g.operation_value() >= 10000.0,
-		"ov_10k": func(): return g.operation_value() >= 150000.0,
-		"ov_100k": func(): return g.operation_value() >= 4000000.0,
-		"louisiana": func(): return g.stats.made.classic_louisiana > 0,
-		"ov_1m": func(): return g.operation_value() >= T.PRESTIGE_OV,
+		"ov_150k": func(): return g.operation_value() >= 150000.0,
+		"ov_1m": func(): return g.operation_value() >= 1e6,
+		"ov_4m": func(): return g.operation_value() >= 4e6,
+		"sale": func(): return g.operation_value() >= T.PRESTIGE_OV,
 	}
-	for sauce in LADDER:
-		watch["made " + sauce] = (func(item): return func(): return g.stats.made[item] > 0).call(sauce)
 	var at_15: Dictionary = {}
 	var at_30: Dictionary = {}
-	var at_45: Dictionary = {}
+	var at_60: Dictionary = {}
 	var at_90: Dictionary = {}
 	var at_100: Dictionary = {}
 	var ov_60 := 0.0
-	var ov_110 := 0.0
-	var ov_50 := 0.0
-	var ov_180 := 0.0
-	var at_150: Dictionary = {}
-	var u4 := {"classic_louisiana": 0, "pickled_brine": 0}
-	var at_60: Dictionary = {}
-	var u5 := {"waiting": 0, "busy": 0, "longest": 0.0, "where": "", "since": {}, "vats": 0, "ingredient_vats": 0}
-	var window := {"line_busy": 0, "ticks": 0, "brine_start": 0, "brine_end": 0}
+	var ov_by_30 := []
 	for i in minute(MINUTES):
 		p.step(g)
 		g.tick()
@@ -88,134 +76,74 @@ func run() -> void:
 		for key in watch:
 			if not reached.has(key) and watch[key].call():
 				reached[key] = now
+		if g.stats.ticks % minute(30) == 0:
+			ov_by_30.append("%s $%s" % [clock(now), String.num(g.operation_value(), 0)])
 		if g.stats.ticks == minute(15):
 			at_15 = g.to_state()
-		if g.stats.ticks == minute(30):
+		elif g.stats.ticks == minute(30):
 			at_30 = g.to_state()
-		if g.stats.ticks == minute(45):
-			at_45 = g.to_state()
-		if g.stats.ticks == minute(90):
-			at_90 = g.to_state()
-		if g.stats.ticks == minute(60):
-			ov_60 = g.operation_value()
-		if g.stats.ticks == minute(100):
-			at_100 = g.to_state()
-		if g.stats.ticks == minute(60):
+		elif g.stats.ticks == minute(60):
 			at_60 = g.to_state()
-		if g.stats.ticks == minute(110):
-			ov_110 = g.operation_value()
-		if g.stats.ticks == minute(150):
-			at_150 = g.to_state()
-		if g.stats.ticks == minute(180):
-			ov_180 = g.operation_value()
-		if g.stats.ticks == minute(150):
-			for item in u4:
-				u4[item] = -g.stats.made[item]
-		if g.stats.ticks == minute(160):
-			for item in u4:
-				u4[item] += g.stats.made[item]
-		if g.stats.ticks > minute(60) and g.stats.ticks <= minute(180):
-			u5_tick(g, u5)
-		if g.stats.ticks > minute(120) and g.stats.ticks <= minute(180):
-			for v in g.vats:
-				if v.recipe != "":
-					u5.vats += 1
-					if INGREDIENT_MASH.has(g.data.recipes[v.recipe].output):
-						u5.ingredient_vats += 1
-		if g.stats.ticks == minute(40):
-			window.brine_start = g.stats.made.pickled_brine
-		if g.stats.ticks == minute(50):
-			ov_50 = g.operation_value()
-			window.brine_end = g.stats.made.pickled_brine
-		if g.stats.ticks > minute(40) and g.stats.ticks <= minute(50):
-			window.ticks += 1
-			for s in g.lines:
-				if s.recipe == "table_mild" and s.running:
-					window.line_busy += 1
-					break
+			ov_60 = g.operation_value()
+		elif g.stats.ticks == minute(90):
+			at_90 = g.to_state()
+		elif g.stats.ticks == minute(100):
+			at_100 = g.to_state()
 
 	print("Pacing: the first %d minutes" % MINUTES)
 	for entry in p.events:
-		if not String(entry[1]).begins_with("sell"):
+		if not String(entry[1]).begins_with("sell") and not String(entry[1]).begins_with("upgrade"):
 			print("  %s  %s" % [clock(entry[0]), entry[1]])
-	print("  at %s: $%.2f cash, $%.2f earned, Operation Value $%.2f; %d Table Mild and %d Bistro Verde made" % [
-		clock(MINUTES * 60.0), g.cash, g.stats.cash_earned, g.operation_value(), g.stats.made.table_mild, g.stats.made.bistro_verde])
+	print("  at %s: $%.2f cash, $%.2f earned, Operation Value $%.2f" % [clock(MINUTES * 60.0), g.cash, g.stats.cash_earned, g.operation_value()])
+	print("  Operation Value every 30 minutes: " + ", ".join(ov_by_30))
 	for key in reached:
 		print("  reached %s at %s" % [key, clock(reached[key])])
 
-	# v0.2's criteria, to 15:00 (FACTORY.md).
+	# I6: the first sale on time.
+	var sale: float = reached.get("sale", INF)
+	criterion("I6", sale >= 120 * 60.0 and sale <= 150 * 60.0, "$10M Operation Value at %s (2:00–2:30); $150K at %s, $1M at %s, $4M at %s; at 3:15 $%s" % [
+		clock(sale), clock(reached.get("ov_150k", INF)), clock(reached.get("ov_1m", INF)), clock(reached.get("ov_4m", INF)), String.num(g.operation_value(), 0)])
+
+	# FACTORY.md's kitchen criteria, to 15:00 (I4).
 	criterion("F1", reached.get("status_bar", INF) <= 15.0, "status bar at %s (by 0:15)" % clock(reached.get("status_bar", INF)))
 	criterion("F2", reached.get("deck", INF) <= 90.0, "deck at %s (by 1:30)" % clock(reached.get("deck", INF)))
-	criterion("F3", p.first("buy vat 1 (sweet_mash)") <= 180.0, "vat at %s (by 3:00)" % clock(p.first("buy vat 1 (sweet_mash)")))
-	var line_at := p.first("buy line 1 (table_mild)")
+	criterion("F3", first_like(p, "buy vat 1") <= 180.0, "vat at %s (by 3:00)" % clock(first_like(p, "buy vat 1")))
+	var line_at := first_like(p, "buy line 1")
 	criterion("F4", line_at <= 300.0, "line at %s (by 5:00)" % clock(line_at))
 	criterion("F5", p.first("sell_batch") <= 330.0, "first Sell Batch at %s (by 5:30)" % clock(p.first("sell_batch")))
 	criterion("F6", longest_wait(p, line_at, 15 * 60.0) <= 90.0, "longest wait between purchases or research, line to 15:00: %.0f s (at most 90)" % longest_wait(p, line_at, 15 * 60.0))
-	var idle_15 := minute_from(at_15, 0.0)
-	var tap_15 := minute_from(at_15, p.taps_per_second)
-	criterion("F7", idle_15 >= 180.0, "factory alone earns $%.2f a minute at 15:00 (at least $180, D035)" % idle_15)
-	var lift_15 := (tap_15 - idle_15) / idle_15 if idle_15 > 0.0 else INF
-	criterion("F8", lift_15 >= 0.25, "tapping adds %.0f%% at 15:00 (at least 25%%)" % (lift_15 * 100.0))
 
-	# v0.6d: Idle Planet Miner's early flow (ECONOMY.md, D041).
-	var stations := []
-	var new_plots := 0
+	# I7: no dead air from the first line to the sale (A4's bar, 6:30).
+	var to := minf(sale, MINUTES * 60.0)
+	var gap := 0.0
+	var gap_where := ""
+	var last := line_at
 	for entry in p.events:
 		var what := String(entry[1])
-		if what.begins_with("buy plot") or what.begins_with("buy vat") or what.begins_with("buy line"):
-			stations.append(entry)
-			if what.begins_with("buy plot") and what != "buy plot bell" and entry[0] > line_at and entry[0] <= 14 * 60.0:
-				new_plots += 1
-	var a4_gap := 0.0
-	var a4_where := ""
-	for i in range(stations.size() - 1):
-		var at: float = stations[i][0]
-		if at >= line_at and at < 14 * 60.0 and stations[i + 1][0] - at > a4_gap:
-			a4_gap = stations[i + 1][0] - at
-			a4_where = "%s to %s" % [stations[i][1], stations[i + 1][1]]
-	criterion("A4", new_plots >= 2 and a4_gap <= 390.0, "first line to 14:00: %d new plots (at least 2); longest wait between new stations %s (at most 6:30, W26; %s)" % [new_plots, clock(a4_gap), a4_where])
-	# v0.6e: Cargo comes into play (FACTORY.md, D043).
-	var cargo_at := INF
-	for entry in p.events:
-		if String(entry[1]).ends_with(".cargo"):
-			cargo_at = entry[0]
-			break
-	criterion("C7", cargo_at <= 30 * 60.0, "the first Cargo level at %s (by 30:00)" % clock(cargo_at))
+		if entry[0] <= line_at or entry[0] > to:
+			continue
+		if what.begins_with("buy ") or what.begins_with("research "):
+			if entry[0] - last > gap:
+				gap = entry[0] - last
+				gap_where = "ending %s at %s" % [what, clock(entry[0])]
+			last = entry[0]
+	if to - last > gap:
+		gap = to - last
+		gap_where = "to %s at %s" % ["the sale" if sale < INF else "3:15", clock(to)]
+	criterion("I7", gap <= 390.0, "longest stretch without buying a farm, vat, line or recipe or researching, first line to the sale: %s (at most 6:30; %s)" % [clock(gap), gap_where])
 
-	# v0.3's criteria, to 50:00 (ECONOMY.md).
-	criterion("N1", reached.get("nav", INF) <= 9 * 60.0, "Stage 3 ($4,000) at %s (by 9:00)" % clock(reached.get("nav", INF)))
-	criterion("N2", reached.get("tech", INF) <= 14 * 60.0, "Tech Tree ($7,500) at %s (by 14:00)" % clock(reached.get("tech", INF)))
-	var e1 := p.first("research jalapeno_blueprint")
-	criterion("N3", e1 <= 20 * 60.0, "Jalapeño blueprint at %s (by 20:00)" % clock(e1))
-	criterion("N4", reached.get("bistro", INF) <= 30 * 60.0, "first Bistro Verde at %s (by 30:00)" % clock(reached.get("bistro", INF)))
-	criterion("N5", reached.get("ov_10k", INF) <= 50 * 60.0, "Operation Value $150,000 at %s (by 50:00, D036; at 50:00 $%.0f); $10,000 at %s" % [clock(reached.get("ov_10k", INF)), ov_50, clock(reached.get("ov_1k", INF))])
-	var wait := longest_wait(p, 15 * 60.0, 50 * 60.0)
-	criterion("N6", wait <= 120.0, "longest wait between purchases or research, 15:00–50:00: %.0f s (at most 120)" % wait)
-	var busy: float = window.line_busy / float(maxi(window.ticks, 1))
-	var brine: int = window.brine_end - window.brine_start
-	criterion("N7", busy >= 0.5 and brine > 0, "40:00–50:00: Table Mild line busy %.0f%% (at least 50%%), %d Pickled Brine made from Bell Peppers" % [busy * 100.0, brine])
-	var idle_30 := minute_from(at_30, 0.0)
-	var tap_30 := minute_from(at_30, p.taps_per_second)
-	var lift_30 := (tap_30 - idle_30) / idle_30 if idle_30 > 0.0 else INF
-	criterion("N8", lift_30 >= 0.10, "tapping adds %.0f%% at 30:00 (at least 10%%): $%.2f vs $%.2f a minute" % [lift_30 * 100.0, tap_30, idle_30])
+	# I8: the button still matters (F8, N8, M5's bars).
+	var lifts := []
+	var i8 := true
+	for at in [[at_15, "15:00", 0.25, false], [at_30, "30:00", 0.10, false], [at_90, "1:30:00", 0.30, false]]:
+		var idle := minute_from(at[0], 0.0)
+		var tap := minute_from(at[0], p.taps_per_second)
+		var lift := (tap - idle) / idle if idle > 0.0 else INF
+		i8 = i8 and lift >= at[2]
+		lifts.append("%.0f%% at %s (at least %.0f%%)" % [lift * 100.0, at[1], at[2] * 100.0])
+	criterion("I8", i8, "tapping adds " + ", ".join(lifts))
 
-	# v0.4's criteria, to 1:50 (ECONOMY.md).
-	var tier_3 := minf(p.first("research cayenne_blueprint"), p.first("research garlic_blueprint"))
-	criterion("M1", tier_3 <= 48 * 60.0, "first Tier 3 blueprint at %s (by 48:00)" % clock(tier_3))
-	# M2 (the first Classic Louisiana by 55:00) is retired (D036): U3 holds the
-	# same sauce to within 20 minutes of its time.
-	criterion("M3", reached.get("ov_100k", INF) <= 110 * 60.0, "Operation Value $4,000,000 at %s (by 1:50:00); at 1:50 $%.0f" % [clock(reached.get("ov_100k", INF)), ov_110])
-	var wait_m := longest_wait(p, 50 * 60.0, 110 * 60.0)
-	criterion("M4", wait_m <= 150.0, "longest wait between purchases or research, 50:00–1:50:00: %.0f s (at most 150)" % wait_m)
-	var idle_90 := minute_from(at_90, 0.0)
-	var tap_90 := minute_from(at_90, p.taps_per_second)
-	var lift_90 := (tap_90 - idle_90) / idle_90 if idle_90 > 0.0 else INF
-	criterion("M5", lift_90 >= 0.30, "tapping adds %.0f%% at 1:30:00 (at least 30%%): $%.0f vs $%.0f a minute" % [lift_90 * 100.0, tap_90, idle_90])
-	# M6 is retired: U4 checks the same thing for v0.6a's run (D032).
-	var piston := p.first("research automated_piston")
-	criterion("M7", piston <= 110 * 60.0, "Automated Piston at %s (by 1:50:00)" % clock(piston))
-
-	# v0.5.1's early-game criteria (FACTORY.md), for both players.
+	# The early game, for both players (FACTORY.md, I4).
 	var eager := early(Player.new())
 	var casual := early(Player.casual())
 	criterion("E1", casual.deck <= 90.0, "casual player: the deck at %s (by 1:30)" % clock(casual.deck))
@@ -223,13 +151,10 @@ func run() -> void:
 	criterion("E3", eager.gap <= 75.0 and casual.gap <= 100.0, "longest stretch with nothing new, deck to 15:00: %.0f s eager (at most 75), %.0f s casual (at most 100)" % [eager.gap, casual.gap])
 	criterion("E4", casual.plot_share >= 1.0 / 3.0, "the plot picks %.0f%% of the casual player's peppers in the first 5 minutes (at least a third)" % (casual.plot_share * 100.0))
 	criterion("E5", casual.tech <= 15 * 60.0, "casual player: the Tech Tree at %s (by 15:00)" % clock(casual.tech))
-	# Narrowed to the casual player after measuring: the eager one buys the line
-	# 36 s after the vat, so little mash waits (FACTORY.md says so).
 	criterion("E6", casual.crate_mash >= 10, "Sweet Pepper Mash waiting for the Starter Crate: %d casual (at least 10); %d eager (not judged)" % [casual.crate_mash, eager.crate_mash])
-	criterion("A7", casual.second_plot <= 210.0, "the casual player's first plot after Bell at %s (by 3:30); eager %s (not judged)" % [clock(casual.second_plot), clock(eager.second_plot)])
-	criterion("J3", casual.late_gap <= 120.0, "longest stretch with nothing new, 15:00–30:00: %.0f s casual (at most 120); %.0f s eager (not judged)" % [casual.late_gap, eager.late_gap])
+	criterion("A7", casual.second_plot <= 210.0, "the casual player's first farm after the Bell Plot at %s (by 3:30); eager %s (not judged)" % [clock(casual.second_plot), clock(eager.second_plot)])
 
-	# v0.5's criteria (OFFLINE.md).
+	# OFFLINE.md's P1–P2 and FULL_RUN.md's U8.
 	var checker := set_up(at_30)
 	var away := checker.catch_up(8 * 3600.0)
 	var back := Player.new()
@@ -243,61 +168,9 @@ func run() -> void:
 	var tapping_rate := minute_from(at_100, p.taps_per_second, true)
 	criterion("P2", slept.ov >= tapping_rate * 120.0, "from 1:40, 8 h away (counted %s at %d%%) raise Operation Value $%.0f; 2 h of tapping would $%.0f" % [
 		clock(slept.counted), roundi(night.offline_speed() * 100.0), slept.ov, tapping_rate * 120.0])
-
-	# v0.6a's criteria (FULL_RUN.md).
-	var bands := [["ov_1k", "$10,000", 12, 18], ["ov_10k", "$150,000", 40, 55], ["ov_100k", "$4,000,000", 95, 115], ["ov_1m", "$10,000,000 (the sale, D035)", 120, 150]]
-	var u1_ok := true
-	var u1_text := []
-	for b in bands:
-		var at: float = reached.get(b[0], INF)
-		u1_ok = u1_ok and at >= b[2] * 60.0 and at <= b[3] * 60.0
-		u1_text.append("%s at %s (%s–%s)" % [b[1], clock(at), clock(b[2] * 60.0), clock(b[3] * 60.0)])
-	criterion("U1", u1_ok, ", ".join(u1_text))
-	var wait_u := longest_wait(p, 110 * 60.0, 180 * 60.0)
-	criterion("U2", wait_u <= 300.0, "longest wait between purchases or research, 1:50–3:00: %.0f s (at most 300, D033)" % wait_u)
-	var u3_ok := true
-	var u3_text := []
-	for sauce in LADDER:
-		var at: float = reached.get("made " + sauce, INF)
-		u3_ok = u3_ok and at <= 180 * 60.0 and absf(at - LADDER[sauce] * 60.0) <= 20 * 60.0
-		u3_text.append("%s %s (%s)" % [sauce, clock(at), clock(LADDER[sauce] * 60.0)])
-	criterion("U3", u3_ok, "first made, against expected: " + ", ".join(u3_text))
-	criterion("U4", u4.classic_louisiana > 0 and u4.pickled_brine > 0, "2:30–2:40 made: %d Classic Louisiana, %d Pickled Brine (each at least 1)" % [u4.classic_louisiana, u4.pickled_brine])
-	var spent: float = u5.ingredient_vats / float(maxi(u5.vats, 1))
-	criterion("U5", spent >= 0.30 and u5.longest <= 300.0, "2:00–3:00: %.0f%% of vat time runs an ingredient's mash (at least 30%%, D033); 1:00–3:00: the longest wait on one %.0f s (at most 300; %s)" % [spent * 100.0, u5.longest, u5.where])
-	var edge := 0.0
-	var edge_text := ""
-	for swap in SWAPS:
-		var other := run_to(180, swap)
-		var e := absf(other - ov_180) / ov_180 if ov_180 > 0.0 else 0.0
-		if e > edge:
-			edge = e
-			edge_text = "%s ($%.0f against $%.0f)" % [swap.keys()[0], other, ov_180]
-	var forks_taken := 0
-	for id in g.data.tech:
-		if g.data.tech[id].excludes.size() > 0 and g.is_researched(id):
-			forks_taken += 1
-	criterion("U6", forks_taken >= 2 and edge >= 0.05, "%d forks taken by 3:15; the biggest swing from swapping one fork: %.1f%% at 3:00, %s (at least 5%%)" % [forks_taken, edge * 100.0, edge_text])
-	var idle_150 := minute_from(at_150, 0.0)
-	var tap_150 := minute_from(at_150, p.taps_per_second)
-	var lift_150 := (tap_150 - idle_150) / idle_150 if idle_150 > 0.0 else INF
-	criterion("U7", lift_150 >= 0.30, "tapping adds %.0f%% at 2:30 (at least 30%%): $%.0f vs $%.0f a minute" % [lift_150 * 100.0, tap_150, idle_150])
-	var night_80 := set_up(at_60)
-	night_80.catch_up(8 * 3600.0)
-	criterion("U8", night_80.operation_value() < T.PRESTIGE_OV, "from 1:00, 8 hours away leaves Operation Value at $%.0f (under the sale's $10,000,000, D035)" % night_80.operation_value())
-
-	# Forager's Luck (TECH_TREE.md T4): its top-up for this player at 0:45.
-	var lucky := forage_minute(at_45, p.taps_per_second, true)
-	var plain := forage_minute(at_45, p.taps_per_second, false)
-	var gain := 0.0
-	var short := ""
-	for crop in lucky.drops:
-		if lucky.drops[crop] > lucky.drops.get(short, 0):
-			short = crop
-	if short != "":
-		gain = float(lucky.got[short] - plain.got[short]) / maxf(plain.got[short], 1.0)
-	criterion("T4", gain >= 0.10 and gain <= 0.20, "Forager's Luck from 0:45 adds %.0f%% to the shortest ingredient (%s over 10 min: %d against %d; want 10–20%%)" % [
-		gain * 100.0, short if short != "" else "none", lucky.got.get(short, 0), plain.got.get(short, 0)])
+	var night_60 := set_up(at_60)
+	night_60.catch_up(8 * 3600.0)
+	criterion("U8", night_60.operation_value() < T.PRESTIGE_OV, "from 1:00, 8 hours away leaves Operation Value at $%.0f (under the sale's $10,000,000, D035)" % night_60.operation_value())
 
 	for failure in failures:
 		printerr("FAIL: ", failure)
@@ -379,7 +252,8 @@ func longest_wait(p: Player, from: float, to: float) -> float:
 ## player had lent to research at that tick (D035).
 func set_up(state: Dictionary) -> Game:
 	var c := Game.new()
-	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	var problem := c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	assert_loaded(problem)
 	var p := Player.new()
 	p.buys = false
 	p.decide(c)
@@ -388,7 +262,7 @@ func set_up(state: Dictionary) -> Game:
 
 func minute_from(state: Dictionary, taps_per_second: float, no_spike: bool = false) -> float:
 	var c := Game.new()
-	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
+	assert_loaded(c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true))))
 	if no_spike:
 		# A spike lasts 30 minutes; a minute scaled to hours mustn't carry it.
 		c.ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
@@ -409,68 +283,9 @@ func minute_from(state: Dictionary, taps_per_second: float, no_spike: bool = fal
 	return c.operation_value() - start
 
 
-## FORAGE_MINUTES from a saved state, tapping at the given rate and buying nothing,
-## with or without Forager's Luck granted: each ingredient's harvest (drops
-## included), and how many drops it got.
-func forage_minute(state: Dictionary, taps_per_second: float, lucky: bool) -> Dictionary:
-	var c := Game.new()
-	c.load_state(JSON.parse_string(JSON.stringify(state, "", false, true)))
-	if lucky:
-		c.research["foragers_luck"] = true
-		c._refresh_fx()
-	var p := Player.new()
-	p.taps_per_second = taps_per_second
-	p.buys = false
-	var out := {"got": {}, "drops": {}}
-	var before := {}
-	for crop in c.plots:
-		before[crop] = c.stats.harvested[crop]
-	for i in minute(FORAGE_MINUTES):
-		var short := c._shortest_ingredient()
-		var foraged: int = c.stats.foraged
-		p.step(c)
-		c.tick()
-		if c.stats.foraged > foraged:
-			out.drops[short] = out.drops.get(short, 0) + c.stats.foraged - foraged
-	for crop in c.plots:
-		if c.data.items[crop].ingredient:
-			out.got[crop] = c.stats.harvested[crop] - before[crop]
-	return out
-
-
-## U5: one tick of slot time, and whether each slot is waiting on an
-## ingredient's mash; the longest such wait is kept per slot.
-func u5_tick(g: Game, u5: Dictionary) -> void:
-	for station in ["vat", "line"]:
-		for i in g.slots(station).size():
-			var s: Dictionary = g.slots(station)[i]
-			if s.recipe == "":
-				continue
-			u5.busy += 1
-			var key := "%s%d" % [station, i]
-			var short := false
-			if not s.running:
-				var inputs: Dictionary = g.recipe_inputs(s.recipe)
-				for item in INGREDIENT_MASH:
-					if inputs.has(item) and g.stock[item] < inputs[item]:
-						short = true
-			if short:
-				u5.waiting += 1
-				u5.since[key] = u5.since.get(key, 0.0) + T.TICK_SECONDS
-				if u5.since[key] > u5.longest:
-					u5.longest = u5.since[key]
-					u5.where = "%s on %s, ending %s" % [key, s.recipe, clock(g.now_seconds())]
-			else:
-				u5.since.erase(key)
-
-
-## Operation Value at `minutes` for a fresh run by the pacing player with these
-## fork swaps (U6).
-func run_to(minutes: int, forks: Dictionary) -> float:
-	var g := Game.new()
-	var p := Player.new()
-	p.forks = forks
-	for i in minute(minutes):
-		p.step(g)
-		g.tick()
-	return g.operation_value()
+## A saved state that doesn't load would leave a fresh game behind and let a
+## criterion pass on nothing (U8 under the sale's bar), so it fails the suite.
+func assert_loaded(problem: String) -> void:
+	checks += 1
+	if problem != "":
+		failures.append("a saved state didn't load: " + problem)

@@ -4,8 +4,10 @@ extends RefCounted
 ## (docs/FACTORY.md S6).
 
 const FILES := ["items", "recipes", "plots", "slots", "tech", "rooms"]
-## What an HQ room can change (docs/PRESTIGE.md).
-const ROOM_EFFECTS := ["plot_speed", "plot_yield", "vat_speed", "line_speed", "crop_input", "mash_input", "tech_cost", "button_yield", "start_cash", "bottle_value", "credits", "offline_hours"]
+## What an HQ room can change (docs/SKELETON.md): Idle Planet Miner's rooms,
+## plus Ergonomics Lab and Seed Capital Office.
+const ROOM_EFFECTS := ["harvest", "vat_speed", "truck_speed", "upgrade_cost", "cargo", "line_speed", "tech_cost", "button_yield",
+	"credits", "offline_hours", "start_cash", "vat_input", "line_input", "value", "ticker"]
 const KINDS := ["crop", "mash", "bottle"]
 const STATIONS := {"vat": "mash", "line": "bottle"}
 
@@ -42,11 +44,13 @@ static func load_dir(dir: String = "res://data") -> Dictionary:
 	return check(raw)
 
 
-## Checks parsed files and builds the lookup tables the game uses:
-## items, recipes, plots (by id), slots, tech (by id), tech_order (ids in file order).
+## Checks parsed files and builds the lookup tables the game uses: items,
+## recipes, plots (the farms, by id), slots, tech (by id), tech_order (ids in
+## file order), rooms (by id), room_order (the order they're offered) and
+## ladder (the peppers, lowest rung first).
 static func check(raw: Dictionary) -> Dictionary:
 	var errors: Array[String] = []
-	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": [], "rooms": {}}
+	var data := {"items": {}, "recipes": {}, "plots": {}, "slots": {}, "tech": {}, "tech_order": [], "rooms": {}, "room_order": [], "ladder": []}
 
 	var rows := _rows(raw, "items", "items", errors)
 	for i in rows.size():
@@ -64,6 +68,9 @@ static func check(raw: Dictionary) -> Dictionary:
 			if r.get("ingredient", false) and r.kind != "crop":
 				errors.append(where + ": only a crop can be an ingredient")
 			data.items[r.id] = {"id": r.id, "name": r.name, "plural": r.plural, "short": str(r.get("short", r.name)), "kind": r.kind, "tier": int(r.tier), "value": float(r.value), "ingredient": bool(r.get("ingredient", false))}
+			# The pepper ladder (D053) is the peppers in file order, for Crossbreeding.
+			if r.kind == "crop" and not data.items[r.id].ingredient:
+				data.ladder.append(r.id)
 
 	rows = _rows(raw, "recipes", "recipes", errors)
 	for i in rows.size():
@@ -97,43 +104,70 @@ static func check(raw: Dictionary) -> Dictionary:
 				ok = false
 			else:
 				inputs[item] = int(r.inputs[item])
+		# A recipe is bought with cash, as Idle Planet Miner's are (D051); 0 is free.
+		var unlock: Variant = r.get("unlock", 0.0)
+		if typeof(unlock) != TYPE_FLOAT or unlock < 0.0:
+			errors.append(where + ": unlock is a cash price of at least 0")
+			ok = false
 		if ok:
-			data.recipes[r.id] = {"id": r.id, "station": r.station, "inputs": inputs, "output": r.output, "seconds": float(r.seconds), "unlocked": bool(r.get("unlocked", false))}
+			data.recipes[r.id] = {"id": r.id, "station": r.station, "inputs": inputs, "output": r.output, "seconds": float(r.seconds),
+				"unlock": float(unlock), "kitchen": bool(r.get("kitchen", false))}
 
+	# The farms (D050): each grows its crops in shares, percent of its harvest.
 	rows = _rows(raw, "plots", "plots", errors)
 	for i in rows.size():
 		var r: Variant = rows[i]
 		var where := _where("plots", i, r)
-		if not _fields(r, {"crop": TYPE_STRING, "price": TYPE_FLOAT, "seconds": TYPE_FLOAT, "yield": TYPE_FLOAT}, where, errors):
+		if not _fields(r, {"id": TYPE_STRING, "name": TYPE_STRING, "price": TYPE_FLOAT, "crops": TYPE_DICTIONARY, "distance": TYPE_FLOAT, "survey": TYPE_FLOAT}, where, errors):
 			continue
-		if not data.items.has(r.crop) or data.items[r.crop].kind != "crop":
-			errors.append(where + ": %s is not a crop" % r.crop)
-		elif data.plots.has(r.crop):
-			errors.append(where + ": a second plot for " + r.crop)
-		elif r.price <= 0.0 or r.seconds <= 0.0 or r["yield"] < 1.0:
-			errors.append(where + ": price and seconds must be above 0, and yield at least 1")
-		else:
-			data.plots[r.crop] = {"crop": r.crop, "name": str(r.get("name", data.items[r.crop].name + " Plot")), "price": float(r.price), "seconds": float(r.seconds), "yield": int(r["yield"]), "unlocked": bool(r.get("unlocked", false))}
-	if not data.plots.has("bell"):
-		errors.append("plots.json: no bell plot (onboarding needs one)")
+		var ok := true
+		if data.plots.has(r.id):
+			errors.append(where + ": duplicate id")
+			ok = false
+		if r.price <= 0.0 or r.distance <= 0.0 or r.survey < 0.0:
+			errors.append(where + ": price and distance must be above 0, survey at least 0")
+			ok = false
+		if r.crops.is_empty():
+			errors.append(where + ": grows no crops")
+			ok = false
+		var crops := {}
+		for crop in r.crops:
+			if not data.items.has(crop) or data.items[crop].kind != "crop":
+				errors.append(where + ": %s is not a crop" % crop)
+				ok = false
+			elif typeof(r.crops[crop]) != TYPE_FLOAT or r.crops[crop] <= 0.0:
+				errors.append(where + ": %s's share must be above 0" % crop)
+				ok = false
+			else:
+				crops[crop] = float(r.crops[crop]) / 100.0
+		var extra := {}
+		for k in ["upgrade_price", "harvest_mult", "cargo_mult"]:
+			var v: Variant = r.get(k, r.price if k == "upgrade_price" else 1.0)
+			if typeof(v) != TYPE_FLOAT or v <= 0.0:
+				errors.append(where + ": %s must be a number above 0" % k)
+				ok = false
+			else:
+				extra[k] = float(v)
+		if ok:
+			data.plots[r.id] = {"id": r.id, "name": r.name, "price": float(r.price), "crops": crops, "distance": float(r.distance),
+				"survey": int(r.survey), "upgrade_price": extra.upgrade_price, "harvest_mult": extra.harvest_mult, "cargo_mult": extra.cargo_mult,
+				"ingredient": bool(r.get("ingredient", false))}
+	if not data.plots.has("bell") or data.plots.bell.crops.keys() != ["bell"]:
+		errors.append("plots.json: no bell plot growing only Bell Peppers (onboarding needs one)")
 
 	var slots: Variant = raw.get("slots", {})
 	for station in STATIONS:
-		var s: Variant = slots.get(station) if typeof(slots) == TYPE_DICTIONARY else null
-		if typeof(s) != TYPE_DICTIONARY or typeof(s.get("prices")) != TYPE_ARRAY or s.prices.is_empty():
+		var st: Variant = slots.get(station) if typeof(slots) == TYPE_DICTIONARY else null
+		if typeof(st) != TYPE_DICTIONARY or typeof(st.get("prices")) != TYPE_ARRAY or st.prices.is_empty():
 			errors.append("slots.json: %s needs a non-empty prices list" % station)
 			continue
 		var prices: Array[float] = []
-		for p in s.prices:
+		for p in st.prices:
 			if typeof(p) != TYPE_FLOAT or p <= 0.0:
 				errors.append("slots.json: %s prices must be numbers above 0" % station)
 				break
 			prices.append(float(p))
-		var base: Variant = s.get("base_cap", float(prices.size()))
-		if typeof(base) != TYPE_FLOAT or base < 1.0 or base > prices.size():
-			errors.append("slots.json: %s base_cap must be between 1 and the number of prices" % station)
-			continue
-		data.slots[station] = {"prices": prices, "base_cap": int(base)}
+		data.slots[station] = {"prices": prices}
 
 	rows = _rows(raw, "tech", "nodes", errors)
 	for i in rows.size():
@@ -152,7 +186,13 @@ static func check(raw: Dictionary) -> Dictionary:
 				ok = false
 			else:
 				cost[item] = int(r.cost[item])
-		for need in r.needs:
+		# needs: every one; needs_any: at least one (Idle Planet Miner's OR).
+		var needs_any: Variant = r.get("needs_any", [])
+		if typeof(needs_any) != TYPE_ARRAY:
+			errors.append(where + ": needs_any is a list of node ids")
+			needs_any = []
+			ok = false
+		for need in r.needs + needs_any:
 			if not data.tech.has(need):
 				errors.append(where + ": needs %s, which isn't an earlier node" % str(need))
 				ok = false
@@ -164,15 +204,19 @@ static func check(raw: Dictionary) -> Dictionary:
 				continue
 			var kind: String = e.keys()[0]
 			match kind:
-				"unlock_plot":
-					if not data.plots.has(e[kind]):
-						errors.append(where + ": unlocks unknown plot " + str(e[kind]))
+				"survey", "crossbreed", "pressure":
+					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0 or e[kind] != floorf(e[kind]):
+						errors.append(where + ": %s needs a whole number of at least 1" % kind)
 						ok = false
-				"unlock_recipe":
-					if not data.recipes.has(e[kind]):
-						errors.append(where + ": unlocks unknown recipe " + str(e[kind]))
+				"harvest_mult", "truck_speed", "cargo", "vat_speed", "line_speed", "mash_value", "sauce_value", "pressure_speed":
+					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 1.0:
+						errors.append(where + ": %s needs a multiplier above 1" % kind)
 						ok = false
-				"delivery_van", "heat_meter", "overdrive", "overflow_valve", "smart_stockpiling", "market_ticker", "sop":
+				"target_bonus", "vat_input_cut", "line_input_cut", "vat_double", "line_double", "station_discount", "pressure_extra":
+					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0 or e[kind] >= 1.0:
+						errors.append(where + ": %s needs a share between 0 and 1" % kind)
+						ok = false
+				"delivery_van", "heat_meter", "overdrive", "overflow_valve", "smart_stockpiling", "market_ticker", "sop", "crop_priority":
 					if e[kind] != true:
 						errors.append(where + ": %s takes true" % kind)
 						ok = false
@@ -180,7 +224,7 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] < 1.0:
 						errors.append(where + ": tap_yield needs a whole number of at least 1")
 						ok = false
-				"double_tap", "forage", "bumper_crop", "byproduct_recycling", "input_reduction", "stock_value_bonus", "heat_drain":
+				"double_tap", "forage", "bumper_crop", "byproduct_recycling", "stock_value_bonus", "heat_drain":
 					if typeof(e[kind]) != TYPE_FLOAT or e[kind] <= 0.0 or e[kind] >= 1.0:
 						errors.append(where + ": %s needs a share between 0 and 1" % kind)
 						ok = false
@@ -189,8 +233,9 @@ static func check(raw: Dictionary) -> Dictionary:
 						errors.append(where + ": %s needs a number above 0" % kind)
 						ok = false
 				"plot_speed", "plot_yield":
+					# A crop's harvest × mult wherever it grows (the Pantry's ingredient stations).
 					var v: Variant = e[kind]
-					if typeof(v) != TYPE_DICTIONARY or not data.plots.has(v.get("crop")) or typeof(v.get("mult")) != TYPE_FLOAT or v.mult <= 1.0:
+					if typeof(v) != TYPE_DICTIONARY or not data.items.has(v.get("crop")) or data.items[v.crop].kind != "crop" or typeof(v.get("mult")) != TYPE_FLOAT or v.mult <= 1.0:
 						errors.append(where + ": %s needs {crop, mult above 1}" % kind)
 						ok = false
 				"concentrate":
@@ -208,16 +253,6 @@ static func check(raw: Dictionary) -> Dictionary:
 					if typeof(v) != TYPE_DICTIONARY or typeof(v.get("hours")) != TYPE_FLOAT or typeof(v.get("speed")) != TYPE_FLOAT or v.hours < 0.0 or v.speed < 0.0:
 						errors.append(where + ": offline needs {hours, speed}, neither below 0")
 						ok = false
-				"slot_cap":
-					var v: Variant = e[kind]
-					if typeof(v) != TYPE_DICTIONARY or v.is_empty():
-						errors.append(where + ": slot_cap needs {vat, line}")
-						ok = false
-					else:
-						for st in v:
-							if not STATIONS.has(st) or typeof(v[st]) != TYPE_FLOAT or v[st] < 1.0:
-								errors.append(where + ": slot_cap %s needs a whole number of at least 1" % st)
-								ok = false
 				_:
 					errors.append(where + ": unknown effect " + kind)
 					ok = false
@@ -234,7 +269,8 @@ static func check(raw: Dictionary) -> Dictionary:
 			if typeof(after_sale) != TYPE_BOOL:
 				errors.append(where + ": after_sale is true or false")
 				after_sale = false
-			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1]), "excludes": excludes.duplicate(), "after_sale": after_sale}
+			data.tech[r.id] = {"id": r.id, "label": r.label, "name": r.name, "wing": r.wing, "needs": r.needs.duplicate(), "needs_any": needs_any.duplicate(),
+				"cost": cost, "effects": effects, "pos": Vector2(r.pos[0], r.pos[1]), "excludes": excludes.duplicate(), "after_sale": after_sale}
 			data.tech_order.append(r.id)
 	# A fork (D026) names the nodes it locks; each side has to name the other.
 	for id in data.tech:
@@ -243,40 +279,46 @@ static func check(raw: Dictionary) -> Dictionary:
 				errors.append("tech.json (%s): excludes unknown node %s" % [id, str(other)])
 			elif not data.tech[other].excludes.has(id):
 				errors.append("tech.json (%s): excludes %s, which doesn't exclude it back" % [id, other])
+
 	rows = _rows(raw, "rooms", "rooms", errors)
 	for i in rows.size():
 		var r: Variant = rows[i]
 		var where := _where("rooms", i, r)
-		if not _fields(r, {"id": TYPE_STRING, "name": TYPE_STRING, "effect": TYPE_STRING, "cap": TYPE_FLOAT}, where, errors):
+		if not _fields(r, {"id": TYPE_STRING, "name": TYPE_STRING, "effect": TYPE_STRING, "cap": TYPE_FLOAT, "open_cost": TYPE_FLOAT, "level_costs": TYPE_ARRAY}, where, errors):
 			continue
 		if data.rooms.has(r.id):
 			errors.append(where + ": duplicate id")
 		elif not r.effect in ROOM_EFFECTS:
 			errors.append(where + ": effect must be one of " + str(ROOM_EFFECTS))
-		elif r.cap < 1.0:
-			errors.append(where + ": cap must be at least 1")
+		elif r.cap < 1.0 or r.open_cost < 1.0:
+			errors.append(where + ": cap and open_cost must be at least 1")
+		elif r.level_costs.size() != int(r.cap) - 1 or r.level_costs.any(func(c): return typeof(c) != TYPE_FLOAT or c < 1.0):
+			errors.append(where + ": level_costs needs cap − 1 credit prices of at least 1")
 		elif r.effect == "start_cash" and (typeof(r.get("amounts")) != TYPE_ARRAY or r.amounts.is_empty() or typeof(r.get("growth")) != TYPE_FLOAT):
 			errors.append(where + ": start_cash needs amounts and growth")
-		elif r.effect != "start_cash" and (typeof(r.get("base")) != TYPE_FLOAT or typeof(r.get("step")) != TYPE_FLOAT or r.base <= 0.0 or r.step < 0.0):
-			errors.append(where + ": needs base above 0 and step at least 0")
+		elif r.effect != "start_cash" and (typeof(r.get("base")) != TYPE_FLOAT or typeof(r.get("step")) != TYPE_FLOAT or r.base <= 0.0):
+			errors.append(where + ": needs base above 0 and a step")
 		else:
-			var room := {"id": r.id, "name": r.name, "effect": r.effect, "cap": int(r.cap)}
+			var room := {"id": r.id, "name": r.name, "effect": r.effect, "cap": int(r.cap), "open_cost": int(r.open_cost),
+				"level_costs": r.level_costs.map(func(c): return int(c))}
 			for k in ["base", "step", "growth"]:
 				if r.has(k):
 					room[k] = float(r[k])
 			if r.has("amounts"):
 				room.amounts = r.amounts.map(func(a): return float(a))
 			data.rooms[r.id] = room
+			data.room_order.append(r.id)
 	if not data.tech.has("kitchen_table"):
 		errors.append("tech.json: no kitchen_table root")
-	for station in data.slots:
-		var cap: int = data.slots[station].base_cap
-		for id in data.tech:
-			for e in data.tech[id].effects:
-				if e.has("slot_cap"):
-					cap += int(e.slot_cap.get(station, 0))
-		if cap > data.slots[station].prices.size():
-			errors.append("slots.json: Slot Expansion opens %d %s slots but only %d are priced" % [cap, station, data.slots[station].prices.size()])
+	# Every farm's survey exists, so every farm can be reached.
+	var surveys := {0: true}
+	for id in data.tech:
+		for e in data.tech[id].effects:
+			if e.has("survey"):
+				surveys[int(e.survey)] = true
+	for id in data.plots:
+		if not surveys.has(data.plots[id].survey):
+			errors.append("plots.json (%s): survey %d isn't in tech.json" % [id, data.plots[id].survey])
 	return {"data": data if errors.is_empty() else {}, "errors": errors}
 
 

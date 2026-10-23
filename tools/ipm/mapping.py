@@ -453,9 +453,9 @@ ADOPT = [
     ("Cargo Logistics", "Crop Priority", "choose which crop a farm's truck takes first", ""),
     ("Ore Targeting", "Targeted Fertiliser", "a farm's priority crop +15%", ""),
     ("Advanced Ore Targeting", "Precision Fertiliser", "+30% instead (not added to the 15%)", ""),
-    ("Alchemy", "Crossbreeding I", "one farm's crop becomes the next rung up (you pick the farm)", ""),
-    ("Advanced Alchemy", "Crossbreeding II", "two rungs up, a farm not already crossbred", ""),
-    ("Superior Alchemy", "Crossbreeding III", "three rungs up", ""),
+    ("Alchemy", "Crossbreed I", "one farm's crop becomes the next rung up (you pick the farm)", ""),
+    ("Advanced Alchemy", "Crossbreed II", "two rungs up, a farm not already crossbred", ""),
+    ("Superior Alchemy", "Crossbreed III", "three rungs up", ""),
     ("Advanced Furnace", "Hotter Burners", "vats ×1.2 faster", ""),
     ("Superior Furnace", "Steam Jackets", "vats ×1.2 faster again", ""),
     ("Smelting Efficiency", "Zero-Waste Piping I", "vat recipes take 20% fewer inputs", "S5 (brief name kept)"),
@@ -514,7 +514,21 @@ ROOMS = [
     ("Marketing", "Ad Agency", "Market Ticker spikes (new)"),
 ]
 rinfo = {r["name"]: r for r in snap["rooms"]}
-open_costs = [int(r["min_cost"].replace(",", "")) for r in snap["rooms"] if r["min_cost"].replace(",", "").isdigit()]
+
+
+def level_cost(t):
+    """A room level's credits. Aeronautical's and Packaging's level 31 read "10.938" on the wiki,
+    a typo for 10,938 (Engineering's same row), so a dot before three digits is a thousands mark."""
+    t = t.strip()
+    if re.fullmatch(r"\d{1,3}(\.\d{3})+", t):
+        t = t.replace(".", "")
+    return int(t.replace(",", ""))
+# The n-th room bought costs this many credits. The wiki's Min Cost column gives
+# Engineering and the Forge 3 each because either can be first; its Combined
+# Min Cost column (3, 3, 9, 21, 42…) shows the second purchase costs 6, so the
+# Forge's row is skipped.
+mins = [int(r["min_cost"].replace(",", "")) for r in snap["rooms"] if r["min_cost"].replace(",", "").isdigit()]
+open_costs = [mins[0]] + mins[2:]
 L = ["| Offered | Our room | IPM room | Effect | Level 1 | Per level | Max level | Opening cost (credits, as the n-th room bought) |", "| --- | --- | --- | --- | --- | --- | --- | --- |"]
 mapping["rooms"] = []
 for i, (ipm, ours_r, eff) in enumerate(ROOMS):
@@ -523,7 +537,7 @@ for i, (ipm, ours_r, eff) in enumerate(ROOMS):
         L.append(f"| {i+1} | {ours_r} | {ipm} | {eff} | {r['base']} | {r['per_level']} | {r['max_level']} | {open_costs[i]} |")
         lv = snap["room_levels"][ipm]
         mapping["rooms"].append({"name": ours_r, "ipm": ipm, "base": r["base"], "per_level": r["per_level"], "max": int(r["max_level"]),
-                                 "level_costs": [int(x["cost"].replace(",", "")) for x in lv if x["cost"].replace(",", "").isdigit()], "open_cost": open_costs[i]})
+                                 "level_costs": [level_cost(x["cost"]) for x in lv if x["level"] > 1], "open_cost": open_costs[i]})
     else:
         L.append(f"| {i+1} | {ours_r} | (none) | {eff} | as now (rooms.json) | as now | as now | {open_costs[i]} |")
         mapping["rooms"].append({"name": ours_r, "ipm": None, "open_cost": open_costs[i], "level_costs": "Engineering's (assumed)"})

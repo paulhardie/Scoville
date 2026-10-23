@@ -189,7 +189,7 @@ All reveals happen in the first 15 minutes, as the brief's first pillar asks. Th
 | --- | --- | --- | --- |
 | Stage 3: the nav bar, plus the **Processing** tab | £400 | 7:59 | The vats and lines move from Farms to Processing |
 | **Tech Tree** tab | £750 | 12:42 | Opens on the free `[00] Kitchen Table` node |
-| **Shift Roster** tab | £10,000 (provisional) | 42:18 | Set by the 45–60 minute target. v0.3 reaches £10,000 a little early; £14,000 would land at 50:00. Settle in v0.7, when the tab is built and opens with one free Recruitment Pack |
+| **Shift Roster** tab | £10,000 (provisional) | 42:18 | Set by the 45–60 minute target. v0.3 reaches £10,000 a little early; £14,000 would land at 50:00. Settle in v0.8, when the tab is built and opens with one free Recruitment Pack |
 | **HQ Facilities** tab | £1,000,000 | 3:00 target | Brief §2, §6 |
 
 A locked tab shows `[ ? ]`. Tapping it shows the Operation Value it unlocks at (assumed: the brief says only that the icons are locked).

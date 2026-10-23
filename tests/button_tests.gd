@@ -44,7 +44,7 @@ static func with(nodes: Array, seed_value: int = 1) -> Game:
 	g.revealed.status_bar = true
 	g.account.best_ov = 1e9
 	for item in g.stock:
-		g.stock[item] = 100000
+		g.stock[item] = 10000000
 	for node in nodes:
 		research_with_parents(g, node)
 	for item in g.stock:
@@ -53,7 +53,11 @@ static func with(nodes: Array, seed_value: int = 1) -> Game:
 
 
 static func research_with_parents(g: Game, node: String) -> void:
-	for need in g.data.tech[node].needs:
+	var needs: Array = g.data.tech[node].needs.duplicate()
+	# needs_any: the first will do (SKELETON.md, IPM's OR).
+	if not g.data.tech[node].needs_any.is_empty():
+		needs.append(g.data.tech[node].needs_any[0])
+	for need in needs:
 		if not g.is_researched(need):
 			research_with_parents(g, need)
 	if not g.is_researched(node):
@@ -103,7 +107,7 @@ func test_ergonomic_grip() -> void:
 
 func test_overclock() -> void:
 	for node in ["overclock_1", "overclock_2", "overclock_3"]:
-		var g := with([node, "slot_expansion_1"])
+		var g := with([node])
 		g.fx.double = 0.0  # one press is one press here
 		var cut: float = g.fx.overclock
 		g.cash = 1e6
@@ -162,7 +166,7 @@ func test_heat_on_sales() -> void:
 	g.stock.table_mild = 10
 	var ov := g.operation_value()
 	var batch: float = 10 * g.value("table_mild")
-	check(close(ov, g.stats.cash_earned + batch), "H2: stock is valued as normal")
+	check(close(ov, g.cash + g.stats.spent + batch), "H2: stock is valued as normal")
 	var before: float = g.cash
 	g.sell_batch()
 	check(close(g.cash - before, batch * mult), "H2: Sell Batch gets the bonus")
@@ -224,50 +228,58 @@ func test_heat_steady_states() -> void:
 				check(g.heat < 10.0, "H3: %s can't hold Heat (from %d%%, ends %.0f%%)" % [c[0], start, g.heat])
 
 
-## A Forager's Luck game owning these ingredient stations, with their recipes.
-static func forager(crops: Array, nodes: Array, seed_value: int = 1) -> Game:
+## A Forager's Luck game owning these ingredient stations, with these recipes
+## bought (D051) and these nodes researched.
+static func forager(crops: Array, recipes: Array, seed_value: int = 1, nodes: Array = []) -> Game:
 	var g := with(["foragers_luck"] + nodes, seed_value)
 	for crop in crops:
 		g.plots[crop].owned = true
+	for r in recipes:
+		g.bought[r] = true
+	g._refresh_fx()
 	return g
 
 
+## A Forager's Luck drop: what the station grows in FORAGE_SECONDS.
+static func drop(g: Game, crop: String) -> int:
+	return roundi(g.crop_rate(crop, crop) * T.FORAGE_SECONDS)
+
+
 func test_forage_rate() -> void:
-	var g := forager(["vinegar"], ["brine_blueprint"])
+	var g := forager(["vinegar"], ["pickled_brine"])
 	g.stock.vinegar = 1000000   # always the shortest (the only one); stock doesn't change the chance
 	for i in 10000:
 		g.press()
 	var share: float = float(g.stats.foraged) / g.stats.presses
 	check(share >= 0.02 and share <= 0.03, "T1: %.2f%% of presses forage (want 2–3%%)" % (share * 100.0))
-	check(g.stats.harvested.vinegar == g.stats.foraged * g.plot_yield("vinegar"), "T1: each drop is one harvest of the Vinegar Cask")
+	check(g.stats.harvested.vinegar == g.stats.foraged * drop(g, "vinegar"), "T1: each drop is %d s of the Vinegar Cask's growth" % int(T.FORAGE_SECONDS))
 
 
 func test_forage_goes_to_the_shortest() -> void:
-	var g := forager(["vinegar", "garlic"], ["brine_blueprint", "paste_blueprint"])
-	g.plots.garlic["yield"] = 10   # yield and speed upgrades count (D041)
-	g.plots.garlic.speed = 10
-	g.stock.vinegar = 50   # 5 cycles of Pickled Brine (10)
-	g.stock.garlic = 40    # 2 cycles of Garlic Paste (20)
+	var g := forager(["vinegar", "garlic"], ["pickled_brine", "garlic_paste"])
+	g.plots.garlic.harvest = 10   # Harvest Rate levels count (D041)
+	g.stock.vinegar = 5000   # 5 cycles of Pickled Brine (1,000)
+	g.stock.garlic = 2000    # 2 cycles of Garlic Paste (1,000)
 	check(g._shortest_ingredient() == "garlic", "T2: Garlic (2 cycles) is shorter than Vinegar (5)")
 	while g.stats.foraged == 0:
 		g.press()
-	var drop := floori(g.plot_yield_exact("garlic") * g.data.plots.garlic.seconds / g.plot_cycle("garlic"))
-	check(g.stock.garlic == 40 + drop and drop > g.data.plots.garlic["yield"], "T2: the drop is one Garlic harvest at its base cycle, upgrades included (got %d, want %d)" % [g.stock.garlic - 40, drop])
-	check(g.stock.vinegar == 50, "T2: and nothing else")
-	g.stock.garlic = 50
-	g.stock.vinegar = 20
+	var want := drop(g, "garlic")
+	check(g.stock.garlic == 2000 + want and want > roundi(0.25 * T.FORAGE_SECONDS), "T2: the drop is the Garlic Plot's growth, upgrades included (got %d, want %d)" % [g.stock.garlic - 2000, want])
+	check(g.stock.vinegar == 5000, "T2: and nothing else")
+	g.stock.garlic = 2500
+	g.stock.vinegar = 2000
 	check(g._shortest_ingredient() == "vinegar", "T2: Vinegar (2 cycles) is shorter than Garlic (2.5)")
-	g.stock.vinegar = 25
+	g.stock.vinegar = 2500
 	check(g._shortest_ingredient() == "vinegar", "T2: ties go in data order")
-	var unused := forager(["vinegar", "garlic"], ["brine_blueprint"])
-	unused.stock.vinegar = 1000
-	check(unused._shortest_ingredient() == "vinegar", "T2: an ingredient no researched recipe uses is never the shortest")
-	check(forager(["jalapeno"], ["brine_blueprint"])._shortest_ingredient() == "", "T2: peppers aren't ingredients")
+	var unused := forager(["vinegar", "garlic"], ["pickled_brine"])
+	unused.stock.vinegar = 100000
+	check(unused._shortest_ingredient() == "vinegar", "T2: an ingredient no unlocked recipe uses is never the shortest")
+	check(forager(["farm_09"], ["pickled_brine"])._shortest_ingredient() == "", "T2: peppers aren't ingredients")
 
 
 func test_forage_needs_a_station() -> void:
-	var a := with(["foragers_luck", "brine_blueprint"], 7)
-	var b := with(["double_tap", "brine_blueprint"], 7)
+	var a := forager([], ["pickled_brine"], 7)
+	var b := with(["double_tap"], 7)
 	for i in 1000:
 		a.press()
 		b.press()
@@ -276,8 +288,8 @@ func test_forage_needs_a_station() -> void:
 
 
 func test_forage_while_away() -> void:
-	var g := forager(["vinegar"], ["brine_blueprint", "automated_piston"])
+	var g := forager(["vinegar"], ["pickled_brine"], 1, ["automated_piston"])
 	g.catch_up(3600.0)
 	var expected: float = 3600.0 * g.offline_speed() * 1.1 * 0.025
 	check(g.stats.foraged > expected * 0.6 and g.stats.foraged < expected * 1.4, "T2: the Piston forages while away (%d drops, about %d expected)" % [g.stats.foraged, roundi(expected)])
-	check(g.stats.harvested.vinegar >= g.stats.foraged * g.plot_yield("vinegar"), "T2: and the drops count as harvested")
+	check(g.stats.harvested.vinegar >= g.stats.foraged * drop(g, "vinegar"), "T2: and the drops count as harvested")

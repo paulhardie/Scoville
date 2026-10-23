@@ -1939,12 +1939,7 @@
    "name": "Jolrael",
    "price": "",
    "telescope": "25",
-   "ores": [
-    [
-     "",
-     ""
-    ]
-   ],
+   "ores": [],
    "distance": ""
   },
   {
@@ -1952,12 +1947,7 @@
    "name": "Hyperion",
    "price": "",
    "telescope": "25",
-   "ores": [
-    [
-     "",
-     ""
-    ]
-   ],
+   "ores": [],
    "distance": ""
   },
   {
@@ -1965,12 +1955,7 @@
    "name": "Astrea",
    "price": "",
    "telescope": "25",
-   "ores": [
-    [
-     "",
-     ""
-    ]
-   ],
+   "ores": [],
    "distance": ""
   }
  ],
@@ -6001,10 +5986,717 @@
   [
    "1q",
    "459"
-  ],
-  [
-   "(10x more than the previous)",
-   "(next triangular number, x10)"
   ]
- ]
+ ],
+ "credits_past_table": "each decade 10x more: the next triangular number x10 (the wiki's words)",
+ "upgrades": {
+  "formulas": [
+   "Upgraded Base Mining Rate (at level) = 0.25 + 0.1 * (level - 1) + 0.017 * (level - 1)2",
+   "Upgraded Base Ship Speed (at level) = 1 + 0.2 * (level - 1) + (1/75) * (level - 1)2",
+   "Upgraded Base Cargo (at level) = 5 + 2 * (level - 1) + 0.1 * (level - 1)2 [rounded (using rounding half to even) after application of bonus modifiers]",
+   "Base Upgrade Price (at level, in order to reach level + 1) = (Planet's Unlock Price/20) * 1.3level - 1 [rounded only for display, not for actual spending]"
+  ],
+  "levels": [
+   {
+    "level": 1,
+    "mining": "0.250",
+    "ship_speed": "1.00",
+    "cargo": "5",
+    "price_share": "0.05"
+   },
+   {
+    "level": 2,
+    "mining": "0.367",
+    "ship_speed": "1.21",
+    "cargo": "7",
+    "price_share": "0.065"
+   },
+   {
+    "level": 3,
+    "mining": "0.518",
+    "ship_speed": "1.45",
+    "cargo": "9",
+    "price_share": "0.0845"
+   },
+   {
+    "level": 4,
+    "mining": "0.703",
+    "ship_speed": "1.72",
+    "cargo": "12",
+    "price_share": "0.10985"
+   },
+   {
+    "level": 5,
+    "mining": "0.922",
+    "ship_speed": "2.01",
+    "cargo": "15",
+    "price_share": "0.142805"
+   },
+   {
+    "level": 6,
+    "mining": "1.175",
+    "ship_speed": "2.33",
+    "cargo": "18",
+    "price_share": "0.1856465"
+   },
+   {
+    "level": 7,
+    "mining": "1.462",
+    "ship_speed": "2.68",
+    "cargo": "21",
+    "price_share": "0.2413405"
+   },
+   {
+    "level": 8,
+    "mining": "1.783",
+    "ship_speed": "3.05",
+    "cargo": "24",
+    "price_share": "0.3137426"
+   },
+   {
+    "level": 9,
+    "mining": "2.138",
+    "ship_speed": "3.45",
+    "cargo": "27",
+    "price_share": "0.4078654"
+   },
+   {
+    "level": 10,
+    "mining": "2.527",
+    "ship_speed": "3.88",
+    "cargo": "31",
+    "price_share": "0.530225"
+   },
+   {
+    "level": 11,
+    "mining": "2.950",
+    "ship_speed": "4.33",
+    "cargo": "35",
+    "price_share": "0.6892925"
+   },
+   {
+    "level": 12,
+    "mining": "3.407",
+    "ship_speed": "4.81",
+    "cargo": "39",
+    "price_share": "0.8960802"
+   },
+   {
+    "level": 13,
+    "mining": "3.898",
+    "ship_speed": "5.32",
+    "cargo": "43",
+    "price_share": "1.164904"
+   },
+   {
+    "level": 14,
+    "mining": "4.423",
+    "ship_speed": "5.85",
+    "cargo": "48",
+    "price_share": "1.514376"
+   },
+   {
+    "level": 15,
+    "mining": "4.982",
+    "ship_speed": "6.41",
+    "cargo": "53",
+    "price_share": "1.968688"
+   },
+   {
+    "level": 16,
+    "mining": "5.575",
+    "ship_speed": "7.00",
+    "cargo": "58",
+    "price_share": "2.559295"
+   },
+   {
+    "level": 17,
+    "mining": "6.202",
+    "ship_speed": "7.61",
+    "cargo": "63",
+    "price_share": "3.327083"
+   },
+   {
+    "level": 18,
+    "mining": "6.863",
+    "ship_speed": "8.25",
+    "cargo": "68",
+    "price_share": "4.325208"
+   },
+   {
+    "level": 19,
+    "mining": "7.558",
+    "ship_speed": "8.92",
+    "cargo": "73",
+    "price_share": "5.62277"
+   },
+   {
+    "level": 20,
+    "mining": "8.287",
+    "ship_speed": "9.61",
+    "cargo": "79",
+    "price_share": "7.309601"
+   },
+   {
+    "level": 21,
+    "mining": "9.050",
+    "ship_speed": "10.33",
+    "cargo": "85",
+    "price_share": "9.502482"
+   },
+   {
+    "level": 22,
+    "mining": "9.847",
+    "ship_speed": "11.08",
+    "cargo": "91",
+    "price_share": "12.35323"
+   },
+   {
+    "level": 23,
+    "mining": "10.678",
+    "ship_speed": "11.85",
+    "cargo": "97",
+    "price_share": "16.05919"
+   },
+   {
+    "level": 24,
+    "mining": "11.543",
+    "ship_speed": "12.65",
+    "cargo": "104",
+    "price_share": "20.87695"
+   },
+   {
+    "level": 25,
+    "mining": "12.442",
+    "ship_speed": "13.48",
+    "cargo": "111",
+    "price_share": "27.14004"
+   },
+   {
+    "level": 26,
+    "mining": "13.375",
+    "ship_speed": "14.33",
+    "cargo": "118",
+    "price_share": "35.28205"
+   },
+   {
+    "level": 27,
+    "mining": "14.342",
+    "ship_speed": "15.21",
+    "cargo": "125",
+    "price_share": "45.86667"
+   },
+   {
+    "level": 28,
+    "mining": "15.343",
+    "ship_speed": "16.12",
+    "cargo": "132",
+    "price_share": "59.62666"
+   },
+   {
+    "level": 29,
+    "mining": "16.378",
+    "ship_speed": "17.05",
+    "cargo": "139",
+    "price_share": "77.51466"
+   },
+   {
+    "level": 30,
+    "mining": "17.447",
+    "ship_speed": "18.01",
+    "cargo": "147",
+    "price_share": "100.7691"
+   },
+   {
+    "level": 31,
+    "mining": "18.550",
+    "ship_speed": "19.00",
+    "cargo": "155",
+    "price_share": "130.9998"
+   },
+   {
+    "level": 32,
+    "mining": "19.687",
+    "ship_speed": "20.01",
+    "cargo": "163",
+    "price_share": "170.2997"
+   },
+   {
+    "level": 33,
+    "mining": "20.858",
+    "ship_speed": "21.05",
+    "cargo": "171",
+    "price_share": "221.3896"
+   },
+   {
+    "level": 34,
+    "mining": "22.063",
+    "ship_speed": "22.12",
+    "cargo": "180",
+    "price_share": "287.8065"
+   },
+   {
+    "level": 35,
+    "mining": "23.302",
+    "ship_speed": "23.21",
+    "cargo": "189",
+    "price_share": "374.1485"
+   },
+   {
+    "level": 36,
+    "mining": "24.575",
+    "ship_speed": "24.33",
+    "cargo": "198",
+    "price_share": "486.393"
+   },
+   {
+    "level": 37,
+    "mining": "25.882",
+    "ship_speed": "25.48",
+    "cargo": "207",
+    "price_share": "632.3109"
+   },
+   {
+    "level": 38,
+    "mining": "27.223",
+    "ship_speed": "26.65",
+    "cargo": "216",
+    "price_share": "822.0042"
+   },
+   {
+    "level": 39,
+    "mining": "28.598",
+    "ship_speed": "27.85",
+    "cargo": "225",
+    "price_share": "1,068.605"
+   },
+   {
+    "level": 40,
+    "mining": "30.007",
+    "ship_speed": "29.08",
+    "cargo": "235",
+    "price_share": "1,389.187"
+   },
+   {
+    "level": 41,
+    "mining": "31.450",
+    "ship_speed": "30.33",
+    "cargo": "245",
+    "price_share": "1,805.943"
+   },
+   {
+    "level": 42,
+    "mining": "32.927",
+    "ship_speed": "31.61",
+    "cargo": "255",
+    "price_share": "2,347.726"
+   },
+   {
+    "level": 43,
+    "mining": "34.438",
+    "ship_speed": "32.92",
+    "cargo": "265",
+    "price_share": "3,052.044"
+   },
+   {
+    "level": 44,
+    "mining": "35.983",
+    "ship_speed": "34.25",
+    "cargo": "276",
+    "price_share": "3,967.657"
+   },
+   {
+    "level": 45,
+    "mining": "37.562",
+    "ship_speed": "35.61",
+    "cargo": "287",
+    "price_share": "5,157.954"
+   },
+   {
+    "level": 46,
+    "mining": "39.175",
+    "ship_speed": "37.00",
+    "cargo": "298",
+    "price_share": "6,705.341"
+   },
+   {
+    "level": 47,
+    "mining": "40.822",
+    "ship_speed": "38.41",
+    "cargo": "309",
+    "price_share": "8,716.943"
+   },
+   {
+    "level": 48,
+    "mining": "42.503",
+    "ship_speed": "39.85",
+    "cargo": "320",
+    "price_share": "11,332.03"
+   },
+   {
+    "level": 49,
+    "mining": "44.218",
+    "ship_speed": "41.32",
+    "cargo": "331",
+    "price_share": "14,731.63"
+   },
+   {
+    "level": 50,
+    "mining": "45.967",
+    "ship_speed": "42.81",
+    "cargo": "343",
+    "price_share": "19,151.12"
+   },
+   {
+    "level": 51,
+    "mining": "47.750",
+    "ship_speed": "44.33",
+    "cargo": "355",
+    "price_share": "24,896.46"
+   },
+   {
+    "level": 52,
+    "mining": "49.567",
+    "ship_speed": "45.88",
+    "cargo": "367",
+    "price_share": "32,365.4"
+   },
+   {
+    "level": 53,
+    "mining": "51.418",
+    "ship_speed": "47.45",
+    "cargo": "379",
+    "price_share": "42,075.02"
+   },
+   {
+    "level": 54,
+    "mining": "53.303",
+    "ship_speed": "49.05",
+    "cargo": "392",
+    "price_share": "54,697.53"
+   },
+   {
+    "level": 55,
+    "mining": "55.222",
+    "ship_speed": "50.68",
+    "cargo": "405",
+    "price_share": "71,106.78"
+   },
+   {
+    "level": 56,
+    "mining": "57.175",
+    "ship_speed": "52.33",
+    "cargo": "418",
+    "price_share": "92,438.82"
+   },
+   {
+    "level": 57,
+    "mining": "59.162",
+    "ship_speed": "54.01",
+    "cargo": "431",
+    "price_share": "120,170.5"
+   },
+   {
+    "level": 58,
+    "mining": "61.183",
+    "ship_speed": "55.72",
+    "cargo": "444",
+    "price_share": "156,221.6"
+   },
+   {
+    "level": 59,
+    "mining": "63.238",
+    "ship_speed": "57.45",
+    "cargo": "457",
+    "price_share": "203,088.1"
+   },
+   {
+    "level": 60,
+    "mining": "65.327",
+    "ship_speed": "59.21",
+    "cargo": "471",
+    "price_share": "264,014.5"
+   },
+   {
+    "level": 61,
+    "mining": "67.450",
+    "ship_speed": "61.00",
+    "cargo": "485",
+    "price_share": "343,218.9"
+   },
+   {
+    "level": 62,
+    "mining": "69.607",
+    "ship_speed": "62.81",
+    "cargo": "499",
+    "price_share": "446,184.5"
+   },
+   {
+    "level": 63,
+    "mining": "71.798",
+    "ship_speed": "64.65",
+    "cargo": "513",
+    "price_share": "580,039.9"
+   },
+   {
+    "level": 64,
+    "mining": "74.023",
+    "ship_speed": "66.52",
+    "cargo": "528",
+    "price_share": "754,051.8"
+   },
+   {
+    "level": 65,
+    "mining": "76.282",
+    "ship_speed": "68.41",
+    "cargo": "543",
+    "price_share": "980,267.4"
+   },
+   {
+    "level": 66,
+    "mining": "78.575",
+    "ship_speed": "70.33",
+    "cargo": "558",
+    "price_share": "1,274,348"
+   },
+   {
+    "level": 67,
+    "mining": "80.902",
+    "ship_speed": "72.28",
+    "cargo": "573",
+    "price_share": "1,656,652"
+   },
+   {
+    "level": 68,
+    "mining": "83.263",
+    "ship_speed": "74.25",
+    "cargo": "588",
+    "price_share": "2,153,647"
+   },
+   {
+    "level": 69,
+    "mining": "85.658",
+    "ship_speed": "76.25",
+    "cargo": "603",
+    "price_share": "2,799,742"
+   },
+   {
+    "level": 70,
+    "mining": "88.087",
+    "ship_speed": "78.28",
+    "cargo": "619",
+    "price_share": "3,639,664"
+   },
+   {
+    "level": 71,
+    "mining": "90.550",
+    "ship_speed": "80.33",
+    "cargo": "635",
+    "price_share": "4,731,563"
+   },
+   {
+    "level": 72,
+    "mining": "93.047",
+    "ship_speed": "82.41",
+    "cargo": "651",
+    "price_share": "6,151,032"
+   },
+   {
+    "level": 73,
+    "mining": "95.578",
+    "ship_speed": "84.52",
+    "cargo": "667",
+    "price_share": "7,996,342"
+   },
+   {
+    "level": 74,
+    "mining": "98.143",
+    "ship_speed": "86.65",
+    "cargo": "684",
+    "price_share": "10,395,245"
+   },
+   {
+    "level": 75,
+    "mining": "100.742",
+    "ship_speed": "88.81",
+    "cargo": "701",
+    "price_share": "13,513,818"
+   },
+   {
+    "level": 76,
+    "mining": "103.375",
+    "ship_speed": "91.00",
+    "cargo": "718",
+    "price_share": "17,567,964"
+   },
+   {
+    "level": 77,
+    "mining": "106.042",
+    "ship_speed": "93.21",
+    "cargo": "735",
+    "price_share": "22,838,353"
+   },
+   {
+    "level": 78,
+    "mining": "108.743",
+    "ship_speed": "95.45",
+    "cargo": "752",
+    "price_share": "29,689,859"
+   },
+   {
+    "level": 79,
+    "mining": "111.478",
+    "ship_speed": "97.72",
+    "cargo": "769",
+    "price_share": "38,596,816"
+   },
+   {
+    "level": 80,
+    "mining": "114.247",
+    "ship_speed": "100.01",
+    "cargo": "787",
+    "price_share": "50,175,861"
+   },
+   {
+    "level": 81,
+    "mining": "117.050",
+    "ship_speed": "102.33",
+    "cargo": "805",
+    "price_share": "65,228,620"
+   },
+   {
+    "level": 82,
+    "mining": "119.887",
+    "ship_speed": "104.68",
+    "cargo": "823",
+    "price_share": "84,797,206"
+   },
+   {
+    "level": 83,
+    "mining": "122.758",
+    "ship_speed": "107.05",
+    "cargo": "841",
+    "price_share": "110,236,367"
+   },
+   {
+    "level": 84,
+    "mining": "125.663",
+    "ship_speed": "109.45",
+    "cargo": "860",
+    "price_share": "143,307,278"
+   },
+   {
+    "level": 85,
+    "mining": "128.602",
+    "ship_speed": "111.88",
+    "cargo": "879",
+    "price_share": "186,299,461"
+   },
+   {
+    "level": 86,
+    "mining": "131.575",
+    "ship_speed": "114.33",
+    "cargo": "898",
+    "price_share": "242,189,299"
+   },
+   {
+    "level": 87,
+    "mining": "134.582",
+    "ship_speed": "116.81",
+    "cargo": "917",
+    "price_share": "314,846,089"
+   },
+   {
+    "level": 88,
+    "mining": "137.623",
+    "ship_speed": "119.32",
+    "cargo": "936",
+    "price_share": "409,299,916"
+   },
+   {
+    "level": 89,
+    "mining": "140.698",
+    "ship_speed": "121.85",
+    "cargo": "955",
+    "price_share": "532,089,890"
+   },
+   {
+    "level": 90,
+    "mining": "143.807",
+    "ship_speed": "124.41",
+    "cargo": "975",
+    "price_share": "691,716,857"
+   },
+   {
+    "level": 91,
+    "mining": "146.950",
+    "ship_speed": "127.00",
+    "cargo": "995",
+    "price_share": "899,231,914"
+   },
+   {
+    "level": 92,
+    "mining": "150.127",
+    "ship_speed": "129.61",
+    "cargo": "1015",
+    "price_share": "1,169,001,489"
+   },
+   {
+    "level": 93,
+    "mining": "153.338",
+    "ship_speed": "132.25",
+    "cargo": "1035",
+    "price_share": "1,519,701,935"
+   },
+   {
+    "level": 94,
+    "mining": "156.583",
+    "ship_speed": "134.92",
+    "cargo": "1056",
+    "price_share": "1,975,612,516"
+   },
+   {
+    "level": 95,
+    "mining": "159.862",
+    "ship_speed": "137.61",
+    "cargo": "1077",
+    "price_share": "2,568,296,271"
+   },
+   {
+    "level": 96,
+    "mining": "163.175",
+    "ship_speed": "140.33",
+    "cargo": "1098",
+    "price_share": "3,338,785,152"
+   },
+   {
+    "level": 97,
+    "mining": "166.522",
+    "ship_speed": "143.08",
+    "cargo": "1119",
+    "price_share": "4,340,420,698"
+   },
+   {
+    "level": 98,
+    "mining": "169.903",
+    "ship_speed": "145.85",
+    "cargo": "1140",
+    "price_share": "5,642,546,907"
+   },
+   {
+    "level": 99,
+    "mining": "173.318",
+    "ship_speed": "148.65",
+    "cargo": "1161",
+    "price_share": "7,335,310,979"
+   },
+   {
+    "level": 100,
+    "mining": "176.767",
+    "ship_speed": "151.48",
+    "cargo": "1183",
+    "price_share": "9,535,904,273"
+   }
+  ]
+ }
 }

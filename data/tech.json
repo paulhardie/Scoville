@@ -1,101 +1,2211 @@
 {
-	"_source": "The Tech Tree (docs/TECH_TREE.md): v0.3's slice, v0.4's 26 nodes (D010) v0.5's Night Shift Protocols (D018) and Forager's Luck (D025). Costs are GUESSES. `pos` is the node's place in the web: x east, y south, in grid steps from the centre. Effects: unlock_plot, unlock_recipe, delivery_van, tap_yield, double_tap (chance), grip (presses/s held), heat_meter, heat_drain (multiplier), overclock (s a press), piston (presses/s), plot_speed ({crop, mult}), slot_cap ({vat, line}), packaging (bottle value ×), input_reduction (share of raw crops), overdrive, overflow_valve, smart_stockpiling, market_ticker, byproduct_recycling (chance), forage (chance a press, D025), bumper_crop (chance a harvest doubles, adding, D043), stock_value_bonus (share), offline ({hours, speed}), forage (chance a press), plot_yield ({crop, mult}: Bulk), concentrate ({item, share}: less of a raw ingredient in vat recipes), reserve ({item: a mash, bonus}: sauces taking it sell for more). `excludes` makes a fork: researching a node locks the ones it names (D026). v0.6a's nodes are docs/FULL_RUN.md's. `after_sale` nodes open only once the franchise has been sold (docs/PRESTIGE.md part 2: sop, Standard Operating Procedures, and Tier 6, D034).",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). Land Surveys are IPM's telescopes; nodes with `ipm` are its projects at its costs; the rest are ours, with costs kept at their old dollar worth in the nearest-valued item of their kind (G23). `needs_any`: at least one of them (IPM's OR). `pos` is the node's place in the web.",
 	"nodes": [
-		{"id": "kitchen_table", "label": "00", "name": "Kitchen Table", "wing": "centre", "needs": [], "cost": {}, "effects": [], "pos": [0, 0]},
-		{"id": "jalapeno_blueprint", "label": "E1", "name": "Jalapeño Cultivation", "wing": "east", "needs": ["kitchen_table"], "cost": {"table_mild": 3}, "effects": [{"plot_speed": {"crop": "jalapeno", "mult": 1.5}}], "pos": [1, 0]},
-		{"id": "verde_blueprint", "label": "E2", "name": "Culinary Blueprint: Verde Mash", "wing": "east", "needs": ["jalapeno_blueprint"], "cost": {"table_mild": 10}, "effects": [{"unlock_recipe": "verde_mash"}], "pos": [2, -1]},
-		{"id": "vinegar_blueprint", "label": "E3", "name": "Crop Blueprint: White Vinegar", "wing": "east", "needs": ["jalapeno_blueprint"], "cost": {"table_mild": 10, "sweet_mash": 5}, "effects": [{"unlock_plot": "vinegar"}], "pos": [2, 1]},
-		{"id": "brine_blueprint", "label": "E4", "name": "Culinary Blueprint: Pickled Brine", "wing": "east", "needs": ["vinegar_blueprint"], "cost": {"table_mild": 10, "sweet_mash": 5}, "effects": [{"unlock_recipe": "pickled_brine"}], "pos": [3, 1]},
-		{"id": "bistro_blueprint", "label": "E5", "name": "Culinary Blueprint: Bistro Verde", "wing": "east", "needs": ["verde_blueprint", "brine_blueprint"], "cost": {"table_mild": 20}, "effects": [{"unlock_recipe": "bistro_verde"}], "pos": [3, -1]},
-		{"id": "calloused_thumbs", "label": "N1", "name": "Calloused Thumbs", "wing": "north", "needs": ["kitchen_table"], "cost": {"table_mild": 10}, "effects": [{"tap_yield": 2}], "pos": [0, -1]},
-		{"id": "delivery_van", "label": "W1", "name": "The Delivery Van", "wing": "west", "needs": ["kitchen_table"], "cost": {"table_mild": 15}, "effects": [{"delivery_van": true}], "pos": [-1, 0]},
-		{"id": "double_tap", "label": "N2", "name": "Double-Tap Mechanics", "wing": "north", "needs": ["calloused_thumbs"], "cost": {"bistro_verde": 15}, "effects": [{"double_tap": 0.1}], "pos": [0, -2]},
-		{"id": "foragers_luck", "label": "N10", "name": "Forager's Luck", "wing": "north", "needs": ["double_tap"], "cost": {"bistro_verde": 20}, "effects": [{"forage": 0.0225}], "pos": [1, -2]},
-		{"id": "ergonomic_grip", "label": "N3", "name": "Ergonomic Grip", "wing": "north", "needs": ["double_tap"], "cost": {"bistro_verde": 25}, "effects": [{"grip": 2.0}], "pos": [0, -3]},
-		{"id": "heat_meter", "label": "N4", "name": "Heat Meter", "wing": "north", "needs": ["ergonomic_grip"], "cost": {"bistro_verde": 30}, "effects": [{"heat_meter": true}], "pos": [1, -3]},
-		{"id": "overclock_1", "label": "N6", "name": "Factory Overclock I", "wing": "north", "needs": ["ergonomic_grip"], "cost": {"bistro_verde": 35}, "effects": [{"overclock": 0.05}], "pos": [-1, -3]},
-		{"id": "overflow_valve", "label": "W2", "name": "Raw Overflow Valve", "wing": "west", "needs": ["delivery_van"], "cost": {"bistro_verde": 20}, "effects": [{"overflow_valve": true}], "pos": [-2, 0]},
-		{"id": "smart_stockpiling", "label": "W3", "name": "Smart Stockpiling", "wing": "west", "needs": ["overflow_valve"], "cost": {"bistro_verde": 30}, "effects": [{"smart_stockpiling": true}], "pos": [-3, 0]},
-		{"id": "slot_expansion_1", "label": "S1", "name": "Slot Expansion I", "wing": "south", "needs": ["kitchen_table"], "cost": {"sweet_mash": 40, "verde_mash": 20}, "effects": [{"slot_cap": {"vat": 1, "line": 1}}], "pos": [0, 1]},
-		{"id": "slot_expansion_2", "label": "S2", "name": "Slot Expansion II", "wing": "south", "needs": ["slot_expansion_1"], "cost": {"verde_mash": 25, "pickled_brine": 25}, "effects": [{"slot_cap": {"vat": 1, "line": 1}}], "pos": [0, 2]},
-		{"id": "flint_glass", "label": "S3", "name": "Heavy Flint Glass", "wing": "south", "needs": ["slot_expansion_1"], "cost": {"verde_mash": 40, "pickled_brine": 40}, "effects": [{"packaging": 1.5}], "pos": [-1, 2]},
-		{"id": "zero_waste_1", "label": "S5", "name": "Zero-Waste Piping I", "wing": "south", "needs": ["slot_expansion_1"], "cost": {"sweet_mash": 60, "pickled_brine": 30}, "effects": [{"input_reduction": 0.1}], "pos": [1, 2]},
-		{"id": "cayenne_blueprint", "label": "E6", "name": "Crop Blueprint: Cayenne", "wing": "east", "needs": ["bistro_blueprint"], "cost": {"serrano_fire": 4, "verde_mash": 5}, "effects": [{"unlock_plot": "cayenne"}], "pos": [4, -1]},
-		{"id": "garlic_blueprint", "label": "E7", "name": "Crop Blueprint: Garlic", "wing": "east", "needs": ["bistro_blueprint"], "cost": {"serrano_fire": 4, "pickled_brine": 5}, "effects": [{"unlock_plot": "garlic"}], "pos": [4, 1]},
-		{"id": "paste_blueprint", "label": "E8", "name": "Culinary Blueprint: Roasted Garlic Paste", "wing": "east", "needs": ["garlic_blueprint"], "cost": {"serrano_fire": 6}, "effects": [{"unlock_recipe": "garlic_paste"}], "pos": [5, 1]},
-		{"id": "cayenne_mash_blueprint", "label": "E9", "name": "Culinary Blueprint: Cayenne Mash", "wing": "east", "needs": ["cayenne_blueprint"], "cost": {"serrano_fire": 5, "pickled_brine": 5}, "effects": [{"unlock_recipe": "cayenne_mash"}], "pos": [5, -1]},
-		{"id": "louisiana_blueprint", "label": "E10", "name": "Culinary Blueprint: Classic Louisiana", "wing": "east", "needs": ["paste_blueprint", "cayenne_mash_blueprint"], "cost": {"serrano_fire": 5}, "effects": [{"unlock_recipe": "classic_louisiana"}], "pos": [6, 0]},
-		{"id": "hydroponic_bell", "label": "E11", "name": "Hydroponic Bell Peppers", "wing": "east", "needs": ["louisiana_blueprint"], "cost": {"classic_louisiana": 40}, "effects": [{"plot_speed": {"crop": "bell", "mult": 4.0}}], "pos": [7, 0]},
-		{"id": "slow_burn", "label": "N5", "name": "Slow Burn", "wing": "north", "needs": ["heat_meter"], "cost": {"classic_louisiana": 15}, "effects": [{"heat_drain": 0.5}], "pos": [1, -4]},
-		{"id": "overclock_2", "label": "N7", "name": "Factory Overclock II", "wing": "north", "needs": ["overclock_1"], "cost": {"classic_louisiana": 15}, "effects": [{"overclock": 0.1}], "pos": [-1, -4]},
-		{"id": "overclock_3", "label": "N8", "name": "Factory Overclock III", "wing": "north", "needs": ["overclock_2"], "cost": {"classic_louisiana": 30}, "effects": [{"overclock": 0.15}], "pos": [-1, -5]},
-		{"id": "automated_piston", "label": "N9", "name": "Automated Piston", "wing": "north", "needs": ["slow_burn", "overclock_3"], "cost": {"classic_louisiana": 50}, "effects": [{"piston": 1.0}], "pos": [0, -5]},
-		{"id": "market_ticker", "label": "W4", "name": "Market Ticker", "wing": "west", "needs": ["delivery_van"], "cost": {"classic_louisiana": 15}, "effects": [{"market_ticker": true}], "pos": [-2, 1]},
-		{"id": "foil_wraps", "label": "S4", "name": "Foil Neck Wraps", "wing": "south", "needs": ["flint_glass"], "cost": {"cayenne_mash": 30, "garlic_paste": 30}, "effects": [{"packaging": 2.2}], "pos": [-1, 3]},
-		{"id": "zero_waste_2", "label": "S6", "name": "Zero-Waste Piping II", "wing": "south", "needs": ["zero_waste_1"], "cost": {"cayenne_mash": 25, "garlic_paste": 25}, "effects": [{"input_reduction": 0.2}], "pos": [1, 3]},
-		{"id": "overdrive_turbines", "label": "S7", "name": "Overdrive Turbines", "wing": "south", "needs": ["foil_wraps", "zero_waste_2"], "cost": {"cayenne_mash": 60, "garlic_paste": 60}, "effects": [{"overdrive": true}], "pos": [0, 4]},
-		{"id": "byproduct_recycling", "label": "B1", "name": "Byproduct Recycling", "wing": "bridge", "needs": ["zero_waste_1", "louisiana_blueprint"], "cost": {"classic_louisiana": 15, "cayenne_mash": 30}, "effects": [{"byproduct_recycling": 0.25}], "pos": [2, 2]},
-		{"id": "franchise_auditors", "label": "B2", "name": "Franchise Auditors", "wing": "bridge", "needs": ["smart_stockpiling", "flint_glass"], "cost": {"classic_louisiana": 20}, "effects": [{"stock_value_bonus": 0.2}], "pos": [-2, 2]},
-		{"id": "night_shift_1", "label": "W5", "name": "Night Shift Protocols I", "wing": "west", "needs": ["delivery_van"], "cost": {"classic_louisiana": 15}, "effects": [{"offline": {"hours": 2.0, "speed": 0.1}}], "pos": [-2, -1]},
-		{"id": "night_shift_2", "label": "W6", "name": "Night Shift Protocols II", "wing": "west", "needs": ["night_shift_1"], "cost": {"classic_louisiana": 25}, "effects": [{"offline": {"hours": 2.0, "speed": 0.1}}], "pos": [-3, -1]},
-		{"id": "poblano_blueprint", "label": "E12", "name": "Poblano Cultivation", "wing": "east", "needs": ["jalapeno_blueprint"], "cost": {"table_mild": 5}, "effects": [{"plot_speed": {"crop": "poblano", "mult": 1.5}}], "pos": [1, -1]},
-		{"id": "ancho_blueprint", "label": "E13", "name": "Culinary Blueprint: Ancho Mash", "wing": "east", "needs": ["poblano_blueprint"], "cost": {"table_mild": 8, "sweet_mash": 3}, "effects": [{"unlock_recipe": "ancho_mash"}], "pos": [2, -2]},
-		{"id": "smoky_ancho_blueprint", "label": "E14", "name": "Culinary Blueprint: Smoky Ancho", "wing": "east", "needs": ["ancho_blueprint"], "cost": {"table_mild": 12}, "effects": [{"unlock_recipe": "smoky_ancho"}], "pos": [3, -2]},
-		{"id": "serrano_blueprint", "label": "E15", "name": "Crop Blueprint: Serrano", "wing": "east", "needs": ["bistro_blueprint"], "cost": {"bistro_verde": 10}, "effects": [{"unlock_plot": "serrano"}], "pos": [4, -2]},
-		{"id": "serrano_mash_blueprint", "label": "E16", "name": "Culinary Blueprint: Serrano Mash", "wing": "east", "needs": ["serrano_blueprint"], "cost": {"bistro_verde": 10, "verde_mash": 5}, "effects": [{"unlock_recipe": "serrano_mash"}], "pos": [5, -2]},
-		{"id": "serrano_fire_blueprint", "label": "E17", "name": "Culinary Blueprint: Serrano Fire", "wing": "east", "needs": ["serrano_mash_blueprint"], "cost": {"bistro_verde": 15}, "effects": [{"unlock_recipe": "serrano_fire"}], "pos": [6, -2]},
-		{"id": "thai_chili_blueprint", "label": "E18", "name": "Crop Blueprint: Thai Chili", "wing": "east", "needs": ["louisiana_blueprint"], "cost": {"classic_louisiana": 10}, "effects": [{"unlock_plot": "thai_chili"}], "pos": [7, -1]},
-		{"id": "thai_chili_mash_blueprint", "label": "E19", "name": "Culinary Blueprint: Thai Chili Mash", "wing": "east", "needs": ["thai_chili_blueprint"], "cost": {"classic_louisiana": 10, "garlic_paste": 5}, "effects": [{"unlock_recipe": "thai_chili_mash"}], "pos": [8, -1]},
-		{"id": "cajun_red_blueprint", "label": "E20", "name": "Culinary Blueprint: Cajun Red", "wing": "east", "needs": ["thai_chili_mash_blueprint"], "cost": {"classic_louisiana": 15}, "effects": [{"unlock_recipe": "cajun_red"}], "pos": [9, -1]},
-		{"id": "pineapple_blueprint", "label": "E21", "name": "Crop Blueprint: Pineapple", "wing": "east", "needs": ["louisiana_blueprint"], "cost": {"cajun_red": 5}, "effects": [{"unlock_plot": "pineapple"}], "pos": [7, 1]},
-		{"id": "glaze_blueprint", "label": "E22", "name": "Culinary Blueprint: Charred Pineapple Glaze", "wing": "east", "needs": ["pineapple_blueprint"], "cost": {"cajun_red": 5, "garlic_paste": 5}, "effects": [{"unlock_recipe": "glaze"}], "pos": [8, 1]},
-		{"id": "bonnet_blueprint", "label": "E23", "name": "Crop Blueprint: Scotch Bonnet", "wing": "east", "needs": ["glaze_blueprint", "cajun_red_blueprint"], "cost": {"cajun_red": 10}, "effects": [{"unlock_plot": "bonnet"}], "pos": [9, 1]},
-		{"id": "bonnet_mash_blueprint", "label": "E24", "name": "Culinary Blueprint: Bonnet Mash", "wing": "east", "needs": ["bonnet_blueprint"], "cost": {"cajun_red": 10, "glaze": 5}, "effects": [{"unlock_recipe": "bonnet_mash"}], "pos": [10, 1]},
-		{"id": "island_heat_blueprint", "label": "E25", "name": "Culinary Blueprint: Island Heat", "wing": "east", "needs": ["bonnet_mash_blueprint"], "cost": {"cajun_red": 15}, "effects": [{"unlock_recipe": "island_heat"}], "pos": [11, 1]},
-		{"id": "caribbean_red_blueprint", "label": "E26", "name": "Crop Blueprint: Caribbean Red Habanero", "wing": "east", "needs": ["island_heat_blueprint"], "cost": {"island_heat": 20}, "effects": [{"unlock_plot": "caribbean_red"}], "pos": [9, 2]},
-		{"id": "caribbean_red_mash_blueprint", "label": "E27", "name": "Culinary Blueprint: Caribbean Red Mash", "wing": "east", "needs": ["caribbean_red_blueprint"], "cost": {"island_heat": 20, "glaze": 10}, "effects": [{"unlock_recipe": "caribbean_red_mash"}], "pos": [10, 2]},
-		{"id": "sweet_heat_blueprint", "label": "E28", "name": "Culinary Blueprint: Sweet Heat Reserve", "wing": "east", "needs": ["caribbean_red_mash_blueprint"], "cost": {"island_heat": 30}, "effects": [{"unlock_recipe": "sweet_heat"}], "pos": [11, 2]},
-		{"id": "chocolate_blueprint", "label": "E29", "name": "Crop Blueprint: Chocolate Habanero", "wing": "east", "needs": ["sweet_heat_blueprint"], "cost": {"sweet_heat": 20}, "effects": [{"unlock_plot": "chocolate"}], "pos": [12, 1]},
-		{"id": "chocolate_mash_blueprint", "label": "E30", "name": "Culinary Blueprint: Chocolate Habanero Mash", "wing": "east", "needs": ["chocolate_blueprint"], "cost": {"sweet_heat": 20, "caribbean_red_mash": 10}, "effects": [{"unlock_recipe": "chocolate_mash"}], "pos": [13, 1]},
-		{"id": "cocoa_loco_blueprint", "label": "E31", "name": "Culinary Blueprint: Cocoa Loco", "wing": "east", "needs": ["chocolate_mash_blueprint"], "cost": {"sweet_heat": 30}, "effects": [{"unlock_recipe": "cocoa_loco"}], "pos": [14, 1]},
-		{"id": "oak_blueprint", "label": "E32", "name": "Crop Blueprint: Smoked Oak", "wing": "east", "needs": ["sweet_heat_blueprint"], "cost": {"cocoa_loco": 20}, "effects": [{"unlock_plot": "oak"}], "pos": [12, 3]},
-		{"id": "smoke_blueprint", "label": "E33", "name": "Culinary Blueprint: Liquid Smoke", "wing": "east", "needs": ["oak_blueprint"], "cost": {"cocoa_loco": 20, "glaze": 10}, "effects": [{"unlock_recipe": "liquid_smoke"}], "pos": [13, 3]},
-		{"id": "ghost_blueprint", "label": "E34", "name": "Crop Blueprint: Ghost Pepper", "wing": "east", "needs": ["cocoa_loco_blueprint"], "cost": {"cocoa_loco": 20}, "effects": [{"unlock_plot": "ghost"}], "pos": [12, 2]},
-		{"id": "ghost_mash_blueprint", "label": "E35", "name": "Culinary Blueprint: Ghost Mash", "wing": "east", "needs": ["ghost_blueprint"], "cost": {"cocoa_loco": 20, "chocolate_mash": 10}, "effects": [{"unlock_recipe": "ghost_mash"}], "pos": [13, 2]},
-		{"id": "phantom_blueprint", "label": "E36", "name": "Culinary Blueprint: Phantom Smokehouse", "wing": "east", "needs": ["ghost_mash_blueprint", "smoke_blueprint"], "cost": {"cocoa_loco": 30}, "effects": [{"unlock_recipe": "phantom"}], "pos": [14, 2]},
-		{"id": "hydroponic_jalapeno", "label": "E37", "name": "Hydroponic Jalapeños", "wing": "east", "needs": ["hydroponic_bell", "sweet_heat_blueprint"], "cost": {"sweet_heat": 30}, "effects": [{"plot_speed": {"crop": "jalapeno", "mult": 4.0}}], "pos": [8, 0]},
-		{"id": "hydroponic_cayenne", "label": "E38", "name": "Hydroponic Cayenne", "wing": "east", "needs": ["hydroponic_jalapeno", "cocoa_loco_blueprint"], "cost": {"cocoa_loco": 30}, "effects": [{"plot_speed": {"crop": "cayenne", "mult": 4.0}}], "pos": [9, 0]},
-		{"id": "pantry_vinegar_booster", "label": "P1", "name": "Vinegar Booster", "wing": "east", "needs": ["brine_blueprint"], "cost": {"pickled_brine": 30, "classic_louisiana": 10}, "effects": [{"plot_speed": {"crop": "vinegar", "mult": 2.0}}], "pos": [3, 4]},
-		{"id": "pantry_vinegar_concentrate", "label": "P2", "name": "Vinegar Concentrate", "wing": "east", "needs": ["pantry_vinegar_booster"], "cost": {"pickled_brine": 40, "classic_louisiana": 15}, "effects": [{"concentrate": {"item": "vinegar", "share": 0.4}}], "pos": [4, 4]},
-		{"id": "pantry_vinegar_bulk", "label": "P3", "name": "Vinegar: Bulk", "wing": "east", "needs": ["pantry_vinegar_concentrate"], "cost": {"pickled_brine": 60, "cajun_red": 20}, "effects": [{"plot_yield": {"crop": "vinegar", "mult": 2.0}}], "pos": [5, 4], "excludes": ["pantry_vinegar_reserve"]},
-		{"id": "pantry_vinegar_reserve", "label": "P4", "name": "Vinegar: Reserve", "wing": "east", "needs": ["pantry_vinegar_concentrate"], "cost": {"pickled_brine": 60, "cajun_red": 20}, "effects": [{"reserve": {"item": "pickled_brine", "bonus": 0.25}}], "pos": [5, 5], "excludes": ["pantry_vinegar_bulk"]},
-		{"id": "pantry_garlic_booster", "label": "P5", "name": "Garlic Booster", "wing": "east", "needs": ["paste_blueprint"], "cost": {"garlic_paste": 30, "classic_louisiana": 10}, "effects": [{"plot_speed": {"crop": "garlic", "mult": 2.0}}], "pos": [7, 4]},
-		{"id": "pantry_garlic_concentrate", "label": "P6", "name": "Garlic Concentrate", "wing": "east", "needs": ["pantry_garlic_booster"], "cost": {"garlic_paste": 40, "cajun_red": 10}, "effects": [{"concentrate": {"item": "garlic", "share": 0.4}}], "pos": [8, 4]},
-		{"id": "pantry_garlic_bulk", "label": "P7", "name": "Garlic: Bulk", "wing": "east", "needs": ["pantry_garlic_concentrate"], "cost": {"garlic_paste": 60, "cajun_red": 20}, "effects": [{"plot_yield": {"crop": "garlic", "mult": 2.0}}], "pos": [9, 4], "excludes": ["pantry_garlic_reserve"]},
-		{"id": "pantry_garlic_reserve", "label": "P8", "name": "Garlic: Reserve", "wing": "east", "needs": ["pantry_garlic_concentrate"], "cost": {"garlic_paste": 60, "cajun_red": 20}, "effects": [{"reserve": {"item": "garlic_paste", "bonus": 0.25}}], "pos": [9, 5], "excludes": ["pantry_garlic_bulk"]},
-		{"id": "pantry_pineapple_booster", "label": "P9", "name": "Pineapple Booster", "wing": "east", "needs": ["glaze_blueprint"], "cost": {"glaze": 30, "island_heat": 10}, "effects": [{"plot_speed": {"crop": "pineapple", "mult": 2.0}}], "pos": [11, 4]},
-		{"id": "pantry_pineapple_concentrate", "label": "P10", "name": "Pineapple Concentrate", "wing": "east", "needs": ["pantry_pineapple_booster"], "cost": {"glaze": 40, "sweet_heat": 10}, "effects": [{"concentrate": {"item": "pineapple", "share": 0.4}}], "pos": [12, 4]},
-		{"id": "pantry_pineapple_bulk", "label": "P11", "name": "Pineapple: Bulk", "wing": "east", "needs": ["pantry_pineapple_concentrate"], "cost": {"glaze": 60, "sweet_heat": 15}, "effects": [{"plot_yield": {"crop": "pineapple", "mult": 2.0}}], "pos": [13, 4], "excludes": ["pantry_pineapple_reserve"]},
-		{"id": "pantry_pineapple_reserve", "label": "P12", "name": "Pineapple: Reserve", "wing": "east", "needs": ["pantry_pineapple_concentrate"], "cost": {"glaze": 60, "sweet_heat": 15}, "effects": [{"reserve": {"item": "glaze", "bonus": 0.25}}], "pos": [13, 5], "excludes": ["pantry_pineapple_bulk"]},
-		{"id": "pantry_oak_booster", "label": "P13", "name": "Smoked Oak Booster", "wing": "east", "needs": ["smoke_blueprint"], "cost": {"liquid_smoke": 20, "cocoa_loco": 10}, "effects": [{"plot_speed": {"crop": "oak", "mult": 2.0}}], "pos": [15, 4]},
-		{"id": "pantry_oak_concentrate", "label": "P14", "name": "Smoked Oak Concentrate", "wing": "east", "needs": ["pantry_oak_booster"], "cost": {"liquid_smoke": 30, "phantom": 5}, "effects": [{"concentrate": {"item": "oak", "share": 0.4}}], "pos": [16, 4]},
-		{"id": "pantry_oak_bulk", "label": "P15", "name": "Smoked Oak: Bulk", "wing": "east", "needs": ["pantry_oak_concentrate"], "cost": {"liquid_smoke": 40, "phantom": 10}, "effects": [{"plot_yield": {"crop": "oak", "mult": 2.0}}], "pos": [17, 4], "excludes": ["pantry_oak_reserve"]},
-		{"id": "pantry_oak_reserve", "label": "P16", "name": "Smoked Oak: Reserve", "wing": "east", "needs": ["pantry_oak_concentrate"], "cost": {"liquid_smoke": 40, "phantom": 10}, "effects": [{"reserve": {"item": "liquid_smoke", "bonus": 0.25}}], "pos": [17, 5], "excludes": ["pantry_oak_bulk"]},
-		{"id": "slot_expansion_3", "label": "S8", "name": "Slot Expansion III", "wing": "south", "needs": ["slot_expansion_2"], "cost": {"cayenne_mash": 40, "garlic_paste": 40}, "effects": [{"slot_cap": {"vat": 1, "line": 1}}], "pos": [-2, 3]},
-		{"id": "slot_expansion_4", "label": "S9", "name": "Slot Expansion IV", "wing": "south", "needs": ["slot_expansion_3"], "cost": {"caribbean_red_mash": 30, "glaze": 30}, "effects": [{"slot_cap": {"vat": 1, "line": 1}}], "pos": [-2, 4]},
-		{"id": "artisan_decanters", "label": "S10", "name": "Embossed Artisan Decanters", "wing": "south", "needs": ["foil_wraps"], "cost": {"chocolate_mash": 60, "liquid_smoke": 40}, "effects": [{"packaging": 3.5}], "pos": [-1, 4]},
-		{"id": "standard_operating_procedures", "label": "W7", "name": "Standard Operating Procedures", "wing": "west", "needs": ["delivery_van"], "cost": {"table_mild": 10}, "effects": [{"sop": true}], "pos": [-1, 1], "after_sale": true},
-		{"id": "moruga_blueprint", "label": "E39", "name": "Crop Blueprint: Trinidad Moruga Scorpion", "wing": "east", "needs": ["phantom_blueprint"], "cost": {"phantom": 20}, "effects": [{"unlock_plot": "moruga"}], "pos": [15, 2], "after_sale": true},
-		{"id": "moruga_mash_blueprint", "label": "E40", "name": "Culinary Blueprint: Moruga Mash", "wing": "east", "needs": ["moruga_blueprint"], "cost": {"phantom": 20, "ghost_mash": 10}, "effects": [{"unlock_recipe": "moruga_mash"}], "pos": [16, 2], "after_sale": true},
-		{"id": "scorpion_sting_blueprint", "label": "E41", "name": "Culinary Blueprint: Scorpion Sting", "wing": "east", "needs": ["moruga_mash_blueprint"], "cost": {"phantom": 30}, "effects": [{"unlock_recipe": "scorpion_sting"}], "pos": [17, 2], "after_sale": true},
-		{"id": "grim_blueprint", "label": "E42", "name": "Crop Blueprint: Alabama Grim", "wing": "east", "needs": ["scorpion_sting_blueprint"], "cost": {"scorpion_sting": 20}, "effects": [{"unlock_plot": "grim"}], "pos": [18, 2], "after_sale": true},
-		{"id": "grim_mash_blueprint", "label": "E43", "name": "Culinary Blueprint: Grim Mash", "wing": "east", "needs": ["grim_blueprint"], "cost": {"scorpion_sting": 20, "moruga_mash": 10}, "effects": [{"unlock_recipe": "grim_mash"}], "pos": [19, 2], "after_sale": true},
-		{"id": "widowmaker_blueprint", "label": "E44", "name": "Culinary Blueprint: Widowmaker Reserve", "wing": "east", "needs": ["grim_mash_blueprint"], "cost": {"scorpion_sting": 30}, "effects": [{"unlock_recipe": "widowmaker"}], "pos": [20, 2], "after_sale": true},
-		{"id": "pepper_y_blueprint", "label": "E45", "name": "Crop Blueprint: Pepper Y", "wing": "east", "needs": ["widowmaker_blueprint"], "cost": {"widowmaker": 20}, "effects": [{"unlock_plot": "pepper_y"}], "pos": [21, 2], "after_sale": true},
-		{"id": "pepper_y_mash_blueprint", "label": "E46", "name": "Culinary Blueprint: Pepper Y Mash", "wing": "east", "needs": ["pepper_y_blueprint"], "cost": {"widowmaker": 20, "grim_mash": 10}, "effects": [{"unlock_recipe": "pepper_y_mash"}], "pos": [22, 2], "after_sale": true},
-		{"id": "extinction_event_blueprint", "label": "E47", "name": "Culinary Blueprint: Extinction Event", "wing": "east", "needs": ["pepper_y_mash_blueprint"], "cost": {"widowmaker": 30}, "effects": [{"unlock_recipe": "extinction_event"}], "pos": [23, 2], "after_sale": true},
-		{"id": "bumper_crop_1", "label": "E48", "name": "Bumper Crop I", "wing": "east", "needs": ["smoky_ancho_blueprint"], "cost": {"bistro_verde": 15}, "effects": [{"bumper_crop": 0.1}], "pos": [3, -3]},
-		{"id": "bumper_crop_2", "label": "E49", "name": "Bumper Crop II", "wing": "east", "needs": ["bumper_crop_1", "serrano_fire_blueprint"], "cost": {"classic_louisiana": 20}, "effects": [{"bumper_crop": 0.1}], "pos": [6, -3]},
-		{"id": "bumper_crop_3", "label": "E50", "name": "Bumper Crop III", "wing": "east", "needs": ["bumper_crop_2", "cajun_red_blueprint"], "cost": {"island_heat": 15}, "effects": [{"bumper_crop": 0.1}], "pos": [9, -2]}
+		{
+			"id": "kitchen_table",
+			"label": "00",
+			"name": "Kitchen Table",
+			"wing": "centre",
+			"needs": [],
+			"cost": {},
+			"effects": [],
+			"pos": [
+				0,
+				0
+			]
+		},
+		{
+			"id": "calloused_thumbs",
+			"label": "N1",
+			"name": "Calloused Thumbs",
+			"wing": "north",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"table_mild": 10
+			},
+			"effects": [
+				{
+					"tap_yield": 2
+				}
+			],
+			"pos": [
+				0,
+				-1
+			]
+		},
+		{
+			"id": "delivery_van",
+			"label": "W1",
+			"name": "The Delivery Van",
+			"wing": "west",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"table_mild": 15
+			},
+			"effects": [
+				{
+					"delivery_van": true
+				}
+			],
+			"pos": [
+				-1,
+				0
+			]
+		},
+		{
+			"id": "double_tap",
+			"label": "N2",
+			"name": "Double-Tap Mechanics",
+			"wing": "north",
+			"needs": [
+				"calloused_thumbs"
+			],
+			"cost": {
+				"table_mild": 128
+			},
+			"effects": [
+				{
+					"double_tap": 0.1
+				}
+			],
+			"pos": [
+				0,
+				-2
+			]
+		},
+		{
+			"id": "foragers_luck",
+			"label": "N10",
+			"name": "Forager's Luck",
+			"wing": "north",
+			"needs": [
+				"double_tap"
+			],
+			"cost": {
+				"table_mild": 170
+			},
+			"effects": [
+				{
+					"forage": 0.0225
+				}
+			],
+			"pos": [
+				1,
+				-2
+			]
+		},
+		{
+			"id": "ergonomic_grip",
+			"label": "N3",
+			"name": "Ergonomic Grip",
+			"wing": "north",
+			"needs": [
+				"double_tap"
+			],
+			"cost": {
+				"table_mild": 212
+			},
+			"effects": [
+				{
+					"grip": 2.0
+				}
+			],
+			"pos": [
+				0,
+				-3
+			]
+		},
+		{
+			"id": "heat_meter",
+			"label": "N4",
+			"name": "Heat Meter",
+			"wing": "north",
+			"needs": [
+				"ergonomic_grip"
+			],
+			"cost": {
+				"table_mild": 255
+			},
+			"effects": [
+				{
+					"heat_meter": true
+				}
+			],
+			"pos": [
+				1,
+				-3
+			]
+		},
+		{
+			"id": "overclock_1",
+			"label": "N6",
+			"name": "Factory Overclock I",
+			"wing": "north",
+			"needs": [
+				"ergonomic_grip"
+			],
+			"cost": {
+				"table_mild": 298
+			},
+			"effects": [
+				{
+					"overclock": 0.05
+				}
+			],
+			"pos": [
+				-1,
+				-3
+			]
+		},
+		{
+			"id": "overflow_valve",
+			"label": "W2",
+			"name": "Raw Overflow Valve",
+			"wing": "west",
+			"needs": [
+				"delivery_van"
+			],
+			"cost": {
+				"table_mild": 170
+			},
+			"effects": [
+				{
+					"overflow_valve": true
+				}
+			],
+			"pos": [
+				-2,
+				0
+			]
+		},
+		{
+			"id": "smart_stockpiling",
+			"label": "W3",
+			"name": "Smart Stockpiling",
+			"wing": "west",
+			"needs": [
+				"overflow_valve"
+			],
+			"cost": {
+				"table_mild": 255
+			},
+			"effects": [
+				{
+					"smart_stockpiling": true
+				}
+			],
+			"pos": [
+				-3,
+				0
+			]
+		},
+		{
+			"id": "slow_burn",
+			"label": "N5",
+			"name": "Slow Burn",
+			"wing": "north",
+			"needs": [
+				"heat_meter"
+			],
+			"cost": {
+				"sweet_pepper_relish": 6
+			},
+			"effects": [
+				{
+					"heat_drain": 0.5
+				}
+			],
+			"pos": [
+				1,
+				-4
+			]
+		},
+		{
+			"id": "overclock_2",
+			"label": "N7",
+			"name": "Factory Overclock II",
+			"wing": "north",
+			"needs": [
+				"overclock_1"
+			],
+			"cost": {
+				"sweet_pepper_relish": 6
+			},
+			"effects": [
+				{
+					"overclock": 0.1
+				}
+			],
+			"pos": [
+				-1,
+				-4
+			]
+		},
+		{
+			"id": "overclock_3",
+			"label": "N8",
+			"name": "Factory Overclock III",
+			"wing": "north",
+			"needs": [
+				"overclock_2"
+			],
+			"cost": {
+				"sweet_pepper_relish": 12
+			},
+			"effects": [
+				{
+					"overclock": 0.15
+				}
+			],
+			"pos": [
+				-1,
+				-5
+			]
+		},
+		{
+			"id": "automated_piston",
+			"label": "N9",
+			"name": "Automated Piston",
+			"wing": "north",
+			"needs": [
+				"slow_burn",
+				"overclock_3"
+			],
+			"cost": {
+				"sweet_pepper_relish": 20
+			},
+			"effects": [
+				{
+					"piston": 1.0
+				}
+			],
+			"pos": [
+				0,
+				-5
+			]
+		},
+		{
+			"id": "market_ticker",
+			"label": "W4",
+			"name": "Market Ticker",
+			"wing": "west",
+			"needs": [
+				"delivery_van"
+			],
+			"cost": {
+				"sweet_pepper_relish": 6
+			},
+			"effects": [
+				{
+					"market_ticker": true
+				}
+			],
+			"pos": [
+				-2,
+				1
+			]
+		},
+		{
+			"id": "night_shift_1",
+			"label": "W5",
+			"name": "Night Shift Protocols I",
+			"wing": "west",
+			"needs": [
+				"delivery_van"
+			],
+			"cost": {
+				"sweet_pepper_relish": 6
+			},
+			"effects": [
+				{
+					"offline": {
+						"hours": 2.0,
+						"speed": 0.1
+					}
+				}
+			],
+			"pos": [
+				-2,
+				-1
+			]
+		},
+		{
+			"id": "night_shift_2",
+			"label": "W6",
+			"name": "Night Shift Protocols II",
+			"wing": "west",
+			"needs": [
+				"night_shift_1"
+			],
+			"cost": {
+				"sweet_pepper_relish": 10
+			},
+			"effects": [
+				{
+					"offline": {
+						"hours": 2.0,
+						"speed": 0.1
+					}
+				}
+			],
+			"pos": [
+				-3,
+				-1
+			]
+		},
+		{
+			"id": "standard_operating_procedures",
+			"label": "W7",
+			"name": "Standard Operating Procedures",
+			"wing": "west",
+			"needs": [
+				"delivery_van"
+			],
+			"cost": {
+				"table_mild": 10
+			},
+			"effects": [
+				{
+					"sop": true
+				}
+			],
+			"pos": [
+				-1,
+				1
+			],
+			"after_sale": true
+		},
+		{
+			"id": "bumper_crop_1",
+			"label": "E48",
+			"name": "Bumper Crop I",
+			"wing": "east",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"table_mild": 128
+			},
+			"effects": [
+				{
+					"bumper_crop": 0.1
+				}
+			],
+			"pos": [
+				3,
+				-3
+			]
+		},
+		{
+			"id": "survey_1",
+			"label": "L1",
+			"name": "Land Survey I",
+			"wing": "east",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"pimento": 1500,
+				"bell_puree": 5
+			},
+			"effects": [
+				{
+					"survey": 1.0
+				}
+			],
+			"pos": [
+				1,
+				0
+			]
+		},
+		{
+			"id": "pantry_vinegar_booster",
+			"label": "P1",
+			"name": "Vinegar Booster",
+			"wing": "east",
+			"needs": [
+				"survey_1"
+			],
+			"cost": {
+				"sweet_mash": 75,
+				"sweet_pepper_relish": 4
+			},
+			"effects": [
+				{
+					"plot_speed": {
+						"crop": "vinegar",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				3,
+				4
+			]
+		},
+		{
+			"id": "pantry_vinegar_concentrate",
+			"label": "P2",
+			"name": "Vinegar Concentrate",
+			"wing": "east",
+			"needs": [
+				"pantry_vinegar_booster"
+			],
+			"cost": {
+				"sweet_mash": 100,
+				"sweet_pepper_relish": 6
+			},
+			"effects": [
+				{
+					"concentrate": {
+						"item": "vinegar",
+						"share": 0.4
+					}
+				}
+			],
+			"pos": [
+				4,
+				4
+			]
+		},
+		{
+			"id": "pantry_vinegar_bulk",
+			"label": "P3",
+			"name": "Vinegar: Bulk",
+			"wing": "east",
+			"needs": [
+				"pantry_vinegar_concentrate"
+			],
+			"cost": {
+				"sweet_mash": 150,
+				"sweet_pepper_relish": 22
+			},
+			"effects": [
+				{
+					"plot_yield": {
+						"crop": "vinegar",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				5,
+				4
+			],
+			"excludes": [
+				"pantry_vinegar_reserve"
+			]
+		},
+		{
+			"id": "pantry_vinegar_reserve",
+			"label": "P4",
+			"name": "Vinegar: Reserve",
+			"wing": "east",
+			"needs": [
+				"pantry_vinegar_concentrate"
+			],
+			"cost": {
+				"sweet_mash": 150,
+				"sweet_pepper_relish": 22
+			},
+			"effects": [
+				{
+					"reserve": {
+						"item": "pickled_brine",
+						"bonus": 0.25
+					}
+				}
+			],
+			"pos": [
+				5,
+				5
+			],
+			"excludes": [
+				"pantry_vinegar_bulk"
+			]
+		},
+		{
+			"id": "survey_2",
+			"label": "L2",
+			"name": "Land Survey II",
+			"wing": "east",
+			"needs": [
+				"survey_1"
+			],
+			"cost": {
+				"ancho_mash": 10,
+				"cascabel": 500
+			},
+			"effects": [
+				{
+					"survey": 2.0
+				}
+			],
+			"pos": [
+				2,
+				0
+			]
+		},
+		{
+			"id": "survey_3",
+			"label": "L3",
+			"name": "Land Survey III",
+			"wing": "east",
+			"needs": [
+				"survey_2"
+			],
+			"cost": {
+				"pimento_spread": 10,
+				"cascabel_mash": 15
+			},
+			"effects": [
+				{
+					"survey": 3.0
+				}
+			],
+			"pos": [
+				3,
+				0
+			]
+		},
+		{
+			"id": "pantry_garlic_booster",
+			"label": "P5",
+			"name": "Garlic Booster",
+			"wing": "east",
+			"needs": [
+				"survey_3"
+			],
+			"cost": {
+				"bell_puree": 14,
+				"sweet_pepper_relish": 4
+			},
+			"effects": [
+				{
+					"plot_speed": {
+						"crop": "garlic",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				7,
+				4
+			]
+		},
+		{
+			"id": "pantry_garlic_concentrate",
+			"label": "P6",
+			"name": "Garlic Concentrate",
+			"wing": "east",
+			"needs": [
+				"pantry_garlic_booster"
+			],
+			"cost": {
+				"bell_puree": 19,
+				"sweet_pepper_relish": 11
+			},
+			"effects": [
+				{
+					"concentrate": {
+						"item": "garlic",
+						"share": 0.4
+					}
+				}
+			],
+			"pos": [
+				8,
+				4
+			]
+		},
+		{
+			"id": "pantry_garlic_bulk",
+			"label": "P7",
+			"name": "Garlic: Bulk",
+			"wing": "east",
+			"needs": [
+				"pantry_garlic_concentrate"
+			],
+			"cost": {
+				"bell_puree": 28,
+				"sweet_pepper_relish": 22
+			},
+			"effects": [
+				{
+					"plot_yield": {
+						"crop": "garlic",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				9,
+				4
+			],
+			"excludes": [
+				"pantry_garlic_reserve"
+			]
+		},
+		{
+			"id": "pantry_garlic_reserve",
+			"label": "P8",
+			"name": "Garlic: Reserve",
+			"wing": "east",
+			"needs": [
+				"pantry_garlic_concentrate"
+			],
+			"cost": {
+				"bell_puree": 28,
+				"sweet_pepper_relish": 22
+			},
+			"effects": [
+				{
+					"reserve": {
+						"item": "garlic_paste",
+						"bonus": 0.25
+					}
+				}
+			],
+			"pos": [
+				9,
+				5
+			],
+			"excludes": [
+				"pantry_garlic_bulk"
+			]
+		},
+		{
+			"id": "survey_4",
+			"label": "L4",
+			"name": "Land Survey IV",
+			"wing": "east",
+			"needs": [
+				"survey_3"
+			],
+			"cost": {
+				"smoky_ancho": 5,
+				"verde_mash": 20
+			},
+			"effects": [
+				{
+					"survey": 4.0
+				}
+			],
+			"pos": [
+				4,
+				0
+			]
+		},
+		{
+			"id": "pantry_pineapple_booster",
+			"label": "P9",
+			"name": "Pineapple Booster",
+			"wing": "east",
+			"needs": [
+				"survey_4"
+			],
+			"cost": {
+				"ancho_mash": 29,
+				"pimento_spread": 14
+			},
+			"effects": [
+				{
+					"plot_speed": {
+						"crop": "pineapple",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				11,
+				4
+			]
+		},
+		{
+			"id": "pantry_pineapple_concentrate",
+			"label": "P10",
+			"name": "Pineapple Concentrate",
+			"wing": "east",
+			"needs": [
+				"pantry_pineapple_booster"
+			],
+			"cost": {
+				"ancho_mash": 38,
+				"garden_hot_sauce": 8
+			},
+			"effects": [
+				{
+					"concentrate": {
+						"item": "pineapple",
+						"share": 0.4
+					}
+				}
+			],
+			"pos": [
+				12,
+				4
+			]
+		},
+		{
+			"id": "pantry_pineapple_bulk",
+			"label": "P11",
+			"name": "Pineapple: Bulk",
+			"wing": "east",
+			"needs": [
+				"pantry_pineapple_concentrate"
+			],
+			"cost": {
+				"ancho_mash": 58,
+				"garden_hot_sauce": 12
+			},
+			"effects": [
+				{
+					"plot_yield": {
+						"crop": "pineapple",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				13,
+				4
+			],
+			"excludes": [
+				"pantry_pineapple_reserve"
+			]
+		},
+		{
+			"id": "pantry_pineapple_reserve",
+			"label": "P12",
+			"name": "Pineapple: Reserve",
+			"wing": "east",
+			"needs": [
+				"pantry_pineapple_concentrate"
+			],
+			"cost": {
+				"ancho_mash": 58,
+				"garden_hot_sauce": 12
+			},
+			"effects": [
+				{
+					"reserve": {
+						"item": "glaze",
+						"bonus": 0.25
+					}
+				}
+			],
+			"pos": [
+				13,
+				5
+			],
+			"excludes": [
+				"pantry_pineapple_bulk"
+			]
+		},
+		{
+			"id": "bumper_crop_2",
+			"label": "E49",
+			"name": "Bumper Crop II",
+			"wing": "east",
+			"needs": [
+				"bumper_crop_1",
+				"survey_4"
+			],
+			"cost": {
+				"sweet_pepper_relish": 8
+			},
+			"effects": [
+				{
+					"bumper_crop": 0.1
+				}
+			],
+			"pos": [
+				6,
+				-3
+			]
+		},
+		{
+			"id": "survey_5",
+			"label": "L5",
+			"name": "Land Survey V",
+			"wing": "east",
+			"needs": [
+				"survey_4"
+			],
+			"cost": {
+				"bistro_verde": 3,
+				"serrano_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 5.0
+				}
+			],
+			"pos": [
+				5,
+				0
+			]
+		},
+		{
+			"id": "bumper_crop_3",
+			"label": "E50",
+			"name": "Bumper Crop III",
+			"wing": "east",
+			"needs": [
+				"bumper_crop_2",
+				"survey_5"
+			],
+			"cost": {
+				"pimento_spread": 21
+			},
+			"effects": [
+				{
+					"bumper_crop": 0.1
+				}
+			],
+			"pos": [
+				9,
+				-2
+			]
+		},
+		{
+			"id": "survey_6",
+			"label": "L6",
+			"name": "Land Survey VI",
+			"wing": "east",
+			"needs": [
+				"survey_5"
+			],
+			"cost": {
+				"serrano_fire": 3,
+				"sofrito_base": 25
+			},
+			"effects": [
+				{
+					"survey": 6.0
+				}
+			],
+			"pos": [
+				6,
+				0
+			]
+		},
+		{
+			"id": "pantry_oak_booster",
+			"label": "P13",
+			"name": "Smoked Oak Booster",
+			"wing": "east",
+			"needs": [
+				"survey_6"
+			],
+			"cost": {
+				"garlic_paste": 27,
+				"smoky_ancho": 8
+			},
+			"effects": [
+				{
+					"plot_speed": {
+						"crop": "oak",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				15,
+				4
+			]
+		},
+		{
+			"id": "pantry_oak_concentrate",
+			"label": "P14",
+			"name": "Smoked Oak Concentrate",
+			"wing": "east",
+			"needs": [
+				"pantry_oak_booster"
+			],
+			"cost": {
+				"garlic_paste": 40,
+				"cascabel_salsa": 8
+			},
+			"effects": [
+				{
+					"concentrate": {
+						"item": "oak",
+						"share": 0.4
+					}
+				}
+			],
+			"pos": [
+				16,
+				4
+			]
+		},
+		{
+			"id": "pantry_oak_bulk",
+			"label": "P15",
+			"name": "Smoked Oak: Bulk",
+			"wing": "east",
+			"needs": [
+				"pantry_oak_concentrate"
+			],
+			"cost": {
+				"garlic_paste": 53,
+				"cascabel_salsa": 15
+			},
+			"effects": [
+				{
+					"plot_yield": {
+						"crop": "oak",
+						"mult": 2.0
+					}
+				}
+			],
+			"pos": [
+				17,
+				4
+			],
+			"excludes": [
+				"pantry_oak_reserve"
+			]
+		},
+		{
+			"id": "pantry_oak_reserve",
+			"label": "P16",
+			"name": "Smoked Oak: Reserve",
+			"wing": "east",
+			"needs": [
+				"pantry_oak_concentrate"
+			],
+			"cost": {
+				"garlic_paste": 53,
+				"cascabel_salsa": 15
+			},
+			"effects": [
+				{
+					"reserve": {
+						"item": "liquid_smoke",
+						"bonus": 0.25
+					}
+				}
+			],
+			"pos": [
+				17,
+				5
+			],
+			"excludes": [
+				"pantry_oak_bulk"
+			]
+		},
+		{
+			"id": "survey_7",
+			"label": "L7",
+			"name": "Land Survey VII",
+			"wing": "east",
+			"needs": [
+				"survey_6"
+			],
+			"cost": {
+				"sunshine_sauce": 3,
+				"cayenne_mash": 20
+			},
+			"effects": [
+				{
+					"survey": 7.0
+				}
+			],
+			"pos": [
+				7,
+				0
+			]
+		},
+		{
+			"id": "survey_8",
+			"label": "L8",
+			"name": "Land Survey VIII",
+			"wing": "east",
+			"needs": [
+				"survey_7"
+			],
+			"cost": {
+				"pineapple_picante": 3,
+				"pequin_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 8.0
+				}
+			],
+			"pos": [
+				8,
+				0
+			]
+		},
+		{
+			"id": "survey_9",
+			"label": "L9",
+			"name": "Land Survey IX",
+			"wing": "east",
+			"needs": [
+				"survey_8"
+			],
+			"cost": {
+				"mole_poblano": 3,
+				"thai_chili_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 9.0
+				}
+			],
+			"pos": [
+				9,
+				0
+			]
+		},
+		{
+			"id": "survey_10",
+			"label": "L10",
+			"name": "Land Survey X",
+			"wing": "east",
+			"needs": [
+				"survey_9"
+			],
+			"cost": {
+				"classic_louisiana": 3,
+				"bonnet_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 10.0
+				}
+			],
+			"pos": [
+				10,
+				0
+			]
+		},
+		{
+			"id": "survey_11",
+			"label": "L11",
+			"name": "Land Survey XI",
+			"wing": "east",
+			"needs": [
+				"survey_10"
+			],
+			"cost": {
+				"phantom": 3,
+				"fatalii_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 11.0
+				}
+			],
+			"pos": [
+				11,
+				0
+			]
+		},
+		{
+			"id": "survey_12",
+			"label": "L12",
+			"name": "Land Survey XII",
+			"wing": "east",
+			"needs": [
+				"survey_11"
+			],
+			"cost": {
+				"cajun_red": 3,
+				"caribbean_red_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 12.0
+				}
+			],
+			"pos": [
+				12,
+				0
+			]
+		},
+		{
+			"id": "survey_13",
+			"label": "L13",
+			"name": "Land Survey XIII",
+			"wing": "east",
+			"needs": [
+				"survey_12"
+			],
+			"cost": {
+				"pitmaster_bbq": 3,
+				"chocolate_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 13.0
+				}
+			],
+			"pos": [
+				13,
+				0
+			]
+		},
+		{
+			"id": "survey_14",
+			"label": "L14",
+			"name": "Land Survey XIV",
+			"wing": "east",
+			"needs": [
+				"survey_13"
+			],
+			"cost": {
+				"island_heat": 3,
+				"ghost_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 14.0
+				}
+			],
+			"pos": [
+				14,
+				0
+			]
+		},
+		{
+			"id": "survey_15",
+			"label": "L15",
+			"name": "Land Survey XV",
+			"wing": "east",
+			"needs": [
+				"survey_14"
+			],
+			"cost": {
+				"ranchero": 5,
+				"seven_pot_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 15.0
+				}
+			],
+			"pos": [
+				15,
+				0
+			]
+		},
+		{
+			"id": "survey_16",
+			"label": "L16",
+			"name": "Land Survey XVI",
+			"wing": "east",
+			"needs": [
+				"survey_15"
+			],
+			"cost": {
+				"fatalii_fire": 3,
+				"naga_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 16.0
+				}
+			],
+			"pos": [
+				16,
+				0
+			]
+		},
+		{
+			"id": "survey_17",
+			"label": "L17",
+			"name": "Land Survey XVII",
+			"wing": "east",
+			"needs": [
+				"survey_16"
+			],
+			"cost": {
+				"sweet_heat": 3,
+				"moruga_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 17.0
+				}
+			],
+			"pos": [
+				17,
+				0
+			]
+		},
+		{
+			"id": "survey_18",
+			"label": "L18",
+			"name": "Land Survey XVIII",
+			"wing": "east",
+			"needs": [
+				"survey_17"
+			],
+			"cost": {
+				"jalapeno_ranch": 4,
+				"grim_mash": 10
+			},
+			"effects": [
+				{
+					"survey": 18.0
+				}
+			],
+			"pos": [
+				18,
+				0
+			]
+		},
+		{
+			"id": "survey_19",
+			"label": "L19",
+			"name": "Land Survey XIX",
+			"wing": "east",
+			"needs": [
+				"survey_18"
+			],
+			"cost": {
+				"volcano_sauce": 4,
+				"pepper_y_mash": 12
+			},
+			"effects": [
+				{
+					"survey": 19.0
+				}
+			],
+			"pos": [
+				19,
+				0
+			]
+		},
+		{
+			"id": "survey_20",
+			"label": "L20",
+			"name": "Land Survey XX",
+			"wing": "east",
+			"needs": [
+				"survey_19"
+			],
+			"cost": {
+				"cocoa_loco": 5,
+				"lava_lantern_mash": 15
+			},
+			"effects": [
+				{
+					"survey": 20.0
+				}
+			],
+			"pos": [
+				20,
+				0
+			]
+		},
+		{
+			"id": "survey_21",
+			"label": "L21",
+			"name": "Land Survey XXI",
+			"wing": "east",
+			"needs": [
+				"survey_20"
+			],
+			"cost": {
+				"black_hole": 5,
+				"solar_flare_mash": 20
+			},
+			"effects": [
+				{
+					"survey": 21.0
+				}
+			],
+			"pos": [
+				21,
+				0
+			]
+		},
+		{
+			"id": "survey_22",
+			"label": "L22",
+			"name": "Land Survey XXII",
+			"wing": "east",
+			"needs": [
+				"survey_21"
+			],
+			"cost": {
+				"seven_pot_stew": 6,
+				"crystal_extract": 24
+			},
+			"effects": [
+				{
+					"survey": 22.0
+				}
+			],
+			"pos": [
+				22,
+				0
+			]
+		},
+		{
+			"id": "survey_23",
+			"label": "L23",
+			"name": "Land Survey XXIII",
+			"wing": "east",
+			"needs": [
+				"survey_22"
+			],
+			"cost": {
+				"naga_sunrise": 6,
+				"brimstone_mash": 30
+			},
+			"effects": [
+				{
+					"survey": 23.0
+				}
+			],
+			"pos": [
+				23,
+				0
+			]
+		},
+		{
+			"id": "survey_24",
+			"label": "L24",
+			"name": "Land Survey XXIV",
+			"wing": "east",
+			"needs": [
+				"survey_23"
+			],
+			"cost": {
+				"ghost_town": 7,
+				"supernova_mash": 36
+			},
+			"effects": [
+				{
+					"survey": 24.0
+				}
+			],
+			"pos": [
+				24,
+				0
+			]
+		},
+		{
+			"id": "survey_25",
+			"label": "L25",
+			"name": "Land Survey XXV",
+			"wing": "east",
+			"needs": [
+				"survey_24"
+			],
+			"cost": {
+				"scorpion_sting": 7,
+				"event_horizon_mash": 42
+			},
+			"effects": [
+				{
+					"survey": 25.0
+				}
+			],
+			"pos": [
+				25,
+				0
+			]
+		},
+		{
+			"id": "hydroponic_bell",
+			"label": "E11",
+			"name": "Hydroponic Bell Peppers",
+			"wing": "east",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"garden_hot_sauce": 5,
+				"verde_mash": 20
+			},
+			"effects": [
+				{
+					"harvest_mult": 1.25
+				}
+			],
+			"pos": [
+				1,
+				-1
+			],
+			"ipm": "Advanced Mining"
+		},
+		{
+			"id": "truck_tune_up",
+			"label": "F1",
+			"name": "Truck Tune-Up",
+			"wing": "east",
+			"needs": [
+				"hydroponic_bell"
+			],
+			"cost": {
+				"cascabel_salsa": 2,
+				"serrano_mash": 10
+			},
+			"effects": [
+				{
+					"truck_speed": 1.25
+				}
+			],
+			"pos": [
+				2,
+				-2
+			],
+			"ipm": "Advanced Thrusters"
+		},
+		{
+			"id": "bigger_crates",
+			"label": "F3",
+			"name": "Bigger Crates",
+			"wing": "east",
+			"needs": [
+				"hydroponic_bell"
+			],
+			"cost": {
+				"smoky_ancho": 5,
+				"hungarian_wax_mash": 25
+			},
+			"effects": [
+				{
+					"cargo": 1.25
+				}
+			],
+			"pos": [
+				2,
+				-1
+			],
+			"ipm": "Advanced Cargo Handling"
+		},
+		{
+			"id": "hydroponic_jalapeno",
+			"label": "E37",
+			"name": "Hydroponic Jalapeños",
+			"wing": "east",
+			"needs": [],
+			"cost": {
+				"pineapple_picante": 10,
+				"cayenne_mash": 25
+			},
+			"effects": [
+				{
+					"harvest_mult": 1.25
+				}
+			],
+			"pos": [
+				-1,
+				-1
+			],
+			"ipm": "Superior Mining",
+			"needs_any": [
+				"truck_tune_up",
+				"bigger_crates"
+			]
+		},
+		{
+			"id": "highway_route",
+			"label": "F2",
+			"name": "Highway Route",
+			"wing": "east",
+			"needs": [
+				"hydroponic_jalapeno"
+			],
+			"cost": {
+				"mole_poblano": 4
+			},
+			"effects": [
+				{
+					"truck_speed": 1.25
+				}
+			],
+			"pos": [
+				-1,
+				-2
+			],
+			"ipm": "Superior Thrusters"
+		},
+		{
+			"id": "pallet_racking",
+			"label": "F4",
+			"name": "Pallet Racking",
+			"wing": "east",
+			"needs": [
+				"hydroponic_jalapeno"
+			],
+			"cost": {
+				"pequin_mash": 50
+			},
+			"effects": [
+				{
+					"cargo": 1.25
+				}
+			],
+			"pos": [
+				-2,
+				-2
+			],
+			"ipm": "Superior Cargo Handling"
+		},
+		{
+			"id": "crop_priority",
+			"label": "F5",
+			"name": "Crop Priority",
+			"wing": "east",
+			"needs": [
+				"survey_4"
+			],
+			"cost": {
+				"verde_mash": 10,
+				"bistro_verde": 3
+			},
+			"effects": [
+				{
+					"crop_priority": true
+				}
+			],
+			"pos": [
+				4,
+				-1
+			],
+			"ipm": "Cargo Logistics"
+		},
+		{
+			"id": "targeted_fertiliser",
+			"label": "F6",
+			"name": "Targeted Fertiliser",
+			"wing": "east",
+			"needs": [
+				"crop_priority"
+			],
+			"cost": {
+				"smoky_ancho": 100,
+				"garden_hot_sauce": 50
+			},
+			"effects": [
+				{
+					"target_bonus": 0.15
+				}
+			],
+			"pos": [
+				4,
+				-2
+			],
+			"ipm": "Ore Targeting"
+		},
+		{
+			"id": "precision_fertiliser",
+			"label": "F7",
+			"name": "Precision Fertiliser",
+			"wing": "east",
+			"needs": [
+				"targeted_fertiliser"
+			],
+			"cost": {
+				"salsa_verde_reserve": 100,
+				"classic_louisiana": 15
+			},
+			"effects": [
+				{
+					"target_bonus": 0.3
+				}
+			],
+			"pos": [
+				4,
+				-3
+			],
+			"ipm": "Advanced Ore Targeting"
+		},
+		{
+			"id": "crossbreed_i",
+			"label": "F8",
+			"name": "Crossbreed I",
+			"wing": "east",
+			"needs": [
+				"survey_4"
+			],
+			"cost": {
+				"serrano_mash": 50,
+				"garlic_gold": 6
+			},
+			"effects": [
+				{
+					"crossbreed": 1.0
+				}
+			],
+			"pos": [
+				5,
+				-1
+			],
+			"ipm": "Alchemy"
+		},
+		{
+			"id": "crossbreed_ii",
+			"label": "F9",
+			"name": "Crossbreed II",
+			"wing": "east",
+			"needs": [
+				"crossbreed_i"
+			],
+			"cost": {
+				"hungarian_wax": 50000,
+				"pequin": 25000,
+				"salsa_verde_reserve": 6
+			},
+			"effects": [
+				{
+					"crossbreed": 2.0
+				}
+			],
+			"pos": [
+				5,
+				-2
+			],
+			"ipm": "Advanced Alchemy"
+		},
+		{
+			"id": "crossbreed_iii",
+			"label": "F10",
+			"name": "Crossbreed III",
+			"wing": "east",
+			"needs": [
+				"crossbreed_ii"
+			],
+			"cost": {
+				"bonnet_mash": 400,
+				"fatalii_mash": 200,
+				"phantom": 5
+			},
+			"effects": [
+				{
+					"crossbreed": 3.0
+				}
+			],
+			"pos": [
+				5,
+				-3
+			],
+			"ipm": "Superior Alchemy"
+		},
+		{
+			"id": "hotter_burners",
+			"label": "S11",
+			"name": "Hotter Burners",
+			"wing": "south",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"cascabel_salsa": 3,
+				"verde_mash": 10
+			},
+			"effects": [
+				{
+					"vat_speed": 1.2
+				}
+			],
+			"pos": [
+				0,
+				1
+			],
+			"ipm": "Advanced Furnace"
+		},
+		{
+			"id": "zero_waste_1",
+			"label": "S5",
+			"name": "Zero-Waste Piping I",
+			"wing": "south",
+			"needs": [
+				"hotter_burners"
+			],
+			"cost": {
+				"sofrito_base": 200
+			},
+			"effects": [
+				{
+					"vat_input_cut": 0.2
+				}
+			],
+			"pos": [
+				0,
+				2
+			],
+			"ipm": "Smelting Efficiency"
+		},
+		{
+			"id": "byproduct_recycling",
+			"label": "B1",
+			"name": "Byproduct Recycling",
+			"wing": "bridge",
+			"needs": [
+				"zero_waste_1",
+				"survey_5"
+			],
+			"cost": {
+				"sweet_pepper_relish": 6,
+				"bell_puree": 20
+			},
+			"effects": [
+				{
+					"byproduct_recycling": 0.25
+				}
+			],
+			"pos": [
+				2,
+				2
+			]
+		},
+		{
+			"id": "slow_roasting",
+			"label": "S13",
+			"name": "Slow Roasting",
+			"wing": "south",
+			"needs": [
+				"hotter_burners"
+			],
+			"cost": {
+				"bistro_verde": 3,
+				"hungarian_wax_mash": 10
+			},
+			"effects": [
+				{
+					"mash_value": 1.2
+				}
+			],
+			"pos": [
+				1,
+				2
+			],
+			"ipm": "Advanced Alloy Value"
+		},
+		{
+			"id": "steam_jackets",
+			"label": "S12",
+			"name": "Steam Jackets",
+			"wing": "south",
+			"needs": [],
+			"cost": {
+				"thai_chili_mash": 5,
+				"pequin_mash": 20,
+				"cayenne_mash": 50
+			},
+			"effects": [
+				{
+					"vat_speed": 1.2
+				}
+			],
+			"pos": [
+				1,
+				1
+			],
+			"ipm": "Superior Furnace",
+			"needs_any": [
+				"zero_waste_1",
+				"slow_roasting"
+			]
+		},
+		{
+			"id": "wood_fired_roasting",
+			"label": "S14",
+			"name": "Wood-Fired Roasting",
+			"wing": "south",
+			"needs": [
+				"slow_roasting"
+			],
+			"cost": {
+				"arbol": 250000,
+				"serrano_fire": 30
+			},
+			"effects": [
+				{
+					"mash_value": 1.2
+				}
+			],
+			"pos": [
+				1,
+				3
+			],
+			"ipm": "Superior Alloy Value"
+		},
+		{
+			"id": "double_batch",
+			"label": "S15",
+			"name": "Double Batch",
+			"wing": "south",
+			"needs": [
+				"slow_roasting"
+			],
+			"cost": {
+				"salsa_verde_reserve": 5,
+				"mole_poblano": 2
+			},
+			"effects": [
+				{
+					"vat_double": 0.1
+				}
+			],
+			"pos": [
+				2,
+				3
+			],
+			"ipm": "Smelting Specialist"
+		},
+		{
+			"id": "faster_cappers",
+			"label": "S16",
+			"name": "Faster Cappers",
+			"wing": "south",
+			"needs": [
+				"kitchen_table"
+			],
+			"cost": {
+				"garlic_gold": 5,
+				"serrano_mash": 50
+			},
+			"effects": [
+				{
+					"line_speed": 1.2
+				}
+			],
+			"pos": [
+				0,
+				3
+			],
+			"ipm": "Advanced Crafter"
+		},
+		{
+			"id": "zero_waste_2",
+			"label": "S6",
+			"name": "Zero-Waste Piping II",
+			"wing": "south",
+			"needs": [
+				"faster_cappers"
+			],
+			"cost": {
+				"sunshine_sauce": 30
+			},
+			"effects": [
+				{
+					"line_input_cut": 0.2
+				}
+			],
+			"pos": [
+				1,
+				4
+			],
+			"ipm": "Crafting Efficiency"
+		},
+		{
+			"id": "flint_glass",
+			"label": "S3",
+			"name": "Heavy Flint Glass",
+			"wing": "south",
+			"needs": [
+				"faster_cappers"
+			],
+			"cost": {
+				"garlic_gold": 1,
+				"hungarian_wax_mash": 5
+			},
+			"effects": [
+				{
+					"sauce_value": 1.2
+				}
+			],
+			"pos": [
+				-1,
+				3
+			],
+			"ipm": "Advanced Item Value"
+		},
+		{
+			"id": "franchise_auditors",
+			"label": "B2",
+			"name": "Franchise Auditors",
+			"wing": "bridge",
+			"needs": [
+				"smart_stockpiling",
+				"flint_glass"
+			],
+			"cost": {
+				"sweet_pepper_relish": 8
+			},
+			"effects": [
+				{
+					"stock_value_bonus": 0.2
+				}
+			],
+			"pos": [
+				-2,
+				2
+			]
+		},
+		{
+			"id": "rotary_filler",
+			"label": "S17",
+			"name": "Rotary Filler",
+			"wing": "south",
+			"needs": [],
+			"cost": {
+				"classic_louisiana": 2,
+				"mole_poblano": 10,
+				"pineapple_picante": 20
+			},
+			"effects": [
+				{
+					"line_speed": 1.2
+				}
+			],
+			"pos": [
+				3,
+				3
+			],
+			"ipm": "Superior Crafting",
+			"needs_any": [
+				"zero_waste_2",
+				"flint_glass"
+			]
+		},
+		{
+			"id": "foil_wraps",
+			"label": "S4",
+			"name": "Foil Neck Wraps",
+			"wing": "south",
+			"needs": [
+				"flint_glass"
+			],
+			"cost": {
+				"bonnet_mash": 200,
+				"pineapple_picante": 25
+			},
+			"effects": [
+				{
+					"sauce_value": 1.2
+				}
+			],
+			"pos": [
+				-2,
+				4
+			],
+			"ipm": "Superior Item Value"
+		},
+		{
+			"id": "overdrive_turbines",
+			"label": "S7",
+			"name": "Overdrive Turbines",
+			"wing": "south",
+			"needs": [
+				"foil_wraps",
+				"zero_waste_2"
+			],
+			"cost": {
+				"bell_puree": 67
+			},
+			"effects": [
+				{
+					"overdrive": true
+				}
+			],
+			"pos": [
+				0,
+				4
+			]
+		},
+		{
+			"id": "artisan_decanters",
+			"label": "S10",
+			"name": "Embossed Artisan Decanters",
+			"wing": "south",
+			"needs": [
+				"foil_wraps"
+			],
+			"cost": {
+				"hungarian_wax_mash": 41,
+				"garlic_paste": 53
+			},
+			"effects": [
+				{
+					"packaging": 3.5
+				}
+			],
+			"pos": [
+				-1,
+				4
+			]
+		},
+		{
+			"id": "double_fill",
+			"label": "S18",
+			"name": "Double Fill",
+			"wing": "south",
+			"needs": [
+				"flint_glass"
+			],
+			"cost": {
+				"mole_poblano": 3,
+				"phantom": 2
+			},
+			"effects": [
+				{
+					"line_double": 0.1
+				}
+			],
+			"pos": [
+				-2,
+				3
+			],
+			"ipm": "Crafting Specialist"
+		},
+		{
+			"id": "bulk_buyers_club",
+			"label": "S19",
+			"name": "Bulk Buyer's Club",
+			"wing": "south",
+			"needs": [
+				"steam_jackets"
+			],
+			"cost": {
+				"pimento_spread": 200,
+				"smoky_ancho": 75,
+				"bistro_verde": 40
+			},
+			"effects": [
+				{
+					"station_discount": 0.5
+				}
+			],
+			"pos": [
+				2,
+				1
+			],
+			"ipm": "Preferred Vendor"
+		},
+		{
+			"id": "pressure_cooker",
+			"label": "S20",
+			"name": "Pressure Cooker",
+			"wing": "south",
+			"needs": [
+				"steam_jackets"
+			],
+			"cost": {
+				"fatalii_mash": 20,
+				"bangkok_burn": 1
+			},
+			"effects": [
+				{
+					"pressure": 1.0
+				}
+			],
+			"pos": [
+				3,
+				1
+			],
+			"ipm": "Furnace Overdrive"
+		},
+		{
+			"id": "pressure_cooker_ii",
+			"label": "S21",
+			"name": "Pressure Cooker II",
+			"wing": "south",
+			"needs": [
+				"pressure_cooker"
+			],
+			"cost": {
+				"caribbean_red_mash": 40,
+				"chocolate_mash": 20,
+				"classic_louisiana": 10
+			},
+			"effects": [
+				{
+					"pressure_speed": 4.0
+				}
+			],
+			"pos": [
+				3,
+				2
+			],
+			"ipm": "Advanced Furnace Overdrive"
+		},
+		{
+			"id": "pressure_valve",
+			"label": "S22",
+			"name": "Pressure Valve",
+			"wing": "south",
+			"needs": [
+				"pressure_cooker"
+			],
+			"cost": {
+				"thai_chili_mash": 200,
+				"ranchero": 1
+			},
+			"effects": [
+				{
+					"pressure_extra": 0.2
+				}
+			],
+			"pos": [
+				4,
+				2
+			],
+			"ipm": "Furnace Overdrive Efficiency"
+		},
+		{
+			"id": "second_pressure_cooker",
+			"label": "S23",
+			"name": "Second Pressure Cooker",
+			"wing": "south",
+			"needs": [
+				"pressure_cooker"
+			],
+			"cost": {
+				"naga_mash": 200,
+				"bangkok_burn": 20,
+				"sweet_heat": 2
+			},
+			"effects": [
+				{
+					"pressure": 1.0
+				}
+			],
+			"pos": [
+				4,
+				1
+			],
+			"ipm": "Furnace Overdrive 2"
+		},
+		{
+			"id": "third_pressure_cooker",
+			"label": "S24",
+			"name": "Third Pressure Cooker",
+			"wing": "south",
+			"needs": [
+				"second_pressure_cooker"
+			],
+			"cost": {
+				"grim_mash": 300,
+				"bangkok_burn": 100,
+				"naga_sunrise": 2
+			},
+			"effects": [
+				{
+					"pressure": 1.0
+				}
+			],
+			"pos": [
+				5,
+				2
+			],
+			"ipm": "Furnace Overdrive 3"
+		}
 	]
 }

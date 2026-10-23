@@ -1,7 +1,8 @@
 extends SceneTree
-## The factory's rules (docs/FACTORY.md): the deck, plots, vat and line slots,
-## recipes (S1–S3), the Starter Crate, Sell Batch, upgrades, Operation Value
-## (S5) and the save migrations (S4).
+## The factory's rules (docs/FACTORY.md, SKELETON.md): the deck, farms, vat and
+## line slots, recipes (S1–S3), the kitchen, the Starter Crate, Sell Batch,
+## slot upgrades, Operation Value as Galaxy Value (S5), selling raw (A3),
+## determinism (S10) and old saves reaching v12 without loss (I11).
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
@@ -48,16 +49,10 @@ func opened(cash: float) -> Game:
 	return g
 
 
-## A game past Stage 3 and the Tech Tree, with the Tier 2 blueprints researched.
-func tier_2(cash: float = 100000.0) -> Game:
+## A game with Processing and the Tech Tree open and the given cash.
+func factory(cash: float = 1e9) -> Game:
 	var g := opened(cash)
 	g.account.best_ov = T.TAB_THRESHOLDS.tech
-	g.stock.table_mild = 1000
-	g.stock.sweet_mash = 100
-	for node in ["jalapeno_blueprint", "verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint"]:
-		check(g.research_node(node), "researches " + node)
-	g.stock.table_mild = 0
-	g.stock.sweet_mash = 0
 	return g
 
 
@@ -67,7 +62,7 @@ func test_on_sale_from_the_start() -> void:
 	for i in 50:
 		g.press()
 	g.sell_raw()
-	check(g.buy_plot("bell"), "the Bell Pepper Plot can be bought from the start, once cash covers it")
+	check(g.buy_plot("bell"), "the Bell Plot can be bought from the start, once cash covers it")
 
 
 func test_tier_1_offered_in_order() -> void:
@@ -75,32 +70,29 @@ func test_tier_1_offered_in_order() -> void:
 	check(g.plot_offered("bell") and g.slot_offered("vat"), "the plot and first vat are offered with the deck")
 	check(not g.slot_offered("line") and not g.buy_slot("line"), "the line isn't offered before a vat")
 	check(g.buy_slot("vat") and g.slot_offered("line"), "buying a vat offers the line")
-	check(not g.slot_offered("vat"), "no second vat before Stage 3")
+	check(not g.slot_offered("vat"), "no second vat before Processing opens")
 	check(close(g.cash, 1000.0 - g.data.slots.vat.prices[0]), "vat slot 1 costs its listed price")
-	check(not g.plot_offered("vinegar") and not g.buy_plot("vinegar"), "no Vinegar Cask without its blueprint")
+	check(not g.plot_offered("vinegar") and not g.buy_plot("vinegar"), "no Vinegar Cask before Land Survey 1")
 
 
-func test_plot_harvests() -> void:
+func test_bell_plot() -> void:
+	# The kitchen's Bell Plot (D052): IPM's Balor at four times the harvest
+	# and cargo, so a Bell Pepper a second, its truck carrying 20 every 20 s.
 	var price: float = Game.new().plot_price("bell")
-	var cycle: float = Game.new().data.plots.bell.seconds
 	var g := opened(price)
 	check(g.buy_plot("bell") and g.cash == 0.0, "the plot costs its listed $%.0f" % price)
 	check(not g.buy_plot("bell"), "a plot can't be bought twice")
+	check(close(g.harvest_rate("bell"), 1.0) and g.truck_cargo("bell") == 20 and close(g.trip_seconds("bell"), 20.0), "1 a second, 20 a trip, 20 s a trip")
 	var before: int = g.stock.bell
-	g.advance(seconds(10.0))
-	var cycles := roundi(10.0 / cycle)
-	check(g.stock.bell - before == cycles, "1 pepper every %.1f s: %d in 10 s" % [cycle, g.stock.bell - before])
-	g.plots.bell["yield"] = 50   # 1 × (1 + 50 × 6%): 4 a cycle (D041)
-	before = g.stats.harvested.bell
-	g.advance(seconds(10.0))
-	check(g.stats.harvested.bell - before == roundi(g.plot_yield_exact("bell")) * cycles, "yield 50 levels: %d a cycle, %d harvested in 10 s" % [roundi(g.plot_yield_exact("bell")), g.stats.harvested.bell - before])
+	g.advance(seconds(60.0))
+	check(g.stock.bell - before == 60, "60 Bell Peppers reach stock in 60 s: %d" % (g.stock.bell - before))
 
 
 func test_vat_takes_ten_and_makes_mash() -> void:
 	var g := opened(1000.0)
 	g.stock.bell = 25
 	g.buy_slot("vat")
-	check(g.vats[0].recipe == "sweet_mash", "a new vat starts on Sweet Pepper Mash")
+	check(g.vats[0].recipe == "sweet_mash", "the kitchen vat starts on Sweet Pepper Mash")
 	check(g.stock.bell == 15 and g.vats[0].running, "S1: it takes 10 peppers at once")
 	g.advance(seconds(8.0) - 1)
 	check(g.stock.sweet_mash == 0, "no mash before the cycle ends")
@@ -137,81 +129,88 @@ func test_sell_batch() -> void:
 	check(g.stats.sold.table_mild == 8 and g.stats.sold.bistro_verde == 2, "sales are counted")
 
 
-func test_upgrades() -> void:
+func test_sell_any_item() -> void:
+	# IPM sells any ore, bar or item (SKELETON.md); sell_item takes a count.
+	var g := Game.new()
+	g.stock.bell_puree = 5
+	check(g.sell_item("bell_puree", 2) and g.stock.bell_puree == 3 and close(g.cash, 2 * g.value("bell_puree")), "two of five Bell Pepper Purée sell at their value")
+	check(g.sell_item("bell_puree") and g.stock.bell_puree == 0, "the rest with no count")
+	check(not g.sell_item("bell_puree"), "nothing to sell with none held")
+
+
+func test_slot_upgrades() -> void:
 	var g := opened(10000.0)
-	check(not g.upgrade_plot("bell", "speed"), "can't upgrade a plot not owned")
-	g.buy_plot("bell")
-	var first: float = g.plot_price("bell") * T.PLOT_UPGRADE_SHARE
-	check(close(g.plot_upgrade_cost("bell", "speed"), first), "first speed level at %.0f%% of the plot's price" % (T.PLOT_UPGRADE_SHARE * 100.0))
-	check(g.upgrade_plot("bell", "speed") and g.plots.bell.speed == 1, "buys a speed level")
-	check(close(g.plot_upgrade_cost("bell", "speed"), first * T.PLOT_UPGRADE_GROWTH), "the next costs more")
-	check(close(g.plot_cycle("bell"), g.data.plots.bell.seconds / (1.0 + T.PLOT_SPEED_STEP)), "and the cycle is shorter")
-	check(not g.upgrade_plot("bell", "colour"), "unknown upgrades don't buy")
 	g.buy_slot("vat")
 	check(close(g.slot_upgrade_cost("vat", 0), T.VAT_SPEED_COST), "vat 1's speed at base cost")
 	check(g.upgrade_slot("vat", 0) and close(g.slot_cycle("vat", 0), 8.0 / 1.25), "a vat speed level")
 	check(not g.upgrade_slot("vat", 1), "no slot 2 to upgrade")
 
 
-func test_upgrades_scale_with_price() -> void:
-	var g := tier_2()
-	check(g.buy_plot("jalapeno"), "buys the Jalapeño Plot")
-	g.buy_slot("vat")
-	g.buy_slot("vat")
-	var prices: Array = g.data.slots.vat.prices
-	check(close(g.slot_upgrade_cost("vat", 1), T.VAT_SPEED_COST * pow(prices[1] / T.VAT_PRICE_REFERENCE, T.COST_SCALE_POWER)), "vat slot 2's speed costs the vat curve × (price ÷ the $%.0f reference)^%.1f" % [T.VAT_PRICE_REFERENCE, T.COST_SCALE_POWER])
-
-
 func test_slot_caps() -> void:
-	var g := opened(100000.0)
-	g.account.best_ov = T.TAB_THRESHOLDS.processing
-	for i in 3:
+	var g := factory(1e40)
+	for i in 10:
 		check(g.buy_slot("vat"), "buys vat slot %d" % (i + 1))
-	check(g.slot_cap("vat") == 3 and not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: no fourth vat before Slot Expansion")
-	for i in 2:
+	check(g.slot_cap("vat") == 10 and not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: ten vats, no eleventh (IPM's ten smelters)")
+	for i in 10:
 		check(g.buy_slot("line"), "buys line slot %d" % (i + 1))
-	check(not g.buy_slot("line"), "S3: no third line")
+	check(not g.buy_slot("line"), "S3: no eleventh line")
 	check(g.lines[1].crate == 0, "only the first line has a Starter Crate")
+	check(g.vats[1].recipe == "" and g.lines[1].recipe == "", "slots after the kitchen's start switched off")
 	var spent := 0.0
 	for station in ["vat", "line"]:
-		for i in g.data.slots[station].base_cap:
-			spent += g.data.slots[station].prices[i]
-	check(close(g.cash, 100000.0 - spent), "each slot costs its listed price")
+		for p in g.data.slots[station].prices:
+			spent += p
+	check(close(g.cash, 1e40 - spent, 1e-12), "each slot costs its listed price")
 
 
-func test_recipes_need_blueprints() -> void:
-	var g := opened(100000.0)
-	g.account.best_ov = T.TAB_THRESHOLDS.tech
-	g.buy_slot("vat")
-	check(g.recipes_for("vat") == ["sweet_mash"], "only Sweet Pepper Mash at first")
-	check(not g.assign("vat", 0, "verde_mash") and g.vats[0].recipe == "sweet_mash", "S1: can't run a recipe not researched")
-	var t := tier_2()
-	check(t.recipes_for("vat") == ["sweet_mash", "pickled_brine", "verde_mash"], "the blueprints add Tier 2's mashes")
-	check(t.recipes_for("line") == ["table_mild", "bistro_verde"], "and Bistro Verde")
-
-
-func test_tier_2_spine() -> void:
-	var g := tier_2()
-	g.stock.jalapeno = 15
-	g.stock.vinegar = 10
-	g.stock.bell = 5
+func test_recipes_are_bought() -> void:
+	# D051: recipes are bought with cash at IPM's unlock prices.
+	var g := factory(100000.0)
 	g.buy_slot("vat")
 	g.buy_slot("vat")
-	check(g.assign("vat", 0, "verde_mash") and g.assign("vat", 1, "pickled_brine"), "assigns Verde and Brine")
-	check(g.stock.jalapeno == 0 and g.stock.vinegar == 0 and g.stock.bell == 0, "S1: each takes exactly its inputs")
-	g.advance(seconds(12.0))
-	check(g.stock.verde_mash == 1 and g.stock.pickled_brine == 1, "S1: 1 Verde Mash in 12 s, 1 Pickled Brine in 10 s")
+	check(g.recipe_unlocked("bell_puree") and not g.recipe_unlocked("pimento_mash"), "Bell Pepper Purée is free; Pimento Mash isn't")
+	check(not g.assign("vat", 1, "pimento_mash") and g.vats[1].recipe == "", "S1: can't run a recipe not bought")
+	var price: float = g.recipe_price("pimento_mash")
+	check(close(price, 3000.0), "Pimento Mash costs $3,000 (IPM's Iron Bar)")
+	var before := g.cash
+	check(g.buy_recipe("pimento_mash") and close(g.cash, before - price) and g.recipe_unlocked("pimento_mash"), "buys it")
+	check(not g.buy_recipe("pimento_mash"), "a recipe can't be bought twice")
+	check(g.assign("vat", 1, "pimento_mash"), "then a vat runs it")
+	g.cash = 0.0
+	check(not g.buy_recipe("ancho_mash"), "not without the cash")
+
+
+func test_kitchen_recipes_only_in_the_kitchen() -> void:
+	# D052: Sweet Pepper Mash and Table Mild run only in the first vat and line.
+	var g := factory()
+	g.buy_slot("vat")
+	g.buy_slot("vat")
 	g.buy_slot("line")
-	g.assign("line", 0, "bistro_verde")
-	check(g.stock.verde_mash == 0 and g.stock.pickled_brine == 0, "S1: Bistro Verde takes one of each")
+	g.buy_slot("line")
+	check(g.recipes_for("vat", 0).has("sweet_mash") and not g.recipes_for("vat", 1).has("sweet_mash"), "Sweet Pepper Mash only in vat 1")
+	check(not g.assign("vat", 1, "sweet_mash") and not g.assign("line", 1, "table_mild"), "and Table Mild only in line 1")
+	check(g.assign("vat", 0, "bell_puree"), "the kitchen vat can run any recipe")
+
+
+func test_ipm_chain_runs() -> void:
+	# S1: Bell Pepper Purée takes 1,000 Bell Peppers and makes one in 20 s;
+	# Sweet Pepper Relish takes 5 of them (IPM's Copper Bar and Copper Wire).
+	var g := factory()
+	g.buy_slot("vat")
+	g.buy_slot("line")
 	g.lines[0].crate = 0
-	g.lines[0].progress = 0.0
-	g.advance(seconds(12.0))
-	check(g.stock.bistro_verde == 1 and close(g.value("bistro_verde"), 425.0), "S1: a $425 Bistro Verde after 12 s")
+	g.stock.bell = 1000
+	check(g.assign("vat", 0, "bell_puree") and g.stock.bell == 0, "S1: the vat takes exactly 1,000 Bell Peppers")
+	g.advance(seconds(20.0))
+	check(g.stock.bell_puree == 1, "S1: one Purée after 20 s")
+	g.stock.bell_puree = 5
+	check(g.assign("line", 0, "sweet_pepper_relish") and g.stock.bell_puree == 0, "S1: Relish takes 5 Purée")
+	g.advance(seconds(60.0))
+	check(g.stock.sweet_pepper_relish == 1 and close(g.value("sweet_pepper_relish"), 10000.0), "S1: a $10,000 Relish after 60 s")
 
 
 func test_switching_returns_inputs() -> void:
-	var g := tier_2()
+	var g := factory()
 	g.stock.bell = 10
 	g.buy_slot("vat")
 	g.advance(seconds(5.0))
@@ -225,17 +224,23 @@ func test_switching_returns_inputs() -> void:
 
 
 func test_operation_value() -> void:
-	var g := tier_2()
+	# S5 (SKELETON.md): IPM's Galaxy Value: cash, what was spent, stock and
+	# crops waiting at the farms.
+	var g := factory(5000.0)
 	g.stock.bell = 13
 	g.stock.verde_mash = 2
 	g.stock.bistro_verde = 3
-	var expect: float = g.stats.cash_earned + 13 * g.value("bell") + 2 * g.value("verde_mash") + 3 * g.value("bistro_verde")
-	check(close(g.operation_value(), expect), "S5: cash earned + stock at its values: $%.2f" % g.operation_value())
+	var expect: float = g.cash + g.stats.spent + 13 * g.value("bell") + 2 * g.value("verde_mash") + 3 * g.value("bistro_verde")
+	check(close(g.operation_value(), expect), "S5: cash + spent + stock at its values: $%.2f" % g.operation_value())
 	var before := g.operation_value()
-	g.cash -= 500.0
-	check(close(g.operation_value(), before), "S5: spending doesn't lower it")
+	check(g.buy_plot("farm_02") and close(g.operation_value(), before), "S5: buying a farm doesn't lower it")
+	check(g.buy_recipe("pimento_mash") and close(g.operation_value(), before), "S5: nor buying a recipe")
 	g.sell_batch()
 	check(close(g.operation_value(), before), "S5: selling at value doesn't change it")
+	g.account.best_ov = T.TAB_THRESHOLDS.tech
+	g.stock.table_mild = 100
+	before = g.operation_value()
+	check(g.research_node("calloused_thumbs") and close(g.operation_value(), before), "S5: research keeps its items' worth in it")
 	var h := opened(1000.0)
 	h.buy_plot("bell")
 	h.buy_slot("vat")
@@ -243,48 +248,17 @@ func test_operation_value() -> void:
 	for i in seconds(300.0):
 		h.tick()
 		if i % 97 == 0:
-			var sum: float = h.stats.cash_earned
+			var sum: float = h.cash + h.stats.spent
 			for item in h.stock:
-				sum += h.stock[item] * h.value(item)
+				sum += h.stock[item] * h.appraisal(item)
+			sum += h.field_total("bell") * h.value("bell")
 			check(close(h.operation_value(), sum), "S5: holds while running (tick %d)" % i)
 	check(h.account.best_ov >= h.operation_value(), "the account keeps the best")
 
 
-func test_values_follow_d004() -> void:
-	# Every bottle is worth 5× the raw value inside it and every mash 2× its
-	# inputs (D004), worked out from the recipes themselves.
-	var g := Game.new()
-	for id in g.data.recipes:
-		var r: Dictionary = g.data.recipes[id]
-		var inputs := 0.0
-		for item in r.inputs:
-			inputs += r.inputs[item] * g.value(item)
-		if r.station == "vat":
-			check(close(g.value(r.output), 2.0 * inputs, 1e-6), "D004: %s is 2× its inputs" % r.output)
-		else:
-			check(close(g.value(r.output), 5.0 * raw_value(g, r.output), 0.01), "D004: %s is 5× its raw value (%.2f)" % [r.output, raw_value(g, r.output)])
-
-
-## The raw value inside an item: crops at their value, bottles used as inputs at
-## their sale value (D004).
-func raw_value(g: Game, item: String) -> float:
-	var kind: String = g.data.items[item].kind
-	if kind == "crop":
-		return g.value(item)
-	for id in g.data.recipes:
-		var r: Dictionary = g.data.recipes[id]
-		if r.output == item:
-			var v := 0.0
-			for input in r.inputs:
-				var k: String = g.data.items[input].kind
-				v += r.inputs[input] * (g.value(input) if k == "bottle" else raw_value(g, input))
-			return v
-	return 0.0
-
-
 func test_whole_spine_runs() -> void:
 	var g := opened(1000.0)
-	check(g.buy_plot("bell") and g.buy_slot("vat") and g.buy_slot("line"), "buys the Tier 1 spine")
+	check(g.buy_plot("bell") and g.buy_slot("vat") and g.buy_slot("line"), "buys the kitchen")
 	g.advance(seconds(600.0))
 	check(g.stats.harvested.bell > 0 and g.stats.made.sweet_mash > 0 and g.stats.made.table_mild > 0, "peppers become mash become bottles")
 	check(g.stats.made.sweet_mash * 10 <= g.stats.harvested.bell + 100, "the vat never makes mash from nothing")
@@ -292,14 +266,15 @@ func test_whole_spine_runs() -> void:
 
 
 func test_same_inputs_same_game() -> void:
-	var a := tier_2()
-	var b := tier_2()
+	var a := factory()
+	var b := factory()
 	for g in [a, b]:
 		g.buy_plot("bell")
-		g.buy_plot("jalapeno")
+		g.buy_plot("farm_04")
 		g.buy_slot("vat")
 		g.buy_slot("vat")
-		g.assign("vat", 1, "verde_mash")
+		g.buy_recipe("ancho_mash")
+		g.assign("vat", 1, "ancho_mash")
 		for i in 3000:
 			if i % 7 == 0:
 				g.press()
@@ -308,26 +283,28 @@ func test_same_inputs_same_game() -> void:
 
 
 func test_save_round_trip_mid_cycle() -> void:
-	var g := tier_2()
+	var g := factory()
 	g.buy_plot("bell")
-	g.buy_plot("jalapeno")
+	g.buy_plot("farm_04")
 	g.buy_slot("vat")
 	g.buy_slot("vat")
-	g.assign("vat", 1, "verde_mash")
+	g.buy_recipe("ancho_mash")
+	g.assign("vat", 1, "ancho_mash")
 	g.buy_slot("line")
 	g.advance(seconds(37.3))
 	var c := Game.new()
 	var problem := c.load_state(JSON.parse_string(JSON.stringify(g.to_state(), "", false, true)))
-	check(problem == "", "a v3 save loads: " + problem)
+	check(problem == "", "a v12 save loads: " + problem)
 	check(JSON.stringify(c.to_state()) == JSON.stringify(g.to_state()), "it matches what was saved")
 	g.advance(seconds(60.0))
 	c.advance(seconds(60.0))
 	check(JSON.stringify(c.to_state()) == JSON.stringify(g.to_state()), "and plays on identically")
 
 
-func test_bad_v3_saves_are_refused() -> void:
-	var g := tier_2()
+func test_bad_saves_are_refused() -> void:
+	var g := factory()
 	g.buy_slot("vat")
+	g.buy_plot("farm_02")
 	var before := JSON.stringify(g.to_state())
 	var s := g.to_state()
 	s.run.vats[0].recipe = "table_mild"
@@ -339,9 +316,74 @@ func test_bad_v3_saves_are_refused() -> void:
 	s.run.research.append("time_machine")
 	check(g.load_state(s) != "", "unknown research is refused")
 	s = g.to_state()
-	s.run.vats = [{}, {}, {}, {}]
+	s.run.bought.append("perpetual_motion")
+	check(g.load_state(s) != "", "an unknown recipe bought is refused")
+	s = g.to_state()
+	s.run.plots.farm_02.field["unobtainium"] = 4
+	check(g.load_state(s) != "", "an unknown crop in a field is refused")
+	s = g.to_state()
+	s.run.vats = []
+	for i in 11:
+		s.run.vats.append({})
 	check(g.load_state(s) != "", "more slots than the cap are refused")
 	check(JSON.stringify(g.to_state()) == before, "a refused save changes nothing")
+
+
+func test_chances_are_deterministic() -> void:
+	# S10: a game with every chance in play, played twice from the same seed,
+	# and saved and reloaded halfway.
+	var Helpers = load("res://tests/button_tests.gd")
+	var nodes := ["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip", "bumper_crop_1"]
+	var a: Game = Helpers.with(nodes, 99)
+	var b: Game = Helpers.with(nodes, 99)
+	for g in [a, b]:
+		g.cash = 1e6
+		g.buy_plot("bell")
+		g.buy_slot("vat")
+		g.set_holding(true)
+		g.advance(seconds(1800.0))
+	check(a.stats.doubles > 0 and a.stats.free_levels > 0 and a.stats.spikes > 0, "every chance came up")
+	check(JSON.stringify(a.to_state()) == JSON.stringify(b.to_state()), "S10: the same seed and inputs give the same game")
+	var c := Game.new()
+	check(c.load_state(JSON.parse_string(JSON.stringify(a.to_state(), "", false, true))) == "", "S10: a mid-game save loads")
+	c.set_holding(true)
+	a.advance(seconds(1800.0))
+	c.advance(seconds(1800.0))
+	check(JSON.stringify(c.to_state()) == JSON.stringify(a.to_state()), "S10: and plays on identically, chances included")
+	var other: Game = Helpers.with(["double_tap"], 100)
+	var same: Game = Helpers.with(["double_tap"], 99)
+	for g in [other, same]:
+		for i in 200:
+			g.press()
+	check(other.stats.doubles != same.stats.doubles or other.rng.state != same.rng.state, "a different seed gives different chances")
+
+
+func test_sell_any_crop() -> void:
+	var g := opened(0.0)
+	g.stock.poblano = 7
+	g.stock.jalapeno = 3
+	g.stock.bell = 2
+	check(g.can_sell_crop("poblano") and g.sell_crop("poblano"), "A3: Poblanos sell raw")
+	check(g.stock.poblano == 0 and close(g.cash, 7 * g.value("poblano")), "A3: at their value")
+	check(g.stock.jalapeno == 3 and g.stock.bell == 2, "A3: selling one crop leaves the others alone")
+	check(not g.sell_crop("poblano") and not g.can_sell_crop("poblano"), "A3: nothing to sell with none held")
+	g.stock.sweet_mash = 4
+	check(not g.can_sell_crop("sweet_mash") and not g.sell_crop("sweet_mash"), "A3: only crops sell with Sell (mash sells with sell_item)")
+
+
+# --- Old saves reach v12 without loss (I11) -------------------------------------
+
+## What every old save's migration owes (I11): cash at least the run's earnings
+## (all spent cash came back), stock kept, best Operation Value kept.
+func check_no_loss(g: Game, earned: float, best: float, stock: Dictionary, label: String) -> void:
+	check(g.cash >= earned - 1e-6, "I11 %s: cash %.2f is at least the run's earnings %.2f" % [label, g.cash, earned])
+	check(g.account.best_ov >= best - 1e-6, "I11 %s: the best Operation Value is kept" % label)
+	var kept := true
+	for item in stock:
+		kept = kept and g.stock[item] >= stock[item]
+	check(kept, "I11 %s: every item still in the game keeps at least its count" % label)
+	check(g.vats.is_empty() and g.lines.is_empty() and not g.plots.bell.owned, "I11 %s: the factory came back as cash" % label)
+	check(g.to_state().version == Game.SAVE_VERSION, "I11 %s: saved again as v%d" % [label, Game.SAVE_VERSION])
 
 
 ## A save as v0.2 wrote it, mid-game: plot, vat and line, crate half used.
@@ -364,31 +406,9 @@ func test_v2_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v2_save())
 	check(problem == "", "S4: a v2 save loads: " + problem)
-	check(close(g.cash, 41.5 * T.SAVE_V8_MONEY) and g.stock.bell == 23 and g.stock.table_mild == 6, "S4: cash and stock carry over")
-	# v2's speed 3 (+45%) and yield 1 (+1 a harvest), in v9's levels (D041).
-	check(g.plots.bell.owned and g.plot_cycle("bell") <= g.data.plots.bell.seconds / 1.45 + 1e-9 and g.plot_yield_exact("bell") >= 2.0 - 1e-9, "S4: the plot and its levels")
-	check(g.vats.size() == 1 and g.vats[0].recipe == "sweet_mash" and g.vats[0].speed == 2 and g.vats[0].running, "S4: the vat is vat slot 1 on Sweet Pepper Mash")
-	check(g.lines.size() == 1 and g.lines[0].recipe == "table_mild" and g.lines[0].crate == 21, "S4: the line is line slot 1, crate kept")
-	check(g.stats.made.table_mild == 200 and g.stats.sold.table_mild == 194 and close(g.stats.cash_earned, 1100.0 * T.SAVE_V8_MONEY), "S4: stats carry over, money ×10 (D035)")
-	# v8: pounds became dollars ×10; the stock is valued at today's values.
-	var ov: float = 1100.0 * T.SAVE_V8_MONEY + 23 * g.value("bell") + 2 * g.value("sweet_mash") + 6 * g.value("table_mild")
-	check(close(g.account.best_ov, ov), "S4: the account starts at the run's Operation Value, $%.2f: $%.2f" % [ov, g.account.best_ov])
-	check(g.tab_open("processing") and g.tab_open("tech"), "$%.0f opens Processing and the Tech Tree" % ov)
-
-
-func test_v2_migration_produces_the_same() -> void:
-	# The v2 rules, replayed by hand for 60 s from the same state, against the
-	# migrated game: same peppers harvested, mash and bottles made (S4).
-	var g := Game.new()
-	g.load_state(v2_save())
-	g.advance(seconds(60.0))
-	# Production follows today's rules: the migrated levels at today's plot
-	# speed and yield, at least v2's rate (D041 rounds levels up).
-	var v2_rate := floori((60.0 + 0.7) / (g.data.plots.bell.seconds / 1.45) + 1e-6) * 2
-	var harvested := floori(floori((60.0 + 0.7) / g.plot_cycle("bell") + 1e-6) * g.plot_yield_exact("bell") + 1e-6)
-	var got: int = g.stats.harvested.bell - 1500
-	check(got == harvested and got >= v2_rate, "S4: the migrated plot's rate: %d (want %d, at least v2's %d)" % [got, harvested, v2_rate])
-	check(g.stats.made.sweet_mash > 210 and g.stats.made.table_mild > 200, "S4: the vat and line keep going")
+	check_no_loss(g, 1100.0 * T.SAVE_V8_MONEY, 0.0, {"bell": 23, "sweet_mash": 2, "table_mild": 6}, "v2")
+	check(g.stock.bell == 23 + 10 and g.stock.sweet_mash == 2 + 1, "I11 v2: the running vat's and line's inputs come back")
+	check(g.stats.made.table_mild == 200 and g.stats.sold.table_mild == 194, "S4: stats carry over")
 
 
 func test_v1_save_migrates() -> void:
@@ -400,7 +420,7 @@ func test_v1_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v1)
 	check(problem == "", "a v1 save loads: " + problem)
-	check(close(g.cash, 12.5 * T.SAVE_V8_MONEY) and g.stock.bell == 7 and g.revealed.deck, "cash (×10, D035), peppers and the deck carry over")
+	check(g.cash >= 12.5 * T.SAVE_V8_MONEY - 1e-9 and g.stock.bell == 7 and g.revealed.deck, "cash (×10, D035), peppers and the deck carry over")
 	check(g.stats.presses == 132 and g.vats.is_empty(), "stats, and no stations yet")
 	var broken := v1.duplicate(true)
 	broken.erase("bell")
@@ -440,193 +460,89 @@ func test_v3_save_migrates() -> void:
 	var g := Game.new()
 	var problem := g.load_state(v3_save())
 	check(problem == "", "S9: a v3 save loads: " + problem)
-	check(close(g.cash, 812.5 * T.SAVE_V8_MONEY) and g.stock.jalapeno == 30 and g.autosell.table_mild == 50, "S9: cash, stock and sliders carry over")
-	check(g.vats[0].running and g.vats[0].taken == {"bell": 10}, "S9: a running vat's taken inputs are its recipe's")
-	check(g.heat == 0.0 and g.pin == "" and g.keep.is_empty() and g.plots.bell.cargo == 0 and g.plots.bell.field == 0, "S9: new state starts empty")
-	check(g.has_van() and g.tap_yield() == 3, "S9: research carries over, with its effects")
+	check_no_loss(g, 3100.0 * T.SAVE_V8_MONEY, 3300.0 * T.SAVE_V8_MONEY, {"jalapeno": 30, "vinegar": 12, "verde_mash": 1}, "v3")
+	check(g.autosell.table_mild == 50, "S9: sliders carry over")
+	check(g.has_van() and g.tap_yield() == 3, "S9: research that still exists carries over, with its effects")
+	check(not g.research.has("jalapeno_blueprint") and not g.research.has("verde_blueprint"), "I11 v3: removed blueprints are gone")
+	# The two removed blueprints cost 3 + 10 Table Mild in v11; they come back.
+	check(g.stock.table_mild >= 3 + 3 + 10, "I11 v3: their items come back (%d Table Mild)" % g.stock.table_mild)
 	var again := Game.new()
 	again.load_state(v3_save())
 	check(JSON.stringify(again.to_state()) == JSON.stringify(g.to_state()), "S9: the same save migrates the same way, random stream included")
-	# Production goes on as v0.3's rules had it: the plot's harvests, by hand.
-	g.advance(seconds(60.0))
-	# The migrated levels at today's plot speed and yield, at least v0.3's rate.
-	var v3_rate := floori((60.0 + 0.4) / (g.data.plots.bell.seconds / 1.6) + 1e-6) * 3
-	var harvested := floori(floori((60.0 + 0.4) / g.plot_cycle("bell") + 1e-6) * g.plot_yield_exact("bell") + 1e-6)
-	var got: int = g.stats.harvested.bell - 8000
-	check(got == harvested and got >= v3_rate, "S9: the migrated Bell plot's rate: %d (want %d, at least v0.3's %d)" % [got, harvested, v3_rate])
-	var sm_cycle := 8.0 / (1.0 + 0.25 * 5)
-	check(g.stats.made.sweet_mash - 700 >= floori(60.0 / sm_cycle) - 1, "S9: the vat keeps going")
+
+
+func test_v11_save_refunds() -> void:
+	# I11: a v11 save, built by hand as v0.6 wrote it, mid-run with rooms.
+	var s := v11_save()
+	var g := Game.new()
+	var problem := g.load_state(JSON.parse_string(JSON.stringify(s)))
+	check(problem == "", "I11: a v11 save loads: " + problem)
+	# Cash: every dollar earned plus Seed Capital Level 2's $5,000.
+	check(close(g.cash, 50000.0 + 5000.0), "I11: cash is the run's earnings plus its starting cash ($%.2f)" % g.cash)
+	check(g.stock.bell == 10 + 7 + 10 and g.stock.poblano == 3 and g.stock.jalapeno == 5 and g.stock.bistro_verde == 2, "I11: fields and the vat's inputs go to stock")
+	# Removed: Jalapeño Cultivation (3 Table Mild), Slot Expansion I (40 Sweet Mash + 20 Verde).
+	check(g.stock.table_mild == 3 and g.stock.sweet_mash == 40 and g.stock.verde_mash == 20, "I11: removed nodes give back their items")
+	check(g.is_researched("delivery_van") and not g.is_researched("slot_expansion_1"), "I11: kept research stays")
+	# Credits: 2 rooms (5 + 10), levels (2 for Seed Capital; 2 + 4 for the
+	# Tasting Room), the paid draft (15), plus 4 held.
+	check(g.account.credits == 4 + 15 + 2 + 6 + 15 and g.account.rooms.is_empty(), "I11: every room comes back as its credits (%d)" % g.account.credits)
+	check(g.account.best_ov >= 90000.0 and g.account.prestiges == 1, "I11: the account's best Operation Value and sales kept")
+	# A pin on a removed node goes with it rather than refusing the save.
+	var pinned := v11_save()
+	pinned.run.pin = "jalapeno_blueprint"
 	var h := Game.new()
-	h.load_state(v3_save())
-	check(h.assign("vat", 0, "") and h.stock.bell == 50, "S9: switching the migrated vat off returns its 10 peppers")
+	problem = h.load_state(JSON.parse_string(JSON.stringify(pinned)))
+	check(problem == "" and h.pin == "", "I11: a v11 save pinning a removed node loads, unpinned: %s" % problem)
+	pinned.run.pin = "delivery_van"
+	h = Game.new()
+	check(h.load_state(JSON.parse_string(JSON.stringify(pinned))) == "" and h.pin == "delivery_van", "I11: a pin on a kept node stays")
 
 
-func test_chances_are_deterministic() -> void:
-	# S10: a game with every chance in play, played twice from the same seed,
-	# and saved and reloaded halfway.
-	var Helpers = load("res://tests/button_tests.gd")
-	var a: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip", "bumper_crop_1"], 99)
-	var b: Game = Helpers.with(["double_tap", "byproduct_recycling", "market_ticker", "ergonomic_grip", "bumper_crop_1"], 99)
-	for g in [a, b]:
-		g.cash = 1e6
-		g.buy_plot("bell")
-		g.buy_slot("vat")
-		g.set_holding(true)
-		g.advance(seconds(1800.0))
-	check(a.stats.doubles > 0 and a.stats.free_levels > 0 and a.stats.spikes > 0, "every chance came up")
-	check(JSON.stringify(a.to_state()) == JSON.stringify(b.to_state()), "S10: the same seed and inputs give the same game")
-	var c := Game.new()
-	check(c.load_state(JSON.parse_string(JSON.stringify(a.to_state(), "", false, true))) == "", "S10: a mid-game save loads")
-	c.set_holding(true)
-	a.advance(seconds(1800.0))
-	c.advance(seconds(1800.0))
-	check(JSON.stringify(c.to_state()) == JSON.stringify(a.to_state()), "S10: and plays on identically, chances included")
-	var other: Game = Helpers.with(["double_tap"], 100)
-	var same: Game = Helpers.with(["double_tap"], 99)
-	for g in [other, same]:
-		for i in 200:
-			g.press()
-	check(other.stats.doubles != same.stats.doubles or other.rng.state != same.rng.state, "a different seed gives different chances")
+## v8–v10 saves, made from the v11 fixture in each version's shape, reach v12
+## with nothing lost (I11): their plot conversions and renames still run first.
+func test_v8_to_v10_saves_refund() -> void:
+	var v10 := v11_save()
+	v10.version = 10
+	for id in v10.run.plots:
+		var p: Dictionary = v10.run.plots[id]
+		p.quality = p.cargo
+		for k in ["cargo", "field", "haul"]:
+			p.erase(k)
+	var v9: Dictionary = JSON.parse_string(JSON.stringify(v10).replace("thai_chili", "tabasco"))
+	v9.version = 9
+	v9.run.stock["savina_gold"] = 4
+	var v8: Dictionary = v9.duplicate(true)
+	v8.version = 8
+	for id in v8.run.plots:
+		v8.run.plots[id].erase("spare")
+	for save in [v10, v9, v8]:
+		var g := Game.new()
+		var problem := g.load_state(JSON.parse_string(JSON.stringify(save)))
+		var label := "v%d" % save.version
+		check(problem == "", "I11 %s: loads: %s" % [label, problem])
+		check_no_loss(g, 50000.0, 90000.0, {"bell": 10, "jalapeno": 5, "bistro_verde": 2}, label)
+		check(g.account.credits == 4 + 15 + 2 + 6 + 15, "I11 %s: rooms back as credits (%d)" % [label, g.account.credits])
+	var g9 := Game.new()
+	g9.load_state(JSON.parse_string(JSON.stringify(v9)))
+	check(g9.stock.cocoa_loco == 4, "I11 v9: D042's renames still run (Savina Gold is Cocoa Loco: %d)" % g9.stock.cocoa_loco)
+	var bad := v8.duplicate(true)
+	bad.run.plots.bell = 5
+	check(Game.new().load_state(JSON.parse_string(JSON.stringify(bad))) != "", "I11 v8: a broken plot is refused, not crashed on")
 
 
-# --- v0.6d: Idle Planet Miner's early flow (ECONOMY.md, D041) ---------------
-
-func test_starting_plots() -> void:
-	var g := opened(100000.0)
-	var order := ["bell", "poblano", "jalapeno"]
-	for crop in order:
-		check(g.plot_offered(crop) and g.data.plots[crop].unlocked, "A1: the %s is on sale with the deck, no blueprint" % g.data.plots[crop].name)
-	for crop in g.data.plots:
-		if not crop in order:
-			check(not g.plot_offered(crop), "A1: the %s still needs its blueprint" % g.data.plots[crop].name)
-	for i in range(1, order.size()):
-		check(g.plot_price(order[i]) > g.plot_price(order[i - 1]), "A1: the %s costs more than the %s" % [g.data.plots[order[i]].name, g.data.plots[order[i - 1]].name])
-	for crop in ["poblano", "jalapeno"]:
-		var plot: Dictionary = g.data.plots[crop]
-		var payback: float = g.plot_price(crop) / (plot["yield"] / plot.seconds * g.value(crop))
-		check(payback >= 300.0 and payback <= 600.0, "A1: the %s pays for itself raw in %.1f minutes (5–10)" % [plot.name, payback / 60.0])
-	# A8 (D048): after Bell, each starting plot costs 2–4× the one before, as
-	# Idle Planet Miner's first planets do ($200, $500, $1,250, $5,000).
-	for i in range(2, order.size()):
-		var step: float = g.plot_price(order[i]) / g.plot_price(order[i - 1])
-		check(step >= 2.0 and step <= 4.0, "A8: the %s costs %.1f× the %s (2–4)" % [g.data.plots[order[i]].name, step, g.data.plots[order[i - 1]].name])
-
-
-func test_upgrade_curve() -> void:
-	var g := opened(1e12)
-	for crop in g.data.plots:
-		g.plots[crop].owned = true
-		for upgrade in g.PLOT_UPGRADES:
-			var first: float = g.plot_price(crop) * 0.05
-			var ok := close(g.plot_upgrade_cost(crop, upgrade), first)
-			for lv in 4:
-				ok = ok and absf(g.plot_upgrade_cost(crop, upgrade, lv + 1) / g.plot_upgrade_cost(crop, upgrade, lv) - 1.3) < 1e-9
-			check(ok, "A2: %s %s: 5%% of the price, then ×1.3 a level" % [crop, upgrade])
-
-
-func test_sell_any_crop() -> void:
-	var g := opened(0.0)
-	g.stock.poblano = 7
-	g.stock.jalapeno = 3
-	g.stock.bell = 2
-	check(g.can_sell_crop("poblano") and g.sell_crop("poblano"), "A3: Poblano Peppers sell raw")
-	check(g.stock.poblano == 0 and close(g.cash, 7 * g.value("poblano")), "A3: at their value")
-	check(g.stock.jalapeno == 3 and g.stock.bell == 2, "A3: selling one crop leaves the others alone")
-	check(not g.sell_crop("poblano") and not g.can_sell_crop("poblano"), "A3: nothing to sell with none held")
-	g.stock.sweet_mash = 4
-	check(not g.can_sell_crop("sweet_mash") and not g.sell_crop("sweet_mash"), "A3: only crops sell raw")
-
-
-func test_v8_plots_convert() -> void:
-	# A v8 save with old levels: speed 3 (+45%), yield 2 (+2 crops), quality 10 (30%).
-	var g := opened(0.0)
-	g.buy_plot("jalapeno")
-	var s: Dictionary = g.to_state()
-	s.version = 8
-	s.run.plots.jalapeno.speed = 3
-	s.run.plots.jalapeno["yield"] = 2
-	s.run.plots.jalapeno.quality = 10
-	s.run.plots.jalapeno.erase("spare")
-	var h := Game.new()
-	check(h.load_state(JSON.parse_string(JSON.stringify(s))) == "", "A5: a v8 save loads")
-	var p: Dictionary = h.plots.jalapeno
-	var base: Dictionary = h.data.plots.jalapeno
-	check(h.plot_cycle("jalapeno") <= base.seconds / 1.45 + 1e-9, "A5: at least as fast (%.3f s against %.3f)" % [h.plot_cycle("jalapeno"), base.seconds / 1.45])
-	check(h.plot_yield_exact("jalapeno") >= base["yield"] + 2 - 1e-9, "A5: at least as productive (%.2f a harvest against %d)" % [h.plot_yield_exact("jalapeno"), base["yield"] + 2])
-	check(p.cargo == 30, "A5: its Crop Quality kept, as 30 Cargo levels since D043 (%d)" % p.cargo)
-	check(p.speed <= 3 * 0.15 / T.PLOT_SPEED_STEP + 1 and h.to_state().version == Game.SAVE_VERSION, "A5: no more levels than it takes, saved as v%d" % Game.SAVE_VERSION)
-
-
-func test_fractional_yield_carries() -> void:
-	var g := opened(1000.0)
-	g.buy_plot("bell")
-	g.plots.bell["yield"] = 5   # 1 × (1 + 5 × step) a harvest
-	var exact: float = g.plot_yield_exact("bell")
-	var cycle: float = g.plot_cycle("bell")
-	for i in roundi(100.0 * cycle / T.TICK_SECONDS):
-		g.tick()
-	check(absi(g.stats.harvested.bell - roundi(100.0 * exact)) <= 1, "a fractional yield carries: %d from 100 harvests of %.2f" % [g.stats.harvested.bell, exact])
-
-
-func test_malformed_v8_plot_refused() -> void:
-	var g := opened(0.0)
-	var s: Dictionary = g.to_state()
-	s.version = 8
-	s.run.plots.bell = 5
-	var h := Game.new()
-	var problem := h.load_state(JSON.parse_string(JSON.stringify(s)))
-	check(problem != "", "A5: a v8 save with a broken plot is refused, not crashed on: %s" % problem)
-	s.run.plots.bell = {"owned": true, "speed": "fast"}
-	check(Game.new().load_state(JSON.parse_string(JSON.stringify(s))) == "", "A5: a level that isn't a number reads as 0")
-
-
-func test_v9_names_migrate() -> void:
-	# D042: a v9 save with the old ids loads under the new ones.
-	var g := opened(0.0)
-	var s: Dictionary = g.to_state()
-	var text := JSON.stringify(s)
-	for pair in Game.RENAMES_V10:
-		text = text.replace(pair[1], pair[0])
-	var old: Dictionary = JSON.parse_string(text)
-	old.version = 9
-	old.run.stock["savina_gold"] = 3
-	old.run.stock["savina"] = 4
-	old.run.stock["habanero_mash"] = 5
-	old.run.stock["sugar"] = 6
-	old.run.research.append("tabasco_blueprint")
-	var h := Game.new()
-	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v9 save with the old pepper names loads")
-	check(h.stock.cocoa_loco == 3 and h.stock.chocolate == 4 and h.stock.caribbean_red_mash == 5 and h.stock.pineapple == 6, "S: Savina Gold, Red Savina, Habanero Mash and Cane Sugar become Cocoa Loco, Chocolate Habanero, Caribbean Red Mash and Pineapple")
-	check(h.is_researched("thai_chili_blueprint"), "S: research carries over under the new ids")
-
-
-func test_v8_renamed_plot_converts() -> void:
-	# A v8 save's Cane Sugar plot is renamed (D042) before its levels convert (D041).
-	var g := opened(0.0)
-	var s: Dictionary = g.to_state()
-	var text := JSON.stringify(s)
-	for pair in Game.RENAMES_V10:
-		text = text.replace(pair[1], pair[0])
-	var old: Dictionary = JSON.parse_string(text)
-	old.version = 8
-	old.run.plots.sugar = {"owned": true, "speed": 0, "yield": 2, "quality": 0, "progress": 0.0}
-	var h := Game.new()
-	check(h.load_state(JSON.parse_string(JSON.stringify(old))) == "", "S: a v8 save with a Cane Sugar plot loads")
-	var base: int = h.data.plots.pineapple["yield"]
-	check(h.plots.pineapple.owned and h.plot_yield_exact("pineapple") >= base + 2 - 1e-9, "S: as a Pineapple Grove, its yield levels converted (%.2f a harvest, at least %d)" % [h.plot_yield_exact("pineapple"), base + 2])
-
-
-func test_v10_quality_becomes_cargo() -> void:
-	# C5 (D043): a v10 save's Crop Quality levels become Cargo levels.
-	var g := opened(1000.0)
-	g.buy_plot("bell")
-	var s: Dictionary = g.to_state()
-	s.version = 10
-	s.run.plots.bell.erase("cargo")
-	s.run.plots.bell.erase("field")
-	s.run.plots.bell.erase("haul")
-	s.run.plots.bell.quality = 7
-	var h := Game.new()
-	check(h.load_state(JSON.parse_string(JSON.stringify(s))) == "", "C5: a v10 save loads")
-	check(h.plots.bell.cargo == 7 and h.plots.bell.field == 0 and not h.plots.bell.has("quality"), "C5: 7 Crop Quality levels are 7 Cargo levels, the field empty")
-
+func v11_save() -> Dictionary:
+	return {
+		"version": 11,
+		"run": {
+			"cash": 1234.0, "stock": {"bell": 10, "jalapeno": 5, "bistro_verde": 2},
+			"plots": {"bell": {"owned": true, "speed": 3, "yield": 2, "cargo": 1, "progress": 0.0, "spare": 0.0, "field": 7, "haul": 0.0},
+				"poblano": {"owned": true, "speed": 0, "yield": 0, "cargo": 0, "progress": 0.0, "spare": 0.0, "field": 3, "haul": 0.0}},
+			"vats": [{"recipe": "sweet_mash", "speed": 1, "progress": 1.0, "running": true, "taken": {"bell": 10}}],
+			"lines": [{"recipe": "table_mild", "speed": 0, "progress": 0.0, "running": false, "taken": {}, "crate": 0}],
+			"research": ["kitchen_table", "jalapeno_blueprint", "slot_expansion_1", "delivery_van"],
+			"autosell": {}, "autosell_acc": {}, "heat": 0.0, "press_acc": {"grip": 0.0, "piston": 0.0}, "overdrive": {"until": 0, "ready": 0},
+			"keep": {}, "pin": "", "ticker": {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}, "byproduct_ready": 0.0,
+			"rng": {"seed": "1", "state": "2"}, "stats": {"cash_earned": 50000.0, "ticks": 100},
+		},
+		"account": {"best_ov": 90000.0, "credits": 4, "prestiges": 1, "rooms": {"seed_capital": 2, "tasting_room": 3}, "draft": ["cooperage", "glassworks"]},
+	}

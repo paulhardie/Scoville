@@ -83,24 +83,36 @@ func test_tabs_follow_the_best_value() -> void:
 
 func test_research_needs_parents_and_cost() -> void:
 	var g := open_tree()
+	g.stock.pimento = 100000
+	g.stock.bell_puree = 100
 	check(g.is_researched("kitchen_table"), "the Kitchen Table starts researched")
-	check(not g.can_research("verde_blueprint") and not g.research_node("verde_blueprint"), "R1: Verde needs the Jalapeño blueprint first")
+	check(not g.can_research("survey_2") and not g.research_node("survey_2"), "R1: Land Survey 2 needs Land Survey 1 first")
 	var closed := Game.new()
 	closed.stock.table_mild = 500
-	check(not closed.research_node("jalapeno_blueprint"), "R1: nothing before the tab opens")
-	var price: int = g.data.tech.jalapeno_blueprint.cost.table_mild
+	check(not closed.research_node("calloused_thumbs"), "R1: nothing before the tab opens")
+	var price: int = g.data.tech.calloused_thumbs.cost.table_mild
 	g.stock.table_mild = price - 1
 	var before := JSON.stringify(g.to_state())
-	check(not g.research_node("jalapeno_blueprint"), "R1: one bottle short can't pay")
+	check(not g.research_node("calloused_thumbs"), "R1: one bottle short can't pay")
 	check(JSON.stringify(g.to_state()) == before, "R1: a refused research changes nothing")
 	g.stock.table_mild = price
-	check(g.research_node("jalapeno_blueprint") and g.stock.table_mild == 0, "R2: it takes exactly its cost")
-	check(not g.research_node("jalapeno_blueprint"), "a node can't be researched twice")
+	check(g.research_node("calloused_thumbs") and g.stock.table_mild == 0, "R2: it takes exactly its cost")
+	check(not g.research_node("calloused_thumbs"), "a node can't be researched twice")
+	# needs_any (IPM's OR): Hydroponic Jalapeños needs Truck Tune-Up or Bigger Crates.
+	var any := open_tree()
+	for item in any.stock:
+		any.stock[item] = 10000000
+	any.research_node("hydroponic_bell")
+	check(not any.research_reachable("hydroponic_jalapeno"), "R1: needs_any: neither side yet")
+	any.research_node("bigger_crates")
+	check(any.research_reachable("hydroponic_jalapeno"), "R1: needs_any: one side is enough")
 
 
 func test_research_costs_and_permanence() -> void:
 	var g := open_tree()
-	for node in ["jalapeno_blueprint", "vinegar_blueprint", "brine_blueprint", "verde_blueprint", "bistro_blueprint", "delivery_van", "calloused_thumbs"]:
+	for item in g.stock:
+		g.stock[item] = 10000000
+	for node in ["calloused_thumbs", "delivery_van", "double_tap", "survey_1", "survey_2", "hydroponic_bell", "hotter_burners"]:
 		var cost: Dictionary = g.data.tech[node].cost
 		var had := {}
 		for item in cost:
@@ -116,23 +128,21 @@ func test_research_costs_and_permanence() -> void:
 	check(c.research.size() == g.research.size(), "R2: and nothing else is researched")
 
 
-func test_blueprints_open_what_they_name() -> void:
+func test_surveys_open_their_farms() -> void:
+	# I5 (R3 since v0.7): farms 1–4 from the start; Land Survey n opens farms
+	# 3n + 2 to 3n + 4 and the ingredient stations placed with it.
 	var g := open_tree()
-	g.cash = 100000.0
-	check(not g.plot_unlocked("vinegar") and not g.recipe_unlocked("verde_mash"), "nothing open before research")
-	g.buy_plot("jalapeno")
-	var cycle: float = g.plot_cycle("jalapeno")
-	g.research_node("jalapeno_blueprint")
-	check(close(g.plot_cycle("jalapeno"), cycle / 1.5), "R3: E1 (D041: Jalapeño Cultivation) speeds the Jalapeño Plot up ×1.5")
-	check(not g.plot_unlocked("vinegar") and not g.recipe_unlocked("verde_mash"), "R3: and only that")
-	g.research_node("verde_blueprint")
-	check(g.recipe_unlocked("verde_mash") and not g.recipe_unlocked("pickled_brine"), "R3: E2 opens Verde Mash only")
-	g.research_node("vinegar_blueprint")
-	check(g.plot_unlocked("vinegar"), "R3: E3 opens the White Vinegar Plot")
-	g.research_node("brine_blueprint")
-	check(g.recipe_unlocked("pickled_brine") and not g.recipe_unlocked("bistro_verde"), "R3: E4 opens Pickled Brine only")
-	g.research_node("bistro_blueprint")
-	check(g.recipe_unlocked("bistro_verde"), "R3: E5 opens Bistro Verde")
+	for item in g.stock:
+		g.stock[item] = 10000000
+	for id in g.data.plots:
+		check(g.plot_offered(id) == (g.data.plots[id].survey == 0), "I5: %s on sale from the start only if it's farm 1–4" % id)
+	for n in range(1, 26):
+		check(g.research_node("survey_%d" % n), "researches Land Survey %d" % n)
+		var ok := true
+		for id in g.data.plots:
+			ok = ok and g.plot_offered(id) == (g.data.plots[id].survey <= n)
+		check(ok, "I5: after Land Survey %d, exactly the farms of surveys 0–%d are on sale" % [n, n])
+	check(g.plot_offered("farm_79") and g.plot_offered("oak"), "every farm and station by the last survey")
 	check(not g.has_van(), "no Van yet")
 	g.research_node("delivery_van")
 	check(g.has_van(), "R3: W1 brings the Delivery Van")
@@ -205,13 +215,19 @@ func test_bad_data_names_file_and_row() -> void:
 	var good := {}
 	for name in DataLoader.FILES:
 		good[name] = JSON.parse_string(FileAccess.get_file_as_string("res://data/%s.json" % name))
+	var row := func(file: String, list: String, i: int) -> String:
+		return "%s.json row %d (%s)" % [file, i + 1, good[file][list][i].id]
 	var cases := [
-		["recipes", func(d): d.recipes.recipes[2].output = "table_mild", "recipes.json row 3 (verde_mash)"],
-		["recipes", func(d): d.recipes.recipes[1].inputs["moonbeam"] = 2.0, "recipes.json row 2 (pickled_brine)"],
-		["items", func(d): d.items.items[0].value = -1.0, "items.json row 1 (bell)"],
-		["plots", func(d): d.plots.plots[1].crop = "table_mild", "plots.json row 2 (table_mild)"],
-		["tech", func(d): d.tech.nodes[2].needs = ["nowhere"], "tech.json row 3 (verde_blueprint)"],
-		["tech", func(d): d.tech.nodes[1].effects = [{"unlock_plot": "mars"}], "tech.json row 2 (jalapeno_blueprint)"],
+		["recipes", func(d): d.recipes.recipes[2].output = "table_mild", row.call("recipes", "recipes", 2)],
+		["recipes", func(d): d.recipes.recipes[1].inputs["moonbeam"] = 2.0, row.call("recipes", "recipes", 1)],
+		["recipes", func(d): d.recipes.recipes[3].unlock = -5.0, row.call("recipes", "recipes", 3)],
+		["items", func(d): d.items.items[0].value = -1.0, row.call("items", "items", 0)],
+		["plots", func(d): d.plots.plots[1].crops = {"table_mild": 100.0}, row.call("plots", "plots", 1)],
+		["plots", func(d): d.plots.plots[2].survey = 99.0, "plots.json (%s)" % good.plots.plots[2].id],
+		["tech", func(d): d.tech.nodes[2].needs = ["nowhere"], row.call("tech", "nodes", 2)],
+		["tech", func(d): d.tech.nodes[1].effects = [{"unlock_plot": "mars"}], row.call("tech", "nodes", 1)],
+		["tech", func(d): d.tech.nodes[1].effects = [{"harvest_mult": 0.5}], row.call("tech", "nodes", 1)],
+		["rooms", func(d): d.rooms.rooms[0].level_costs = [1.0], row.call("rooms", "rooms", 0)],
 		["slots", func(d): d.slots.vat.prices = [], "slots.json"],
 	]
 	for c in cases:

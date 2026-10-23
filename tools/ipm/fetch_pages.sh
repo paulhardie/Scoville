@@ -7,6 +7,6 @@ out="${1:?out dir}"
 mkdir -p "$out"
 for p in Ores Alloys Items Planets Projects Smelters Crafters Credit Rooms \
 	Engineering Forge Aeronautical Astronomy Packaging Workshop Laboratory Lounge \
-	Backup_Generator Underforge Dorm Sales Marketing; do
+	Backup_Generator Underforge Dorm Sales Marketing Planetary_Upgrades; do
 	curl -sS --fail "https://idle-planet-miner.fandom.com/api.php?action=parse&page=$p&prop=wikitext&format=json&redirects=1" -o "$out/$p.json"
 done

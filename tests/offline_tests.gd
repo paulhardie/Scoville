@@ -103,12 +103,12 @@ func test_long_absence_matches_ticks() -> void:
 
 
 func test_backed_up_plot_matches_ticks() -> void:
-	# C6 (D043): with the Bell Pepper Plot outgrowing its truck, two hours away
+	# C6 (D043, D050): with the Bell Plot outgrowing its truck, two hours away
 	# carry crops as ticking would.
 	var fast := loaded(60)
 	var slow := loaded(60)
 	for g in [fast, slow]:
-		g.plots.bell["yield"] = 100
+		g.plots.bell.harvest = 40   # far more than its truck carries
 	var speed := fast.offline_speed()
 	var r := fast.catch_up(7200.0)
 	var ov_before := slow.operation_value()
@@ -118,8 +118,8 @@ func test_backed_up_plot_matches_ticks() -> void:
 	slow.advance(seconds(7200.0 * speed))
 	var want := slow.operation_value() - ov_before
 	var diff := absf(r.ov - want) / want
-	var waiting_fast: int = fast.plots.bell.field
-	var waiting_slow: int = slow.plots.bell.field
+	var waiting_fast: int = fast.field_total("bell")
+	var waiting_slow: int = slow.field_total("bell")
 	check(waiting_slow > 0 and diff <= 0.02 and absf(waiting_fast - waiting_slow) <= 0.02 * waiting_slow, "C6: a backed-up plot, 2 h away: $%.0f against $%.0f tick by tick (%.2f%% off), %d against %d waiting" % [r.ov, want, diff * 100.0, waiting_fast, waiting_slow])
 
 
@@ -130,7 +130,7 @@ func test_safety() -> void:
 		var slots_before := [g.vats.size(), g.lines.size()]
 		var levels_before := 0
 		for crop in g.plots:
-			levels_before += g.plots[crop].speed + g.plots[crop]["yield"] + g.plots[crop].cargo
+			levels_before += g.plots[crop].harvest + g.plots[crop].truck + g.plots[crop].cargo
 		var recipes_before := []
 		for s in g.vats + g.lines:
 			recipes_before.append(s.recipe)
@@ -154,7 +154,7 @@ func test_safety() -> void:
 
 
 func test_timers() -> void:
-	var g: Game = Helpers.with(["overdrive_turbines", "byproduct_recycling", "market_ticker", "bistro_blueprint"], 3)
+	var g: Game = Helpers.with(["overdrive_turbines", "byproduct_recycling", "market_ticker"], 3)
 	check(g.activate_overdrive(), "Overdrive pressed before leaving")
 	var ready_at: int = g.overdrive.ready
 	var start: int = g.stats.ticks
@@ -165,8 +165,8 @@ func test_timers() -> void:
 	g.catch_up(5 * 60.0)
 	check(g.can_overdrive(), "X5: and ready after 5 more: 15 minutes from the press")
 	# The Market Ticker: spikes while away aren't paid, and the schedule holds.
-	var a: Game = Helpers.with(["market_ticker", "bistro_blueprint"], 7)
-	var b: Game = Helpers.with(["market_ticker", "bistro_blueprint"], 7)
+	var a: Game = Helpers.with(["market_ticker"], 7)
+	var b: Game = Helpers.with(["market_ticker"], 7)
 	a.catch_up(6 * 3600.0)
 	b.advance(seconds(6 * 3600.0))
 	check(a.ticker.next == b.ticker.next and a.stats.spikes == b.stats.spikes, "X5: the next spike keeps the Ticker's schedule (%d spikes either way)" % a.stats.spikes)

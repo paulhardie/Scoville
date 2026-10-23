@@ -1,15 +1,12 @@
 extends SceneTree
-## v0.6a's rules (docs/FULL_RUN.md V1–V7): the sauce ladder's values, station
-## sizing, the Pantry's effects and the fork; and Tier 6's (docs/PRESTIGE.md
-## Q11; V1 covers its values).
+## v0.6a's Pantry rules (docs/FULL_RUN.md V4–V7): its effects and the fork.
+## V1–V3 and Q11 retired with v0.7 (SKELETON.md).
 
 const Game = preload("res://src/core/game.gd")
 const T = preload("res://src/core/tuning.gd")
 const DataLoader = preload("res://src/core/data_loader.gd")
 const Helpers = preload("res://tests/button_tests.gd")
 
-const LADDER := ["table_mild", "smoky_ancho", "bistro_verde", "serrano_fire", "classic_louisiana", "cajun_red",
-	"island_heat", "sweet_heat", "cocoa_loco", "phantom"]
 
 var failures: Array[String] = []
 var checks := 0
@@ -39,104 +36,33 @@ func run() -> void:
 	quit(0 if failures.is_empty() else 1)
 
 
-## The recipe that makes an item, "" for a crop.
-static func maker(g: Game, item: String) -> String:
-	for id in g.data.recipes:
-		if g.data.recipes[id].output == item:
-			return id
-	return ""
-
-
-## Raw value inside an item (ECONOMY.md, D004): crops at their value, mash
-## through its inputs, a bottle used as an input at its full value.
-static func raw_inside(g: Game, item: String) -> float:
-	var r := maker(g, item)
-	if r == "":
-		return g.value(item)
-	var v := 0.0
-	for input in g.data.recipes[r].inputs:
-		var n: int = g.data.recipes[r].inputs[input]
-		v += n * (g.value(input) if g.data.items[input].kind == "bottle" else raw_inside(g, input))
-	return v
-
-
-func test_values_follow_d004() -> void:
-	var g := Game.new()
-	for id in g.data.recipes:
-		var r: Dictionary = g.data.recipes[id]
-		var out: String = r.output
-		if r.station == "vat":
-			var inputs := 0.0
-			for item in r.inputs:
-				inputs += r.inputs[item] * g.value(item)
-			check(absf(g.value(out) - 2.0 * inputs) < 0.01, "V1: %s is worth 2× its inputs ($%.2f against $%.2f)" % [out, g.value(out), 2.0 * inputs])
-		else:
-			var m: float = g.value(out) / raw_inside(g, out)
-			check(m >= 4.9 and m <= 5.1, "V1: %s is worth 5× the raw value inside (%.2f×)" % [out, m])
-
-
-func test_ladder_climbs() -> void:
-	var g := Game.new()
-	for i in range(1, LADDER.size()):
-		var step: float = g.value(LADDER[i]) / g.value(LADDER[i - 1])
-		check(step >= 2.0 and step <= 3.4, "V2/D035: %s is ×2.0–3.4 the rung below (×%.2f)" % [LADDER[i], step])
-
-
-func test_stations_feed_one_vat() -> void:
-	var g := Game.new()
-	for crop in ["poblano", "serrano", "thai_chili", "pineapple", "bonnet", "caribbean_red", "chocolate", "oak", "ghost"]:
-		var p: Dictionary = g.data.plots[crop]
-		var r: Dictionary = g.data.recipes[maker(g, crop + "_mash") if maker(g, crop + "_mash") != "" else _mash_of(g, crop)]
-		var supply: float = p["yield"] / p.seconds
-		var need: float = r.inputs[crop] / r.seconds
-		check(absf(supply - need) < 0.01, "V3: the %s feeds one vat at base (%.3f a second against %.3f)" % [p.name, supply, need])
-
-
-static func _mash_of(g: Game, crop: String) -> String:
-	for id in g.data.recipes:
-		if g.data.recipes[id].station == "vat" and g.data.recipes[id].inputs.has(crop):
-			return id
-	return ""
-
-
-func test_tier6() -> void:
-	var g := Game.new()
-	var top := ["phantom", "scorpion_sting", "widowmaker", "extinction_event"]
-	for i in range(1, top.size()):
-		var step: float = g.value(top[i]) / g.value(top[i - 1])
-		check(step >= 2.0 and step <= 3.4, "Q11/D035: %s is ×2.0–3.4 the rung below (×%.2f)" % [top[i], step])
-	for crop in ["moruga", "grim", "pepper_y"]:
-		var p: Dictionary = g.data.plots[crop]
-		var r: Dictionary = g.data.recipes[crop + "_mash"]
-		var supply: float = p["yield"] / p.seconds
-		var need: float = r.inputs[crop] / r.seconds
-		check(absf(supply - need) < 0.01, "Q11: the %s feeds one vat at base (%.3f a second against %.3f)" % [p.name, supply, need])
-
+## v0.7 (SKELETON.md) retires V1–V3 and Q11: D004's markups, the old sauce
+## ladder and one vat per station are Idle Planet Miner's numbers now (I1).
+## The Pantry's rules (V4–V7) stay, on IPM's 1,000-crop batches.
 
 func test_booster_concentrate_bulk() -> void:
 	var g: Game = Helpers.with(["pantry_vinegar_bulk"])
-	check(close(g.plot_cycle("vinegar"), g.data.plots.vinegar.seconds / 2.0), "V4: the Vinegar Booster halves the Cask's cycle")
-	check(g.recipe_inputs("pickled_brine").vinegar == 6, "V4: Concentrate: Pickled Brine takes 6 Vinegar (got %d)" % g.recipe_inputs("pickled_brine").vinegar)
-	check(g.recipe_inputs("pickled_brine").bell == 5, "V4: and the same Bell Peppers")
-	check(g.plot_yield("vinegar") == 2 * g.data.plots.vinegar["yield"], "V4: Bulk doubles a harvest")
-	var z: Game = Helpers.with(["pantry_vinegar_concentrate", "zero_waste_2"])
-	check(z.recipe_inputs("pickled_brine").vinegar == 4, "V4: with Zero-Waste II, 10 × 0.8 × 0.6 rounds down to 4 (got %d)" % z.recipe_inputs("pickled_brine").vinegar)
+	var base: float = Game.new().ipm_curve(T.HARVEST_RATE, 0)
+	check(close(g.crop_rate("vinegar", "vinegar"), base * 2.0 * 2.0), "V4: the Booster doubles the Cask's harvest, and Bulk doubles it again (%.2f a second)" % g.crop_rate("vinegar", "vinegar"))
+	check(g.recipe_inputs("pickled_brine").vinegar == 600, "V4: Concentrate: Pickled Brine takes 600 Vinegar, 40%% less (got %d)" % g.recipe_inputs("pickled_brine").vinegar)
+	var z: Game = Helpers.with(["pantry_vinegar_concentrate", "zero_waste_1"])
+	check(z.recipe_inputs("pickled_brine").vinegar == 480, "V4: with Zero-Waste I, 1,000 × 0.8 × 0.6 = 480 (got %d)" % z.recipe_inputs("pickled_brine").vinegar)
 
 
 func test_reserve() -> void:
 	var plain: Game = Helpers.with(["pantry_vinegar_concentrate"])
 	var g: Game = Helpers.with(["pantry_vinegar_reserve"])
-	for bottle in ["bistro_verde", "serrano_fire", "cajun_red", "island_heat", "cocoa_loco"]:
-		check(close(g.sale_price(bottle), plain.sale_price(bottle) * 1.25), "V5: Reserve on Vinegar sells %s for +25%%" % bottle)
-	for bottle in ["classic_louisiana", "phantom", "table_mild"]:
-		check(close(g.sale_price(bottle), plain.sale_price(bottle)), "V5: but not %s, which takes Brine only through a mash, or none" % bottle)
+	for bottle in ["bistro_verde", "smoky_ancho"]:
+		check(close(g.sale_price(bottle), plain.sale_price(bottle) * 1.25), "V5: Reserve on Vinegar sells %s, which takes Pickled Brine, for +25%%" % bottle)
+	for bottle in ["classic_louisiana", "table_mild", "garden_hot_sauce"]:
+		check(close(g.sale_price(bottle), plain.sale_price(bottle)), "V5: but not %s, which takes none" % bottle)
 	check(close(g.appraisal("bistro_verde"), plain.appraisal("bistro_verde")), "V5: stock is valued as before")
 	var both: Game = Helpers.with(["pantry_vinegar_reserve", "pantry_garlic_reserve"])
-	check(close(both.sale_price("cajun_red"), plain.sale_price("cajun_red") * 1.5), "V5: Cajun Red takes both, so +50%")
+	check(close(both.sale_price("classic_louisiana"), plain.sale_price("classic_louisiana") * 1.25) and close(both.sale_price("bistro_verde"), plain.sale_price("bistro_verde") * 1.25), "V5: each Reserve on its own sauces")
 
 
 func test_fork() -> void:
-	var g: Game = Helpers.with(["pantry_vinegar_concentrate", "paste_blueprint"])
+	var g: Game = Helpers.with(["pantry_vinegar_concentrate"])
 	for item in g.stock:
 		g.stock[item] = 100000
 	check(g.can_research("pantry_vinegar_bulk") and g.can_research("pantry_vinegar_reserve"), "V6: both sides are open before the choice")
@@ -149,7 +75,7 @@ func test_fork() -> void:
 	for item in c.stock:
 		c.stock[item] = 100000
 	check(not c.can_research("pantry_vinegar_reserve"), "V6: and the fork stays chosen")
-	check(c.can_research("pantry_garlic_booster"), "V6: other tracks are untouched")
+	check(c.fork_taken("pantry_garlic_bulk") == "" and c.fork_taken("pantry_garlic_reserve") == "", "V6: other tracks are untouched")
 
 
 func test_bad_fork_data() -> void:

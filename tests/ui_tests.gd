@@ -80,7 +80,7 @@ func run() -> void:
 	sell.pressed.emit()
 	await create_timer(0.5).timeout
 	var buy_plot: Button = screen.find_child("Buy_plot_bell", true, false)
-	check(goal.text.begins_with("Next: buy the Bell Pepper Plot") and ring.get_global_rect().encloses(buy_plot.get_global_rect()), "L13: then the plot's Buy is ringed: %s" % goal.text)
+	check(goal.text.begins_with("Next: buy the Bell Plot") and ring.get_global_rect().encloses(buy_plot.get_global_rect()), "L13: then the plot's Buy is ringed: %s" % goal.text)
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
 	await process_frame
 	check(not (screen.find_child("Page_tech", true, false) as Control).visible, "L11: a locked tab doesn't open")
@@ -93,16 +93,17 @@ func run() -> void:
 	await process_frame
 	check(screen.game.plots.bell.owned and not buy_plot.visible, "the buy button buys it and goes")
 	var manage: Button = screen.find_child("Manage_plot_bell", true, false)
-	check(manage.visible and screen.find_child("Upgrade_plot_bell_speed", true, false) == null, "L3: the card shows Manage, not its upgrades")
+	check(manage.visible and screen.find_child("Upgrade_plot_bell_harvest", true, false) == null, "L3: the card shows Manage, not its upgrades")
 	manage.pressed.emit()
 	await process_frame
-	var speed: Button = screen.find_child("Upgrade_plot_bell_speed", true, false)
-	check(speed != null and speed.is_visible_in_tree() and speed.text.begins_with("Harvest Speed"), "L3: Manage opens its sheet with the upgrades: %s" % (speed.text if speed else "none"))
+	var speed: Button = screen.find_child("Upgrade_plot_bell_harvest", true, false)
+	check(speed != null and speed.is_visible_in_tree() and speed.text.begins_with("Harvest Rate"), "L3: Manage opens its sheet with the upgrades: %s" % (speed.text if speed else "none"))
 	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 	await process_frame
 
 	# Processing opens at $4,000 Operation Value, as it did.
-	screen.game.cash = 10000.0
+	# Operation Value counts cash (IPM's Galaxy Value), so only enough for the vat.
+	screen.game.cash = screen.game.slot_price("vat")
 	(screen.find_child("BuySlot_vat", true, false) as Button).pressed.emit()
 	screen.game.account.best_ov = T.TAB_THRESHOLDS.processing
 	await create_timer(0.6).timeout
@@ -111,7 +112,7 @@ func run() -> void:
 	await process_frame
 	var vat_card: Control = screen.find_child("Card_vat_0", true, false)
 	check((screen.find_child("Page_processing", true, false) as Control).visible and vat_card.is_visible_in_tree(), "Processing shows the vat")
-	check((screen.find_child("Recipe_vat_0", true, false) as OptionButton).item_count == 2, "its picker offers Off and Sweet Pepper Mash")
+	check((screen.find_child("Recipe_vat_0", true, false) as OptionButton).item_count == 3, "its picker offers Off, Sweet Pepper Mash and Bell Purée (free, IPM's Copper Bar)")
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
 	await process_frame
 	check(not (screen.find_child("Page_tech", true, false) as Control).visible, "O9: a locked tab doesn't open")
@@ -124,14 +125,22 @@ func run() -> void:
 	await process_frame
 	check((screen.find_child("Page_tech", true, false) as Control).visible, "the Tech Tree page shows")
 	screen.game.stock.table_mild = 50
-	(screen.find_child("Tech_jalapeno_blueprint", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_calloused_thumbs", true, false) as Button).pressed.emit()
 	await process_frame
 	var research: Button = screen.find_child("Research", true, false)
 	check(research.visible and not research.disabled, "the selected node can be researched")
 	research.pressed.emit()
 	await process_frame
-	check(screen.game.is_researched("jalapeno_blueprint"), "Research researches it")
-	check((screen.find_child("Card_plot_jalapeno", true, false) as Control).visible, "and the Jalapeño Plot appears on Farms")
+	check(screen.game.is_researched("calloused_thumbs"), "Research researches it")
+	# I5: the next farms go on sale with their Land Survey.
+	check(not (screen.find_child("Card_plot_farm_05", true, false) as Control).visible, "I5: farm 5 isn't on Farms before Land Survey I")
+	screen.game.stock.pimento = 1500
+	screen.game.stock.bell_puree = 5
+	(screen.find_child("Tech_survey_1", true, false) as Button).pressed.emit()
+	await process_frame
+	research.pressed.emit()
+	await process_frame
+	check(screen.game.is_researched("survey_1") and (screen.find_child("Card_plot_farm_05", true, false) as Control).visible, "I5: and appears with it")
 
 	# v0.4: Heat, holding, Overdrive, the valve, pins (TECH_TREE.md).
 	var Helpers = load("res://tests/button_tests.gd")
@@ -183,7 +192,7 @@ func run() -> void:
 	await process_frame
 	(screen.find_child("Manage_plot_bell", true, false) as Button).pressed.emit()
 	await process_frame
-	check((screen.find_child("Upgrade_plot_bell_cargo", true, false) as Button).text.begins_with("Cargo") and screen.find_child("Upgrade_plot_bell_quality", true, false) == null, "C1: plots offer Cargo, not Crop Quality")
+	check((screen.find_child("Upgrade_plot_bell_cargo", true, false) as Button).text.begins_with("Truck Cargo") and screen.find_child("Upgrade_plot_bell_quality", true, false) == null, "C1: plots offer Cargo, not Crop Quality")
 	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 	await process_frame
 
@@ -324,8 +333,8 @@ func test_return_waiting() -> void:
 	await process_frame
 
 
-## Q9: the HQ tab sells the franchise on a second tap, and opens rooms through
-## the draft (docs/PRESTIGE.md).
+## Q9: the HQ tab sells the franchise on a second tap, and opens rooms from
+## the two offered (docs/PRESTIGE.md, SKELETON.md).
 func test_hq() -> void:
 	var screen := Main.instantiate()
 	screen.save_path = ""
@@ -334,34 +343,34 @@ func test_hq() -> void:
 	await process_frame
 	var g = screen.game
 	g.revealed = {"counter": true, "status_bar": true, "deck": true}
-	g.stats.cash_earned = 1e8
+	g.cash = 1e8
 	g._note_value()
+	var credits: int = g.prestige_credits()
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await process_frame
 	var sell: Button = screen.find_child("SellFranchise", true, false)
-	check(sell.is_visible_in_tree() and not sell.disabled and sell.text == "Sell (+30 credits)", "Q9: HQ offers the sale at $100M: %s" % sell.text)
+	check(sell.is_visible_in_tree() and not sell.disabled and credits > 0 and sell.text == "Sell (+%d credits)" % credits, "Q9: HQ offers the sale at $100M: %s" % sell.text)
 	sell.pressed.emit()
 	await process_frame
 	check(g.account.prestiges == 0 and sell.text == "Tap again to sell", "Q9: the first tap only asks again")
 	sell.pressed.emit()
 	await process_frame
-	check(g.account.prestiges == 1 and g.account.credits == 30, "Q9: the second tap sells")
+	check(g.account.prestiges == 1 and g.account.credits == credits, "Q9: the second tap sells")
 	check(sell.disabled, "Q9: and the new run can't sell yet")
-	var open: Button = screen.find_child("OpenRoom", true, false)
+	g.account.credits = 100
+	await process_frame
+	var offered: Array = g.rooms_offered()
+	var open: Button = screen.find_child("OpenRoom_" + offered[0], true, false)
+	check(offered.size() == 2 and open != null and open.is_visible_in_tree() and screen.find_child("OpenRoom_" + offered[1], true, false) != null, "Q9: two rooms are offered")
 	open.pressed.emit()
 	await process_frame
-	var picks: Array = g.account.draft
-	check(picks.size() == 2 and not open.visible, "Q9: opening a room deals two cards")
-	var card: Button = screen.find_child("Draft_" + picks[0], true, false)
-	check(card != null and card.is_visible_in_tree(), "Q9: both show as cards")
-	card.pressed.emit()
-	await process_frame
-	check(g.account.rooms.has(picks[0]), "Q9: tapping one opens it")
-	var up: Button = screen.find_child("LevelRoom_" + picks[0], true, false)
-	check(up != null and up.text == "Lv 2: 2" and not up.disabled, "Q9: its row offers Level 2 for 2 credits: %s" % (up.text if up else "none"))
+	check(g.account.rooms.has(offered[0]) and g.account.credits == 100 - 3, "Q9: tapping one opens it for 3 credits")
+	var up: Button = screen.find_child("LevelRoom_" + offered[0], true, false)
+	var price: int = g.room_level_cost(offered[0])
+	check(up != null and up.text == "Lv 2: %d" % price and not up.disabled, "Q9: its row offers Level 2 at its table's price: %s" % (up.text if up else "none"))
 	up.pressed.emit()
 	await process_frame
-	check(g.account.rooms[picks[0]] == 2 and g.account.credits == 23, "Q9: and levels it")
+	check(g.account.rooms[offered[0]] == 2 and g.account.credits == 97 - price, "Q9: and levels it")
 	screen.queue_free()
 	await process_frame
 
@@ -376,12 +385,12 @@ func test_after_sale() -> void:
 	await process_frame
 	var g = screen.game
 	g.revealed = {"counter": true, "status_bar": true, "deck": true}
-	g.stats.cash_earned = 2e6
+	g.cash = 2e6
 	g._note_value()
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
-	(screen.find_child("Tech_moruga_blueprint", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_standard_operating_procedures", true, false) as Button).pressed.emit()
 	await process_frame
-	check("Opens after your first franchise sale." in visible_text(screen), "Q14: a Tier 6 node says it opens after the first sale")
+	check("Opens after your first franchise sale." in visible_text(screen), "Q14: an after-sale node says it opens after the first sale")
 	g.account.prestiges = 1
 	(screen.find_child("Tech_standard_operating_procedures", true, false) as Button).pressed.emit()
 	await process_frame
@@ -423,22 +432,22 @@ func test_layout() -> void:
 	manage.pressed.emit()
 	await settle()
 	(screen.find_child("Mode_10", true, false) as Button).pressed.emit()
-	var ten: float = g.plot_upgrade_cost_n("bell", "speed", 10)
+	var ten: float = g.plot_upgrade_cost_n("bell", "truck", 10)
 	g.cash = ten - 1.0
 	await settle()
-	var speed: Button = screen.find_child("Upgrade_plot_bell_speed", true, false)
-	check(speed.disabled and speed.text.contains("→ 10"), "L3: ×10 is off a dollar short, showing ten levels: %s" % speed.text)
+	var speed: Button = screen.find_child("Upgrade_plot_bell_truck", true, false)
+	check(speed.disabled and speed.text.contains("Lv 1 → 11"), "L3: ×10 is off a dollar short, showing ten levels: %s" % speed.text)
 	g.cash = ten
 	await settle()
 	speed.pressed.emit()
 	await settle()
-	check(g.plots.bell.speed == 10, "L3: ×10 buys ten levels (Lv %d)" % g.plots.bell.speed)
+	check(g.plots.bell.truck == 10, "L3: ×10 buys ten levels (Lv %d)" % g.plots.bell.truck)
 	(screen.find_child("Mode_max", true, false) as Button).pressed.emit()
 	g.cash = 5e6
-	var can: int = g.plot_levels_affordable("bell", "yield")
-	(screen.find_child("Upgrade_plot_bell_yield", true, false) as Button).pressed.emit()
+	var can: int = g.plot_levels_affordable("bell", "harvest")
+	(screen.find_child("Upgrade_plot_bell_harvest", true, false) as Button).pressed.emit()
 	await settle()
-	check(can > 1 and g.plots.bell.yield == can, "L3: Max buys all %d it can (Lv %d)" % [can, g.plots.bell.yield])
+	check(can > 1 and g.plots.bell.harvest == can, "L3: Max buys all %d it can (Lv %d)" % [can, g.plots.bell.harvest])
 	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 	var again := Main.instantiate()
 	again.save_path = ""
@@ -476,8 +485,18 @@ func test_layout() -> void:
 	# L6: the goal bar, once the early sequence is done (L14, D044).
 	var goal: Label = screen.find_child("Goal", true, false)
 	g.stats.sold.table_mild = 1
-	g.plots.poblano.owned = true
-	g.plots.jalapeno.owned = true
+	# Operation Value counts cash, spending, stock and fields (v0.7): clear them
+	# so this run is worth just under the Tech Tree.
+	g.cash = 0.0
+	g.stats.spent = 0.0
+	for item in g.stock:
+		g.stock[item] = 0
+	for id in g.plots:
+		for crop in g.plots[id].field:
+			g.plots[id].field[crop] = 0
+	g.plots.bell.harvest = 0
+	g.plots.farm_02.owned = true
+	g.plots.farm_03.owned = true
 	g.stats.researched = 1
 	g.account.best_ov = T.TAB_THRESHOLDS.processing
 	await settle()
@@ -485,18 +504,25 @@ func test_layout() -> void:
 	g.account.best_ov = T.TAB_THRESHOLDS.tech
 	await settle()
 	check(goal.text.begins_with("Next: ") and goal.text.contains("/"), "L6: then the next node and its scarcest item: %s" % goal.text)
-	g.stats.cash_earned = T.PRESTIGE_OV * 0.64
+	g.cash = T.PRESTIGE_OV * 0.64
 	await settle()
 	check(goal.text.contains("Sale 6"), "L6: and the sale from half way: %s" % goal.text)
 
 	# L7: the stock strip and the warehouse.
 	g.stock.sweet_mash = 7
 	g.stock.table_mild = 4
-	g.stock.bistro_verde = 2
-	g.stats.made.bistro_verde = 2
+	g.stock.island_heat = 2
+	g.stats.made.island_heat = 2
 	await settle()
 	var strip: Label = screen.find_child("Counter", true, false)
 	check(strip.max_lines_visible == 1 and not strip.text.contains("Sweet") and strip.text.contains("Table Mild"), "L7: one line of Bell Peppers and bottles: %s" % strip.text)
+	for bottle in ["pimento_spread", "garden_hot_sauce", "sweet_pepper_relish", "cascabel_salsa", "extinction_event"]:
+		g.stock[bottle] = 123456
+	await settle()
+	check(strip.get_line_count() == 1 and strip.text.contains("+") and strip.text.begins_with("Bell"), "L7: a crowded strip stays one line, the rest counted: %s" % strip.text)
+	for bottle in ["pimento_spread", "garden_hot_sauce", "sweet_pepper_relish", "cascabel_salsa", "extinction_event"]:
+		g.stock[bottle] = 0
+	await settle()
 	var tap := InputEventMouseButton.new()
 	tap.pressed = true
 	tap.button_index = MOUSE_BUTTON_LEFT
@@ -513,7 +539,8 @@ func test_layout() -> void:
 	DirAccess.remove_absolute(path)
 
 
-## A3 (ECONOMY.md, D041): every crop sells raw from its plot's card.
+## A3 (ECONOMY.md, D041): every crop sells raw from its farm's card (v0.7:
+## all the farm's crops at once).
 func test_raw_sales() -> void:
 	var screen := Main.instantiate()
 	screen.save_path = ""
@@ -524,17 +551,18 @@ func test_raw_sales() -> void:
 	g.revealed = {"counter": true, "status_bar": true, "deck": true}
 	g.cash = 1e6
 	await settle()
-	check((screen.find_child("Card_plot_poblano", true, false) as Control).visible, "A1: the Poblano Plot is on Farms with the deck")
-	g.buy_plot("poblano")
-	g.stock.poblano = 12
+	check((screen.find_child("Card_plot_farm_02", true, false) as Control).visible, "I5: farm 2 is on Farms from the start")
+	g.buy_plot("farm_02")
+	g.stock.pimento = 12
 	g.stock.bell = 5
+	g.stock.cascabel = 7
 	await settle()
-	var sell: Button = screen.find_child("Sell_plot_poblano", true, false)
-	check(sell.visible and not sell.disabled and sell.text.contains("12"), "A3: the card offers its 12 Poblano Peppers: %s" % sell.text)
+	var sell: Button = screen.find_child("Sell_plot_farm_02", true, false)
+	check(sell.visible and not sell.disabled and sell.text.contains("17"), "A3: the card offers its crops, 12 Pimentos and 5 Bells: %s" % sell.text)
 	var cash: float = g.cash
 	sell.pressed.emit()
 	await settle()
-	check(g.stock.poblano == 0 and is_equal_approx(g.cash - cash, 12 * g.value("poblano")) and g.stock.bell == 5, "A3: they sell at their value, and nothing else does")
+	check(g.stock.pimento == 0 and g.stock.bell == 0 and is_equal_approx(g.cash - cash, 12 * g.value("pimento") + 5 * g.value("bell")) and g.stock.cascabel == 7, "A3: they sell at their value, and nothing else does")
 	check(sell.disabled, "A3: with none left the button is off")
 	screen.queue_free()
 	await settle()
@@ -555,7 +583,8 @@ func test_dashboard() -> void:
 	g.buy_slot("vat")
 	await settle()
 	check(factory._tiles("plot").size() == 1 and factory._tiles("vat").size() == 1 and factory._tiles("line").is_empty(), "L12: a tile per owned station on its floor")
-	g.plots.bell["yield"] = 100
+	g.plots.bell.harvest = 60  # far more than the truck carries
+	g.plots.bell.truck = 30  # a round trip well inside the wait
 	var dots_before: int = screen.dots_shown
 	var seconds := 3.0
 	await create_timer(seconds).timeout
@@ -573,7 +602,7 @@ func test_dashboard() -> void:
 	await settle()
 	var ring: Control = screen.find_child("Ring", true, false)
 	var farms_tab: Control = screen.find_child("Tab_farms", true, false)
-	check(g.next_action() == {"do": "buy_plot", "id": "poblano"} and ring.visible and ring.get_global_rect().encloses(farms_tab.get_global_rect()), "L13: the Poblano Plot is on Farms, so the Farms selector is ringed")
+	check(g.next_action() == {"do": "buy_plot", "id": "farm_02"} and ring.visible and ring.get_global_rect().encloses(farms_tab.get_global_rect()), "L13: farm 2 is on Farms, so the Farms selector is ringed: %s" % str(g.next_action()))
 	screen.queue_free()
 	await settle()
 
@@ -606,9 +635,9 @@ func test_bottling() -> void:
 	check(screen.bottle_buzzes == 1, "K8: the second doesn't buzz")
 	await create_timer(S.BOTTLE_SECONDS).timeout
 	check(factory.bottles.is_empty(), "K9: bottles are gone within %.1f s" % S.BOTTLE_SECONDS)
-	var tier: int = g.data.items.bistro_verde.tier
+	var tier: int = g.data.items.island_heat.tier
 	screen.settings.vibration = false
-	g.stats.made.bistro_verde += 1
+	g.stats.made.island_heat += 1
 	await create_timer(0.4).timeout
 	check(is_equal_approx(screen.last_clink_pitch, 1.0 - S.BOTTLE_TIER_PITCH * (tier - 1)) and screen.last_clink_pitch < 1.0, "K7: a Tier %d sauce clinks lower (%.2f)" % [tier, screen.last_clink_pitch])
 	check(screen.bottle_buzzes == 1, "K8: with Vibration off a first bottle doesn't buzz")

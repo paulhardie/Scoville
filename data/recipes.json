@@ -1,35 +1,934 @@
 {
-	"_source": "Inputs and outputs are the brief's (§3). Seconds are GUESSES (docs/FACTORY.md). `unlocked` recipes need no blueprint.",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). IPM's recipes, seconds and cash unlock prices (`unlock`, 0 is free); four sauces also take an ingredient mash (D051). `kitchen` recipes run only in the first vat and line (D052).",
 	"recipes": [
-		{"id": "sweet_mash", "station": "vat", "inputs": {"bell": 10}, "output": "sweet_mash", "seconds": 8.0, "unlocked": true},
-		{"id": "pickled_brine", "station": "vat", "inputs": {"vinegar": 10, "bell": 5}, "output": "pickled_brine", "seconds": 10.0},
-		{"id": "verde_mash", "station": "vat", "inputs": {"jalapeno": 15}, "output": "verde_mash", "seconds": 10.0},
-		{"id": "garlic_paste", "station": "vat", "inputs": {"garlic": 20}, "output": "garlic_paste", "seconds": 12.0},
-		{"id": "cayenne_mash", "station": "vat", "inputs": {"cayenne": 25, "pickled_brine": 1}, "output": "cayenne_mash", "seconds": 12.0},
-		{"id": "table_mild", "station": "line", "inputs": {"sweet_mash": 1}, "output": "table_mild", "seconds": 8.0, "unlocked": true},
-		{"id": "bistro_verde", "station": "line", "inputs": {"verde_mash": 1, "pickled_brine": 1}, "output": "bistro_verde", "seconds": 10.0},
-		{"id": "classic_louisiana", "station": "line", "inputs": {"cayenne_mash": 1, "garlic_paste": 1}, "output": "classic_louisiana", "seconds": 12.0},
-		{"id": "ancho_mash", "station": "vat", "inputs": {"poblano": 15}, "output": "ancho_mash", "seconds": 18.0},
-		{"id": "serrano_mash", "station": "vat", "inputs": {"serrano": 20}, "output": "serrano_mash", "seconds": 11.0},
-		{"id": "thai_chili_mash", "station": "vat", "inputs": {"thai_chili": 50}, "output": "thai_chili_mash", "seconds": 13.0},
-		{"id": "bonnet_mash", "station": "vat", "inputs": {"bonnet": 40}, "output": "bonnet_mash", "seconds": 14.0},
-		{"id": "glaze", "station": "vat", "inputs": {"pineapple": 30, "garlic_paste": 1}, "output": "glaze", "seconds": 14.0},
-		{"id": "caribbean_red_mash", "station": "vat", "inputs": {"caribbean_red": 40}, "output": "caribbean_red_mash", "seconds": 14.0},
-		{"id": "chocolate_mash", "station": "vat", "inputs": {"chocolate": 60}, "output": "chocolate_mash", "seconds": 15.0},
-		{"id": "liquid_smoke", "station": "vat", "inputs": {"oak": 25, "pickled_brine": 2}, "output": "liquid_smoke", "seconds": 16.0},
-		{"id": "ghost_mash", "station": "vat", "inputs": {"ghost": 60}, "output": "ghost_mash", "seconds": 16.0},
-		{"id": "smoky_ancho", "station": "line", "inputs": {"ancho_mash": 1}, "output": "smoky_ancho", "seconds": 9.0},
-		{"id": "serrano_fire", "station": "line", "inputs": {"serrano_mash": 1, "verde_mash": 1, "pickled_brine": 1}, "output": "serrano_fire", "seconds": 11.0},
-		{"id": "cajun_red", "station": "line", "inputs": {"thai_chili_mash": 1, "pickled_brine": 2, "garlic_paste": 1}, "output": "cajun_red", "seconds": 13.0},
-		{"id": "island_heat", "station": "line", "inputs": {"bonnet_mash": 1, "pickled_brine": 2, "glaze": 1}, "output": "island_heat", "seconds": 14.0},
-		{"id": "sweet_heat", "station": "line", "inputs": {"caribbean_red_mash": 1, "glaze": 2, "table_mild": 1}, "output": "sweet_heat", "seconds": 14.0},
-		{"id": "cocoa_loco", "station": "line", "inputs": {"chocolate_mash": 1, "pickled_brine": 3, "classic_louisiana": 1}, "output": "cocoa_loco", "seconds": 18.0},
-		{"id": "phantom", "station": "line", "inputs": {"ghost_mash": 1, "liquid_smoke": 1, "classic_louisiana": 1}, "output": "phantom", "seconds": 18.0},
-		{"id": "moruga_mash", "station": "vat", "inputs": {"moruga": 60}, "output": "moruga_mash", "seconds": 16.0},
-		{"id": "grim_mash", "station": "vat", "inputs": {"grim": 80}, "output": "grim_mash", "seconds": 18.0},
-		{"id": "pepper_y_mash", "station": "vat", "inputs": {"pepper_y": 100}, "output": "pepper_y_mash", "seconds": 20.0},
-		{"id": "scorpion_sting", "station": "line", "inputs": {"moruga_mash": 1, "cocoa_loco": 1}, "output": "scorpion_sting", "seconds": 20.0},
-		{"id": "widowmaker", "station": "line", "inputs": {"grim_mash": 1, "phantom": 1, "sweet_heat": 1}, "output": "widowmaker", "seconds": 22.0},
-		{"id": "extinction_event", "station": "line", "inputs": {"pepper_y_mash": 1, "scorpion_sting": 1}, "output": "extinction_event", "seconds": 24.0}
+		{
+			"id": "sweet_mash",
+			"station": "vat",
+			"inputs": {
+				"bell": 10
+			},
+			"output": "sweet_mash",
+			"seconds": 8.0,
+			"unlock": 0.0,
+			"kitchen": true
+		},
+		{
+			"id": "table_mild",
+			"station": "line",
+			"inputs": {
+				"sweet_mash": 1
+			},
+			"output": "table_mild",
+			"seconds": 8.0,
+			"unlock": 0.0,
+			"kitchen": true
+		},
+		{
+			"id": "pickled_brine",
+			"station": "vat",
+			"inputs": {
+				"vinegar": 1000
+			},
+			"output": "pickled_brine",
+			"seconds": 30.0,
+			"unlock": 3000.0
+		},
+		{
+			"id": "garlic_paste",
+			"station": "vat",
+			"inputs": {
+				"garlic": 1000
+			},
+			"output": "garlic_paste",
+			"seconds": 80.0,
+			"unlock": 75000.0
+		},
+		{
+			"id": "glaze",
+			"station": "vat",
+			"inputs": {
+				"pineapple": 1000
+			},
+			"output": "glaze",
+			"seconds": 180.0,
+			"unlock": 500000.0
+		},
+		{
+			"id": "liquid_smoke",
+			"station": "vat",
+			"inputs": {
+				"oak": 1000
+			},
+			"output": "liquid_smoke",
+			"seconds": 720.0,
+			"unlock": 8000000.0
+		},
+		{
+			"id": "bell_puree",
+			"station": "vat",
+			"inputs": {
+				"bell": 1000
+			},
+			"output": "bell_puree",
+			"seconds": 20.0,
+			"unlock": 0.0
+		},
+		{
+			"id": "pimento_mash",
+			"station": "vat",
+			"inputs": {
+				"pimento": 1000
+			},
+			"output": "pimento_mash",
+			"seconds": 30.0,
+			"unlock": 3000.0
+		},
+		{
+			"id": "ancho_mash",
+			"station": "vat",
+			"inputs": {
+				"poblano": 1000
+			},
+			"output": "ancho_mash",
+			"seconds": 40.0,
+			"unlock": 9000.0
+		},
+		{
+			"id": "cascabel_mash",
+			"station": "vat",
+			"inputs": {
+				"cascabel": 1000
+			},
+			"output": "cascabel_mash",
+			"seconds": 60.0,
+			"unlock": 25000.0
+		},
+		{
+			"id": "verde_mash",
+			"station": "vat",
+			"inputs": {
+				"jalapeno": 1000
+			},
+			"output": "verde_mash",
+			"seconds": 80.0,
+			"unlock": 75000.0
+		},
+		{
+			"id": "hungarian_wax_mash",
+			"station": "vat",
+			"inputs": {
+				"hungarian_wax": 1000
+			},
+			"output": "hungarian_wax_mash",
+			"seconds": 120.0,
+			"unlock": 225000.0
+		},
+		{
+			"id": "serrano_mash",
+			"station": "vat",
+			"inputs": {
+				"serrano": 1000
+			},
+			"output": "serrano_mash",
+			"seconds": 180.0,
+			"unlock": 500000.0
+		},
+		{
+			"id": "sofrito_base",
+			"station": "vat",
+			"inputs": {
+				"hungarian_wax_mash": 2,
+				"bell_puree": 10
+			},
+			"output": "sofrito_base",
+			"seconds": 240.0,
+			"unlock": 1000000.0
+		},
+		{
+			"id": "mole_base",
+			"station": "vat",
+			"inputs": {
+				"ancho_mash": 15,
+				"pimento_mash": 30
+			},
+			"output": "mole_base",
+			"seconds": 480.0,
+			"unlock": 2000000.0
+		},
+		{
+			"id": "cayenne_mash",
+			"station": "vat",
+			"inputs": {
+				"serrano_mash": 2,
+				"cayenne": 1000
+			},
+			"output": "cayenne_mash",
+			"seconds": 600.0,
+			"unlock": 4000000.0
+		},
+		{
+			"id": "pequin_mash",
+			"station": "vat",
+			"inputs": {
+				"sofrito_base": 2,
+				"pequin": 1000
+			},
+			"output": "pequin_mash",
+			"seconds": 720.0,
+			"unlock": 8000000.0
+		},
+		{
+			"id": "thai_chili_mash",
+			"station": "vat",
+			"inputs": {
+				"mole_base": 2,
+				"thai_chili": 1000
+			},
+			"output": "thai_chili_mash",
+			"seconds": 840.0,
+			"unlock": 15000000.0
+		},
+		{
+			"id": "bonnet_mash",
+			"station": "vat",
+			"inputs": {
+				"cayenne_mash": 2,
+				"bonnet": 1000
+			},
+			"output": "bonnet_mash",
+			"seconds": 960.0,
+			"unlock": 30000000.0
+		},
+		{
+			"id": "fatalii_mash",
+			"station": "vat",
+			"inputs": {
+				"pequin_mash": 2,
+				"fatalii": 1000
+			},
+			"output": "fatalii_mash",
+			"seconds": 1080.0,
+			"unlock": 60000000.0
+		},
+		{
+			"id": "caribbean_red_mash",
+			"station": "vat",
+			"inputs": {
+				"thai_chili_mash": 2,
+				"caribbean_red": 1000
+			},
+			"output": "caribbean_red_mash",
+			"seconds": 1200.0,
+			"unlock": 120000000.0
+		},
+		{
+			"id": "chocolate_mash",
+			"station": "vat",
+			"inputs": {
+				"bonnet_mash": 2,
+				"chocolate": 1000
+			},
+			"output": "chocolate_mash",
+			"seconds": 1440.0,
+			"unlock": 250000000.0
+		},
+		{
+			"id": "ghost_mash",
+			"station": "vat",
+			"inputs": {
+				"fatalii_mash": 2,
+				"ghost": 1000
+			},
+			"output": "ghost_mash",
+			"seconds": 1680.0,
+			"unlock": 500000000.0
+		},
+		{
+			"id": "seven_pot_mash",
+			"station": "vat",
+			"inputs": {
+				"caribbean_red_mash": 2,
+				"seven_pot": 1000
+			},
+			"output": "seven_pot_mash",
+			"seconds": 1920.0,
+			"unlock": 1000000000.0
+		},
+		{
+			"id": "naga_mash",
+			"station": "vat",
+			"inputs": {
+				"chocolate_mash": 2,
+				"naga": 1000
+			},
+			"output": "naga_mash",
+			"seconds": 2160.0,
+			"unlock": 2000000000.0
+		},
+		{
+			"id": "moruga_mash",
+			"station": "vat",
+			"inputs": {
+				"ghost_mash": 2,
+				"moruga": 1000
+			},
+			"output": "moruga_mash",
+			"seconds": 2400.0,
+			"unlock": 4000000000.0
+		},
+		{
+			"id": "grim_mash",
+			"station": "vat",
+			"inputs": {
+				"seven_pot_mash": 2,
+				"grim": 1000
+			},
+			"output": "grim_mash",
+			"seconds": 2640.0,
+			"unlock": 8000000000.0
+		},
+		{
+			"id": "pepper_y_mash",
+			"station": "vat",
+			"inputs": {
+				"naga_mash": 2,
+				"pepper_y": 1000
+			},
+			"output": "pepper_y_mash",
+			"seconds": 2880.0,
+			"unlock": 16000000000.0
+		},
+		{
+			"id": "lava_lantern_mash",
+			"station": "vat",
+			"inputs": {
+				"moruga_mash": 5,
+				"lava_lantern": 1500
+			},
+			"output": "lava_lantern_mash",
+			"seconds": 3300.0,
+			"unlock": 84000000000.0
+		},
+		{
+			"id": "solar_flare_mash",
+			"station": "vat",
+			"inputs": {
+				"grim_mash": 5,
+				"solar_flare": 1500
+			},
+			"output": "solar_flare_mash",
+			"seconds": 3720.0,
+			"unlock": 275000000000.0
+		},
+		{
+			"id": "crystal_extract",
+			"station": "vat",
+			"inputs": {
+				"pepper_y_mash": 5,
+				"capsaicin_crystal": 1500
+			},
+			"output": "crystal_extract",
+			"seconds": 4140.0,
+			"unlock": 1000000000000.0
+		},
+		{
+			"id": "brimstone_mash",
+			"station": "vat",
+			"inputs": {
+				"lava_lantern_mash": 5,
+				"brimstone": 1500
+			},
+			"output": "brimstone_mash",
+			"seconds": 4560.0,
+			"unlock": 4200000000000.0
+		},
+		{
+			"id": "supernova_mash",
+			"station": "vat",
+			"inputs": {
+				"solar_flare_mash": 5,
+				"supernova": 1500
+			},
+			"output": "supernova_mash",
+			"seconds": 4980.0,
+			"unlock": 12000000000000.0
+		},
+		{
+			"id": "event_horizon_mash",
+			"station": "vat",
+			"inputs": {
+				"brimstone_mash": 5,
+				"event_horizon": 1500
+			},
+			"output": "event_horizon_mash",
+			"seconds": 5520.0,
+			"unlock": 30000000000000.0
+		},
+		{
+			"id": "heat_death_mash",
+			"station": "vat",
+			"inputs": {
+				"supernova_mash": 10,
+				"heat_death": 1500
+			},
+			"output": "heat_death_mash",
+			"seconds": 6000.0,
+			"unlock": 70000000000000.0
+		},
+		{
+			"id": "sweet_pepper_relish",
+			"station": "line",
+			"inputs": {
+				"bell_puree": 5
+			},
+			"output": "sweet_pepper_relish",
+			"seconds": 60.0,
+			"unlock": 0.0
+		},
+		{
+			"id": "pimento_spread",
+			"station": "line",
+			"inputs": {
+				"pimento_mash": 5
+			},
+			"output": "pimento_spread",
+			"seconds": 120.0,
+			"unlock": 20000.0
+		},
+		{
+			"id": "garden_hot_sauce",
+			"station": "line",
+			"inputs": {
+				"sweet_pepper_relish": 2,
+				"bell_puree": 10
+			},
+			"output": "garden_hot_sauce",
+			"seconds": 240.0,
+			"unlock": 50000.0
+		},
+		{
+			"id": "smoky_ancho",
+			"station": "line",
+			"inputs": {
+				"pimento_spread": 2,
+				"ancho_mash": 5,
+				"pickled_brine": 2
+			},
+			"output": "smoky_ancho",
+			"seconds": 480.0,
+			"unlock": 100000.0
+		},
+		{
+			"id": "cascabel_salsa",
+			"station": "line",
+			"inputs": {
+				"cascabel_mash": 10
+			},
+			"output": "cascabel_salsa",
+			"seconds": 720.0,
+			"unlock": 200000.0
+		},
+		{
+			"id": "bistro_verde",
+			"station": "line",
+			"inputs": {
+				"cascabel_mash": 5,
+				"verde_mash": 5,
+				"sweet_pepper_relish": 10,
+				"pickled_brine": 10
+			},
+			"output": "bistro_verde",
+			"seconds": 1200.0,
+			"unlock": 400000.0
+		},
+		{
+			"id": "garlic_gold",
+			"station": "line",
+			"inputs": {
+				"cascabel_salsa": 1,
+				"hungarian_wax_mash": 5,
+				"garlic_paste": 2
+			},
+			"output": "garlic_gold",
+			"seconds": 2400.0,
+			"unlock": 1000000.0
+		},
+		{
+			"id": "serrano_fire",
+			"station": "line",
+			"inputs": {
+				"serrano_mash": 5,
+				"garlic_gold": 1,
+				"pimento_mash": 10
+			},
+			"output": "serrano_fire",
+			"seconds": 3600.0,
+			"unlock": 2000000.0
+		},
+		{
+			"id": "salsa_verde_reserve",
+			"station": "line",
+			"inputs": {
+				"bistro_verde": 5,
+				"hungarian_wax_mash": 5
+			},
+			"output": "salsa_verde_reserve",
+			"seconds": 4800.0,
+			"unlock": 5000000.0
+		},
+		{
+			"id": "sunshine_sauce",
+			"station": "line",
+			"inputs": {
+				"bistro_verde": 5,
+				"cascabel_salsa": 10
+			},
+			"output": "sunshine_sauce",
+			"seconds": 6000.0,
+			"unlock": 10000000.0
+		},
+		{
+			"id": "pineapple_picante",
+			"station": "line",
+			"inputs": {
+				"sofrito_base": 5,
+				"serrano_fire": 2,
+				"garlic_gold": 5,
+				"glaze": 11
+			},
+			"output": "pineapple_picante",
+			"seconds": 7200.0,
+			"unlock": 20000000.0
+		},
+		{
+			"id": "mole_poblano",
+			"station": "line",
+			"inputs": {
+				"mole_base": 20,
+				"garden_hot_sauce": 30
+			},
+			"output": "mole_poblano",
+			"seconds": 9000.0,
+			"unlock": 30000000.0
+		},
+		{
+			"id": "classic_louisiana",
+			"station": "line",
+			"inputs": {
+				"cayenne_mash": 5,
+				"serrano_fire": 2,
+				"cascabel_salsa": 5,
+				"garlic_paste": 41
+			},
+			"output": "classic_louisiana",
+			"seconds": 10800.0,
+			"unlock": 50000000.0
+		},
+		{
+			"id": "phantom",
+			"station": "line",
+			"inputs": {
+				"pequin_mash": 5,
+				"salsa_verde_reserve": 5,
+				"liquid_smoke": 5
+			},
+			"output": "phantom",
+			"seconds": 12600.0,
+			"unlock": 120000000.0
+		},
+		{
+			"id": "cajun_red",
+			"station": "line",
+			"inputs": {
+				"classic_louisiana": 1,
+				"pineapple_picante": 2
+			},
+			"output": "cajun_red",
+			"seconds": 13500.0,
+			"unlock": 250000000.0
+		},
+		{
+			"id": "bangkok_burn",
+			"station": "line",
+			"inputs": {
+				"thai_chili_mash": 15,
+				"pineapple_picante": 5
+			},
+			"output": "bangkok_burn",
+			"seconds": 15000.0,
+			"unlock": 550000000.0
+		},
+		{
+			"id": "pitmaster_bbq",
+			"station": "line",
+			"inputs": {
+				"cayenne_mash": 75,
+				"verde_mash": 150,
+				"pequin_mash": 50,
+				"liquid_smoke": 15
+			},
+			"output": "pitmaster_bbq",
+			"seconds": 15600.0,
+			"unlock": 1500000000.0
+		},
+		{
+			"id": "smoked_paprika",
+			"station": "line",
+			"inputs": {
+				"garlic_gold": 20,
+				"phantom": 1
+			},
+			"output": "smoked_paprika",
+			"seconds": 16800.0,
+			"unlock": 5000000000.0
+		},
+		{
+			"id": "island_heat",
+			"station": "line",
+			"inputs": {
+				"mole_base": 150,
+				"bonnet_mash": 30,
+				"glaze": 218
+			},
+			"output": "island_heat",
+			"seconds": 18000.0,
+			"unlock": 17500000000.0
+		},
+		{
+			"id": "ranchero",
+			"station": "line",
+			"inputs": {
+				"sofrito_base": 500,
+				"smoky_ancho": 200
+			},
+			"output": "ranchero",
+			"seconds": 19200.0,
+			"unlock": 60000000000.0
+		},
+		{
+			"id": "fatalii_fire",
+			"station": "line",
+			"inputs": {
+				"fatalii_mash": 20,
+				"mole_poblano": 3
+			},
+			"output": "fatalii_fire",
+			"seconds": 20400.0,
+			"unlock": 100000000000.0
+		},
+		{
+			"id": "sweet_heat",
+			"station": "line",
+			"inputs": {
+				"caribbean_red_mash": 5,
+				"bangkok_burn": 1
+			},
+			"output": "sweet_heat",
+			"seconds": 21000.0,
+			"unlock": 200000000000.0
+		},
+		{
+			"id": "jalapeno_ranch",
+			"station": "line",
+			"inputs": {
+				"verde_mash": 300,
+				"ranchero": 1
+			},
+			"output": "jalapeno_ranch",
+			"seconds": 21600.0,
+			"unlock": 500000000000.0
+		},
+		{
+			"id": "tropical_storm",
+			"station": "line",
+			"inputs": {
+				"island_heat": 1,
+				"smoked_paprika": 1,
+				"sunshine_sauce": 25
+			},
+			"output": "tropical_storm",
+			"seconds": 22200.0,
+			"unlock": 1000000000000.0
+		},
+		{
+			"id": "volcano_sauce",
+			"station": "line",
+			"inputs": {
+				"sweet_heat": 1,
+				"thai_chili_mash": 300
+			},
+			"output": "volcano_sauce",
+			"seconds": 22800.0,
+			"unlock": 2000000000000.0
+		},
+		{
+			"id": "cocoa_loco",
+			"station": "line",
+			"inputs": {
+				"chocolate_mash": 500,
+				"ghost_mash": 100
+			},
+			"output": "cocoa_loco",
+			"seconds": 23100.0,
+			"unlock": 3000000000000.0
+		},
+		{
+			"id": "black_hole",
+			"station": "line",
+			"inputs": {
+				"phantom": 60,
+				"volcano_sauce": 1
+			},
+			"output": "black_hole",
+			"seconds": 24300.0,
+			"unlock": 6000000000000.0
+		},
+		{
+			"id": "seven_pot_stew",
+			"station": "line",
+			"inputs": {
+				"seven_pot_mash": 300,
+				"fatalii_fire": 90
+			},
+			"output": "seven_pot_stew",
+			"seconds": 26000.0,
+			"unlock": 15000000000000.0
+		},
+		{
+			"id": "naga_sunrise",
+			"station": "line",
+			"inputs": {
+				"naga_mash": 200,
+				"moruga_mash": 100,
+				"sweet_heat": 100
+			},
+			"output": "naga_sunrise",
+			"seconds": 27000.0,
+			"unlock": 75000000000000.0
+		},
+		{
+			"id": "ghost_town",
+			"station": "line",
+			"inputs": {
+				"cajun_red": 250,
+				"black_hole": 1
+			},
+			"output": "ghost_town",
+			"seconds": 29000.0,
+			"unlock": 500000000000000.0
+		},
+		{
+			"id": "scorpion_sting",
+			"station": "line",
+			"inputs": {
+				"naga_sunrise": 1,
+				"cocoa_loco": 40,
+				"volcano_sauce": 50
+			},
+			"output": "scorpion_sting",
+			"seconds": 31000.0,
+			"unlock": 2500000000000000.0
+		},
+		{
+			"id": "hurricane_reserve",
+			"station": "line",
+			"inputs": {
+				"tropical_storm": 70,
+				"island_heat": 100,
+				"ghost_town": 1
+			},
+			"output": "hurricane_reserve",
+			"seconds": 32300.0,
+			"unlock": 1.5e+16
+		},
+		{
+			"id": "widowmaker",
+			"station": "line",
+			"inputs": {
+				"seven_pot_stew": 100,
+				"scorpion_sting": 5
+			},
+			"output": "widowmaker",
+			"seconds": 62300.0,
+			"unlock": 1.42e+17
+		},
+		{
+			"id": "lava_flow",
+			"station": "line",
+			"inputs": {
+				"hurricane_reserve": 5,
+				"ghost_town": 100,
+				"lava_lantern_mash": 1000
+			},
+			"output": "lava_flow",
+			"seconds": 115200.0,
+			"unlock": 1.49e+18
+		},
+		{
+			"id": "solar_wind",
+			"station": "line",
+			"inputs": {
+				"widowmaker": 4,
+				"solar_flare_mash": 500
+			},
+			"output": "solar_wind",
+			"seconds": 120000.0,
+			"unlock": 2e+19
+		},
+		{
+			"id": "crystal_clear",
+			"station": "line",
+			"inputs": {
+				"lava_flow": 4,
+				"crystal_extract": 400
+			},
+			"output": "crystal_clear",
+			"seconds": 125000.0,
+			"unlock": 2.7e+20
+		},
+		{
+			"id": "hyperdrive",
+			"station": "line",
+			"inputs": {
+				"jalapeno_ranch": 160,
+				"scorpion_sting": 40,
+				"solar_wind": 4
+			},
+			"output": "hyperdrive",
+			"seconds": 180000.0,
+			"unlock": 3.65e+21
+		},
+		{
+			"id": "cosmic_drizzle",
+			"station": "line",
+			"inputs": {
+				"mole_poblano": 250,
+				"supernova_mash": 1000,
+				"crystal_clear": 4
+			},
+			"output": "cosmic_drizzle",
+			"seconds": 188000.0,
+			"unlock": 4.9299999999999995e+22
+		},
+		{
+			"id": "dark_star",
+			"station": "line",
+			"inputs": {
+				"volcano_sauce": 50,
+				"bonnet_mash": 10000,
+				"hyperdrive": 4
+			},
+			"output": "dark_star",
+			"seconds": 194000.0,
+			"unlock": 6.65e+23
+		},
+		{
+			"id": "stratosphere",
+			"station": "line",
+			"inputs": {
+				"thai_chili_mash": 10000,
+				"cosmic_drizzle": 4,
+				"solar_wind": 15
+			},
+			"output": "stratosphere",
+			"seconds": 244000.0,
+			"unlock": 5e+26
+		},
+		{
+			"id": "brimstone_reserve",
+			"station": "line",
+			"inputs": {
+				"brimstone_mash": 6000,
+				"dark_star": 4,
+				"hyperdrive": 10
+			},
+			"output": "brimstone_reserve",
+			"seconds": 399000.0,
+			"unlock": 1.0000000000000001e+29
+		},
+		{
+			"id": "supernova_glaze",
+			"station": "line",
+			"inputs": {
+				"sunshine_sauce": 1000,
+				"crystal_clear": 20,
+				"cosmic_drizzle": 132
+			},
+			"output": "supernova_glaze",
+			"seconds": 399000.0,
+			"unlock": 1.0000000000000001e+29
+		},
+		{
+			"id": "wormhole",
+			"station": "line",
+			"inputs": {
+				"cosmic_drizzle": 100,
+				"lava_flow": 350,
+				"brimstone_reserve": 1
+			},
+			"output": "wormhole",
+			"seconds": 699000.0,
+			"unlock": 5e+31
+		},
+		{
+			"id": "mind_melt",
+			"station": "line",
+			"inputs": {
+				"dark_star": 20,
+				"supernova_glaze": 1,
+				"fatalii_mash": 16000
+			},
+			"output": "mind_melt",
+			"seconds": 699000.0,
+			"unlock": 5e+31
+		},
+		{
+			"id": "big_bang",
+			"station": "line",
+			"inputs": {
+				"stratosphere": 9,
+				"wormhole": 3,
+				"event_horizon_mash": 16800
+			},
+			"output": "big_bang",
+			"seconds": 19976068.0,
+			"unlock": 8e+34
+		},
+		{
+			"id": "extinction_event",
+			"station": "line",
+			"inputs": {
+				"stratosphere": 9,
+				"wormhole": 3,
+				"heat_death_mash": 16800
+			},
+			"output": "extinction_event",
+			"seconds": 19976068.0,
+			"unlock": 8e+34
+		},
+		{
+			"id": "singularity",
+			"station": "line",
+			"inputs": {
+				"stratosphere": 9,
+				"mind_melt": 3,
+				"event_horizon_mash": 16800
+			},
+			"output": "singularity",
+			"seconds": 19976068.0,
+			"unlock": 8e+34
+		},
+		{
+			"id": "last_drop",
+			"station": "line",
+			"inputs": {
+				"stratosphere": 9,
+				"mind_melt": 3,
+				"heat_death_mash": 16800
+			},
+			"output": "last_drop",
+			"seconds": 19976068.0,
+			"unlock": 8e+34
+		}
 	]
 }

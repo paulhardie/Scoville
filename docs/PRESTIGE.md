@@ -159,3 +159,22 @@ As measured for D040, before D041: run 1 reaches the sale at 2:07:58 and sells a
 **What 5% does beyond Y2:** research SOP grants is free, so at 5% it isn't just automation: it saves run 2 most of its research costs. Run 2 reaches the sale in under an hour and is worth **$1.69B at 3:00 and $2.0B at 3:15** (14× run 1 at 3:00), after only three rooms. Nothing bounds how much faster run 2 may be (Y1 only asks for faster): W24.
 
 **Why paying cash fails Y2 and Y4:** the pacing player spends all its cash on stations and upgrades the moment it can, so SOP almost never finds cash to pay with; it researches less than at 1% free, and later. A real player spends much the same way. Paying in items instead fails the same way through Auto-Sell.
+
+## When the first sale comes (W31, a proposal, not built)
+
+**The question.** The owner's pacing guide for this session says the first prestige should arrive within roughly the first hour. Today the sale opens at $10M Operation Value, which the pacing player reaches at 2:02 (U1's bar is 2:00–2:30, the owner's choice in D035). The two don't agree, and the sale's timing is the owner's to set, so nothing here is built.
+
+**Measured on `main` (this session, no Cargo from PR #20):**
+
+| | 15 min | 30 min | 45 min | 1:00 | 1:15 | 1:30 |
+| --- | --- | --- | --- | --- | --- | --- |
+| Pacing player | $12.4K | $54.6K | $146K | $522K | $1.02M | $2.45M |
+| Casual player | $9.9K | $39.8K | $109K | $364K | $640K | $1.18M |
+
+**Options:**
+
+1. **Keep D035** (sale at $10M, about 2:00). Nothing changes; the first hour has no reset to look forward to, only the HQ tab's price on its locked label.
+2. **An early sale** (recommended if the owner wants the hour): the sale opens at about $400K, paying 5 credits, exactly one room, with a new first row in the credit table and $10M still paying 10. Two numbers in `tuning.gd` (`PRESTIGE_OV`, `CREDIT_TABLE`) and the Executive Lounge rounding. It's easy to undo. Knock-ons to re-measure, with bars set first: U1's last band, U8 (a night from 25:00 already reaches about $510K, so a night would hand over the early sale), Y1–Y4 (run 2 starts with one room, not three), and SOP's 1% bar, which is what makes a repeat run fast.
+3. **Speed the whole run up** so $10M lands by about 1:00: every tier twice as fast, which undoes most of v0.6a–v0.6d's measured curve. Not recommended.
+
+**Why option 2 rather than 3:** Idle Planet Miner's lesson is a small first reset that teaches the loop, then bigger ones; the ladder past $400K (Tiers 3–5, Phantom) still pays more credits for pushing on, so an early seller gives up credits, not content. **The cost:** a player who sells at the first chance meets Tier 3 onwards a run later, and SOP's free research makes that second run quicker, which is W24's floor question again.

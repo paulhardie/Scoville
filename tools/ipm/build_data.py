@@ -120,7 +120,7 @@ for ing in MAP["ingredients"]:
                   "survey": ing["survey"], "ingredient": True})
 
 # --- Vats and lines ------------------------------------------------------------
-slots = {"vat": {"prices": MAP["vats"]}, "line": {"prices": MAP["lines"]}}
+slots = {"vat": {"prices": list(MAP["vats"])}, "line": {"prices": list(MAP["lines"])}}
 
 # --- Tech ------------------------------------------------------------------------
 value_now = {i["id"]: i["value"] for i in items}
@@ -384,6 +384,9 @@ for t in TWEAKS:
                 m = t["factor"] ** r["survey"]
                 r["harvest_mult"] = r.get("harvest_mult", 1.0) * m
                 r["cargo_mult"] = r.get("cargo_mult", 1.0) * m
+    elif t["op"] == "slot_insert":
+        for station in ("vat", "line"):
+            slots[station]["prices"].insert(t["index"], t[station])
     else:
         raise SystemExit("tweaks.json: unknown op " + t["op"])
 

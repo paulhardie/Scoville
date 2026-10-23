@@ -530,13 +530,14 @@ func can_buy_recipe(recipe: String) -> bool:
 	return data.recipes.has(recipe) and not recipe_unlocked(recipe) and cash >= recipe_price(recipe)
 
 
-## Recipes a slot can run now, in data order: kitchen recipes only in the
-## first vat and line (D052).
+## Recipes a slot can run now, in data order. The first vat and line are the
+## kitchen's and run only its recipes, which run nowhere else (D052; PR 3's
+## T4 keeps the kitchen making Table Mild all run, for the Tech Tree).
 func recipes_for(station: String, index: int = 0) -> Array:
 	var out := []
 	for id in data.recipes:
 		var r: Dictionary = data.recipes[id]
-		if r.station == station and recipe_unlocked(id) and (index == 0 or not r.kitchen):
+		if r.station == station and recipe_unlocked(id) and (index == 0) == r.kitchen:
 			out.append(id)
 	return out
 
@@ -1048,12 +1049,17 @@ func scarcest_cost(node: String) -> Array:
 	return out
 
 
+## What a node may cost and still research itself under Standard Operating
+## Procedures: SOP_SHARE of the run's Operation Value (PR 3's T6).
+func sop_bar() -> float:
+	return T.SOP_SHARE * operation_value()
+
+
 ## Standard Operating Procedures (D034): nodes the player could research whose
 ## cost is under the bar research themselves, free, in file order (D040: a
-## cost under 1% of an hour's bottles is too small to charge). Forks are the
-## player's choice.
+## cost that small is too small to charge). Forks are the player's choice.
 func _sop() -> void:
-	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * bottle_rate()
+	var bar := sop_bar()
 	var due := []
 	for node in data.tech_order:
 		if data.tech[node].excludes.is_empty() and research_reachable(node) and tech_cost_value(node) < bar:

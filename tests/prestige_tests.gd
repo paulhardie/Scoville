@@ -260,7 +260,7 @@ static func sold(nodes: Array, sauce: String = "") -> Game:
 
 ## Nodes Standard Operating Procedures would research now.
 static func under_bar(g: Game) -> Array:
-	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
+	var bar: float = g.sop_bar()
 	var out := []
 	for id in g.data.tech_order:
 		if g.data.tech[id].excludes.is_empty() and g.research_reachable(id) and g.tech_cost_value(id) < bar:
@@ -288,7 +288,7 @@ func test_after_sale_gate() -> void:
 func test_sop() -> void:
 	var nodes := ["standard_operating_procedures", "pantry_vinegar_concentrate"]
 	var g := sold(nodes, "island_heat")
-	var bar: float = T.SOP_SHARE * T.SOP_WINDOW * g.bottle_rate()
+	var bar: float = g.sop_bar()
 	check(bar > 0.0, "Q12: a running Island Heat line sets a bar ($%.0f)" % bar)
 	var due := under_bar(g)
 	var waiting := []

@@ -63,8 +63,8 @@
 			"distance": 16.0,
 			"survey": 1,
 			"ipm": "Verr",
-			"harvest_mult": 1.2,
-			"cargo_mult": 1.2
+			"harvest_mult": 1.15,
+			"cargo_mult": 1.15
 		},
 		{
 			"id": "farm_06",
@@ -76,8 +76,8 @@
 			"distance": 18.0,
 			"survey": 1,
 			"ipm": "Newton",
-			"harvest_mult": 1.2,
-			"cargo_mult": 1.2
+			"harvest_mult": 1.15,
+			"cargo_mult": 1.15
 		},
 		{
 			"id": "farm_07",
@@ -91,8 +91,8 @@
 			"distance": 20.0,
 			"survey": 1,
 			"ipm": "Widow",
-			"harvest_mult": 1.2,
-			"cargo_mult": 1.2
+			"harvest_mult": 1.15,
+			"cargo_mult": 1.15
 		},
 		{
 			"id": "farm_08",
@@ -105,8 +105,8 @@
 			"distance": 22.0,
 			"survey": 2,
 			"ipm": "Acheron",
-			"harvest_mult": 1.44,
-			"cargo_mult": 1.44
+			"harvest_mult": 1.3224999999999998,
+			"cargo_mult": 1.3224999999999998
 		},
 		{
 			"id": "farm_09",
@@ -119,8 +119,8 @@
 			"distance": 23.0,
 			"survey": 2,
 			"ipm": "Yangtze",
-			"harvest_mult": 1.44,
-			"cargo_mult": 1.44
+			"harvest_mult": 1.3224999999999998,
+			"cargo_mult": 1.3224999999999998
 		},
 		{
 			"id": "farm_10",
@@ -134,8 +134,8 @@
 			"distance": 25.0,
 			"survey": 2,
 			"ipm": "Solveig",
-			"harvest_mult": 1.44,
-			"cargo_mult": 1.44
+			"harvest_mult": 1.3224999999999998,
+			"cargo_mult": 1.3224999999999998
 		},
 		{
 			"id": "farm_11",
@@ -147,8 +147,8 @@
 			"distance": 26.0,
 			"survey": 3,
 			"ipm": "Imir",
-			"harvest_mult": 1.7279999999999998,
-			"cargo_mult": 1.7279999999999998
+			"harvest_mult": 1.5208749999999998,
+			"cargo_mult": 1.5208749999999998
 		},
 		{
 			"id": "farm_12",
@@ -162,8 +162,8 @@
 			"distance": 28.0,
 			"survey": 3,
 			"ipm": "Relic",
-			"harvest_mult": 1.7279999999999998,
-			"cargo_mult": 1.7279999999999998
+			"harvest_mult": 1.5208749999999998,
+			"cargo_mult": 1.5208749999999998
 		},
 		{
 			"id": "farm_13",
@@ -176,8 +176,8 @@
 			"distance": 30.0,
 			"survey": 3,
 			"ipm": "Nith",
-			"harvest_mult": 1.7279999999999998,
-			"cargo_mult": 1.7279999999999998
+			"harvest_mult": 1.5208749999999998,
+			"cargo_mult": 1.5208749999999998
 		},
 		{
 			"id": "farm_14",
@@ -191,8 +191,8 @@
 			"distance": 33.0,
 			"survey": 4,
 			"ipm": "Batalla",
-			"harvest_mult": 2.0736,
-			"cargo_mult": 2.0736
+			"harvest_mult": 1.7490062499999994,
+			"cargo_mult": 1.7490062499999994
 		},
 		{
 			"id": "farm_15",
@@ -205,8 +205,8 @@
 			"distance": 35.0,
 			"survey": 4,
 			"ipm": "Micah",
-			"harvest_mult": 2.0736,
-			"cargo_mult": 2.0736
+			"harvest_mult": 1.7490062499999994,
+			"cargo_mult": 1.7490062499999994
 		},
 		{
 			"id": "farm_16",
@@ -218,8 +218,8 @@
 			"distance": 37.0,
 			"survey": 4,
 			"ipm": "Pranas",
-			"harvest_mult": 2.0736,
-			"cargo_mult": 2.0736
+			"harvest_mult": 1.7490062499999994,
+			"cargo_mult": 1.7490062499999994
 		},
 		{
 			"id": "farm_17",
@@ -233,8 +233,8 @@
 			"distance": 40.0,
 			"survey": 5,
 			"ipm": "Castellus",
-			"harvest_mult": 2.4883199999999994,
-			"cargo_mult": 2.4883199999999994
+			"harvest_mult": 2.0113571874999994,
+			"cargo_mult": 2.0113571874999994
 		},
 		{
 			"id": "farm_18",
@@ -247,8 +247,8 @@
 			"distance": 43.0,
 			"survey": 5,
 			"ipm": "Gorgon",
-			"harvest_mult": 2.4883199999999994,
-			"cargo_mult": 2.4883199999999994
+			"harvest_mult": 2.0113571874999994,
+			"cargo_mult": 2.0113571874999994
 		},
 		{
 			"id": "farm_19",
@@ -261,8 +261,8 @@
 			"distance": 45.0,
 			"survey": 5,
 			"ipm": "Parnitha",
-			"harvest_mult": 2.4883199999999994,
-			"cargo_mult": 2.4883199999999994
+			"harvest_mult": 2.0113571874999994,
+			"cargo_mult": 2.0113571874999994
 		},
 		{
 			"id": "farm_20",
@@ -275,8 +275,8 @@
 			"distance": 48.0,
 			"survey": 6,
 			"ipm": "Orisoni",
-			"harvest_mult": 2.9859839999999993,
-			"cargo_mult": 2.9859839999999993
+			"harvest_mult": 2.313060765624999,
+			"cargo_mult": 2.313060765624999
 		},
 		{
 			"id": "farm_21",
@@ -288,8 +288,8 @@
 			"distance": 51.0,
 			"survey": 6,
 			"ipm": "Theseus",
-			"harvest_mult": 2.9859839999999993,
-			"cargo_mult": 2.9859839999999993
+			"harvest_mult": 2.313060765624999,
+			"cargo_mult": 2.313060765624999
 		},
 		{
 			"id": "farm_22",
@@ -302,8 +302,8 @@
 			"distance": 54.0,
 			"survey": 6,
 			"ipm": "Zelene",
-			"harvest_mult": 2.9859839999999993,
-			"cargo_mult": 2.9859839999999993
+			"harvest_mult": 2.313060765624999,
+			"cargo_mult": 2.313060765624999
 		},
 		{
 			"id": "farm_23",
@@ -317,8 +317,8 @@
 			"distance": 57.0,
 			"survey": 7,
 			"ipm": "Han",
-			"harvest_mult": 3.583180799999999,
-			"cargo_mult": 3.583180799999999
+			"harvest_mult": 2.6600198804687487,
+			"cargo_mult": 2.6600198804687487
 		},
 		{
 			"id": "farm_24",
@@ -331,8 +331,8 @@
 			"distance": 58.0,
 			"survey": 7,
 			"ipm": "Strennus",
-			"harvest_mult": 3.583180799999999,
-			"cargo_mult": 3.583180799999999
+			"harvest_mult": 2.6600198804687487,
+			"cargo_mult": 2.6600198804687487
 		},
 		{
 			"id": "farm_25",
@@ -345,8 +345,8 @@
 			"distance": 60.0,
 			"survey": 7,
 			"ipm": "Osun",
-			"harvest_mult": 3.583180799999999,
-			"cargo_mult": 3.583180799999999
+			"harvest_mult": 2.6600198804687487,
+			"cargo_mult": 2.6600198804687487
 		},
 		{
 			"id": "farm_26",
@@ -359,8 +359,8 @@
 			"distance": 63.0,
 			"survey": 8,
 			"ipm": "Ploitari",
-			"harvest_mult": 4.2998169599999985,
-			"cargo_mult": 4.2998169599999985
+			"harvest_mult": 3.0590228625390607,
+			"cargo_mult": 3.0590228625390607
 		},
 		{
 			"id": "farm_27",
@@ -372,8 +372,8 @@
 			"distance": 67.0,
 			"survey": 8,
 			"ipm": "Elysta",
-			"harvest_mult": 4.2998169599999985,
-			"cargo_mult": 4.2998169599999985
+			"harvest_mult": 3.0590228625390607,
+			"cargo_mult": 3.0590228625390607
 		},
 		{
 			"id": "farm_28",
@@ -387,8 +387,8 @@
 			"distance": 70.0,
 			"survey": 8,
 			"ipm": "Tikkun",
-			"harvest_mult": 4.2998169599999985,
-			"cargo_mult": 4.2998169599999985
+			"harvest_mult": 3.0590228625390607,
+			"cargo_mult": 3.0590228625390607
 		},
 		{
 			"id": "farm_29",
@@ -401,8 +401,8 @@
 			"distance": 72.0,
 			"survey": 9,
 			"ipm": "Satent",
-			"harvest_mult": 5.1597803519999985,
-			"cargo_mult": 5.1597803519999985
+			"harvest_mult": 3.5178762919199196,
+			"cargo_mult": 3.5178762919199196
 		},
 		{
 			"id": "farm_30",
@@ -415,8 +415,8 @@
 			"distance": 73.0,
 			"survey": 9,
 			"ipm": "Urla Rast",
-			"harvest_mult": 5.1597803519999985,
-			"cargo_mult": 5.1597803519999985
+			"harvest_mult": 3.5178762919199196,
+			"cargo_mult": 3.5178762919199196
 		},
 		{
 			"id": "farm_31",
@@ -429,8 +429,8 @@
 			"distance": 75.0,
 			"survey": 9,
 			"ipm": "Vular",
-			"harvest_mult": 5.1597803519999985,
-			"cargo_mult": 5.1597803519999985
+			"harvest_mult": 3.5178762919199196,
+			"cargo_mult": 3.5178762919199196
 		},
 		{
 			"id": "farm_32",
@@ -443,8 +443,8 @@
 			"distance": 76.0,
 			"survey": 10,
 			"ipm": "Nibiru",
-			"harvest_mult": 6.191736422399997,
-			"cargo_mult": 6.191736422399997
+			"harvest_mult": 4.045557735707907,
+			"cargo_mult": 4.045557735707907
 		},
 		{
 			"id": "farm_33",
@@ -456,8 +456,8 @@
 			"distance": 78.0,
 			"survey": 10,
 			"ipm": "Xena",
-			"harvest_mult": 6.191736422399997,
-			"cargo_mult": 6.191736422399997
+			"harvest_mult": 4.045557735707907,
+			"cargo_mult": 4.045557735707907
 		},
 		{
 			"id": "farm_34",
@@ -471,8 +471,8 @@
 			"distance": 78.0,
 			"survey": 10,
 			"ipm": "Rupert",
-			"harvest_mult": 6.191736422399997,
-			"cargo_mult": 6.191736422399997
+			"harvest_mult": 4.045557735707907,
+			"cargo_mult": 4.045557735707907
 		},
 		{
 			"id": "farm_35",
@@ -485,8 +485,8 @@
 			"distance": 80.0,
 			"survey": 11,
 			"ipm": "Pax",
-			"harvest_mult": 7.430083706879997,
-			"cargo_mult": 7.430083706879997
+			"harvest_mult": 4.652391396064092,
+			"cargo_mult": 4.652391396064092
 		},
 		{
 			"id": "farm_36",
@@ -498,8 +498,8 @@
 			"distance": 81.0,
 			"survey": 11,
 			"ipm": "Ivyra",
-			"harvest_mult": 7.430083706879997,
-			"cargo_mult": 7.430083706879997
+			"harvest_mult": 4.652391396064092,
+			"cargo_mult": 4.652391396064092
 		},
 		{
 			"id": "farm_37",
@@ -512,8 +512,8 @@
 			"distance": 82.0,
 			"survey": 11,
 			"ipm": "Utritis",
-			"harvest_mult": 7.430083706879997,
-			"cargo_mult": 7.430083706879997
+			"harvest_mult": 4.652391396064092,
+			"cargo_mult": 4.652391396064092
 		},
 		{
 			"id": "farm_38",
@@ -526,8 +526,8 @@
 			"distance": 84.0,
 			"survey": 12,
 			"ipm": "Dosie",
-			"harvest_mult": 8.916100448255996,
-			"cargo_mult": 8.916100448255996
+			"harvest_mult": 5.350250105473706,
+			"cargo_mult": 5.350250105473706
 		},
 		{
 			"id": "farm_39",
@@ -539,8 +539,8 @@
 			"distance": 84.0,
 			"survey": 12,
 			"ipm": "Zulu",
-			"harvest_mult": 8.916100448255996,
-			"cargo_mult": 8.916100448255996
+			"harvest_mult": 5.350250105473706,
+			"cargo_mult": 5.350250105473706
 		},
 		{
 			"id": "farm_40",
@@ -553,8 +553,8 @@
 			"distance": 85.0,
 			"survey": 12,
 			"ipm": "Unicae",
-			"harvest_mult": 8.916100448255996,
-			"cargo_mult": 8.916100448255996
+			"harvest_mult": 5.350250105473706,
+			"cargo_mult": 5.350250105473706
 		},
 		{
 			"id": "farm_41",
@@ -567,8 +567,8 @@
 			"distance": 87.0,
 			"survey": 13,
 			"ipm": "Dune",
-			"harvest_mult": 10.699320537907195,
-			"cargo_mult": 10.699320537907195
+			"harvest_mult": 6.152787621294761,
+			"cargo_mult": 6.152787621294761
 		},
 		{
 			"id": "farm_42",
@@ -580,8 +580,8 @@
 			"distance": 88.0,
 			"survey": 13,
 			"ipm": "Naraka",
-			"harvest_mult": 10.699320537907195,
-			"cargo_mult": 10.699320537907195
+			"harvest_mult": 6.152787621294761,
+			"cargo_mult": 6.152787621294761
 		},
 		{
 			"id": "farm_43",
@@ -595,8 +595,8 @@
 			"distance": 89.0,
 			"survey": 13,
 			"ipm": "Daedalus",
-			"harvest_mult": 10.699320537907195,
-			"cargo_mult": 10.699320537907195
+			"harvest_mult": 6.152787621294761,
+			"cargo_mult": 6.152787621294761
 		},
 		{
 			"id": "farm_44",
@@ -609,8 +609,8 @@
 			"distance": 91.0,
 			"survey": 14,
 			"ipm": "Clovis",
-			"harvest_mult": 12.839184645488633,
-			"cargo_mult": 12.839184645488633
+			"harvest_mult": 7.075705764488975,
+			"cargo_mult": 7.075705764488975
 		},
 		{
 			"id": "farm_45",
@@ -622,8 +622,8 @@
 			"distance": 92.0,
 			"survey": 14,
 			"ipm": "Zero",
-			"harvest_mult": 12.839184645488633,
-			"cargo_mult": 12.839184645488633
+			"harvest_mult": 7.075705764488975,
+			"cargo_mult": 7.075705764488975
 		},
 		{
 			"id": "farm_46",
@@ -636,8 +636,8 @@
 			"distance": 92.0,
 			"survey": 14,
 			"ipm": "Sotomi",
-			"harvest_mult": 12.839184645488633,
-			"cargo_mult": 12.839184645488633
+			"harvest_mult": 7.075705764488975,
+			"cargo_mult": 7.075705764488975
 		},
 		{
 			"id": "farm_47",
@@ -650,8 +650,8 @@
 			"distance": 93.0,
 			"survey": 15,
 			"ipm": "Remidian",
-			"harvest_mult": 15.40702157458636,
-			"cargo_mult": 15.40702157458636
+			"harvest_mult": 8.137061629162321,
+			"cargo_mult": 8.137061629162321
 		},
 		{
 			"id": "farm_48",
@@ -663,8 +663,8 @@
 			"distance": 95.0,
 			"survey": 15,
 			"ipm": "Muse",
-			"harvest_mult": 15.40702157458636,
-			"cargo_mult": 15.40702157458636
+			"harvest_mult": 8.137061629162321,
+			"cargo_mult": 8.137061629162321
 		},
 		{
 			"id": "farm_49",
@@ -677,8 +677,8 @@
 			"distance": 97.0,
 			"survey": 15,
 			"ipm": "Arabis",
-			"harvest_mult": 15.40702157458636,
-			"cargo_mult": 15.40702157458636
+			"harvest_mult": 8.137061629162321,
+			"cargo_mult": 8.137061629162321
 		},
 		{
 			"id": "farm_50",
@@ -691,8 +691,8 @@
 			"distance": 100.0,
 			"survey": 16,
 			"ipm": "Vesna",
-			"harvest_mult": 18.48842588950363,
-			"cargo_mult": 18.48842588950363
+			"harvest_mult": 9.357620873536668,
+			"cargo_mult": 9.357620873536668
 		},
 		{
 			"id": "farm_51",
@@ -704,8 +704,8 @@
 			"distance": 102.0,
 			"survey": 16,
 			"ipm": "Chandra",
-			"harvest_mult": 18.48842588950363,
-			"cargo_mult": 18.48842588950363
+			"harvest_mult": 9.357620873536668,
+			"cargo_mult": 9.357620873536668
 		},
 		{
 			"id": "farm_52",
@@ -719,8 +719,8 @@
 			"distance": 103.0,
 			"survey": 16,
 			"ipm": "Vega",
-			"harvest_mult": 18.48842588950363,
-			"cargo_mult": 18.48842588950363
+			"harvest_mult": 9.357620873536668,
+			"cargo_mult": 9.357620873536668
 		},
 		{
 			"id": "farm_53",
@@ -733,8 +733,8 @@
 			"distance": 105.0,
 			"survey": 17,
 			"ipm": "Crius",
-			"harvest_mult": 22.186111067404354,
-			"cargo_mult": 22.186111067404354
+			"harvest_mult": 10.761264004567169,
+			"cargo_mult": 10.761264004567169
 		},
 		{
 			"id": "farm_54",
@@ -746,8 +746,8 @@
 			"distance": 107.0,
 			"survey": 17,
 			"ipm": "Singhana",
-			"harvest_mult": 22.186111067404354,
-			"cargo_mult": 22.186111067404354
+			"harvest_mult": 10.761264004567169,
+			"cargo_mult": 10.761264004567169
 		},
 		{
 			"id": "farm_55",
@@ -761,8 +761,8 @@
 			"distance": 108.0,
 			"survey": 17,
 			"ipm": "Zumbia",
-			"harvest_mult": 22.186111067404354,
-			"cargo_mult": 22.186111067404354
+			"harvest_mult": 10.761264004567169,
+			"cargo_mult": 10.761264004567169
 		},
 		{
 			"id": "farm_56",
@@ -775,8 +775,8 @@
 			"distance": 109.0,
 			"survey": 18,
 			"ipm": "Elysium",
-			"harvest_mult": 26.623333280885227,
-			"cargo_mult": 26.623333280885227
+			"harvest_mult": 12.375453605252241,
+			"cargo_mult": 12.375453605252241
 		},
 		{
 			"id": "farm_57",
@@ -788,8 +788,8 @@
 			"distance": 110.0,
 			"survey": 18,
 			"ipm": "Nyota",
-			"harvest_mult": 26.623333280885227,
-			"cargo_mult": 26.623333280885227
+			"harvest_mult": 12.375453605252241,
+			"cargo_mult": 12.375453605252241
 		},
 		{
 			"id": "farm_58",
@@ -803,8 +803,8 @@
 			"distance": 112.0,
 			"survey": 18,
 			"ipm": "Doral",
-			"harvest_mult": 26.623333280885227,
-			"cargo_mult": 26.623333280885227
+			"harvest_mult": 12.375453605252241,
+			"cargo_mult": 12.375453605252241
 		},
 		{
 			"id": "farm_59",
@@ -817,8 +817,8 @@
 			"distance": 114.0,
 			"survey": 19,
 			"ipm": "Nikara",
-			"harvest_mult": 31.94799993706227,
-			"cargo_mult": 31.94799993706227
+			"harvest_mult": 14.231771646040077,
+			"cargo_mult": 14.231771646040077
 		},
 		{
 			"id": "farm_60",
@@ -830,8 +830,8 @@
 			"distance": 115.0,
 			"survey": 19,
 			"ipm": "Limbo",
-			"harvest_mult": 31.94799993706227,
-			"cargo_mult": 31.94799993706227
+			"harvest_mult": 14.231771646040077,
+			"cargo_mult": 14.231771646040077
 		},
 		{
 			"id": "farm_61",
@@ -844,8 +844,8 @@
 			"distance": 116.0,
 			"survey": 19,
 			"ipm": "Bob",
-			"harvest_mult": 31.94799993706227,
-			"cargo_mult": 31.94799993706227
+			"harvest_mult": 14.231771646040077,
+			"cargo_mult": 14.231771646040077
 		},
 		{
 			"id": "farm_62",
@@ -858,8 +858,8 @@
 			"distance": 118.0,
 			"survey": 20,
 			"ipm": "Midas",
-			"harvest_mult": 38.33759992447472,
-			"cargo_mult": 38.33759992447472
+			"harvest_mult": 16.36653739294609,
+			"cargo_mult": 16.36653739294609
 		},
 		{
 			"id": "farm_63",
@@ -871,8 +871,8 @@
 			"distance": 120.0,
 			"survey": 20,
 			"ipm": "Antigone",
-			"harvest_mult": 38.33759992447472,
-			"cargo_mult": 38.33759992447472
+			"harvest_mult": 16.36653739294609,
+			"cargo_mult": 16.36653739294609
 		},
 		{
 			"id": "farm_64",
@@ -886,8 +886,8 @@
 			"distance": 122.0,
 			"survey": 20,
 			"ipm": "Hecate",
-			"harvest_mult": 38.33759992447472,
-			"cargo_mult": 38.33759992447472
+			"harvest_mult": 16.36653739294609,
+			"cargo_mult": 16.36653739294609
 		},
 		{
 			"id": "farm_65",
@@ -901,8 +901,8 @@
 			"distance": 124.0,
 			"survey": 21,
 			"ipm": "Sterop",
-			"harvest_mult": 46.00511990936967,
-			"cargo_mult": 46.00511990936967
+			"harvest_mult": 18.821518001888,
+			"cargo_mult": 18.821518001888
 		},
 		{
 			"id": "farm_66",
@@ -914,8 +914,8 @@
 			"distance": 125.0,
 			"survey": 21,
 			"ipm": "Lavinia",
-			"harvest_mult": 46.00511990936967,
-			"cargo_mult": 46.00511990936967
+			"harvest_mult": 18.821518001888,
+			"cargo_mult": 18.821518001888
 		},
 		{
 			"id": "farm_67",
@@ -929,8 +929,8 @@
 			"distance": 127.0,
 			"survey": 21,
 			"ipm": "Ren",
-			"harvest_mult": 46.00511990936967,
-			"cargo_mult": 46.00511990936967
+			"harvest_mult": 18.821518001888,
+			"cargo_mult": 18.821518001888
 		},
 		{
 			"id": "farm_68",
@@ -943,8 +943,8 @@
 			"distance": 129.0,
 			"survey": 22,
 			"ipm": "Gorgons",
-			"harvest_mult": 55.2061438912436,
-			"cargo_mult": 55.2061438912436
+			"harvest_mult": 21.644745702171196,
+			"cargo_mult": 21.644745702171196
 		},
 		{
 			"id": "farm_69",
@@ -957,8 +957,8 @@
 			"distance": 131.0,
 			"survey": 22,
 			"ipm": "Pontus",
-			"harvest_mult": 55.2061438912436,
-			"cargo_mult": 55.2061438912436
+			"harvest_mult": 21.644745702171196,
+			"cargo_mult": 21.644745702171196
 		},
 		{
 			"id": "farm_70",
@@ -970,8 +970,8 @@
 			"distance": 134.0,
 			"survey": 22,
 			"ipm": "Leto",
-			"harvest_mult": 55.2061438912436,
-			"cargo_mult": 55.2061438912436
+			"harvest_mult": 21.644745702171196,
+			"cargo_mult": 21.644745702171196
 		},
 		{
 			"id": "farm_71",
@@ -985,8 +985,8 @@
 			"distance": 136.0,
 			"survey": 23,
 			"ipm": "Laconia",
-			"harvest_mult": 66.24737266949231,
-			"cargo_mult": 66.24737266949231
+			"harvest_mult": 24.891457557496874,
+			"cargo_mult": 24.891457557496874
 		},
 		{
 			"id": "farm_72",
@@ -999,8 +999,8 @@
 			"distance": 138.0,
 			"survey": 23,
 			"ipm": "Awohali",
-			"harvest_mult": 66.24737266949231,
-			"cargo_mult": 66.24737266949231
+			"harvest_mult": 24.891457557496874,
+			"cargo_mult": 24.891457557496874
 		},
 		{
 			"id": "farm_73",
@@ -1012,8 +1012,8 @@
 			"distance": 140.0,
 			"survey": 23,
 			"ipm": "Pegasi",
-			"harvest_mult": 66.24737266949231,
-			"cargo_mult": 66.24737266949231
+			"harvest_mult": 24.891457557496874,
+			"cargo_mult": 24.891457557496874
 		},
 		{
 			"id": "farm_74",
@@ -1026,8 +1026,8 @@
 			"distance": 142.0,
 			"survey": 24,
 			"ipm": "Typhon",
-			"harvest_mult": 79.49684720339077,
-			"cargo_mult": 79.49684720339077
+			"harvest_mult": 28.625176191121405,
+			"cargo_mult": 28.625176191121405
 		},
 		{
 			"id": "farm_75",
@@ -1040,8 +1040,8 @@
 			"distance": 144.0,
 			"survey": 24,
 			"ipm": "Surtur",
-			"harvest_mult": 79.49684720339077,
-			"cargo_mult": 79.49684720339077
+			"harvest_mult": 28.625176191121405,
+			"cargo_mult": 28.625176191121405
 		},
 		{
 			"id": "farm_76",
@@ -1053,8 +1053,8 @@
 			"distance": 146.0,
 			"survey": 24,
 			"ipm": "Vesta",
-			"harvest_mult": 79.49684720339077,
-			"cargo_mult": 79.49684720339077
+			"harvest_mult": 28.625176191121405,
+			"cargo_mult": 28.625176191121405
 		},
 		{
 			"id": "farm_77",
@@ -1067,8 +1067,8 @@
 			"distance": 148.0,
 			"survey": 25,
 			"ipm": "Jolrael",
-			"harvest_mult": 95.39621664406893,
-			"cargo_mult": 95.39621664406893
+			"harvest_mult": 32.918952619789614,
+			"cargo_mult": 32.918952619789614
 		},
 		{
 			"id": "farm_78",
@@ -1081,8 +1081,8 @@
 			"distance": 150.0,
 			"survey": 25,
 			"ipm": "Hyperion",
-			"harvest_mult": 95.39621664406893,
-			"cargo_mult": 95.39621664406893
+			"harvest_mult": 32.918952619789614,
+			"cargo_mult": 32.918952619789614
 		},
 		{
 			"id": "farm_79",
@@ -1094,8 +1094,8 @@
 			"distance": 152.0,
 			"survey": 25,
 			"ipm": "Astrea",
-			"harvest_mult": 95.39621664406893,
-			"cargo_mult": 95.39621664406893
+			"harvest_mult": 32.918952619789614,
+			"cargo_mult": 32.918952619789614
 		},
 		{
 			"id": "vinegar",
@@ -1107,8 +1107,8 @@
 			"distance": 16.0,
 			"survey": 1,
 			"ingredient": true,
-			"harvest_mult": 1.2,
-			"cargo_mult": 1.2
+			"harvest_mult": 1.15,
+			"cargo_mult": 1.15
 		},
 		{
 			"id": "garlic",
@@ -1120,8 +1120,8 @@
 			"distance": 26.0,
 			"survey": 3,
 			"ingredient": true,
-			"harvest_mult": 1.7279999999999998,
-			"cargo_mult": 1.7279999999999998
+			"harvest_mult": 1.5208749999999998,
+			"cargo_mult": 1.5208749999999998
 		},
 		{
 			"id": "pineapple",
@@ -1133,8 +1133,8 @@
 			"distance": 33.0,
 			"survey": 4,
 			"ingredient": true,
-			"harvest_mult": 2.0736,
-			"cargo_mult": 2.0736
+			"harvest_mult": 1.7490062499999994,
+			"cargo_mult": 1.7490062499999994
 		},
 		{
 			"id": "oak",
@@ -1146,8 +1146,8 @@
 			"distance": 48.0,
 			"survey": 6,
 			"ingredient": true,
-			"harvest_mult": 2.9859839999999993,
-			"cargo_mult": 2.9859839999999993
+			"harvest_mult": 2.313060765624999,
+			"cargo_mult": 2.313060765624999
 		}
 	]
 }

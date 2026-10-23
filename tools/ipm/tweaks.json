@@ -21,9 +21,18 @@
 		{
 			"id": "T3",
 			"op": "farm_rate_per_survey",
-			"factor": 1.2,
-			"what": "A farm from Land Survey n harvests and carries × 1.2^n: newer land, better trucks, in place of IPM's managers and colonies (left out, W36).",
+			"factor": 1.15,
+			"what": "A farm from Land Survey n harvests and carries × 1.15^n: newer land, better trucks, in place of IPM's managers and colonies (left out, W36).",
 			"answers": "I6, Z3 (W37): the middle of the run grew too slowly to reach $10M by 2:30"
+		},
+		{
+			"id": "T4",
+			"op": "slot_insert",
+			"index": 1,
+			"vat": 150.0,
+			"line": 100.0,
+			"what": "The kitchen's vat and line run only the kitchen's recipes, and IPM's free first smelter and crafter come after them as Vat 2 and Line 2, at the kitchen's $150 and $100 (a price can't be 0). Every later slot is IPM's, one place on.",
+			"answers": "I8, I7, Y2 (W39, W38, W41): the player handed the kitchen's line to the survey's sauces, so no Table Mild came for the button's nodes"
 		}
 	]
 }

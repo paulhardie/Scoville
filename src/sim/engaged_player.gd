@@ -89,7 +89,11 @@ func decide(g) -> void:
 	_earned.append([now, g.stats.cash_earned])
 	while _earned.size() > 1 and _earned[0][0] < now - INCOME_WINDOW:
 		_earned.pop_front()
-	var goal := next_research(g) if buys else ""
+	# The kitchen comes first: until the Bell Plot, the vat and the line are
+	# bought, nothing is saved for research (after a sale the Tech Tree is open
+	# from the start, and saving Bell Peppers for a survey left no cash).
+	var set_up: bool = g.plots.bell.owned and not g.vats.is_empty() and not g.lines.is_empty()
+	var goal := next_research(g) if buys and set_up else ""
 	if goal != "" and g.research_node(goal):
 		_note(now, "research " + goal)
 		goal = next_research(g)
@@ -281,7 +285,10 @@ func _grows(g, crop: String) -> bool:
 func _assign(g, plan: Dictionary, wanted: Dictionary) -> void:
 	for station in ["vat", "line"]:
 		var n: int = g.slots(station).size()
-		var picks: Array = plan[station].slice(0, n)
+		# What the slots should run: the kitchen's recipe in the first, the
+		# plan's others in as many slots as there are after it.
+		var picks: Array = plan[station].filter(func(r): return g.data.recipes[r].kitchen).slice(0, 1) \
+			+ plan[station].filter(func(r): return not g.data.recipes[r].kitchen).slice(0, n - 1)
 		# A slot mid-cycle on a recipe the plan still wants keeps it: switching
 		# hands its inputs back, and two goal recipes would take turns forever.
 		var kept := {}
@@ -290,17 +297,16 @@ func _assign(g, plan: Dictionary, wanted: Dictionary) -> void:
 			if s.running and (s.recipe in picks or wanted.has(s.recipe)):
 				kept[i] = true
 				picks.erase(s.recipe)
-		var used := 0
+		# Each other slot takes the first pick it can run.
 		for i in n:
 			if kept.has(i):
 				continue
 			var want := ""
-			while used < picks.size():
-				var r: String = picks[used]
-				used += 1
+			for r in picks:
 				if g.recipe_unlocked(r) and r in g.recipes_for(station, i):
 					want = r
 					break
+			picks.erase(want)
 			if want != "" and g.slots(station)[i].recipe != want:
 				g.assign(station, i, want)
 		# Pressure Cookers on the first vats after the kitchen's.
@@ -437,10 +443,11 @@ func _needs(g, plan: Dictionary, wanted: Dictionary) -> Array:
 	# which runs only in the first slot (D052).
 	for station in ["vat", "line"]:
 		var n: int = g.slots(station).size()
-		var rest: Array = plan[station].slice(n).filter(func(x): return not g.data.recipes[x].kitchen)
-		if n == 0 or rest.is_empty() or not g.slot_offered(station):
+		# The first slot is the kitchen's; the others run the rest of the plan.
+		var rest: Array = plan[station].filter(func(x): return not g.data.recipes[x].kitchen)
+		if n == 0 or rest.size() < n or not g.slot_offered(station):
 			continue
-		var r: String = rest[0]
+		var r: String = rest[n - 1]
 		var cheap: bool = g.slot_price(station) <= income() * 60.0 * SLOT_MINUTES
 		var affordable: bool = g.slot_price(station) <= income() * 60.0 * GOAL_SLOT_MINUTES
 		if wanted.has(r) and affordable or cheap and _can_feed(g, r):

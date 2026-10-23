@@ -316,3 +316,9 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** the second plot felt slow (W28) because it was one ×16 step from the Bell Plot, and A4 failed by a second (W29) because nothing new came between the Jalapeño Plot and the Ancho vat. A cheaper Poblano brings the casual player's second plot to 3:18 (A7), and a Jalapeño ×3.3 above it lands mid-gap, so A4 passes at 6:19. A Serrano Plot from the start was tried as Idle Planet Miner's fourth planet and dropped: the pacing player never afforded it early, and any price it could afford paid back in under 4 minutes. **$520 rather than $500 was picked after a result:** $500 failed X3 by 0.05 points from an unusual 2:30 state. E6 (W30) can't be met by prices: Line 1's price trades it against E3.
 
+## D049: E6 is retired
+
+**Decision (the owner's, on the agent's recommendation):** FACTORY.md's E6, at least 10 Sweet Pepper Mash waiting for the casual player's Starter Crate, is no longer a criterion. The pacing suite still prints the figure.
+
+**Why:** since the dashboard (D044) the line comes sooner and E6 measured 9. D048 found no price that passes it without failing E3: Line 1's price moves it only in a step with the casual player's tapping bursts (up to $110: 9 mash; from $115: 13 mash but E3 120 s against 100). E6 was there so the Starter Crate had something to bottle; the ring now leads the player to the line, and the crate bottles whatever is waiting at 10× speed.
+

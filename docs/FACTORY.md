@@ -213,7 +213,7 @@ Otherwise it plays like the pacing player. Both are measured over the first 30 m
 | E3 | From the deck to 15:00, never longer than 75 s (pacing) or 100 s (casual) without something new | 64 s and 96 s |
 | E4 | The plot matters: in the first 5 minutes it picks at least a third of the casual player's peppers | 37% |
 | E5 | The casual player reaches the Tech Tree by 15:00 | 13:10 |
-| E6 | The Starter Crate has a pile to bottle: at least 10 Sweet Pepper Mash waiting when the casual player buys the line | 11 |
+| E6 | ~~The Starter Crate has a pile to bottle: at least 10 Sweet Pepper Mash waiting when the casual player buys the line~~ **Retired by the owner (D049).** Still printed by the pacing suite | 11 (9 when retired) |
 
 **E6 was narrowed after measuring.** It was written for both players, but the pacing player buys the line 36 s after the vat, so only 3 mash waits. That's what a flat-out player gets, so it's now judged on the casual player only.
 

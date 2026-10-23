@@ -38,7 +38,7 @@ Measured on `tests/pacing_tests.gd` and the rest of the suite. Variants tried on
 | A8 | **PASS:** ×3.3 from Poblano to Jalapeño; payback 5:12 and 8:30 |
 | A4 | **PASS:** 6:19 (was 6:31), Jalapeño Plot to the Ancho vat |
 | E6 | **FAIL:** 9, unchanged by plot prices. It moves only with Line 1's price, and in a step: up to $110 the line lands inside one of the casual player's tapping bursts (9 mash, E3 82–84 s); from $115 it slips past a rest (13 mash, but E3 120 s against 100, and A7 3:38). No Line 1 price passes both E3 and E6 (W30). |
-| A9 | **PASS** apart from E6: every suite, the boot, the curve ($10k 12:22, $150k 45:22, $4M 1:42:17, the sale 2:05:44), the second run at 58% of run 1, X3 1.29% |
+| A9 | **PASS** apart from E6, which the owner then retired (D049): every suite, the boot, the curve ($10k 12:22, $150k 45:22, $4M 1:42:17, the sale 2:05:44), the second run at 58% of run 1, X3 1.29% |
 
 
 ## v0.6d: Idle Planet Miner's early flow (D041)

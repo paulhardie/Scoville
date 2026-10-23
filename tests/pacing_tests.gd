@@ -1,7 +1,7 @@
 extends SceneTree
 ## The first 110 minutes against docs/FACTORY.md's F1–F8 (to 15:00) and
 ## docs/ECONOMY.md's N1–N8 (to 50:00), M1–M7 (to 1:50) and A4 (v0.6d), played by the
-## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E6 and J3,
+## pacing player (D003); OFFLINE.md's P1–P2; and FACTORY.md's early-game E1–E5 (E6 retired, D049) and J3,
 ## played by both the eager pacing player and a casual one.
 ## Prints a timeline and each criterion's measurement.
 
@@ -223,9 +223,8 @@ func run() -> void:
 	criterion("E3", eager.gap <= 75.0 and casual.gap <= 100.0, "longest stretch with nothing new, deck to 15:00: %.0f s eager (at most 75), %.0f s casual (at most 100)" % [eager.gap, casual.gap])
 	criterion("E4", casual.plot_share >= 1.0 / 3.0, "the plot picks %.0f%% of the casual player's peppers in the first 5 minutes (at least a third)" % (casual.plot_share * 100.0))
 	criterion("E5", casual.tech <= 15 * 60.0, "casual player: the Tech Tree at %s (by 15:00)" % clock(casual.tech))
-	# Narrowed to the casual player after measuring: the eager one buys the line
-	# 36 s after the vat, so little mash waits (FACTORY.md says so).
-	criterion("E6", casual.crate_mash >= 10, "Sweet Pepper Mash waiting for the Starter Crate: %d casual (at least 10); %d eager (not judged)" % [casual.crate_mash, eager.crate_mash])
+	# E6 is retired (D049): still printed, not judged.
+	print("  E6 retired (D049)  Sweet Pepper Mash waiting for the Starter Crate: %d casual; %d eager" % [casual.crate_mash, eager.crate_mash])
 	criterion("A7", casual.second_plot <= 210.0, "the casual player's first plot after Bell at %s (by 3:30); eager %s (not judged)" % [clock(casual.second_plot), clock(eager.second_plot)])
 	criterion("J3", casual.late_gap <= 120.0, "longest stretch with nothing new, 15:00–30:00: %.0f s casual (at most 120); %.0f s eager (not judged)" % [casual.late_gap, eager.late_gap])
 

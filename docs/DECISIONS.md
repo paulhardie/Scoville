@@ -296,3 +296,10 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** making a bottle is the game's core reward, but it got the same weight as any number changing: a text pop, no sound, no picture, and a $330,000 Phantom felt like a $50 Table Mild. The sound and the bottle need no art, and the visual pass (W8) can restyle them.
 
+## D047: Pixel art is the game's look; trial a ready-made pixel UI skin first
+
+**Decision (the owner's: "I'd like a pixel art style for this game for sure"; the trial is the agent's recommendation):** the game's visual style is pixel art. The first step is a trial of Pixel UI Free (heyheythere, CC BY 4.0, wood theme) over today's screen, drawn at whole-number scales with its bitmap font ([LOOK.md](LOOK.md)). Whether to keep the kit, buy the full pack or commission custom UI art is the owner's call after seeing the trial.
+
+**Why:** W8 asked for a direction; the owner gave one. A skin over the existing screen is the cheapest way to see pixel art on our real content (dense cards, long names, big numbers) before anyone draws art for it. The trade-off: the kit is a generic fantasy-RPG skin, so it shows whether the style works, not what the finished game looks like.
+
+**Note on "colours only in style.gd":** the kit's theme carries its own colours (wood tones, button ink). Every colour of ours is still in `style.gd`, including the few kit colours we override for contrast; the kit's file is a third-party asset, left unchanged.

@@ -19,6 +19,8 @@ bash run_tests.sh
 bash run_godot.sh --headless --path . --quit
 ```
 
+Credits: Pixel UI Free by heyheythere - https://heyheythere.itch.io/pixel-ui-free - CC BY 4.0 (`addons/pixel_ui/`).
+
 Play it in a window:
 
 ```bash

@@ -47,11 +47,11 @@ func run() -> void:
 	var deck: Control = screen.find_child("Deck", true, false)
 	var factory: Control = screen.find_child("Factory", true, false)
 	check(bar.visible and nav.visible and deck.visible and factory.visible, "L10: status bar, tab selectors, panel and factory view all show at the start")
-	check(absf(nav.get_global_rect().position.y - (blank.get_global_rect().end.y + 36.0)) < 1.0 and deck.get_global_rect().position.y >= nav.get_global_rect().end.y - 1.0, "L10: the selectors sit directly under the viewport, the panel under them")
+	check(absf(nav.get_global_rect().position.y - screen.size.y * S.UPPER_FRACTION) < 1.0 and nav.get_global_rect().position.y >= blank.get_global_rect().end.y and deck.get_global_rect().position.y >= nav.get_global_rect().end.y - 1.0, "L10: the selectors sit directly under the viewport, the panel under them")
 	var tabs := []
 	for tab in ["farms", "processing", "tech", "market", "roster", "hq"]:
 		tabs.append((screen.find_child("Tab_" + tab, true, false) as Button).text)
-	check(tabs == ["Farms", "Processing\n$4K", "Tech Tree\n$7.5K", "Market\nVan", "Shift Roster\n$150K", "HQ\n$10M"], "L11: every tab shows, the locked ones with what opens them: %s" % str(tabs))
+	check(tabs == ["Farms", "Processing\n$4K", "Tech Tree\n$7.5K", "Market\nVan", "Roster\n$150K", "HQ\n$10M"], "L11: every tab shows, the locked ones with what opens them: %s" % str(tabs))
 	var goal: Label = screen.find_child("Goal", true, false)
 	var ring: Control = screen.find_child("Ring", true, false)
 	await settle()
@@ -65,7 +65,7 @@ func run() -> void:
 		blank.pressed.emit()
 	await process_frame
 	var texts := visible_text(screen)
-	check("Cash: $0.00" in texts and "Sell Raw Peppers ($1.00/ea)" in texts, "O4: Cash and the sell button: %s" % str(texts))
+	check("Cash: $0.00" in texts and "Sell Raw Peppers\n($1.00/ea)" in texts, "O4: Cash and the sell button (on two lines since LOOK.md): %s" % str(texts))
 
 	var sell: Button = screen.find_child("SellRaw", true, false)
 	sell.pressed.emit()

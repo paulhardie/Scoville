@@ -812,6 +812,8 @@ func _build_tech(holder: Control) -> void:
 	detail.add_theme_constant_override("separation", 6)
 	panel.add_child(detail)
 	_detail.title = _label("", S.SIZE_BODY, S.TEXT)
+	# A long name (Standard Operating Procedures) wraps rather than widening the panel.
+	_detail.title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	detail.add_child(_detail.title)
 	_detail.effect = _label("", S.SIZE_SMALL, S.DIM)
 	_detail.effect.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART

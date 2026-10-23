@@ -1,52 +1,1044 @@
 {
-	"_source": "docs/ECONOMY.md: bottle values are the brief's (§3); crop and mash values follow D004. `ingredient` marks a non-pepper crop (D024), which Forager's Luck tops up (D025). v0.6a's items are docs/FULL_RUN.md's (D029); Tier 6's are docs/PRESTIGE.md's (D034).",
+	"_source": "Built by tools/ipm/build_data.py from docs/ipm_snapshot.json through docs/SKELETON.md's mapping (v0.7, D049–D053). Values are Idle Planet Miner's (ores, alloys, items); the kitchen's two are D004's (D052). `tier` groups crops four rungs a tier, and a made item takes its highest input's.",
 	"items": [
-		{"id": "bell", "name": "Bell Pepper", "plural": "Bell Peppers", "short": "Bell", "kind": "crop", "tier": 1, "value": 1.0},
-		{"id": "jalapeno", "name": "Jalapeño", "plural": "Jalapeños", "short": "Jalapeño", "kind": "crop", "tier": 2, "value": 4.0},
-		{"id": "vinegar", "name": "White Vinegar", "plural": "White Vinegar", "short": "Vinegar", "kind": "crop", "tier": 2, "value": 2.0, "ingredient": true},
-		{"id": "cayenne", "name": "Cayenne", "plural": "Cayenne", "short": "Cayenne", "kind": "crop", "tier": 3, "value": 17.0},
-		{"id": "garlic", "name": "Garlic", "plural": "Garlic", "short": "Garlic", "kind": "crop", "tier": 3, "value": 17.0, "ingredient": true},
-		{"id": "sweet_mash", "name": "Sweet Pepper Mash", "plural": "Sweet Pepper Mash", "short": "Sweet Mash", "kind": "mash", "tier": 1, "value": 20.0},
-		{"id": "pickled_brine", "name": "Pickled Brine", "plural": "Pickled Brine", "short": "Brine", "kind": "mash", "tier": 2, "value": 50.0},
-		{"id": "verde_mash", "name": "Verde Mash", "plural": "Verde Mash", "short": "Verde", "kind": "mash", "tier": 2, "value": 120.0},
-		{"id": "garlic_paste", "name": "Roasted Garlic Paste", "plural": "Roasted Garlic Paste", "short": "Paste", "kind": "mash", "tier": 3, "value": 680.0},
-		{"id": "cayenne_mash", "name": "Cayenne Mash", "plural": "Cayenne Mash", "short": "Cayenne Mash", "kind": "mash", "tier": 3, "value": 950.0},
-		{"id": "table_mild", "name": "Table Mild", "plural": "Table Mild", "short": "Table Mild", "kind": "bottle", "tier": 1, "value": 50.0},
-		{"id": "bistro_verde", "name": "Bistro Verde", "plural": "Bistro Verde", "short": "Bistro", "kind": "bottle", "tier": 2, "value": 425.0},
-		{"id": "classic_louisiana", "name": "Classic Louisiana", "plural": "Classic Louisiana", "short": "Louisiana", "kind": "bottle", "tier": 3, "value": 3950.0},
-		{"id": "poblano", "name": "Poblano", "plural": "Poblanos", "short": "Poblano", "kind": "crop", "tier": 2, "value": 2.0},
-		{"id": "serrano", "name": "Serrano", "plural": "Serranos", "short": "Serrano", "kind": "crop", "tier": 3, "value": 8.0},
-		{"id": "thai_chili", "name": "Thai Chili", "plural": "Thai Chilies", "short": "Thai", "kind": "crop", "tier": 3, "value": 36.0},
-		{"id": "pineapple", "name": "Pineapple", "plural": "Pineapples", "short": "Pineapple", "kind": "crop", "tier": 4, "value": 75.0, "ingredient": true},
-		{"id": "bonnet", "name": "Scotch Bonnet", "plural": "Scotch Bonnets", "short": "Bonnet", "kind": "crop", "tier": 4, "value": 75.0},
-		{"id": "caribbean_red", "name": "Caribbean Red Habanero", "plural": "Caribbean Reds", "short": "Carib Red", "kind": "crop", "tier": 4, "value": 160.0},
-		{"id": "chocolate", "name": "Chocolate Habanero", "plural": "Chocolate Habaneros", "short": "Choc Hab", "kind": "crop", "tier": 5, "value": 340.0},
-		{"id": "oak", "name": "Smoked Oak", "plural": "Smoked Oak", "short": "Oak", "kind": "crop", "tier": 5, "value": 730.0, "ingredient": true},
-		{"id": "ghost", "name": "Ghost Pepper", "plural": "Ghost Peppers", "short": "Ghost", "kind": "crop", "tier": 5, "value": 730.0},
-		{"id": "ancho_mash", "name": "Ancho Mash", "plural": "Ancho Mash", "short": "Ancho Mash", "kind": "mash", "tier": 2, "value": 60.0},
-		{"id": "serrano_mash", "name": "Serrano Mash", "plural": "Serrano Mash", "short": "Serrano Mash", "kind": "mash", "tier": 3, "value": 320.0},
-		{"id": "thai_chili_mash", "name": "Thai Chili Mash", "plural": "Thai Chili Mash", "short": "Thai Mash", "kind": "mash", "tier": 3, "value": 3600.0},
-		{"id": "bonnet_mash", "name": "Bonnet Mash", "plural": "Bonnet Mash", "short": "Bonnet Mash", "kind": "mash", "tier": 4, "value": 6000.0},
-		{"id": "glaze", "name": "Charred Pineapple Glaze", "plural": "Charred Pineapple Glaze", "short": "Glaze", "kind": "mash", "tier": 4, "value": 5860.0},
-		{"id": "caribbean_red_mash", "name": "Caribbean Red Mash", "plural": "Caribbean Red Mash", "short": "Red Mash", "kind": "mash", "tier": 4, "value": 12800.0},
-		{"id": "chocolate_mash", "name": "Chocolate Habanero Mash", "plural": "Chocolate Habanero Mash", "short": "Choc Mash", "kind": "mash", "tier": 5, "value": 40800.0},
-		{"id": "liquid_smoke", "name": "Liquid Smoke", "plural": "Liquid Smoke", "short": "Smoke", "kind": "mash", "tier": 5, "value": 36700.0},
-		{"id": "ghost_mash", "name": "Ghost Mash", "plural": "Ghost Mash", "short": "Ghost Mash", "kind": "mash", "tier": 5, "value": 87600.0},
-		{"id": "smoky_ancho", "name": "Smoky Ancho", "plural": "Smoky Ancho", "short": "Smoky Ancho", "kind": "bottle", "tier": 2, "value": 150.0},
-		{"id": "serrano_fire", "name": "Serrano Fire", "plural": "Serrano Fire", "short": "Serrano Fire", "kind": "bottle", "tier": 3, "value": 1225.0},
-		{"id": "cajun_red", "name": "Cajun Red", "plural": "Cajun Red", "short": "Cajun", "kind": "bottle", "tier": 3, "value": 10950.0},
-		{"id": "island_heat", "name": "Island Heat", "plural": "Island Heat", "short": "Island", "kind": "bottle", "tier": 4, "value": 28200.0},
-		{"id": "sweet_heat", "name": "Sweet Heat Reserve", "plural": "Sweet Heat Reserve", "short": "Sweet Heat", "kind": "bottle", "tier": 4, "value": 58150.0},
-		{"id": "cocoa_loco", "name": "Cocoa Loco", "plural": "Cocoa Loco", "short": "Cocoa", "kind": "bottle", "tier": 5, "value": 122125.0},
-		{"id": "phantom", "name": "Phantom Smokehouse", "plural": "Phantom Smokehouse", "short": "Phantom", "kind": "bottle", "tier": 5, "value": 330250.0},
-		{"id": "moruga", "name": "Trinidad Moruga Scorpion", "plural": "Moruga Scorpions", "short": "Moruga", "kind": "crop", "tier": 6, "value": 1600.0},
-		{"id": "grim", "name": "Alabama Grim", "plural": "Alabama Grims", "short": "Grim", "kind": "crop", "tier": 6, "value": 3500.0},
-		{"id": "pepper_y", "name": "Pepper Y", "plural": "Pepper Y", "short": "Pepper Y", "kind": "crop", "tier": 6, "value": 7800.0},
-		{"id": "moruga_mash", "name": "Moruga Mash", "plural": "Moruga Mash", "short": "Moruga Mash", "kind": "mash", "tier": 6, "value": 192000.0},
-		{"id": "grim_mash", "name": "Grim Mash", "plural": "Grim Mash", "short": "Grim Mash", "kind": "mash", "tier": 6, "value": 560000.0},
-		{"id": "pepper_y_mash", "name": "Pepper Y Mash", "plural": "Pepper Y Mash", "short": "PY Mash", "kind": "mash", "tier": 6, "value": 1560000.0},
-		{"id": "scorpion_sting", "name": "Scorpion Sting", "plural": "Scorpion Sting", "short": "Scorpion", "kind": "bottle", "tier": 6, "value": 1090625.0},
-		{"id": "widowmaker", "name": "Widowmaker Reserve", "plural": "Widowmaker Reserve", "short": "Widowmaker", "kind": "bottle", "tier": 6, "value": 3342000.0},
-		{"id": "extinction_event", "name": "Extinction Event", "plural": "Extinction Event", "short": "Extinction", "kind": "bottle", "tier": 6, "value": 9353125.0}
+		{
+			"id": "vinegar",
+			"name": "White Vinegar",
+			"plural": "White Vinegar",
+			"short": "Vinegar",
+			"kind": "crop",
+			"tier": 1,
+			"value": 2.0,
+			"ingredient": true
+		},
+		{
+			"id": "garlic",
+			"name": "Garlic",
+			"plural": "Garlic",
+			"short": "Garlic",
+			"kind": "crop",
+			"tier": 2,
+			"value": 17.0,
+			"ingredient": true
+		},
+		{
+			"id": "pineapple",
+			"name": "Pineapple",
+			"plural": "Pineapples",
+			"short": "Pineapple",
+			"kind": "crop",
+			"tier": 1,
+			"value": 75.0,
+			"ingredient": true
+		},
+		{
+			"id": "oak",
+			"name": "Smoked Oak",
+			"plural": "Smoked Oak",
+			"short": "Oak",
+			"kind": "crop",
+			"tier": 3,
+			"value": 730.0,
+			"ingredient": true
+		},
+		{
+			"id": "bell",
+			"name": "Bell Pepper",
+			"plural": "Bell Peppers",
+			"short": "Bell",
+			"kind": "crop",
+			"tier": 1,
+			"value": 1.0
+		},
+		{
+			"id": "pimento",
+			"name": "Pimento",
+			"plural": "Pimentos",
+			"short": "Pimento",
+			"kind": "crop",
+			"tier": 1,
+			"value": 2.0
+		},
+		{
+			"id": "poblano",
+			"name": "Poblano",
+			"plural": "Poblanos",
+			"short": "Poblano",
+			"kind": "crop",
+			"tier": 1,
+			"value": 4.0
+		},
+		{
+			"id": "cascabel",
+			"name": "Cascabel",
+			"plural": "Cascabels",
+			"short": "Cascabel",
+			"kind": "crop",
+			"tier": 1,
+			"value": 8.0
+		},
+		{
+			"id": "jalapeno",
+			"name": "Jalapeño",
+			"plural": "Jalapeños",
+			"short": "Jalapeño",
+			"kind": "crop",
+			"tier": 2,
+			"value": 17.0
+		},
+		{
+			"id": "hungarian_wax",
+			"name": "Hungarian Wax",
+			"plural": "Hungarian Waxs",
+			"short": "Wax",
+			"kind": "crop",
+			"tier": 2,
+			"value": 36.0
+		},
+		{
+			"id": "serrano",
+			"name": "Serrano",
+			"plural": "Serranos",
+			"short": "Serrano",
+			"kind": "crop",
+			"tier": 2,
+			"value": 75.0
+		},
+		{
+			"id": "arbol",
+			"name": "Chile de Árbol",
+			"plural": "Chile de Árbols",
+			"short": "Árbol",
+			"kind": "crop",
+			"tier": 2,
+			"value": 160.0
+		},
+		{
+			"id": "cayenne",
+			"name": "Cayenne",
+			"plural": "Cayenne",
+			"short": "Cayenne",
+			"kind": "crop",
+			"tier": 3,
+			"value": 340.0
+		},
+		{
+			"id": "pequin",
+			"name": "Pequin",
+			"plural": "Pequins",
+			"short": "Pequin",
+			"kind": "crop",
+			"tier": 3,
+			"value": 730.0
+		},
+		{
+			"id": "thai_chili",
+			"name": "Thai Chili",
+			"plural": "Thai Chilies",
+			"short": "Thai",
+			"kind": "crop",
+			"tier": 3,
+			"value": 1600.0
+		},
+		{
+			"id": "bonnet",
+			"name": "Scotch Bonnet",
+			"plural": "Scotch Bonnets",
+			"short": "Bonnet",
+			"kind": "crop",
+			"tier": 3,
+			"value": 3500.0
+		},
+		{
+			"id": "fatalii",
+			"name": "Fatalii",
+			"plural": "Fataliis",
+			"short": "Fatalii",
+			"kind": "crop",
+			"tier": 4,
+			"value": 7800.0
+		},
+		{
+			"id": "caribbean_red",
+			"name": "Caribbean Red Habanero",
+			"plural": "Caribbean Reds",
+			"short": "Carib Red",
+			"kind": "crop",
+			"tier": 4,
+			"value": 17500.0
+		},
+		{
+			"id": "chocolate",
+			"name": "Chocolate Habanero",
+			"plural": "Chocolate Habaneros",
+			"short": "Choc Hab",
+			"kind": "crop",
+			"tier": 4,
+			"value": 40000.0
+		},
+		{
+			"id": "ghost",
+			"name": "Ghost Pepper",
+			"plural": "Ghost Peppers",
+			"short": "Ghost",
+			"kind": "crop",
+			"tier": 4,
+			"value": 92000.0
+		},
+		{
+			"id": "seven_pot",
+			"name": "Trinidad 7 Pot",
+			"plural": "Trinidad 7 Pots",
+			"short": "7 Pot",
+			"kind": "crop",
+			"tier": 5,
+			"value": 215000.0
+		},
+		{
+			"id": "naga",
+			"name": "Naga Morich",
+			"plural": "Naga Morichs",
+			"short": "Naga",
+			"kind": "crop",
+			"tier": 5,
+			"value": 510000.0
+		},
+		{
+			"id": "moruga",
+			"name": "Trinidad Moruga Scorpion",
+			"plural": "Moruga Scorpions",
+			"short": "Moruga",
+			"kind": "crop",
+			"tier": 5,
+			"value": 1250000.0
+		},
+		{
+			"id": "grim",
+			"name": "Alabama Grim",
+			"plural": "Alabama Grims",
+			"short": "Grim",
+			"kind": "crop",
+			"tier": 5,
+			"value": 3200000.0
+		},
+		{
+			"id": "pepper_y",
+			"name": "Pepper Y",
+			"plural": "Pepper Y",
+			"short": "Pepper Y",
+			"kind": "crop",
+			"tier": 6,
+			"value": 9000000.0
+		},
+		{
+			"id": "lava_lantern",
+			"name": "Lava Lantern",
+			"plural": "Lava Lanterns",
+			"short": "Lantern",
+			"kind": "crop",
+			"tier": 6,
+			"value": 28000000.0
+		},
+		{
+			"id": "solar_flare",
+			"name": "Solar Flare",
+			"plural": "Solar Flares",
+			"short": "Flare",
+			"kind": "crop",
+			"tier": 6,
+			"value": 90000000.0
+		},
+		{
+			"id": "capsaicin_crystal",
+			"name": "Capsaicin Crystal",
+			"plural": "Capsaicin Crystals",
+			"short": "Crystal",
+			"kind": "crop",
+			"tier": 6,
+			"value": 300000000.0
+		},
+		{
+			"id": "brimstone",
+			"name": "Brimstone Jolokia",
+			"plural": "Brimstone Jolokias",
+			"short": "Brimstone",
+			"kind": "crop",
+			"tier": 7,
+			"value": 1100000000.0
+		},
+		{
+			"id": "supernova",
+			"name": "Supernova Scorpion",
+			"plural": "Supernova Scorpions",
+			"short": "Supernova",
+			"kind": "crop",
+			"tier": 7,
+			"value": 4300000000.0
+		},
+		{
+			"id": "event_horizon",
+			"name": "Event Horizon",
+			"plural": "Event Horizons",
+			"short": "Horizon",
+			"kind": "crop",
+			"tier": 7,
+			"value": 18000000000.0
+		},
+		{
+			"id": "heat_death",
+			"name": "Heat Death",
+			"plural": "Heat Deaths",
+			"short": "Heat Death",
+			"kind": "crop",
+			"tier": 7,
+			"value": 78000000000.0
+		},
+		{
+			"id": "sweet_mash",
+			"name": "Sweet Pepper Mash",
+			"plural": "Sweet Pepper Mash",
+			"short": "Sweet Mash",
+			"kind": "mash",
+			"tier": 1,
+			"value": 20.0
+		},
+		{
+			"id": "pickled_brine",
+			"name": "Pickled Brine",
+			"plural": "Pickled Brine",
+			"short": "Brine",
+			"kind": "mash",
+			"tier": 1,
+			"value": 3000.0
+		},
+		{
+			"id": "garlic_paste",
+			"name": "Roasted Garlic Paste",
+			"plural": "Roasted Garlic Paste",
+			"short": "Paste",
+			"kind": "mash",
+			"tier": 2,
+			"value": 27600.0
+		},
+		{
+			"id": "glaze",
+			"name": "Charred Pineapple Glaze",
+			"plural": "Charred Pineapple Glaze",
+			"short": "Glaze",
+			"kind": "mash",
+			"tier": 1,
+			"value": 120000.0
+		},
+		{
+			"id": "liquid_smoke",
+			"name": "Liquid Smoke",
+			"plural": "Liquid Smoke",
+			"short": "Smoke",
+			"kind": "mash",
+			"tier": 3,
+			"value": 990000.0
+		},
+		{
+			"id": "bell_puree",
+			"name": "Bell Pepper Purée",
+			"plural": "Bell Pepper Purée",
+			"short": "Bell Pepper Purée",
+			"kind": "mash",
+			"tier": 1,
+			"value": 1450.0
+		},
+		{
+			"id": "pimento_mash",
+			"name": "Pimento Mash",
+			"plural": "Pimento Mash",
+			"short": "Pimento Mash",
+			"kind": "mash",
+			"tier": 1,
+			"value": 3000.0
+		},
+		{
+			"id": "ancho_mash",
+			"name": "Ancho Mash",
+			"plural": "Ancho Mash",
+			"short": "Ancho Mash",
+			"kind": "mash",
+			"tier": 1,
+			"value": 6100.0
+		},
+		{
+			"id": "cascabel_mash",
+			"name": "Cascabel Mash",
+			"plural": "Cascabel Mash",
+			"short": "Cascabel Mash",
+			"kind": "mash",
+			"tier": 1,
+			"value": 12500.0
+		},
+		{
+			"id": "verde_mash",
+			"name": "Verde Mash",
+			"plural": "Verde Mash",
+			"short": "Verde",
+			"kind": "mash",
+			"tier": 2,
+			"value": 27600.0
+		},
+		{
+			"id": "hungarian_wax_mash",
+			"name": "Hungarian Wax Mash",
+			"plural": "Hungarian Wax Mash",
+			"short": "Hungarian Wax Mash",
+			"kind": "mash",
+			"tier": 2,
+			"value": 60000.0
+		},
+		{
+			"id": "serrano_mash",
+			"name": "Serrano Mash",
+			"plural": "Serrano Mash",
+			"short": "Serrano Mash",
+			"kind": "mash",
+			"tier": 2,
+			"value": 120000.0
+		},
+		{
+			"id": "sofrito_base",
+			"name": "Sofrito Base",
+			"plural": "Sofrito Base",
+			"short": "Sofrito Base",
+			"kind": "mash",
+			"tier": 2,
+			"value": 234000.0
+		},
+		{
+			"id": "mole_base",
+			"name": "Mole Base",
+			"plural": "Mole Base",
+			"short": "Mole Base",
+			"kind": "mash",
+			"tier": 1,
+			"value": 340000.0
+		},
+		{
+			"id": "cayenne_mash",
+			"name": "Cayenne Mash",
+			"plural": "Cayenne Mash",
+			"short": "Cayenne Mash",
+			"kind": "mash",
+			"tier": 3,
+			"value": 780000.0
+		},
+		{
+			"id": "pequin_mash",
+			"name": "Pequin Mash",
+			"plural": "Pequin Mash",
+			"short": "Pequin Mash",
+			"kind": "mash",
+			"tier": 3,
+			"value": 1630000.0
+		},
+		{
+			"id": "thai_chili_mash",
+			"name": "Thai Chili Mash",
+			"plural": "Thai Chili Mash",
+			"short": "Thai Mash",
+			"kind": "mash",
+			"tier": 3,
+			"value": 3110000.0
+		},
+		{
+			"id": "bonnet_mash",
+			"name": "Bonnet Mash",
+			"plural": "Bonnet Mash",
+			"short": "Bonnet Mash",
+			"kind": "mash",
+			"tier": 3,
+			"value": 7000000.0
+		},
+		{
+			"id": "fatalii_mash",
+			"name": "Fatalii Mash",
+			"plural": "Fatalii Mash",
+			"short": "Fatalii Mash",
+			"kind": "mash",
+			"tier": 4,
+			"value": 14500000.0
+		},
+		{
+			"id": "caribbean_red_mash",
+			"name": "Caribbean Red Mash",
+			"plural": "Caribbean Red Mash",
+			"short": "Red Mash",
+			"kind": "mash",
+			"tier": 4,
+			"value": 31000000.0
+		},
+		{
+			"id": "chocolate_mash",
+			"name": "Chocolate Habanero Mash",
+			"plural": "Chocolate Habanero Mash",
+			"short": "Choc Mash",
+			"kind": "mash",
+			"tier": 4,
+			"value": 68000000.0
+		},
+		{
+			"id": "ghost_mash",
+			"name": "Ghost Mash",
+			"plural": "Ghost Mash",
+			"short": "Ghost Mash",
+			"kind": "mash",
+			"tier": 4,
+			"value": 152000000.0
+		},
+		{
+			"id": "seven_pot_mash",
+			"name": "Seven Pot Mash",
+			"plural": "Seven Pot Mash",
+			"short": "Seven Pot Mash",
+			"kind": "mash",
+			"tier": 5,
+			"value": 352000000.0
+		},
+		{
+			"id": "naga_mash",
+			"name": "Naga Mash",
+			"plural": "Naga Mash",
+			"short": "Naga Mash",
+			"kind": "mash",
+			"tier": 5,
+			"value": 832000000.0
+		},
+		{
+			"id": "moruga_mash",
+			"name": "Moruga Mash",
+			"plural": "Moruga Mash",
+			"short": "Moruga Mash",
+			"kind": "mash",
+			"tier": 5,
+			"value": 2049999999.9999998
+		},
+		{
+			"id": "grim_mash",
+			"name": "Grim Mash",
+			"plural": "Grim Mash",
+			"short": "Grim Mash",
+			"kind": "mash",
+			"tier": 5,
+			"value": 5120000000.0
+		},
+		{
+			"id": "pepper_y_mash",
+			"name": "Pepper Y Mash",
+			"plural": "Pepper Y Mash",
+			"short": "PY Mash",
+			"kind": "mash",
+			"tier": 6,
+			"value": 15500000000.0
+		},
+		{
+			"id": "lava_lantern_mash",
+			"name": "Lava Lantern Mash",
+			"plural": "Lava Lantern Mash",
+			"short": "Lava Lantern Mash",
+			"kind": "mash",
+			"tier": 6,
+			"value": 48000000000.0
+		},
+		{
+			"id": "solar_flare_mash",
+			"name": "Solar Flare Mash",
+			"plural": "Solar Flare Mash",
+			"short": "Solar Flare Mash",
+			"kind": "mash",
+			"tier": 6,
+			"value": 160000000000.0
+		},
+		{
+			"id": "crystal_extract",
+			"name": "Crystal Extract",
+			"plural": "Crystal Extract",
+			"short": "Crystal Extract",
+			"kind": "mash",
+			"tier": 6,
+			"value": 600000000000.0
+		},
+		{
+			"id": "brimstone_mash",
+			"name": "Brimstone Mash",
+			"plural": "Brimstone Mash",
+			"short": "Brimstone Mash",
+			"kind": "mash",
+			"tier": 7,
+			"value": 2400000000000.0
+		},
+		{
+			"id": "supernova_mash",
+			"name": "Supernova Mash",
+			"plural": "Supernova Mash",
+			"short": "Supernova Mash",
+			"kind": "mash",
+			"tier": 7,
+			"value": 17500000000000.0
+		},
+		{
+			"id": "event_horizon_mash",
+			"name": "Event Horizon Mash",
+			"plural": "Event Horizon Mash",
+			"short": "Event Horizon Mash",
+			"kind": "mash",
+			"tier": 7,
+			"value": 277000000000000.0
+		},
+		{
+			"id": "heat_death_mash",
+			"name": "Heat Death Mash",
+			"plural": "Heat Death Mash",
+			"short": "Heat Death Mash",
+			"kind": "mash",
+			"tier": 7,
+			"value": 1200000000000000.0
+		},
+		{
+			"id": "table_mild",
+			"name": "Table Mild",
+			"plural": "Table Mild",
+			"short": "Table Mild",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 50.0
+		},
+		{
+			"id": "sweet_pepper_relish",
+			"name": "Sweet Pepper Relish",
+			"plural": "Sweet Pepper Relish",
+			"short": "Sweet Pepper Relish",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 10000.0
+		},
+		{
+			"id": "pimento_spread",
+			"name": "Pimento Spread",
+			"plural": "Pimento Spread",
+			"short": "Pimento Spread",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 20000.0
+		},
+		{
+			"id": "garden_hot_sauce",
+			"name": "Garden Hot Sauce",
+			"plural": "Garden Hot Sauce",
+			"short": "Garden Hot Sauce",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 70000.0
+		},
+		{
+			"id": "smoky_ancho",
+			"name": "Smoky Ancho",
+			"plural": "Smoky Ancho",
+			"short": "Smoky Ancho",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 146000.0
+		},
+		{
+			"id": "cascabel_salsa",
+			"name": "Cascabel Salsa",
+			"plural": "Cascabel Salsa",
+			"short": "Cascabel Salsa",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 220000.0
+		},
+		{
+			"id": "bistro_verde",
+			"name": "Bistro Verde",
+			"plural": "Bistro Verde",
+			"short": "Bistro",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 682000.0
+		},
+		{
+			"id": "garlic_gold",
+			"name": "Garlic Gold",
+			"plural": "Garlic Gold",
+			"short": "Garlic Gold",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 1220000.0
+		},
+		{
+			"id": "serrano_fire",
+			"name": "Serrano Fire",
+			"plural": "Serrano Fire",
+			"short": "Serrano Fire",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 3200000.0
+		},
+		{
+			"id": "salsa_verde_reserve",
+			"name": "Salsa Verde Reserve",
+			"plural": "Salsa Verde Reserve",
+			"short": "Salsa Verde Reserve",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 7600000.0
+		},
+		{
+			"id": "sunshine_sauce",
+			"name": "Sunshine Sauce",
+			"plural": "Sunshine Sauce",
+			"short": "Sunshine Sauce",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 12500000.0
+		},
+		{
+			"id": "pineapple_picante",
+			"name": "Pineapple Picante",
+			"plural": "Pineapple Picante",
+			"short": "Pineapple Picante",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 34100000.0
+		},
+		{
+			"id": "mole_poblano",
+			"name": "Mole Poblano",
+			"plural": "Mole Poblano",
+			"short": "Mole Poblano",
+			"kind": "bottle",
+			"tier": 1,
+			"value": 35000000.0
+		},
+		{
+			"id": "classic_louisiana",
+			"name": "Classic Louisiana",
+			"plural": "Classic Louisiana",
+			"short": "Louisiana",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 78600000.0
+		},
+		{
+			"id": "phantom",
+			"name": "Phantom Smokehouse",
+			"plural": "Phantom Smokehouse",
+			"short": "Phantom",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 199000000.0
+		},
+		{
+			"id": "cajun_red",
+			"name": "Cajun Red",
+			"plural": "Cajun Red",
+			"short": "Cajun",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 1000000000.0
+		},
+		{
+			"id": "bangkok_burn",
+			"name": "Bangkok Burn",
+			"plural": "Bangkok Burn",
+			"short": "Bangkok Burn",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 1150000000.0
+		},
+		{
+			"id": "pitmaster_bbq",
+			"name": "Pitmaster BBQ",
+			"plural": "Pitmaster BBQ",
+			"short": "Pitmaster BBQ",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 1600000000.0
+		},
+		{
+			"id": "smoked_paprika",
+			"name": "Smoked Paprika Reserve",
+			"plural": "Smoked Paprika Reserve",
+			"short": "Smoked Paprika Reserve",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 2700000000.0
+		},
+		{
+			"id": "island_heat",
+			"name": "Island Heat",
+			"plural": "Island Heat",
+			"short": "Island",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 3740000000.0
+		},
+		{
+			"id": "ranchero",
+			"name": "Ranchero",
+			"plural": "Ranchero",
+			"short": "Ranchero",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 7000000000.0
+		},
+		{
+			"id": "fatalii_fire",
+			"name": "Fatalii Fire",
+			"plural": "Fatalii Fire",
+			"short": "Fatalii Fire",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 12000000000.0
+		},
+		{
+			"id": "sweet_heat",
+			"name": "Sweet Heat Reserve",
+			"plural": "Sweet Heat Reserve",
+			"short": "Sweet Heat",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 26000000000.0
+		},
+		{
+			"id": "jalapeno_ranch",
+			"name": "Jalapeño Ranch",
+			"plural": "Jalapeño Ranch",
+			"short": "Jalapeño Ranch",
+			"kind": "bottle",
+			"tier": 2,
+			"value": 140000000000.0
+		},
+		{
+			"id": "tropical_storm",
+			"name": "Tropical Storm",
+			"plural": "Tropical Storm",
+			"short": "Tropical Storm",
+			"kind": "bottle",
+			"tier": 3,
+			"value": 180000000000.0
+		},
+		{
+			"id": "volcano_sauce",
+			"name": "Volcano Sauce",
+			"plural": "Volcano Sauce",
+			"short": "Volcano Sauce",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 1000000000000.0
+		},
+		{
+			"id": "cocoa_loco",
+			"name": "Cocoa Loco",
+			"plural": "Cocoa Loco",
+			"short": "Cocoa",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 2000000000000.0
+		},
+		{
+			"id": "black_hole",
+			"name": "Black Hole Sauce",
+			"plural": "Black Hole Sauce",
+			"short": "Black Hole Sauce",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 15000000000000.0
+		},
+		{
+			"id": "seven_pot_stew",
+			"name": "Seven Pot Stew",
+			"plural": "Seven Pot Stew",
+			"short": "Seven Pot Stew",
+			"kind": "bottle",
+			"tier": 5,
+			"value": 50000000000000.0
+		},
+		{
+			"id": "naga_sunrise",
+			"name": "Naga Sunrise",
+			"plural": "Naga Sunrise",
+			"short": "Naga Sunrise",
+			"kind": "bottle",
+			"tier": 5,
+			"value": 240000000000000.0
+		},
+		{
+			"id": "ghost_town",
+			"name": "Ghost Town",
+			"plural": "Ghost Town",
+			"short": "Ghost Town",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 1800000000000000.0
+		},
+		{
+			"id": "scorpion_sting",
+			"name": "Scorpion Sting",
+			"plural": "Scorpion Sting",
+			"short": "Scorpion",
+			"kind": "bottle",
+			"tier": 5,
+			"value": 4e+16
+		},
+		{
+			"id": "hurricane_reserve",
+			"name": "Hurricane Reserve",
+			"plural": "Hurricane Reserve",
+			"short": "Hurricane Reserve",
+			"kind": "bottle",
+			"tier": 4,
+			"value": 1e+18
+		},
+		{
+			"id": "widowmaker",
+			"name": "Widowmaker Reserve",
+			"plural": "Widowmaker Reserve",
+			"short": "Widowmaker",
+			"kind": "bottle",
+			"tier": 5,
+			"value": 2.95e+19
+		},
+		{
+			"id": "lava_flow",
+			"name": "Lava Flow",
+			"plural": "Lava Flow",
+			"short": "Lava Flow",
+			"kind": "bottle",
+			"tier": 6,
+			"value": 6.5e+20
+		},
+		{
+			"id": "solar_wind",
+			"name": "Solar Wind",
+			"plural": "Solar Wind",
+			"short": "Solar Wind",
+			"kind": "bottle",
+			"tier": 6,
+			"value": 1.4e+22
+		},
+		{
+			"id": "crystal_clear",
+			"name": "Crystal Clear",
+			"plural": "Crystal Clear",
+			"short": "Crystal Clear",
+			"kind": "bottle",
+			"tier": 6,
+			"value": 3.2e+23
+		},
+		{
+			"id": "hyperdrive",
+			"name": "Hyperdrive",
+			"plural": "Hyperdrive",
+			"short": "Hyperdrive",
+			"kind": "bottle",
+			"tier": 6,
+			"value": 6.8e+24
+		},
+		{
+			"id": "cosmic_drizzle",
+			"name": "Cosmic Drizzle",
+			"plural": "Cosmic Drizzle",
+			"short": "Cosmic Drizzle",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 1.45e+26
+		},
+		{
+			"id": "dark_star",
+			"name": "Dark Star",
+			"plural": "Dark Star",
+			"short": "Dark Star",
+			"kind": "bottle",
+			"tier": 6,
+			"value": 3.2e+27
+		},
+		{
+			"id": "stratosphere",
+			"name": "Stratosphere",
+			"plural": "Stratosphere",
+			"short": "Stratosphere",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 6.8e+28
+		},
+		{
+			"id": "brimstone_reserve",
+			"name": "Brimstone Reserve",
+			"plural": "Brimstone Reserve",
+			"short": "Brimstone Reserve",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 2.8e+30
+		},
+		{
+			"id": "supernova_glaze",
+			"name": "Supernova Glaze",
+			"plural": "Supernova Glaze",
+			"short": "Supernova Glaze",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 2.8e+30
+		},
+		{
+			"id": "wormhole",
+			"name": "Wormhole",
+			"plural": "Wormhole",
+			"short": "Wormhole",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 4.5200000000000004e+32
+		},
+		{
+			"id": "mind_melt",
+			"name": "Mind Melt",
+			"plural": "Mind Melt",
+			"short": "Mind Melt",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 4.5200000000000004e+32
+		},
+		{
+			"id": "big_bang",
+			"name": "Big Bang",
+			"plural": "Big Bang",
+			"short": "Big Bang",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 5e+35
+		},
+		{
+			"id": "extinction_event",
+			"name": "Extinction Event",
+			"plural": "Extinction Event",
+			"short": "Extinction",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 5e+35
+		},
+		{
+			"id": "singularity",
+			"name": "Singularity",
+			"plural": "Singularity",
+			"short": "Singularity",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 5e+35
+		},
+		{
+			"id": "last_drop",
+			"name": "The Last Drop",
+			"plural": "The Last Drop",
+			"short": "The Last Drop",
+			"kind": "bottle",
+			"tier": 7,
+			"value": 5e+35
+		}
 	]
 }

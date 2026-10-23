@@ -514,6 +514,15 @@ ROOMS = [
     ("Marketing", "Ad Agency", "Market Ticker spikes (new)"),
 ]
 rinfo = {r["name"]: r for r in snap["rooms"]}
+
+
+def level_cost(t):
+    """A room level's credits. Aeronautical's and Packaging's level 31 read "10.938" on the wiki,
+    a typo for 10,938 (Engineering's same row), so a dot before three digits is a thousands mark."""
+    t = t.strip()
+    if re.fullmatch(r"\d{1,3}(\.\d{3})+", t):
+        t = t.replace(".", "")
+    return int(t.replace(",", ""))
 open_costs = [int(r["min_cost"].replace(",", "")) for r in snap["rooms"] if r["min_cost"].replace(",", "").isdigit()]
 L = ["| Offered | Our room | IPM room | Effect | Level 1 | Per level | Max level | Opening cost (credits, as the n-th room bought) |", "| --- | --- | --- | --- | --- | --- | --- | --- |"]
 mapping["rooms"] = []
@@ -523,7 +532,7 @@ for i, (ipm, ours_r, eff) in enumerate(ROOMS):
         L.append(f"| {i+1} | {ours_r} | {ipm} | {eff} | {r['base']} | {r['per_level']} | {r['max_level']} | {open_costs[i]} |")
         lv = snap["room_levels"][ipm]
         mapping["rooms"].append({"name": ours_r, "ipm": ipm, "base": r["base"], "per_level": r["per_level"], "max": int(r["max_level"]),
-                                 "level_costs": [int(x["cost"].replace(",", "")) for x in lv if x["cost"].replace(",", "").isdigit()], "open_cost": open_costs[i]})
+                                 "level_costs": [level_cost(x["cost"]) for x in lv if x["level"] > 1], "open_cost": open_costs[i]})
     else:
         L.append(f"| {i+1} | {ours_r} | (none) | {eff} | as now (rooms.json) | as now | as now | {open_costs[i]} |")
         mapping["rooms"].append({"name": ours_r, "ipm": None, "open_cost": open_costs[i], "level_costs": "Engineering's (assumed)"})

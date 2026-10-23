@@ -1,5 +1,5 @@
 {
-	"_source": "v0.7 PR 3's tweaks to the copy (docs/SKELETON.md Z2): tools/ipm/build_data.py applies them to what the mapping gives, and tests/skeleton_tests.gd checks data/ is the mapping with exactly these applied. Each row says what it answers. Everything not named here is Idle Planet Miner's number. T5 (Standard Operating Procedures' bar) is a rule, in src/core/tuning.gd, not data; SKELETON.md lists it with these.",
+	"_source": "v0.7 PR 3's tweaks to the copy's data (docs/SKELETON.md Z2, D054): tools/ipm/build_data.py applies them to what the mapping gives, and tests/skeleton_tests.gd checks data/ is the mapping with exactly these applied. Each row says what it answers. Everything not named here is Idle Planet Miner's number. The rule changes (T5, Standard Operating Procedures' bar, and T9, the credit scale, in src/core/tuning.gd; T4's kitchen-only slots in game.gd) are listed with these in SKELETON.md.",
 	"tweaks": [
 		{
 			"id": "T1",
@@ -7,23 +7,23 @@
 			"anchor": 1250.0,
 			"gamma": 0.3,
 			"until_survey": 10,
-			"what": "Farms from Land Survey 1 on: prices climb from farm 4's $1,250 as (price ÷ $1,250)^0.3, to Land Survey 10's farms; after that they keep IPM's own steps from there. Upgrades follow, at price ÷ 20 (I2).",
-			"answers": "I6, I7, Z3 (W37, W38): IPM's planet prices outrun a run without its managers, colonies and Beacon"
+			"what": "Farms and ingredient stations from Land Survey 1 on: prices climb from farm 4's $1,250 as (price ÷ $1,250)^0.3, to Land Survey 10's farms; after that they keep IPM's own steps from there. Upgrades follow, at price ÷ 20 (I2).",
+			"answers": "I6, I7, Z3: IPM's planet prices outrun a run without its managers, colonies and Beacon"
 		},
 		{
 			"id": "T2",
 			"op": "survey_cost_scale",
 			"factor": 0.5,
-			"until_survey": 1,
-			"what": "Every Land Survey costs its IPM telescope × 0.5 (at least 1 of each item).",
-			"answers": "I6, I7 (W37, W38): Land Survey 3 alone asked for 50,000 Pimento"
+			"what": "Every Land Survey costs its IPM telescope × 0.5 (× factor^min(n, exponent_cap), so 0.5 for all; at least 1 of each item).",
+			"answers": "I6, I7: Land Survey 3 alone asked for 50,000 Pimento",
+			"exponent_cap": 1
 		},
 		{
 			"id": "T3",
 			"op": "farm_rate_per_survey",
 			"factor": 1.15,
-			"what": "A farm from Land Survey n harvests and carries × 1.15^n: newer land, better trucks, in place of IPM's managers and colonies (left out, W36).",
-			"answers": "I6, Z3 (W37): the middle of the run grew too slowly to reach $10M by 2:30"
+			"what": "A farm or ingredient station from Land Survey n harvests and carries × 1.15^n: newer land, better trucks, in place of IPM's managers and colonies (left out, W36).",
+			"answers": "I6, Z3: the middle of the run grew too slowly to reach $10M by 2:30"
 		},
 		{
 			"id": "T4",
@@ -32,7 +32,7 @@
 			"vat": 150.0,
 			"line": 100.0,
 			"what": "The kitchen's vat and line run only the kitchen's recipes, and IPM's free first smelter and crafter come after them as Vat 2 and Line 2, at the kitchen's $150 and $100 (a price can't be 0). Every later slot is IPM's, one place on.",
-			"answers": "I8, I7, Y2 (W39, W38, W41): the player handed the kitchen's line to the survey's sauces, so no Table Mild came for the button's nodes"
+			"answers": "I8, I7, Y2: the player handed the kitchen's line to the survey's sauces, so no Table Mild came for the button's nodes"
 		},
 		{
 			"id": "T6",
@@ -44,7 +44,7 @@
 				}
 			],
 			"what": "Calloused Thumbs: a press picks 8 more Bell Peppers (was 2).",
-			"answers": "I8 (W39): the copy's factory is far bigger at 15:00 than v0.6's, so the button added 8% against F8's 25%"
+			"answers": "I8: the copy's factory is far bigger at 15:00 than v0.6's, so the button added 8% against F8's 25%"
 		},
 		{
 			"id": "T7",
@@ -56,7 +56,18 @@
 			],
 			"factor": 0.5,
 			"what": "Double-Tap, Ergonomic Grip and Heat Meter cost half their Table Mild (rounded up).",
-			"answers": "I8 (W39): the kitchen's Table Mild didn't reach Heat Meter before 1:30 (M5's check)"
+			"answers": "I8: the kitchen's Table Mild didn't reach Heat Meter before 1:30 (M5's check)",
+			"was": {
+				"double_tap": {
+					"table_mild": 128
+				},
+				"ergonomic_grip": {
+					"table_mild": 212
+				},
+				"heat_meter": {
+					"table_mild": 255
+				}
+			}
 		},
 		{
 			"id": "T8",
@@ -66,7 +77,7 @@
 				"table_mild": 128
 			},
 			"what": "Night Shift Protocols I costs 128 Table Mild, the kitchen's bottle (was 6 Sweet Pepper Relish).",
-			"answers": "P2 (W43): offline only beat two hours of tapping with Night Shift, and the player never made the Relish for it before 1:40"
+			"answers": "P2: offline only beat two hours of tapping with Night Shift, and the player never made the Relish for it before 1:40"
 		}
 	]
 }

@@ -693,11 +693,14 @@ func default_keep(item: String) -> int:
 	return fx.default_keep[item]
 
 
-## Sauces that can be made now, for the Market Ticker.
+## Sauces that can be made now, for the Market Ticker: every unlocked line
+## recipe, whichever slot runs it (since T4 the kitchen's line runs only its own).
 func unlocked_bottles() -> Array:
 	var out := []
-	for r in recipes_for("line"):
-		out.append(data.recipes[r].output)
+	for id in data.recipes:
+		var r: Dictionary = data.recipes[id]
+		if r.station == "line" and recipe_unlocked(id):
+			out.append(r.output)
 	return out
 
 

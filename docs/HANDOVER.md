@@ -14,8 +14,8 @@ This branch is **v0.7 PR 3: the copy tuned (W35, D054).** The owner chose to kee
 
 **Results** ([SKELETON.md](SKELETON.md#results-pr-3)):
 
-- **Pass:** I6 (the sale at 2:07), Z3's checkpoints ($150K at 0:27, $1M at 1:04, $4M at 1:41), I8 (tapping 40%, 59%, 50%), I9 (run 2 at 69%), F6, E3, P2, Y2, Z2, Z4 and every other suite.
-- **Fail:** I7 (gaps up to 15:15 against 6:30, W38), E6 (W30), and I10 (run 3 at Land Survey 19 of 25 after 24 hours, W44).
+- **Pass:** I6 (the sale at 2:07), Z3's checkpoints ($150K at 0:27, $1M at 1:04, $4M at 1:41), I8 (tapping 40%, 59%, 50%), I9 (run 2 at 70%), F6, E3, P2, Y2, Z2, Z4 and every other suite.
+- **Fail (so Z1 fails):** I7 (gaps up to 15:15 against 6:30, W38), E6 (W30), and I10 (run 3 at Land Survey 19 of 25 after 24 hours, W44).
 
 The pacing player changed too (SKELETON.md lists how). Each change fixed a stall or a choice no tapping player would make; none moved a bar.
 

@@ -116,7 +116,7 @@ static func tweaked_survey(cost: Dictionary, n: int) -> Dictionary:
 	var t := tweak("survey_cost_scale")
 	if t.is_empty():
 		return cost
-	var f: float = pow(t.factor, mini(n, int(t.until_survey)))
+	var f: float = pow(t.factor, mini(n, int(t.exponent_cap)))
 	var out := {}
 	for item in cost:
 		out[item] = maxi(1, floori(cost[item] * f + 0.5))
@@ -188,6 +188,17 @@ func test_copied() -> void:
 			bad.append("farm %d" % f.n)
 		elif not near(data.harvest_mult, tweaked_rate(id, f.survey)) or not near(data.cargo_mult, tweaked_rate(id, f.survey)):
 			bad.append("farm %d rates" % f.n)
+	# Ingredient stations: their value, and their survey's cheapest farm's price
+	# and rates, tweaked like a farm's (T1, T3).
+	for ing in m.ingredients:
+		var data: Dictionary = g.data.plots.get(ing.id, {})
+		var cheapest := INF
+		for f in m.farms:
+			if f.survey == ing.survey:
+				cheapest = minf(cheapest, f.price)
+		if data.is_empty() or data.survey != ing.survey or not close_price(data.price, tweaked_price(m, cheapest, ing.survey)) \
+				or not near(data.harvest_mult, tweaked_rate(ing.id, ing.survey)) or not near(data.cargo_mult, tweaked_rate(ing.id, ing.survey)):
+			bad.append("station " + ing.id)
 	for s in m.surveys:
 		var node: Dictionary = g.data.tech.get("survey_%d" % s.n, {})
 		if node.is_empty() or node.cost != tweaked_survey(counts(s.cost, ids), s.n):
@@ -236,9 +247,11 @@ func test_copied() -> void:
 					bad.append("tweak %s" % t.id)
 			"node_cost_scale":
 				for id in t.nodes:
-					for item in g.data.tech[id].cost:
-						if g.data.tech[id].cost[item] <= 0:
-							bad.append("tweak %s" % t.id)
+					var want := {}
+					for item in t.was[id]:
+						want[item] = ceili(t.was[id][item] * t.factor)
+					if g.data.tech[id].cost != want:
+						bad.append("tweak %s %s" % [t.id, id])
 	check(bad.is_empty(), "Z2: these differ from the mapping with its tweaks: %s" % str(bad))
 	check(m.farms.size() == 79 and m.peppers.size() == 28 and m.rooms.size() == 15, "I1: 79 farms, 28 peppers and 15 rooms mapped (%d, %d, %d)" % [m.farms.size(), m.peppers.size(), m.rooms.size()])
 

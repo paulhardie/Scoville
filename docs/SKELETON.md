@@ -460,12 +460,12 @@ The owner chose to pull the first sale back to I6's 2:00–2:30 (2026-10-23) rat
 
 | Id | Criterion |
 | --- | --- |
-| Z1 | **Every I criterion passes as written**, I2–I14, with I1 replaced by Z2. That includes I6 (the sale at 2:00–2:30), I7, I8, I9, I10 and I4's F6, E3 and E6. |
+| Z1 | **Every I criterion passes as written**, I2–I14, with I1 replaced by Z2. That includes I6 (the sale at 2:00–2:30), I7, I8, I9, I10, I4's F6 and E3, and E6 (kept as it stands). |
 | Z2 | **Tweaks are listed, not hidden.** `data/` equals `tools/ipm/mapping.json` with `tools/ipm/tweaks.json` applied, nothing else. Each tweak row names the FAIL it answers. Every number not in the table still equals the snapshot through the mapping (`skeleton_tests.gd`, replacing I1). |
 | Z3 | **Checkpoints on the way.** The pacing player reaches $150K Operation Value at 0:25–0:50, $1M at 1:00–1:30 and $4M at 1:35–2:00: roughly even ratios between the kitchen and I6's band. |
 | Z4 | **Still Idle Planet Miner's shape.** The order of surveys, farms, recipes and rooms is unchanged; tweaks change amounts, prices, rates and our own rules, not the graph. |
 
-Z1 keeps E6 at 10 (W30 is still the owner's to settle). If a bar can't be met without breaking another, that's reported, not quietly traded.
+Z1 keeps E6 at 10 (W30 is still the owner's to settle). Z1 first said "I4's F6, E3 and E6"; I4 lists E1–E5, and E6 is kept on its own, so the wording was corrected after the review, the bar unchanged. If a bar can't be met without breaking another, that's reported, not quietly traded.
 
 ### Results (PR 3)
 
@@ -473,12 +473,13 @@ Measured with every tweak below in place, played by the pacing player (its PR 3 
 
 | Id | Result |
 | --- | --- |
+| Z1 | **FAIL** on I7, I10 and E6 below; every other I criterion passes (Z2 for I1). |
 | I6 | **PASS.** $10M at 2:07 (2:00–2:30). |
 | Z3 | **PASS.** $150K at 0:27 (0:25–0:50), $1M at 1:04 (1:00–1:30), $4M at 1:41 (1:35–2:00). |
 | I7 | **FAIL.** 15:15 without a farm, vat, line, recipe or research (0:49 to Night Shift I at 1:05), against 6:30; seven stretches over 6:30, all 7–15 minutes. Purchases come in bursts at each Land Survey, about 20 minutes apart. Nothing tried filled the gaps without breaking another bar (a faster kitchen broke E3, chasing side nodes stalled the run, cheaper slots changed nothing). W38. |
 | I8 | **PASS.** Tapping adds 40% at 15:00, 59% at 30:00 and 50% at 1:30 (Heat Meter at 0:46). |
-| I9 | **PASS.** Run 2's sale at 1:28, 69% of run 1's 2:07; the first sale pays 50 credits. |
-| I10 | **FAIL.** `tools/deep_run.gd`: run 1 sells at 2:10 for 52 credits; run 2 at 4:20 for 553 ($27B, Land Survey 11, 41 farms); run 3, which must pay 5,530 credits (about $10^20), is at Survey 19 with 47 farms and $87T after 24 hours, where the tool stops. Farm 79 and every sauce: never (9 of 48 made; the player only makes what a survey asks for). W44. |
+| I9 | **PASS.** Run 2's sale at 1:29, 70% of run 1's 2:07; the first sale pays 50 credits. |
+| I10 | **FAIL.** `tools/deep_run.gd`: run 1 sells at 2:10 for 52 credits; run 2 at 4:20 for 550 ($27B, Land Survey 11, 41 farms); run 3, which must pay 5,500 credits (about $10^20), is at Survey 19 with 47 farms and $87T after 24 hours, where the tool stops. Farm 79 and every sauce: never (9 of 48 made; the player only makes what a survey asks for). W44. |
 | I4 | **FAIL on E6 only** (2 Sweet Pepper Mash waiting, against 10; W30, the owner's call). F1–F6 and E1–E5 pass (E3 72 s, F6 84 s). |
 | I14 | **PASS.** P1, P2 ($17.7M away against $13.4M tapping), U8, Y2 (SOP researched 21 nodes in run 2), A7 and every other suite pass. |
 | Z2 | **PASS.** `data/` is the mapping with `tweaks.json` applied, nothing else (`skeleton_tests.gd`). |
@@ -492,9 +493,9 @@ Each is in `tools/ipm/tweaks.json` (data, checked by Z2) or `src/core/tuning.gd`
 
 | Id | Tweak | Answers |
 | --- | --- | --- |
-| T1 | Farms from Land Survey 1 on: prices climb from farm 4's $1,250 as (price ÷ $1,250)^0.3 up to Land Survey 10's farms, then keep IPM's own steps from there; their upgrades follow at price ÷ 20, so I2's formula holds. | I6, Z3: IPM's planet prices outran a run without its managers, colonies and Beacon. |
+| T1 | Farms and ingredient stations from Land Survey 1 on: prices climb from farm 4's $1,250 as (price ÷ $1,250)^0.3 up to Land Survey 10's farms, then keep IPM's own steps from there; their upgrades follow at price ÷ 20, so I2's formula holds. | I6, Z3: IPM's planet prices outran a run without its managers, colonies and Beacon. |
 | T2 | Every Land Survey costs its telescope × 0.5. | I6, I7: Survey 3 alone asked 50,000 Pimento. |
-| T3 | A farm from Land Survey n harvests and carries × 1.15^n (IPM's curves, scaled), in place of the managers and colonies left out. Farms 1–4 and the Bell Plot are as IPM's, which is what I2 checks. | I6, Z3: the middle of the run grew too slowly. |
+| T3 | A farm or ingredient station from Land Survey n harvests and carries × 1.15^n (IPM's curves, scaled), in place of the managers and colonies left out. Farms 1–4 and the Bell Plot are untouched; I2 checks farm 2 and the Bell Plot. | I6, Z3: the middle of the run grew too slowly. |
 | T4 | The kitchen's vat and line run only the kitchen's recipes; IPM's free first smelter and crafter follow as Vat 2 and Line 2 at the kitchen's $150 and $100. Eleven of each. | I8, Y2: the player gave the kitchen's line to the survey's sauces, so no Table Mild came for the Tech Tree. |
 | T5 | Standard Operating Procedures researches any node costing under 5% of the run's Operation Value (was 1% of an hour's bottles). A rule, in `tuning.gd`. | Y2, I9: on the copy that bar was under every node's cost. |
 | T6 | Calloused Thumbs: +8 Bell Peppers a press (was +2). | I8: at 15:00 the copy's factory dwarfs v0.6's. |

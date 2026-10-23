@@ -375,7 +375,7 @@ for t in TWEAKS:
     elif t["op"] == "survey_cost_scale":
         for n in out:
             if n["id"].startswith("survey_"):
-                k = min(int(n["id"][7:]), t["until_survey"])
+                k = min(int(n["id"][7:]), t["exponent_cap"])
                 # Halves round up, as the game's roundi does (skeleton_tests.gd checks it).
                 n["cost"] = {i: max(1, math.floor(c * t["factor"] ** k + 0.5)) for i, c in n["cost"].items()}
     elif t["op"] == "farm_rate_per_survey":
@@ -391,6 +391,8 @@ for t in TWEAKS:
     elif t["op"] == "node_cost_scale":
         for n in out:
             if n["id"] in t["nodes"]:
+                if n["cost"] != t["was"][n["id"]]:
+                    raise SystemExit("tweaks.json %s: %s costs %s, not the %s it says it was" % (t["id"], n["id"], n["cost"], t["was"][n["id"]]))
                 n["cost"] = {i: math.ceil(c * t["factor"]) for i, c in n["cost"].items()}
     elif t["op"] == "slot_insert":
         for station in ("vat", "line"):

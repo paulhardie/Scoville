@@ -164,6 +164,13 @@ func test_smart_stockpiling() -> void:
 func test_market_ticker() -> void:
 	var g := with(["market_ticker"], 7)
 	var sauces := g.unlocked_bottles()
+	# Every unlocked line recipe's bottle, from the data, not only the kitchen's
+	# (T4 made the kitchen's line run only Table Mild; the ticker mustn't follow).
+	var want := []
+	for id in g.data.recipes:
+		if g.data.recipes[id].station == "line" and g.recipe_unlocked(id):
+			want.append(g.data.recipes[id].output)
+	check(sauces == want and sauces.size() > 1, "R15: the ticker picks from every unlocked sauce: %s" % str(sauces))
 	var starts: Array = []
 	var last := ""
 	for i in seconds(4 * 3600.0):

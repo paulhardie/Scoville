@@ -61,6 +61,7 @@ func test_credits() -> void:
 	for c in [[1e7, 10.0], [1.25e7, 10.0 + 20.0 / 36.0], [1.75e7, 10.0 + 20.0 / 12.0], [1e8, 30.0], [5.5e8, 45.0], [1e9, 60.0], [1e10, 101.0]]:
 		var got: int = worth(c[0]).prestige_credits()
 		check(got == roundi(c[1] * k), "Q2: %d credits at $%.0f, IPM's %.2f × %.0f (got %d)" % [roundi(c[1] * k), c[0], c[1], k, got])
+	check(worth(1e7).prestige_credits() == 50, "Q2/T9: the first sale pays 50 credits (got %d)" % worth(1e7).prestige_credits())
 	var lounge := worth(1e8, {"boardroom": 1})
 	check(lounge.prestige_credits() == roundi(30.0 * k * 1.15), "Q2: the Boardroom (IPM's Lounge) ×1.15, rounded (got %d)" % lounge.prestige_credits())
 	var g := worth(1e8)

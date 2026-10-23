@@ -226,6 +226,7 @@ func run() -> void:
 	# Narrowed to the casual player after measuring: the eager one buys the line
 	# 36 s after the vat, so little mash waits (FACTORY.md says so).
 	criterion("E6", casual.crate_mash >= 10, "Sweet Pepper Mash waiting for the Starter Crate: %d casual (at least 10); %d eager (not judged)" % [casual.crate_mash, eager.crate_mash])
+	criterion("A7", casual.second_plot <= 210.0, "the casual player's first plot after Bell at %s (by 3:30); eager %s (not judged)" % [clock(casual.second_plot), clock(eager.second_plot)])
 	criterion("J3", casual.late_gap <= 120.0, "longest stretch with nothing new, 15:00–30:00: %.0f s casual (at most 120); %.0f s eager (not judged)" % [casual.late_gap, eager.late_gap])
 
 	# v0.5's criteria (OFFLINE.md).
@@ -311,7 +312,7 @@ func run() -> void:
 ## mash waiting when the line was bought.
 func early(p: Player) -> Dictionary:
 	var g := Game.new()
-	var out := {"deck": INF, "line": INF, "tech": INF, "gap": 0.0, "late_gap": 0.0, "plot_share": 0.0, "crate_mash": 0}
+	var out := {"deck": INF, "line": INF, "tech": INF, "gap": 0.0, "late_gap": 0.0, "second_plot": INF, "plot_share": 0.0, "crate_mash": 0}
 	var reveals := []
 	for i in minute(30):
 		p.step(g)
@@ -331,6 +332,10 @@ func early(p: Player) -> Dictionary:
 					out.tech = now
 		if g.stats.ticks == minute(5):
 			out.plot_share = g.stats.harvested.bell / float(maxi(1, g.stats.harvested.bell + g.stats.bell_picked))
+	# A7: the first plot after Bell.
+	for e in p.events:
+		if String(e[1]).begins_with("buy plot ") and e[1] != "buy plot bell":
+			out.second_plot = minf(out.second_plot, e[0])
 	var times: Array = reveals.duplicate()
 	for e in p.events:
 		if not String(e[1]).begins_with("sell"):

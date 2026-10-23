@@ -309,3 +309,10 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 **Why:** W8 asked for a direction; the owner gave one. A skin over the existing screen is the cheapest way to see pixel art on our real content (dense cards, long names, big numbers) before anyone draws art for it. The trade-off: the kit is a generic fantasy-RPG skin, so it shows whether the style works, not what the finished game looks like.
 
 **Note on "colours only in style.gd":** the kit's theme carries its own colours (wood tones, button ink). Every colour of ours is still in `style.gd`, including the few kit colours we override for contrast; the kit's file is a third-party asset, left unchanged.
+
+## D048: Idle Planet Miner's opening ladder: Poblano $520, Jalapeño $1,700
+
+**Decision (the owner asked how Idle Planet Miner does it):** the Poblano Plot costs $520 (was $800) and the Jalapeño Plot $1,700 (was $1,900), with the same rates. After Bell, each starting plot costs 2–4× the one before (A8), as Idle Planet Miner's first planets go $200, $500, $1,250, $5,000. No fourth starting plot. ([ECONOMY.md](ECONOMY.md#v06f-idle-planet-miners-opening-ladder-w28w30-d048))
+
+**Why:** the second plot felt slow (W28) because it was one ×16 step from the Bell Plot, and A4 failed by a second (W29) because nothing new came between the Jalapeño Plot and the Ancho vat. A cheaper Poblano brings the casual player's second plot to 3:18 (A7), and a Jalapeño ×3.3 above it lands mid-gap, so A4 passes at 6:19. A Serrano Plot from the start was tried as Idle Planet Miner's fourth planet and dropped: the pacing player never afforded it early, and any price it could afford paid back in under 4 minutes. **$520 rather than $500 was picked after a result:** $500 failed X3 by 0.05 points from an unusual 2:30 state. E6 (W30) can't be met by prices: Line 1's price trades it against E3.
+

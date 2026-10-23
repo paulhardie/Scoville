@@ -2,32 +2,26 @@
 
 ## Where it's at
 
-Merged: v0.1–v0.6d, layout step 1, the second run, D036–D045 (PRs #1–#20): Cargo in place of Crop Quality (D043), the dashboard from the first launch with the next action ringed (D044), bottling feel (D045). Open beside this one: #22 (the return card shows sauce waiting to sell, D046; J3; the W31 first-sale proposal).
+Merged: v0.1–v0.6d, layout step 1, the second run, D036–D047 (PRs #1–#22): Cargo (D043), the dashboard from the first launch (D044), bottling feel (D045), the return card's waiting sauce (D046) and the pixel-art skin (D047).
 
-**`main` fails two pacing criteria since #20, each by one unit:** A4 (6:31 against 6:30, W29) and E6 (9 mash against 10, W30). CI stays red on `main` and every branch from it until they're settled.
+This branch is **the early-game pass on Idle Planet Miner's opening ladder (D048, W28–W30)**, as the owner asked:
+- **Poblano Plot $520 (was $800), Jalapeño Plot $1,700 (was $1,900)**, rates unchanged. Idle Planet Miner's first planets go $200, $500, $1,250, $5,000, ×2–4 a step; ours went ×16 from Bell to Poblano, then left a gap after the Jalapeño Plot.
+- **A7 PASS:** the casual player's second plot at 3:18 (was 3:54). **A8 PASS:** ×3.3, paybacks 5:12 and 8:30. **A4 PASS:** 6:19 (was 6:31, W29 closed).
+- **A fourth starting plot was tried and dropped:** a Serrano Plot at $5,000 never got bought early, and cheaper ones paid back in under 4 minutes.
+- **Also restored:** D046 and W31, lost resolving the #22 merge, and the #21 review's doc fixes, pushed after #21 merged.
 
-This branch is **the pixel-art trial** (W8, D047, [LOOK.md](LOOK.md)), now merged with `main`: the owner chose pixel art as the game's look, and the trial puts a ready-made pixel UI skin over the real screen to see whether it carries the game.
-
-- **The kit:** Pixel UI Free by heyheythere (CC BY 4.0), wood theme, copied unchanged into `addons/pixel_ui/`. `src/ui/pixel_kit.gd` builds a 2× copy of its theme so pixels stay square on the 540×960 screen. Nearest filtering everywhere.
-- **Font:** the kit's bitmap font at 16 and 24 px, with the five missing characters drawn to match (`tools/make_pixel_glyphs.gd`).
-- **The Blank Button** is a pixel disc, 140 px on the dashboard.
-- **On the dashboard (after the merge):** the factory view in the wood palette with its floor names at the right, 64 px tab selectors, a square 4 px ring round the next action. PX4 was narrowed to let that outline through ([LOOK.md](LOOK.md#after-merging-20-d043d045-on-main)).
-
-**Results:** PX1–PX7 PASS; every suite passes except A4 and E6, as on `main`; the headless boot is clean and the captures were looked at. PX8 (does it look like a 2026 mobile game?) is the owner's: [before and after](look/trial_before_after.png), taken before the dashboard.
+**Results:** every suite passes except **E6** (9 against 10, W30); the headless boot is clean. $520 was picked over $500 after $500 failed X3 by 0.05 points: said in D048. No UI code changed.
 
 ## Open decisions
 
-- **PX8 and the kit (W8):** keep this free wood kit, buy the full pack (the ember theme suits hot sauce better, same files), or have UI art made in our own palette. Recommend: judge it on the phone first.
-- **Mixed scales:** headlines at 3× beside 2× borders.
-- **W32:** whole pixels on the phone: Godot's integer stretch would fix it, but changes how much screen we get. **W33:** who draws the game's own art, and at what pixel density.
-- **W28:** the second plot feels slow to unlock on a phone; revisit the starting plots with the next early-game pass.
-- **W29 and W30 (A4, E6):** settle in W28's early-game pass, or move A4's bar to 7:00.
-- **W27:** fermentation, as its own version.
-- Still open: W31 the first sale (on #22), W21 late growth, W24 a floor for repeat runs.
+- **W30, E6:** prices can't fix it. Line 1's price moves it in a step with the casual player's tapping bursts, so either E6 or E3 fails. Recommend retiring E6: the dashboard's ring now walks the player to the line (D044), and the crate still bottles what's there at 10× speed. Or lower its bar to 9. CI stays red until this is settled.
+- **W31:** the first sale at about 2:00 (D035) or about an hour. Recommend an early sale at about $400K for 5 credits if the hour stands.
+- **W8, the kit:** keep the free wood kit, buy the full pack (ember), or commission UI art; W32 integer stretch, W33 who draws the art.
+- Still open: W27 fermentation, W21 late growth, W24 a floor for repeat runs, layout step 3 (W22).
 
 ## Next
 
-1. The owner plays the Web build on the phone (`bash tools/serve_web.sh`), then keeps, swaps or replaces the kit (W8).
-2. Layout step 3 (W22) once the look is settled; W28's early-game pass or fermentation (W27), whichever the owner picks.
+1. The owner settles E6 (W30), then merges this PR.
+2. Fermentation (W27), W31 or layout step 3, whichever the owner picks.
 
-Touches: `project.godot` (Nearest filter), `addons/pixel_ui/`, `assets/fonts/`, `src/ui/pixel_kit.gd`, `style.gd`, `main.gd` (kit boxes, wraps, nav names, the factory view's pixel dress), `tests/look_tests.gd`, `ui_tests.gd` (O4, L10, L11), `tools/make_pixel_glyphs.gd`, docs. Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27–W30, W32–W33, G1, G12–G20.
+Touches: `data/plots.json` (Poblano, Jalapeño prices), `tests/pacing_tests.gd` (A7), `tests/factory_tests.gd` (A8), docs (ECONOMY v0.6f, D046 restored, D048, backlog). Stubbed or open: W3–W6, W8–W9, W16, W21–W22, W24, W27, W30–W33, G1, G12–G20.

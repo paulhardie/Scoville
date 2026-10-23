@@ -85,7 +85,7 @@ The owner changed their mind on progressive disclosure: the game opens on the fu
 - **L13:** from a fresh game the ring goes from the button to Sell Raw Peppers (once 50 peppers cover the plot), to the Bell Pepper Plot's Buy, and on through Vat 1, Line 1, Sell Batch and the starting plots to opening the Tech Tree. A purchase on another tab rings that tab's selector (core and UI suites).
 - **L14:** with the sequence done, the goal line is the goal bar again (L6 passes).
 - **L15:** every earlier criterion passes except two:
-  - **A4: 6:31 against 6:30.** This is the same miss as D043's (W29).
+  - **A4: 6:31 against 6:30.** This is the same miss as D043's (W29), settled by D048 (6:19).
   - **E6: 9 Sweet Pepper Mash waiting for the casual player's Starter Crate, against 10.** The first plot can now be bought at $50 straight away rather than after $100 earned, so the casual player reaches the line sooner, with less mash piled up (eager player: plot at 0:17, was 0:34). Raising Line 1 to $115 or $130 fixed E6 but failed E3 (a casual player's 120 s with nothing new) and, at $115, U7; reverted.
   - F1, F2 and E1 now read 0:00.1, since nothing is revealed.
 

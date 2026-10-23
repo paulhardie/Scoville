@@ -105,10 +105,6 @@ func decide(g) -> void:
 		var cost: Dictionary = g.tech_cost(kitchen)
 		for item in cost:
 			keep[item] = maxi(keep.get(item, 0), cost[item])
-	# With the Delivery Van, Auto-Sell holds back the bottles it is saving.
-	if g.has_van():
-		for bottle in g.autosell:
-			g.set_autosell(bottle, 0 if keep.has(bottle) else 100)
 	_sell(g, now, plan, keep)
 	if not buys:
 		return
@@ -317,6 +313,10 @@ func _sell(g, now: float, plan: Dictionary, need: Dictionary) -> void:
 				continue
 			for item in g.data.recipes[r].inputs:
 				keep[item] = maxi(keep.get(item, 0), KEEP_CYCLES * g.data.recipes[r].inputs[item])
+	# With the Delivery Van, Auto-Sell holds back every bottle it keeps.
+	if g.has_van():
+		for bottle in g.autosell:
+			g.set_autosell(bottle, 0 if keep.has(bottle) else 100)
 	for item in g.stock:
 		var extra: int = g.stock[item] - keep.get(item, 0)
 		if extra <= 0:

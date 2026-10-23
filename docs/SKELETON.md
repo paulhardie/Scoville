@@ -435,10 +435,10 @@ Measured on the copy as it stands, played by the pacing player (D003, its v0.7 p
 | I3 | **PASS.** Over 10 minutes a truck-bound farm delivers its carrying rate within 1%, Pimento (worth more) or the Crop Priority pick first, the rest waiting; a truck that keeps up brings everything. |
 | I4 | **FAIL** on F6 (184 s against 90), E3 (184 s eager against 75, 110 s casual against 100) and E6 (2 against 10; W30). The waits are on IPM's farms 3–4 and their levels after the kitchen is bought; E6 falls because the Bell Plot's truck brings peppers 20 at a time. O2–O7, O9–O10, E1, E2 (1:46 and 2:32), E4, E5, F1–F5, K1–K9 and L10–L13 pass. W42, W30. |
 | I5 | **PASS.** Farms 1–4 from the start, every other farm with its survey, the four ingredient stations with Surveys 1, 3, 4 and 6. |
-| I6 | **FAIL.** $10M at **7:54** (2:00–2:30; `second_run_tests.gd`). $150K at 34:07, $1M at 1:59, $2.3M at 3:15. Land Survey 3 wants 10 Pimento Spread, 50,000 Pimento, on farms growing about 5 a second: from 1:35 to 2:46 the player only levels farms. W37. |
+| I6 | **FAIL.** $10M at **7:56** (2:00–2:30; `second_run_tests.gd`). $150K at 34:07, $1M at 1:59, $2.3M at 3:15. Land Survey 3 wants 10 Pimento Spread, 50,000 Pimento, on farms growing about 5 a second: from 1:35 to 2:46 the player only levels farms. W37. |
 | I7 | **FAIL.** 1:11:06 without a farm, vat, line, recipe or research (1:35:27 to Land Survey 3 at 2:46:33), against 6:30. W38. |
 | I8 | **FAIL.** Tapping adds 13% at 15:00 (25%), 10% at 30:00 (10%, passes) and 6% at 1:30 (30%). W39. |
-| I9 | **FAIL.** Run 2's sale at 6:44, 85% of run 1's 7:54 (60–75%). The first sale pays 10 credits: Seed Vault and Fermentation Cellar. W40. |
+| I9 | **FAIL.** Run 2's sale at 6:46, 85% of run 1's 7:56 (60–75%). The first sale pays 10 credits: Seed Vault and Fermentation Cellar. W40. |
 | I10 | I10_RESULT |
 | I11 | **PASS.** Saves v1–v11 load as v12 with cash at least the run's earnings, stock and the best Operation Value kept, removed nodes' items back, rooms back as credits; an unreadable save is kept as `.bad` (`factory_tests.gd`, `skeleton_tests.gd`). |
 | I12 | **PASS.** $1.00 and $999 of each suffix K to Dc, $500Dc, never an exponent or `inf` (`layout_tests.gd`). |

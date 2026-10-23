@@ -8,8 +8,11 @@ const Game = preload("res://src/core/game.gd")
 const RealClock = preload("res://src/core/real_clock.gd")
 const T = preload("res://src/core/tuning.gd")
 const S = preload("res://src/ui/style.gd")
+const Kit = preload("res://src/ui/pixel_kit.gd")
 
 const TAB_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "market": "Market", "roster": "Shift Roster", "hq": "HQ"}
+## On the nav bar, where six names must fit across the screen in the pixel font.
+const NAV_NAMES := {"farms": "Farms", "processing": "Processing", "tech": "Tech Tree", "market": "Market", "roster": "Roster", "hq": "HQ"}
 const MONEY_SUFFIXES := ["K", "M", "B", "T", "Qa", "Qi"]
 const BUY_MODES := ["1", "10", "max"]
 const STATION_NAMES := {"vat": "Vat", "line": "Line"}
@@ -79,6 +82,7 @@ var _valve_rows := {}               # item → {row, label, minus, plus, toggle,
 var _web_scroll: ScrollContainer
 var _web_centred := false
 var _web: WebLines
+var _web_frames: WebFrames
 var _web_nodes := {}                # node id → Button
 var _selected := "kitchen_table"
 var _detail := {}
@@ -121,7 +125,16 @@ class WebLines extends Control:
 
 	func _draw() -> void:
 		for e in edges:
-			draw_line(e[0], e[1], S.WEB_LINE_DONE if e[2] else S.WEB_LINE, 3.0, true)
+			draw_line(e[0], e[1], S.WEB_LINE_DONE if e[2] else S.WEB_LINE, S.PIXEL_SCALE)
+
+
+## The selected and pinned nodes' frames, over the web's buttons.
+class WebFrames extends Control:
+	var frames: Array = []  # [rect, colour]
+
+	func _draw() -> void:
+		for f in frames:
+			draw_rect(f[0], f[1], false, S.PIXEL_SCALE * 2)
 
 
 ## The factory view (LAYOUT.md step 2, D044): Bottling over Vats over Fields,
@@ -174,10 +187,12 @@ class FactoryView extends Control:
 		for f in FLOORS.size():
 			var top := f * h
 			draw_rect(Rect2(0, top + 2, size.x, h - 4), S.FLOOR)
-			draw_string(font, Vector2(8, top + 18), NAMES[FLOORS[f]], HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_TINY - 3, S.MUTED)
+			# The floor's name at the right, clear of the tiles at the left: the
+			# pixel font is too tall to sit above them (LOOK.md).
+			draw_string(font, Vector2(8, top + 18), NAMES[FLOORS[f]], HORIZONTAL_ALIGNMENT_RIGHT, size.x - 16, S.SIZE_TINY, S.MUTED)
 			var tiles := _tiles(FLOORS[f])
 			if tiles.is_empty():
-				draw_string(font, Vector2(8, top + h - 10), EMPTY[FLOORS[f]], HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_TINY - 2, S.DIM)
+				draw_string(font, Vector2(8, top + h - 10), EMPTY[FLOORS[f]], HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_TINY, S.DIM)
 				continue
 			var side := minf(S.TILE, (size.x - 16.0) / tiles.size() - S.TILE_GAP)
 			for i in tiles.size():
@@ -185,7 +200,7 @@ class FactoryView extends Control:
 				draw_rect(r, S.PROGRESS_TRACK)
 				var fill: float = clampf(tiles[i][0], 0.0, 1.0)
 				draw_rect(Rect2(r.position.x, r.end.y - r.size.y * fill, r.size.x, r.size.y * fill), S.PROGRESS_FILL)
-				draw_rect(r, S.ORANGE if tiles[i][1] else S.LINE, false, 2.0 if tiles[i][1] else 1.0)
+				draw_rect(r, S.ORANGE if tiles[i][1] else S.MUTED, false, S.PIXEL_SCALE * (2 if tiles[i][1] else 1))
 		for b in bottles:
 			var t: float = b[1] / S.BOTTLE_SECONDS
 			var x: float = b[0] + t * size.x * 0.5
@@ -198,7 +213,7 @@ class FactoryView extends Control:
 			var t: float = d[2] / S.DOT_SECONDS
 			var from_y: float = (d[0] + 0.5) * h
 			var y: float = lerpf(from_y, from_y - h, t)
-			draw_circle(Vector2(d[1], y), S.DOT_SIZE, Color(S.COIN, 1.0 - t * 0.6))
+			draw_circle(Vector2(d[1], y), S.DOT_SIZE, Color(S.GOLD, 1.0 - t * 0.6))
 
 
 func _ready() -> void:
@@ -286,6 +301,7 @@ func _save() -> void:
 # --- Building --------------------------------------------------------------
 
 func _build() -> void:
+	theme = Kit.theme()
 	var bg := ColorRect.new()
 	bg.color = S.BG
 	bg.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -319,9 +335,7 @@ func _build() -> void:
 func _build_deck() -> void:
 	_deck = PanelContainer.new()
 	_deck.name = "Deck"
-	var deck_box := _box(S.PANEL, 0)
-	deck_box.border_color = S.LINE
-	deck_box.border_width_top = 1
+	var deck_box := _panel_box()
 	deck_box.content_margin_left = S.GUTTER
 	deck_box.content_margin_right = S.GUTTER
 	deck_box.content_margin_top = 14
@@ -487,6 +501,10 @@ func _build_settings(parent: VBoxContainer) -> void:
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		row.add_child(b)
 		_settings_buttons[key] = b
+	var credit := _label(S.KIT_CREDIT, S.SIZE_TINY, S.MUTED)
+	credit.name = "KitCredit"
+	credit.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	card.col.add_child(credit)
 
 
 ## The click and the buzz of a finger press; Grip and the Piston press
@@ -636,18 +654,23 @@ func _build_market(parent: VBoxContainer) -> void:
 	parent.add_child(_valve_card)
 	var valve_col := VBoxContainer.new()
 	_valve_card.add_child(valve_col)
-	valve_col.add_child(_label("Raw Overflow Valve: keep", S.SIZE_BODY, S.TEXT))
+	valve_col.add_child(_title("Raw Overflow Valve: keep"))
 	var hint := _label("Anything above the keep amount is sold.", S.SIZE_TINY, S.MUTED)
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	valve_col.add_child(hint)
 	for item in game.data.items:
 		if game.data.items[item].kind == "bottle":
 			continue
-		var row := HBoxContainer.new()
-		row.add_theme_constant_override("separation", 6)
+		# The label on its own line, the controls under it.
+		var row := VBoxContainer.new()
+		row.add_theme_constant_override("separation", 4)
 		valve_col.add_child(row)
 		var l := _label("", S.SIZE_SMALL, S.DIM)
-		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(l)
+		var buttons := HBoxContainer.new()
+		buttons.add_theme_constant_override("separation", 6)
+		row.add_child(buttons)
 		var minus := _small_button("−", func() -> void: game.set_keep(item, maxi(0, game.keep_amount(item) - KEEP_STEP)))
 		var plus := _small_button("+", func() -> void: game.set_keep(item, maxi(0, game.keep_amount(item)) + KEEP_STEP))
 		var toggle := _small_button("", func() -> void:
@@ -658,7 +681,8 @@ func _build_market(parent: VBoxContainer) -> void:
 		toggle.name = "ValveToggle_" + item
 		var reset := _small_button("Default", func() -> void: game.clear_keep(item))
 		for b in [minus, plus, toggle, reset]:
-			row.add_child(b)
+			b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			buttons.add_child(b)
 		_valve_rows[item] = {"row": row, "label": l, "minus": minus, "plus": plus, "toggle": toggle, "reset": reset}
 
 	# The Delivery Van's Auto-Sell sliders, one per sauce (TECH_TREE.md).
@@ -668,14 +692,15 @@ func _build_market(parent: VBoxContainer) -> void:
 	parent.add_child(_van_card)
 	var van_col := VBoxContainer.new()
 	_van_card.add_child(van_col)
-	van_col.add_child(_label("Delivery Van: Auto-Sell", S.SIZE_BODY, S.TEXT))
+	van_col.add_child(_title("Delivery Van: Auto-Sell"))
 	for item in game.data.items:
 		if game.data.items[item].kind != "bottle":
 			continue
-		var row := HBoxContainer.new()
+		var row := VBoxContainer.new()
+		row.add_theme_constant_override("separation", 2)
 		van_col.add_child(row)
 		var l := _label("", S.SIZE_SMALL, S.DIM)
-		l.custom_minimum_size.x = 210
+		l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		row.add_child(l)
 		var slider := HSlider.new()
 		slider.name = "Autosell_" + item
@@ -736,6 +761,10 @@ func _build_tech(holder: Control) -> void:
 	for id in game.data.tech:
 		for need in game.data.tech[id].needs:
 			_web.edges.append([_web_nodes[need].position + S.WEB_NODE / 2.0, _web_nodes[id].position + S.WEB_NODE / 2.0, false])
+	_web_frames = WebFrames.new()
+	_web_frames.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_web_frames.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+	_web.add_child(_web_frames)
 
 	# The selected node: what it does, what it costs, and Research.
 	var panel := PanelContainer.new()
@@ -769,12 +798,9 @@ func _build_tech(holder: Control) -> void:
 func _build_nav() -> void:
 	_nav = PanelContainer.new()
 	_nav.name = "Nav"
-	var bar := _box(S.PANEL, 0)
-	bar.border_color = S.LINE
-	bar.border_width_top = 1
+	var bar := _panel_box()
 	bar.content_margin_left = 6
 	bar.content_margin_right = 6
-	bar.border_width_bottom = 1
 	_nav.add_theme_stylebox_override("panel", bar)
 	# Directly under the upper viewport (D044), every tab from the start.
 	_nav.anchor_right = 1.0
@@ -792,6 +818,9 @@ func _build_nav() -> void:
 		b.flat = true
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.add_theme_font_size_override("font_size", S.SIZE_TINY)
+		# Flat, so none of the kit's padding: six names must fit across.
+		for state in ["normal", "hover", "pressed", "disabled", "focus"]:
+			b.add_theme_stylebox_override(state, StyleBoxEmpty.new())
 		b.pressed.connect(_on_tab.bind(tab))
 		row.add_child(b)
 		_tab_buttons[tab] = b
@@ -814,11 +843,8 @@ func _build_upper() -> void:
 	_blank.focus_mode = Control.FOCUS_NONE
 	var looks := {"normal": S.BUTTON, "hover": S.BUTTON_HOVER, "pressed": S.BUTTON_PRESSED}
 	for state in looks:
-		var box := _box(looks[state], 999)
-		box.border_color = S.BUTTON_EDGE
-		box.set_border_width_all(4)
-		box.shadow_color = Color(0, 0, 0, 0.45)
-		box.shadow_size = 18
+		var box := StyleBoxTexture.new()
+		box.texture = Kit.disc(S.BLANK_DISC_PX, looks[state], state == "pressed")
 		_blank.add_theme_stylebox_override(state, box)
 	_blank.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	_blank.pressed.connect(_on_blank_pressed)
@@ -833,13 +859,12 @@ func _build_upper() -> void:
 	_heat_bar.name = "HeatBar"
 	_heat_bar.max_value = T.HEAT_MAX
 	_heat_bar.show_percentage = false
-	_heat_bar.add_theme_stylebox_override("background", _box(S.CONTROL_DISABLED, 3))
-	_heat_bar.add_theme_stylebox_override("fill", _box(S.HEAT, 3))
+	_heat_bar.theme_type_variation = &"RedBar"
 	_heat_bar.anchor_top = S.UPPER_FRACTION
 	_heat_bar.anchor_bottom = S.UPPER_FRACTION
 	_heat_bar.offset_left = S.GUTTER
 	_heat_bar.offset_right = S.GUTTER + S.BLANK_BUTTON_COMPACT
-	_heat_bar.offset_top = -30.0
+	_heat_bar.offset_top = -36.0
 	_heat_bar.offset_bottom = -24.0
 	add_child(_heat_bar)
 	_heat_label = _label("", S.SIZE_TINY, S.HEAT)
@@ -902,12 +927,13 @@ func _build_upper() -> void:
 	_goal = _label("", S.SIZE_TINY, S.ORANGE)
 	_goal.name = "Goal"
 	_goal.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_goal.clip_text = true
+	# The pixel font is wide, so a long goal wraps to a second line (LOOK.md).
+	_goal.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	_goal.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_goal.offset_left = S.GUTTER
 	_goal.offset_right = -S.GUTTER
 	_goal.offset_top = S.STATUS_BAR_HEIGHT + S.GOAL_TOP
-	_goal.offset_bottom = _goal.offset_top + 24
+	_goal.offset_bottom = S.STATUS_BAR_HEIGHT + S.STRIP_TOP
 	add_child(_goal)
 
 
@@ -915,11 +941,11 @@ func _build_status_bar() -> void:
 	# The status bar, from the start (D044).
 	_status_bar = PanelContainer.new()
 	_status_bar.name = "StatusBar"
-	var bar := _box(S.PANEL, 0)
+	var bar := _panel_box()
 	bar.content_margin_left = S.GUTTER
 	bar.content_margin_right = S.GUTTER
-	bar.border_color = S.LINE
-	bar.border_width_bottom = 1
+	bar.content_margin_top = 4
+	bar.content_margin_bottom = 4
 	_status_bar.add_theme_stylebox_override("panel", bar)
 	_status_bar.set_anchors_and_offsets_preset(Control.PRESET_TOP_WIDE)
 	_status_bar.offset_bottom = S.STATUS_BAR_HEIGHT
@@ -946,7 +972,7 @@ func _build_status_bar() -> void:
 	money.add_child(_spike)
 	money.custom_minimum_size.x = 0
 	money.clip_contents = true
-	_sell = _control_button("Sell Raw Peppers (%s/ea)" % _money(game.value("bell")), func() -> void: game.sell_raw())
+	_sell = _control_button("Sell Raw Peppers\n(%s/ea)" % _money(game.value("bell")), func() -> void: game.sell_raw())
 	_sell.name = "SellRaw"
 	_sell.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	row.add_child(_sell)
@@ -966,10 +992,8 @@ func _build_card() -> void:
 	_return_card.visible = false
 	add_child(_return_card)
 	var panel := PanelContainer.new()
-	var box := _box(S.PANEL, S.RADIUS)
+	var box := _panel_box()
 	box.set_content_margin_all(22)
-	box.border_color = S.LINE
-	box.set_border_width_all(1)
 	panel.add_theme_stylebox_override("panel", box)
 	panel.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	panel.set_anchors_and_offsets_preset(Control.PRESET_CENTER)
@@ -1054,6 +1078,7 @@ func _slot_card(station: String, index: int) -> Dictionary:
 	picker.name = "Recipe_%s_%d" % [station, index]
 	picker.focus_mode = Control.FOCUS_NONE
 	picker.add_theme_font_size_override("font_size", S.SIZE_SMALL)
+	picker.custom_minimum_size.y = S.BUTTON_HEIGHT
 	picker.item_selected.connect(func(i: int) -> void:
 		game.assign(station, index, str(picker.get_item_metadata(i)))
 		_refresh(true))
@@ -1078,7 +1103,7 @@ func _card(parent: Container, name: String, title: String) -> Dictionary:
 	col.add_theme_constant_override("separation", 8)
 	panel.add_child(col)
 	var nodes := {"card": panel, "col": col}
-	nodes.title = _label(title, S.SIZE_BODY, S.TEXT)
+	nodes.title = _title(title)
 	col.add_child(nodes.title)
 	nodes.info = _label("", S.SIZE_SMALL, S.DIM)
 	nodes.info.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
@@ -1087,8 +1112,7 @@ func _card(parent: Container, name: String, title: String) -> Dictionary:
 	nodes.bar.max_value = 1.0
 	nodes.bar.show_percentage = false
 	nodes.bar.custom_minimum_size.y = S.PROGRESS_HEIGHT
-	nodes.bar.add_theme_stylebox_override("background", _box(S.PROGRESS_TRACK, 4))
-	nodes.bar.add_theme_stylebox_override("fill", _box(S.PROGRESS_FILL, 4))
+	nodes.bar.theme_type_variation = &"GoldBar"
 	col.add_child(nodes.bar)
 	nodes.status = _label("", S.SIZE_SMALL, S.MUTED)
 	col.add_child(nodes.status)
@@ -1184,7 +1208,7 @@ func _refresh(animate: bool) -> void:
 		var b: Button = _tab_buttons[tab]
 		var open := game.tab_open(tab)
 		# A locked tab says what opens it (D044): its price, or the Van.
-		b.text = TAB_NAMES[tab] if open else "%s\n%s" % [TAB_NAMES[tab], "Van" if tab == "market" else _short_money(T.TAB_THRESHOLDS.get(tab, INF))]
+		b.text = NAV_NAMES[tab] if open else "%s\n%s" % [NAV_NAMES[tab], "Van" if tab == "market" else _short_money(T.TAB_THRESHOLDS.get(tab, INF))]
 		b.add_theme_color_override("font_color", S.ORANGE if tab == _page else (S.TEXT if open else S.MUTED))
 
 
@@ -1344,31 +1368,32 @@ func _refresh_tech() -> void:
 		var b: Button = _web_nodes[id]
 		var researched := game.is_researched(id)
 		var reachable := game.research_reachable(id)
-		var fill := S.CONTROL_DISABLED
-		var edge := S.LINE
+		# Affordable now: the kit's button. Reachable: its grey disabled look.
+		# Researched or out of reach: sunk into the board.
+		var box := Kit.box(&"Button", &"normal")
+		var ink := S.INK
 		if researched:
-			fill = Color(S.GREEN, 0.25)
-			edge = S.GREEN
-		elif game.can_research(id):
-			fill = S.CONTROL
-			edge = S.ORANGE
-		elif reachable:
-			fill = S.CONTROL
-		if id == game.pin:
-			edge = S.HEAT
-		var box := _box(fill, 10)
-		box.border_color = S.TEXT if id == _selected else edge
-		box.set_border_width_all(3 if id == _selected else 2)
+			box = _card_box()
+			ink = S.GREEN
+		elif not game.can_research(id):
+			box = Kit.box(&"Button", &"disabled") if reachable else _card_box()
+			ink = S.INK if reachable else S.MUTED
 		for state in ["normal", "hover", "pressed"]:
 			b.add_theme_stylebox_override(state, box)
-		b.add_theme_color_override("font_color", S.TEXT if researched or reachable else S.MUTED)
-		b.add_theme_color_override("font_hover_color", S.TEXT)
+		for c in ["font_color", "font_hover_color", "font_pressed_color"]:
+			b.add_theme_color_override(c, ink)
 	var i := 0
 	for id in game.data.tech:
 		for need in game.data.tech[id].needs:
 			_web.edges[i][2] = game.is_researched(id)
 			i += 1
 	_web.queue_redraw()
+	_web_frames.frames.clear()
+	var grow := S.PIXEL_SCALE * 2.0
+	if game.pin != "" and _web_nodes.has(game.pin):
+		_web_frames.frames.append([Rect2(_web_nodes[game.pin].position, S.WEB_NODE).grow(grow * 2.0), S.HEAT])
+	_web_frames.frames.append([Rect2(_web_nodes[_selected].position, S.WEB_NODE).grow(grow), S.TEXT])
+	_web_frames.queue_redraw()
 
 	var node: Dictionary = game.data.tech[_selected]
 	_detail.title.text = "%s  %s" % [node.label, node.name]
@@ -1632,10 +1657,8 @@ func _build_overlay(name: String) -> Control:
 			shade.visible = false)
 	add_child(shade)
 	var panel := PanelContainer.new()
-	var box := _box(S.PANEL, S.RADIUS)
+	var box := _panel_box()
 	box.set_content_margin_all(S.GUTTER)
-	box.border_color = S.LINE
-	box.border_width_top = 1
 	panel.add_theme_stylebox_override("panel", box)
 	panel.anchor_right = 1.0
 	panel.anchor_top = 1.0 - S.SHEET_FRACTION
@@ -1680,6 +1703,8 @@ func open_sheet(of: Dictionary) -> void:
 		b.name = "Upgrade_%s_%s" % ["plot_" + of.crop if of.kind == "plot" else "%s_%d" % [of.station, of.index], upgrade]
 		b.alignment = HORIZONTAL_ALIGNMENT_LEFT
 		_sheet_box.add_child(b)
+		# Full width, so a long price line wraps rather than widening the sheet.
+		b.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 		_sheet_buttons[upgrade] = b
 	var done := _control_button("Done", func() -> void: _sheet.visible = false)
 	done.name = "SheetDone"
@@ -1716,7 +1741,13 @@ func _refresh_sheet() -> void:
 		_sheet.visible = false
 		return
 	for mode in _mode_buttons:
-		_mode_buttons[mode].add_theme_color_override("font_color", S.ORANGE if mode == settings.buy_mode else S.TEXT)
+		# The chosen mode looks pressed in.
+		if mode == settings.buy_mode:
+			_mode_buttons[mode].add_theme_stylebox_override("normal", Kit.box(&"Button", &"pressed"))
+			_mode_buttons[mode].add_theme_color_override("font_color", S.INK_PRESSED)
+		else:
+			_mode_buttons[mode].remove_theme_stylebox_override("normal")
+			_mode_buttons[mode].remove_theme_color_override("font_color")
 	for upgrade in _sheet_buttons:
 		var b: Button = _sheet_buttons[upgrade]
 		var n := _levels(upgrade)
@@ -1831,7 +1862,7 @@ func _pop(made: Dictionary) -> void:
 		if best == "" or game.value(item) > game.value(best):
 			best = item
 	var text: String = "+%d %s  %s" % [count, game.data.items[best].short, _money(total)] if made.size() == 1 else "+%d bottles  %s" % [count, _money(total)]
-	var l := _label(text, S.SIZE_SMALL, S.COIN)
+	var l := _label(text, S.SIZE_SMALL, S.GOLD)
 	l.name = "Pop"
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -1849,10 +1880,10 @@ func _pop(made: Dictionary) -> void:
 
 
 func _coin() -> void:
-	var c := Panel.new()
+	var c := TextureRect.new()
 	c.name = "Coin"
 	c.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	c.add_theme_stylebox_override("panel", _box(S.COIN, 999))
+	c.texture = Kit.icon("coin")
 	c.size = Vector2.ONE * S.COIN_SIZE
 	add_child(c)
 	c.position = _sell_batch.position + _sell_batch.size / 2.0
@@ -1873,6 +1904,13 @@ func _label(text: String, font_size: int, color: Color) -> Label:
 	return l
 
 
+## A card's title: headline size, wrapping rather than widening the card.
+func _title(text: String) -> Label:
+	var l := _label(text, S.SIZE_BODY, S.TEXT)
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	return l
+
+
 ## A plain button that runs `action` on the game, then redraws.
 func _control_button(text: String, action: Callable) -> Button:
 	var b := Button.new()
@@ -1889,40 +1927,28 @@ func _control_button(text: String, action: Callable) -> Button:
 func _small_button(text: String, action: Callable) -> Button:
 	var b := _control_button(text, action)
 	b.add_theme_font_size_override("font_size", S.SIZE_TINY)
-	for state in ["normal", "hover", "pressed", "disabled"]:
-		var box: StyleBoxFlat = b.get_theme_stylebox(state).duplicate()
-		box.set_content_margin_all(6)
-		b.add_theme_stylebox_override(state, box)
 	return b
 
 
-func _card_box() -> StyleBoxFlat:
-	var box := _box(S.BG, S.RADIUS)
+## A card: the kit's sunken panel.
+func _card_box() -> StyleBox:
+	var box := Kit.box(&"InsetPanel")
 	box.set_content_margin_all(14)
 	return box
 
 
-func _box(color: Color, radius: int) -> StyleBoxFlat:
-	var b := StyleBoxFlat.new()
-	b.bg_color = color
-	b.set_corner_radius_all(radius)
-	return b
+## The kit's raised panel, darkened so text on it reads (LOOK.md, PX5).
+func _panel_box() -> StyleBox:
+	var box := Kit.box(&"PanelContainer")
+	(box as StyleBoxTexture).modulate_color = Color(S.PANEL_SHADE, S.PANEL_SHADE, S.PANEL_SHADE)
+	return box
 
 
+## The kit's button, at least BUTTON_HEIGHT tall; its text colours are the theme's.
 func _style_control(b: Button) -> void:
-	var looks := {"normal": S.CONTROL, "hover": S.CONTROL, "pressed": S.CONTROL_PRESSED, "disabled": S.CONTROL_DISABLED}
-	for state in looks:
-		var box := _box(looks[state], S.RADIUS)
-		box.set_content_margin_all(12)
-		box.border_color = S.LINE
-		box.set_border_width_all(1)
-		b.add_theme_stylebox_override(state, box)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	b.add_theme_font_size_override("font_size", S.SIZE_SMALL)
-	b.add_theme_color_override("font_color", S.TEXT)
-	b.add_theme_color_override("font_hover_color", S.TEXT)
-	b.add_theme_color_override("font_pressed_color", S.TEXT)
-	b.add_theme_color_override("font_disabled_color", S.MUTED)
+	b.custom_minimum_size.y = maxf(b.custom_minimum_size.y, S.BUTTON_HEIGHT)
 
 
 ## A node's name without its "Crop Blueprint:" kind or a leading "The".

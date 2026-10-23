@@ -1,5 +1,7 @@
 # Onboarding
 
+**Superseded by D044** ([LAYOUT.md](LAYOUT.md#step-2-the-dashboard-from-the-first-launch-d044)): the game opens on the full dashboard and nothing is revealed at a milestone. O1, O3's and O4's thresholds and O8 are retired; the early run is guided by one ringed next action instead. Kept below as the history of v0.1–v0.6.
+
 Brief §2: the screen starts as one unlabelled button and reveals itself as the player crosses milestones. v0.1 builds Stages 0 and 1, v0.2 builds Stage 2 ([FACTORY.md](FACTORY.md)), and v0.3 builds Stage 3 (below).
 
 The rules are in `src/core/game.gd`, the numbers in `src/core/tuning.gd`, and the screen in `src/ui/main.gd`.

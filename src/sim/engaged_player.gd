@@ -23,14 +23,14 @@ const RAW_SELL_ABOVE := 50
 ## (`forks` swaps them, for U6).
 const RESEARCH := [
 	"jalapeno_blueprint", "poblano_blueprint", "ancho_blueprint", "smoky_ancho_blueprint", "calloused_thumbs",
-	"verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint", "delivery_van", "standard_operating_procedures", "double_tap",
+	"verde_blueprint", "vinegar_blueprint", "brine_blueprint", "bistro_blueprint", "delivery_van", "standard_operating_procedures", "double_tap", "bumper_crop_1",
 	"slot_expansion_1", "serrano_blueprint", "serrano_mash_blueprint", "serrano_fire_blueprint",
 	"cayenne_blueprint", "garlic_blueprint", "paste_blueprint", "cayenne_mash_blueprint", "slot_expansion_2",
 	"louisiana_blueprint", "ergonomic_grip", "heat_meter", "night_shift_1", "overflow_valve", "overclock_1",
-	"smart_stockpiling", "pantry_vinegar_booster", "thai_chili_blueprint", "thai_chili_mash_blueprint", "cajun_red_blueprint",
+	"smart_stockpiling", "pantry_vinegar_booster", "thai_chili_blueprint", "thai_chili_mash_blueprint", "cajun_red_blueprint", "bumper_crop_2",
 	"flint_glass", "slot_expansion_3", "zero_waste_1", "pantry_garlic_booster", "pantry_vinegar_concentrate",
 	"pineapple_blueprint", "glaze_blueprint", "bonnet_blueprint", "bonnet_mash_blueprint", "island_heat_blueprint",
-	"overclock_2", "slow_burn", "overclock_3", "automated_piston", "night_shift_2", "market_ticker", "pantry_vinegar_bulk", "pantry_garlic_concentrate",
+	"overclock_2", "slow_burn", "overclock_3", "automated_piston", "night_shift_2", "bumper_crop_3", "market_ticker", "pantry_vinegar_bulk", "pantry_garlic_concentrate",
 	"caribbean_red_blueprint", "caribbean_red_mash_blueprint", "sweet_heat_blueprint", "byproduct_recycling",
 	"franchise_auditors", "zero_waste_2", "slot_expansion_4", "pantry_pineapple_booster", "pantry_garlic_bulk",
 	"foil_wraps", "chocolate_blueprint", "chocolate_mash_blueprint",
@@ -477,20 +477,23 @@ func _buy_upgrades(g, now: float) -> void:
 		_note(now, best.name)
 
 
-## Dollars a second a plot level adds: the plot's harvest worth raw, or as
-## bottles (BOTTLE_MULTIPLE, D004) while its vats are short of it, × the
-## level's share.
+## Dollars a second a plot level adds to what reaches stock: the plot's
+## harvest worth raw, or as bottles (BOTTLE_MULTIPLE, D004) while its vats are
+## short of it. Only the slower of growing and carrying counts (Cargo, D043):
+## a level of either is worth nothing while the other holds the plot back.
 func _plot_gain(g, crop: String, upgrade: String, fed: bool) -> float:
 	var p: Dictionary = g.plots[crop]
-	var rate: float = g.plot_yield_exact(crop) / g.plot_cycle(crop) * g.value(crop) * (BOTTLE_MULTIPLE if fed else 1.0)
+	var grow: float = g.plot_growth(crop)
+	var carry: float = g.cargo_rate(crop)
 	match upgrade:
 		"speed":
-			return rate * T.PLOT_SPEED_STEP / (1.0 + T.PLOT_SPEED_STEP * p.speed)
+			grow *= (1.0 + T.PLOT_SPEED_STEP * (p.speed + 1)) / (1.0 + T.PLOT_SPEED_STEP * p.speed)
 		"yield":
-			return rate * T.PLOT_YIELD_STEP / (1.0 + T.PLOT_YIELD_STEP * p["yield"])
-		"quality":
-			return rate * T.CROP_QUALITY_STEP / (1.0 + T.CROP_QUALITY_STEP * p.quality)
-	return 0.0
+			grow *= (1.0 + T.PLOT_YIELD_STEP * (p["yield"] + 1)) / (1.0 + T.PLOT_YIELD_STEP * p["yield"])
+		"cargo":
+			carry *= (1.0 + T.CARGO_STEP * (p.cargo + 1)) / (1.0 + T.CARGO_STEP * p.cargo)
+	var more: float = minf(grow, carry) - minf(g.plot_growth(crop), g.cargo_rate(crop))
+	return more * g.value(crop) * (BOTTLE_MULTIPLE if fed else 1.0)
 
 
 ## Whether its vats could take more of a crop than its plot grows.
@@ -500,7 +503,7 @@ func _short(g, crop: String) -> bool:
 		var recipe: String = g.vats[i].recipe
 		if recipe != "" and g.recipe_inputs(recipe).has(crop):
 			demand += g.recipe_inputs(recipe)[crop] / g.slot_cycle("vat", i)
-	return g.plot_yield_exact(crop) / g.plot_cycle(crop) < demand
+	return minf(g.plot_growth(crop), g.cargo_rate(crop)) < demand
 
 
 ## Crops its vats take, as the layout and research loans assign them.

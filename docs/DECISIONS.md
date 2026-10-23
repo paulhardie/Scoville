@@ -278,6 +278,23 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 **Why:** Tabasco duplicated Cayenne's heat and Habanero duplicated Scotch Bonnet's; Moruga and Reaper overlap. TABASCO (McIlhenny, enforced), RED SAVINA HABANERO and PepperX are registered marks, and "Smokin' Ed's Carolina Reaper" is registered with plain "Carolina Reaper" contested. Real names players know are the trade-off; the agent's searches used secondary sources, not the official register, so it isn't legal advice. Pepper Y and Alabama Grim are parodies by design: they nod at the marks without using them. Pineapple: Scotch Bonnet with pineapple or mango is a real Caribbean pairing, and it fits Island Heat and Sweet Heat better than cane sugar. The Trinidad 7 Pot the proposal added is dropped: the two parody peppers fill Tier 6. Fermentation as a mechanic is a later version (W27).
 
+## D043: Cargo replaces Crop Quality; Bumper Crop in the Tech Tree
+
+**Decision (the owner's, on the agent's recommendation):** a plot's third cash upgrade is Cargo, Idle Planet Miner's: harvests wait in the plot's field and a truck carries them to stock at a cargo rate, twice the plot's base growth at level 0 and raised by every Tech and HQ boost that raises the harvest. The double-crop chance moves to three Tech Tree nodes, Bumper Crop I–III (10% each, 30% in all). Save v11 turns Crop Quality levels into Cargo levels. This changes the brief's plot knobs (§2, "Crop Quality Chance"). ([FACTORY.md](FACTORY.md#v06e-cargo-and-bumper-crop-in-the-tech-tree-d043))
+
+**Why:** Harvest Speed and Yield both mean more crops; Idle Planet Miner's third upgrade is delivery, which makes each plot a balance to keep rather than three ways to grow it. A chance to double is the kind of perk the Tech Tree holds. Boosts raise cargo too so research never backs a plot up by itself; only the player's own levels can outgrow the truck, the moment to rebalance.
+
+## D044: The dashboard from the first launch; the next action, not the empty screen
+
+**Decision (the owner's):** the game opens on the full split-viewport dashboard. Status bar, upper viewport with the button and a factory view, the tab selectors directly below the viewport, and the panel all show from the first second. Nothing waits for a milestone to appear. The start stays gentle because exactly one next action is ringed and named at a time through the early run (`Game.next_action()`). Tabs still unlock at their thresholds, shown dimmed with what opens them. This replaces the brief's Pillar 1 (Strict Progressive Disclosure) and the reveal stages of §2. It retires O1, O3's and O4's thresholds, O8 and L9's blank stage. ([LAYOUT.md](LAYOUT.md#step-2-the-dashboard-from-the-first-launch-d044))
+
+**Why:** the owner changed their mind: progression should come from the obvious next step rather than from hiding the screen. The tab thresholds stay because the pacing is measured against them (N1, N2) and they stage the run's content. Keeping them is the agent's assumption. The factory view is drawn in code rather than waiting on W8, so step 2 can ship and be restyled later.
+
+## D045: Bottling gets a sound, a first-bottle buzz and a bottle in the factory view
+
+**Decision (the owner's, on the agent's recommendation):** every bottle pop plays a glass clink made in code, pitched lower for richer tiers. The first bottle of each sauce in a run gives a short buzz. Each pop drops a bottle, tinted by tier, onto the factory view's Bottling floor. The first-bottle ceremony stays in layout step 3. ([FEEL.md](FEEL.md#bottling-a-sound-a-buzz-and-a-bottle-d045))
+
+**Why:** making a bottle is the game's core reward, but it got the same weight as any number changing: a text pop, no sound, no picture, and a $330,000 Phantom felt like a $50 Table Mild. The sound and the bottle need no art, and the visual pass (W8) can restyle them.
 
 ## D046: The return card says what's waiting to sell
 

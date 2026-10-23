@@ -33,7 +33,7 @@ The owner asked for the early game to flow roughly as Idle Planet Miner's does. 
 As built, after measuring (each change's reason in D041):
 
 - **The starting plots:** Poblano $800 and Jalapeño $1,900, each 2 crops every 2.4 s, so each pays back raw in 8 and 9½ minutes. At v0.6a's rates (3 every 1.8–2.0 s) they added $9 a second at base and halved tapping's share at 15:00 (F8 10–16%). Every planet in Idle Planet Miner starts at the same base rate too. **Ancho Mash takes 18 s, not 9,** so one base Poblano Plot still feeds one vat (V3); its value is unchanged.
-- **Plot upgrades:** 5% of the price, ×1.3 a level (A2). Harvest Speed +3% a level; Yield per Cycle +6% of the base yield a level; Crop Quality 1% a level to 30 levels (`tuning.gd`). Tried and rejected: 5%/5% and 4%/8% (the run 10 minutes fast), 3%/3% (Phantom never made).
+- **Plot upgrades:** 5% of the price, ×1.3 a level (A2). Harvest Speed +3% a level; Yield per Cycle +6% of the base yield a level; Crop Quality 1% a level to 30 levels (`tuning.gd`; replaced by Cargo in D043, FACTORY.md v0.6e). Tried and rejected: 5%/5% and 4%/8% (the run 10 minutes fast), 3%/3% (Phantom never made).
 - **Forager's Luck drops what the plot grows in one base cycle,** speed levels included. Cheap speed levels meant many small harvests, and its share of the shortest ingredient swung from 6% to 37% between runs; now it holds its 2.25% chance and D025's share (T4: 19%).
 - **Savina Pepper Plot $2.0M (was $2.6M) and Moruga Scorpion Plot $5M (was $9.5M):** the run reaches them with less income than before, and saving for them left 379 s (U2) and 511 s (Y4) with nothing bought.
 - **Plot cards list cheapest first,** as Idle Planet Miner lists planets, each with a Sell button.
@@ -229,7 +229,7 @@ For v0.4 the pacing player (`src/sim/engaged_player.gd`):
 - Buys Tier 3's stations in order as each is unlocked, including a second Classic Louisiana line.
 - Taps 3 times a second, which keeps Heat full.
 - Presses Factory Overdrive whenever it's ready.
-- Otherwise buys the cheapest upgrade, Crop Quality included.
+- Otherwise buys the cheapest upgrade, Crop Quality included (since D043: Cargo, only while a plot is backed up).
 
 ### Results (v0.4)
 

@@ -39,9 +39,11 @@ func pressed(times: int) -> Game:
 	return g
 
 
-func test_fresh_game_reveals_nothing() -> void:
+func test_fresh_game_has_everything() -> void:
+	# D044 retires O1: nothing waits to be revealed.
 	var g := Game.new()
-	check(not g.revealed.counter and not g.revealed.status_bar, "O1: nothing revealed at the start")
+	check(g.revealed.counter and g.revealed.status_bar and g.revealed.deck, "L10: everything is open from the start")
+	check(g.plot_offered("bell") and g.slot_offered("vat") and g.tab_open("farms"), "L10: the plot and the first vat are on sale from the start")
 	check(g.stock.bell == 0 and g.cash == 0.0, "starts empty")
 
 
@@ -52,21 +54,45 @@ func test_each_press_picks_one() -> void:
 	check(g.stock.bell == 50 and g.stats.bell_picked == 50 and g.stats.presses == 50, "O2: 50 presses, 50 peppers")
 
 
-func test_counter_appears_on_first_press() -> void:
+func test_next_action() -> void:
+	# L13–L14 (D044): the early run's one next action.
 	var g := Game.new()
-	check(not g.revealed.counter, "O3: no counter before the first press")
-	g.press()
-	check(g.revealed.counter, "O3: the counter appears on the first press")
-
-
-func test_status_bar_at_twenty() -> void:
-	check(not pressed(T.STAGE_1_PEPPERS - 1).revealed.status_bar, "O4: no status bar at 19 peppers")
-	check(pressed(T.STAGE_1_PEPPERS).revealed.status_bar, "O4: the status bar appears at 20 peppers")
+	check(g.next_action() == {"do": "press", "id": ""}, "L13: a fresh game: tap the button")
+	for i in 30:
+		g.press()
+	check(g.next_action().do == "press", "L13: 30 peppers don't cover the $50 plot: keep tapping")
+	for i in 20:
+		g.press()
+	check(g.next_action().do == "sell_raw", "L13: 50 peppers cover it: sell them")
+	g.sell_raw()
+	check(g.next_action() == {"do": "buy_plot", "id": "bell"}, "L13: then buy the Bell Pepper Plot")
+	g.buy_plot("bell")
+	check(g.next_action().do == "press", "L13: then save up for Vat 1")
+	g.cash = 1e4
+	check(g.next_action() == {"do": "buy_slot", "id": "vat"}, "L13: Vat 1 once cash covers it")
+	g.buy_slot("vat")
+	check(g.next_action() == {"do": "buy_slot", "id": "line"}, "L13: then Line 1")
+	g.buy_slot("line")
+	check(g.next_action().do == "press", "L13: no bottles yet: tap")
+	g.stock.table_mild = 3
+	check(g.next_action().do == "sell_batch", "L13: bottles held: Sell Batch")
+	g.sell_batch()
+	g.cash = 0.0
+	check(g.next_action().do == "press", "L13: the Poblano Plot next, cash short and nothing to sell: tap")
+	g.cash = 1e5
+	check(g.next_action() == {"do": "buy_plot", "id": "poblano"}, "L13: the Poblano Plot")
+	g.buy_plot("poblano")
+	check(g.next_action() == {"do": "buy_plot", "id": "jalapeno"}, "L13: the Jalapeño Plot")
+	g.buy_plot("jalapeno")
+	check(g.next_action().is_empty(), "L14: the Tech Tree not open yet: nothing to ring, the goal bar shows")
+	g.account.best_ov = T.TAB_THRESHOLDS.tech
+	check(g.next_action() == {"do": "tab", "id": "tech"}, "L13: once it opens: open the Tech Tree")
+	g.stock.table_mild = 100
+	g.research_node("jalapeno_blueprint")
+	check(g.next_action().is_empty(), "L14: after the first research the sequence is done")
 
 
 func test_sell_raw() -> void:
-	var early := pressed(5)
-	check(not early.sell_raw() and early.stock.bell == 5, "can't sell before the status bar appears")
 	var g := pressed(37)
 	check(g.sell_raw(), "O5: selling works with peppers held")
 	var worth: float = 37 * g.value("bell")
@@ -76,12 +102,13 @@ func test_sell_raw() -> void:
 
 
 func test_reveals_stay() -> void:
-	var g := pressed(T.STAGE_1_PEPPERS)
+	var g := pressed(20)
 	g.sell_raw()
-	check(g.revealed.counter and g.revealed.status_bar, "O6: reveals stay after selling to zero")
+	var s: Dictionary = g.to_state()
+	s.run.revealed = {"counter": false, "status_bar": false, "deck": false}
 	var c := Game.new()
-	check(c.load_state(JSON.parse_string(JSON.stringify(g.to_state()))) == "", "O6: a save loads")
-	check(c.revealed.counter and c.revealed.status_bar, "O6: reveals stay after a reload")
+	check(c.load_state(JSON.parse_string(JSON.stringify(s))) == "", "O6: a save loads")
+	check(c.revealed.counter and c.revealed.status_bar and c.revealed.deck, "D044: an older save that hid things opens on the full dashboard")
 
 
 func test_save_round_trip() -> void:
@@ -100,7 +127,7 @@ func test_bad_saves_are_refused() -> void:
 	check(g.load_state("nope") != "", "O7: a non-object is refused")
 	check(g.load_state({"version": 99}) != "", "O7: a newer version is refused")
 	var s := g.to_state()
-	s.run.erase("revealed")
+	s.run.erase("stock")
 	check(g.load_state(s) != "", "O7: a save missing a field is refused")
 	s = g.to_state()
 	s.run.stats = 3

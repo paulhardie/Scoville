@@ -102,6 +102,27 @@ func test_long_absence_matches_ticks() -> void:
 		check(diff <= 0.02, "X3: at %d:%02d, 2 h away gives $%.0f against $%.0f tick by tick (%.2f%% off, at most 2%%)" % [m / 60, m % 60, r.ov, want, diff * 100.0])
 
 
+func test_backed_up_plot_matches_ticks() -> void:
+	# C6 (D043): with the Bell Pepper Plot outgrowing its truck, two hours away
+	# carry crops as ticking would.
+	var fast := loaded(60)
+	var slow := loaded(60)
+	for g in [fast, slow]:
+		g.plots.bell["yield"] = 100
+	var speed := fast.offline_speed()
+	var r := fast.catch_up(7200.0)
+	var ov_before := slow.operation_value()
+	slow.holding = false
+	slow.ticker = {"sauce": "", "mult": 1.0, "ends": 0, "next": -1}
+	slow.overdrive.until = 0
+	slow.advance(seconds(7200.0 * speed))
+	var want := slow.operation_value() - ov_before
+	var diff := absf(r.ov - want) / want
+	var waiting_fast: int = fast.plots.bell.field
+	var waiting_slow: int = slow.plots.bell.field
+	check(waiting_slow > 0 and diff <= 0.02 and absf(waiting_fast - waiting_slow) <= 0.02 * waiting_slow, "C6: a backed-up plot, 2 h away: $%.0f against $%.0f tick by tick (%.2f%% off), %d against %d waiting" % [r.ov, want, diff * 100.0, waiting_fast, waiting_slow])
+
+
 func test_safety() -> void:
 	for m in [30, 60, 100]:
 		var g := loaded(m)
@@ -109,7 +130,7 @@ func test_safety() -> void:
 		var slots_before := [g.vats.size(), g.lines.size()]
 		var levels_before := 0
 		for crop in g.plots:
-			levels_before += g.plots[crop].speed + g.plots[crop]["yield"] + g.plots[crop].quality
+			levels_before += g.plots[crop].speed + g.plots[crop]["yield"] + g.plots[crop].cargo
 		var recipes_before := []
 		for s in g.vats + g.lines:
 			recipes_before.append(s.recipe)

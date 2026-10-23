@@ -334,9 +334,9 @@ Bought with cash once the Processing tab is open, no cap but the ten. Slot Expan
 | Crop Priority | Cargo Logistics | 10 Verde Mash, 3 Bistro Verde | Land Survey 4 | choose which crop a farm's truck takes first |  |
 | Targeted Fertiliser | Ore Targeting | 100 Smoky Ancho, 50 Garden Hot Sauce | Crop Priority | a farm's priority crop +15% |  |
 | Precision Fertiliser | Advanced Ore Targeting | 100 Salsa Verde Reserve, 15 Classic Louisiana | Targeted Fertiliser | +30% instead (not added to the 15%) |  |
-| Crossbreeding I | Alchemy | 50 Serrano Mash, 6 Garlic Gold | Land Survey 4 | one farm's crop becomes the next rung up (you pick the farm) |  |
-| Crossbreeding II | Advanced Alchemy | 50K Hungarian Wax, 25K Pequin, 6 Salsa Verde Reserve | Crossbreeding I | two rungs up, a farm not already crossbred |  |
-| Crossbreeding III | Superior Alchemy | 400 Bonnet Mash, 200 Fatalii Mash, 5 Phantom Smokehouse | Crossbreeding II | three rungs up |  |
+| Crossbreed I | Alchemy | 50 Serrano Mash, 6 Garlic Gold | Land Survey 4 | one farm's crop becomes the next rung up (you pick the farm) |  |
+| Crossbreed II | Advanced Alchemy | 50K Hungarian Wax, 25K Pequin, 6 Salsa Verde Reserve | Crossbreed I | two rungs up, a farm not already crossbred |  |
+| Crossbreed III | Superior Alchemy | 400 Bonnet Mash, 200 Fatalii Mash, 5 Phantom Smokehouse | Crossbreed II | three rungs up |  |
 | Hotter Burners | Advanced Furnace | 3 Cascabel Salsa, 10 Verde Mash | Kitchen Table (IPM's Smelter: our first vat is the kitchen's) | vats ×1.2 faster |  |
 | Steam Jackets | Superior Furnace | 5 Thai Chili Mash, 20 Pequin Mash, 50 Cayenne Mash | Zero-Waste Piping I OR Slow Roasting | vats ×1.2 faster again |  |
 | Zero-Waste Piping I | Smelting Efficiency | 200 Sofrito Base | Hotter Burners | vat recipes take 20% fewer inputs | S5 (brief name kept) |

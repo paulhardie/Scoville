@@ -278,17 +278,17 @@ func test_ipm_farm_projects() -> void:
 
 
 func test_crossbreeding() -> void:
-	var g := with(["crossbreeding_ii"])
+	var g := with(["crossbreed_ii"])
 	g.cash = 1e9
 	g.buy_plot("farm_04")   # Pimento 80, Poblano 20
-	check(g.crossbreeds_left() == ["crossbreeding_i", "crossbreeding_ii"], "two Crossbreedings to use")
-	check(g.crossbreed("crossbreeding_i", "farm_04", "pimento"), "Crossbreeding I on farm 4's Pimento")
+	check(g.crossbreeds_left() == ["crossbreed_i", "crossbreed_ii"], "two Crossbreedings to use")
+	check(g.crossbreed("crossbreed_i", "farm_04", "pimento"), "Crossbreed I on farm 4's Pimento")
 	check(g.plot_crops("farm_04") == {"cascabel": 0.0} or g.plot_crops("farm_04").get("poblano", 0.0) > 0.0, "it now grows the rung above")
 	check(close(g.plot_crops("farm_04").get("poblano", 0.0), 1.0), "Pimento (rung 2) becomes Poblano (rung 3): all of farm 4 is Poblano")
-	check(not g.crossbreed("crossbreeding_ii", "farm_04", "poblano"), "a farm is crossbred once")
-	check(not g.crossbreed("crossbreeding_i", "farm_02", "bell"), "a node is used once")
+	check(not g.crossbreed("crossbreed_ii", "farm_04", "poblano"), "a farm is crossbred once")
+	check(not g.crossbreed("crossbreed_i", "farm_02", "bell"), "a node is used once")
 	g.buy_plot("farm_02")
-	check(g.crossbreed("crossbreeding_ii", "farm_02", "bell") and g.plots.farm_02.bred.to == "poblano", "Crossbreeding II: Bell (rung 1) two rungs up is Poblano")
+	check(g.crossbreed("crossbreed_ii", "farm_02", "bell") and g.plots.farm_02.bred.to == "poblano", "Crossbreed II: Bell (rung 1) two rungs up is Poblano")
 	var s := g.to_state()
 	var h := Game.new()
 	check(h.load_state(JSON.parse_string(JSON.stringify(s))) == "" and h.plots.farm_04.bred == g.plots.farm_04.bred and h.bred == g.bred, "crossbreeds survive a save")

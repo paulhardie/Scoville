@@ -1626,9 +1626,9 @@
 			"ipm": "Advanced Ore Targeting"
 		},
 		{
-			"id": "crossbreeding_i",
+			"id": "crossbreed_i",
 			"label": "F8",
-			"name": "Crossbreeding I",
+			"name": "Crossbreed I",
 			"wing": "east",
 			"needs": [
 				"survey_4"
@@ -1649,12 +1649,12 @@
 			"ipm": "Alchemy"
 		},
 		{
-			"id": "crossbreeding_ii",
+			"id": "crossbreed_ii",
 			"label": "F9",
-			"name": "Crossbreeding II",
+			"name": "Crossbreed II",
 			"wing": "east",
 			"needs": [
-				"crossbreeding_i"
+				"crossbreed_i"
 			],
 			"cost": {
 				"hungarian_wax": 50000,
@@ -1673,12 +1673,12 @@
 			"ipm": "Advanced Alchemy"
 		},
 		{
-			"id": "crossbreeding_iii",
+			"id": "crossbreed_iii",
 			"label": "F10",
-			"name": "Crossbreeding III",
+			"name": "Crossbreed III",
 			"wing": "east",
 			"needs": [
-				"crossbreeding_ii"
+				"crossbreed_ii"
 			],
 			"cost": {
 				"bonnet_mash": 400,

@@ -45,8 +45,8 @@ func run() -> void:
 	g.buy_plot("bell")
 	g.buy_slot("vat")
 	g.buy_slot("line")
-	g.plots.bell.speed = 3
-	g.plots.bell["yield"] = 1
+	g.plots.bell.harvest = 3
+	g.plots.bell.truck = 1
 	g.vats[0].speed = 2
 	g.lines[0].crate = 23
 	g.stock.bell = 48
@@ -69,7 +69,7 @@ func run() -> void:
 	(screen.find_child("Tab_processing", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_processing.png"), 0.2)
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
-	(screen.find_child("Tech_bistro_blueprint", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_survey_1", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_tech.png"), 0.2)
 
 	# 1:40 of the pacing player: Tier 3, Heat, the valve and most of the tree.
@@ -119,7 +119,7 @@ func run() -> void:
 		early.step(fresh)
 		fresh.tick()
 	g.load_state(fresh.to_state())
-	(screen.find_child("Tech_jalapeno_blueprint", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_calloused_thumbs", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_tech_open.png"), 0.2)
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("stage3_locked_hint.png"), 0.1)
@@ -130,19 +130,43 @@ func run() -> void:
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("v06b_hq_sell.png"), 0.2)
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
-	(screen.find_child("Tech_moruga_blueprint", true, false) as Button).pressed.emit()
+	(screen.find_child("Tech_survey_25", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("w12_tier6_locked.png"), 0.2)
 	(screen.find_child("Tab_hq", true, false) as Button).pressed.emit()
 	g.prestige()
 	g.account.credits = 40
 	g.account.rooms = {"seed_vault": 3, "tasting_room": 1}
 	g._refresh_fx()
-	g.open_room()
+	g.open_room(g.rooms_offered()[0])
 	screen._refresh(false)
 	await _shot(out.path_join("v06b_hq_draft.png"), 0.2)
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
 	(screen.find_child("Tech_standard_operating_procedures", true, false) as Button).pressed.emit()
 	await _shot(out.path_join("w12_sop.png"), 0.2)
+
+	# I13: the deep end's Farms tab, every farm owned and upgraded, grouped by survey.
+	var deep := Game.new()
+	deep.cash = 1e40
+	for id in deep.data.plots:
+		deep.plots[id].owned = true
+		deep.plots[id].harvest = 30
+		deep.plots[id].truck = 20
+		deep.plots[id].cargo = 25
+	for node in deep.data.tech:
+		if node.begins_with("survey_"):
+			deep.research[node] = true
+	deep._refresh_fx()
+	g.load_state(deep.to_state())
+	(screen.find_child("Tab_farms", true, false) as Button).pressed.emit()
+	var deep_farms: ScrollContainer = screen.find_child("Page_farms", true, false)
+	await _shot(out.path_join("i13_farms_top.png"), 0.3)
+	deep_farms.scroll_vertical = 2000
+	await _shot(out.path_join("i13_farms_mid.png"), 0.2)
+	deep_farms.scroll_vertical = 1000000
+	await _shot(out.path_join("i13_farms_end.png"), 0.2)
+	deep_farms.scroll_vertical = 0
+	(screen.find_child("Manage_plot_farm_79", true, false) as Button).pressed.emit()
+	await _shot(out.path_join("i13_sheet.png"), 0.3)
 
 	print("PASS: captured to ", out)
 	quit()

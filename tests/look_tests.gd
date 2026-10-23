@@ -173,16 +173,47 @@ func test_screens() -> void:
 	await look("the return card")
 	screen.close_card()
 
-	g.stats.cash_earned = 2e7
+	g.cash = 2e7
 	g._note_value()
 	await look_tab("hq", "a run worth $20M")
 	g.prestige()
 	g.account.credits = 40
 	g.account.rooms = {"seed_vault": 3, "tasting_room": 1}
 	g._refresh_fx()
-	g.open_room()
+	g.open_room(g.rooms_offered()[0])
 	screen._refresh(false)
 	await look("HQ after a sale")
+
+	# I13: the deep end's Farms tab, every farm owned and upgraded.
+	var deep := Game.new()
+	deep.cash = 1e35
+	for id in deep.data.plots:
+		deep.plots[id].owned = true
+		deep.plots[id].harvest = 60
+		deep.plots[id].truck = 60
+		deep.plots[id].cargo = 60
+		for crop in deep.plots[id].field:
+			deep.plots[id].field[crop] = 1000000000
+	for id in deep.data.tech:
+		if id.begins_with("survey_"):
+			deep.research[id] = true
+	g.load_state(deep.to_state())
+	await look_tab("farms", "every farm owned")
+	var cards := 0
+	var headers := {}
+	for id in g.data.plots:
+		var card: Control = screen.find_child("Card_plot_" + id, true, false)
+		cards += 1 if card != null and card.is_visible_in_tree() else 0
+		headers[g.data.plots[id].survey] = true
+	var shown := _texts(screen.find_child("Page_farms", true, false))
+	var grouped := 0
+	for n in headers:
+		grouped += 1 if n == 0 or ("LAND SURVEY %d" % n) in shown else 0
+	check(cards == g.data.plots.size(), "I13: every farm's card shows (%d of %d)" % [cards, g.data.plots.size()])
+	check(grouped == headers.size(), "I13: grouped under every survey (%d of %d headings)" % [grouped, headers.size()])
+	(screen.find_child("Manage_plot_farm_79", true, false) as Button).pressed.emit()
+	await look("the last farm's sheet")
+	(screen.find_child("SheetDone", true, false) as Button).pressed.emit()
 
 	# The nav with every tab open fits too, whatever is unlocked today.
 	var nav: Control = screen.find_child("Nav", true, false)
@@ -204,6 +235,18 @@ func test_screens() -> void:
 				longest = word
 	var w := font.get_string_size(longest, HORIZONTAL_ALIGNMENT_LEFT, -1, S.SIZE_WEB).x
 	check(w <= room, "PX6: the longest word on a Tech Tree node, '%s', is %.0f px, wider than the node's %.0f" % [longest, w, room])
+
+
+## Every visible Label's and Button's text under `node`.
+func _texts(node: Node) -> Array:
+	var found := []
+	for child in node.get_children():
+		if child is CanvasItem and not child.is_visible_in_tree():
+			continue
+		if (child is Label or child is Button) and child.text != "":
+			found.append(child.text)
+		found.append_array(_texts(child))
+	return found
 
 
 func look_tab(tab: String, when: String) -> void:

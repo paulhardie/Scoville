@@ -467,6 +467,45 @@ The owner chose to pull the first sale back to I6's 2:00–2:30 (2026-10-23) rat
 
 Z1 keeps E6 at 10 (W30 is still the owner's to settle). If a bar can't be met without breaking another, that's reported, not quietly traded.
 
+### Results (PR 3)
+
+Measured with every tweak below in place, played by the pacing player (its PR 3 changes below).
+
+| Id | Result |
+| --- | --- |
+| I6 | **PASS.** $10M at 2:07 (2:00–2:30). |
+| Z3 | **PASS.** $150K at 0:27 (0:25–0:50), $1M at 1:04 (1:00–1:30), $4M at 1:41 (1:35–2:00). |
+| I7 | **FAIL.** 15:15 without a farm, vat, line, recipe or research (0:49 to Night Shift I at 1:05), against 6:30; seven stretches over 6:30, all 7–15 minutes. Purchases come in bursts at each Land Survey, about 20 minutes apart. Nothing tried filled the gaps without breaking another bar (a faster kitchen broke E3, chasing side nodes stalled the run, cheaper slots changed nothing). W38. |
+| I8 | **PASS.** Tapping adds 40% at 15:00, 59% at 30:00 and 50% at 1:30 (Heat Meter at 0:46). |
+| I9 | **PASS.** Run 2's sale at 1:28, 69% of run 1's 2:07; the first sale pays 50 credits. |
+| I10 | **FAIL.** `tools/deep_run.gd`: run 1 sells at 2:10 for 52 credits; run 2 at 4:20 for 553 ($27B, Land Survey 11, 41 farms); run 3, which must pay 5,530 credits (about $10^20), is at Survey 19 with 47 farms and $87T after 24 hours, where the tool stops. Farm 79 and every sauce: never (9 of 48 made; the player only makes what a survey asks for). W44. |
+| I4 | **FAIL on E6 only** (2 Sweet Pepper Mash waiting, against 10; W30, the owner's call). F1–F6 and E1–E5 pass (E3 72 s, F6 84 s). |
+| I14 | **PASS.** P1, P2 ($17.7M away against $13.4M tapping), U8, Y2 (SOP researched 21 nodes in run 2), A7 and every other suite pass. |
+| Z2 | **PASS.** `data/` is the mapping with `tweaks.json` applied, nothing else (`skeleton_tests.gd`). |
+| Z4 | **PASS.** No survey, farm, recipe or room changed place; T4 adds a slot ahead of IPM's, which keep their order. |
+
+Also found and fixed on the way: the Standard Operating Procedures panel ran off the screen (its title didn't wrap; already so in PR 2), now in `look_tests.gd`.
+
+### The tweaks
+
+Each is in `tools/ipm/tweaks.json` (data, checked by Z2) or `src/core/tuning.gd` and `game.gd` (rules), and names what it answers. Everything else is still Idle Planet Miner's.
+
+| Id | Tweak | Answers |
+| --- | --- | --- |
+| T1 | Farms from Land Survey 1 on: prices climb from farm 4's $1,250 as (price ÷ $1,250)^0.3 up to Land Survey 10's farms, then keep IPM's own steps from there; their upgrades follow at price ÷ 20, so I2's formula holds. | I6, Z3: IPM's planet prices outran a run without its managers, colonies and Beacon. |
+| T2 | Every Land Survey costs its telescope × 0.5. | I6, I7: Survey 3 alone asked 50,000 Pimento. |
+| T3 | A farm from Land Survey n harvests and carries × 1.15^n (IPM's curves, scaled), in place of the managers and colonies left out. Farms 1–4 and the Bell Plot are as IPM's, which is what I2 checks. | I6, Z3: the middle of the run grew too slowly. |
+| T4 | The kitchen's vat and line run only the kitchen's recipes; IPM's free first smelter and crafter follow as Vat 2 and Line 2 at the kitchen's $150 and $100. Eleven of each. | I8, Y2: the player gave the kitchen's line to the survey's sauces, so no Table Mild came for the Tech Tree. |
+| T5 | Standard Operating Procedures researches any node costing under 5% of the run's Operation Value (was 1% of an hour's bottles). A rule, in `tuning.gd`. | Y2, I9: on the copy that bar was under every node's cost. |
+| T6 | Calloused Thumbs: +8 Bell Peppers a press (was +2). | I8: at 15:00 the copy's factory dwarfs v0.6's. |
+| T7 | Double-Tap, Ergonomic Grip and Heat Meter cost half their Table Mild. | I8: Heat came after 1:30. |
+| T8 | Night Shift Protocols I costs 128 Table Mild (was 6 Sweet Pepper Relish). | P2: offline needs Night Shift by 1:40. |
+| T9 | A sale pays 5 × IPM's credits (50 at $10M). A rule, in `tuning.gd`. | I9: IPM's 10 credits opened two rooms and run 2 took 80% of run 1. |
+
+**The pacing player's PR 3 changes** (GUESS, `engaged_player.gd`): it keeps everything the survey takes; its survey recipes take turns in the slots it has rather than saving for one dearer than 30 minutes' income; a recipe mid-cycle keeps its slot (it swapped back and forth and never finished); it sets up the kitchen before saving for research; it takes the button's nodes N1–N4 first, then the cheapest kitchen node, and spare research leaves that node's Table Mild alone; after a sale, the Van and SOP first. Each was a stall or a choice no tapping player would make; none moved a bar.
+
+**Z1's I2, said plainly:** I2 checks the formulas on farm 2 and the Bell Plot, which are untouched; farms from the surveys run the same curves × 1.15^n (T3).
+
 ## Assumed
 
 Each is the smallest reasonable answer; the owner can change any of it.

@@ -1898,8 +1898,10 @@ func load_state(s: Variant) -> String:
 		for crop in p.get("spare", {}):
 			if q.field.has(crop):
 				q.spare[crop] = maxf(0.0, float(p.spare[crop]))
-		q.grow = maxf(0.0, float(p.get("grow", 0.0)))
-		q.trip = maxf(0.0, float(p.get("trip", 0.0)))
+		# As saved, not clamped: a timer can sit a hair under 0 (EPSILON), and
+		# a reloaded game must play on identically (S10).
+		q.grow = float(p.get("grow", 0.0))
+		q.trip = float(p.get("trip", 0.0))
 		q.priority = str(p.get("priority", ""))
 		var b: Dictionary = p.get("bred", {})
 		q.bred = {} if b.is_empty() else {"from": str(b.from), "to": str(b.to)}

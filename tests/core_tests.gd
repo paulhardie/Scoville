@@ -68,7 +68,7 @@ func test_next_action() -> void:
 	check(g.next_action() == {"do": "buy_plot", "id": "bell"}, "L13: then buy the Bell Pepper Plot")
 	g.buy_plot("bell")
 	check(g.next_action().do == "press", "L13: then save up for Vat 1")
-	g.cash = 1e4
+	g.cash = 1000.0
 	check(g.next_action() == {"do": "buy_slot", "id": "vat"}, "L13: Vat 1 once cash covers it")
 	g.buy_slot("vat")
 	check(g.next_action() == {"do": "buy_slot", "id": "line"}, "L13: then Line 1")
@@ -78,17 +78,19 @@ func test_next_action() -> void:
 	check(g.next_action().do == "sell_batch", "L13: bottles held: Sell Batch")
 	g.sell_batch()
 	g.cash = 0.0
-	check(g.next_action().do == "press", "L13: the Poblano Plot next, cash short and nothing to sell: tap")
-	g.cash = 1e5
-	check(g.next_action() == {"do": "buy_plot", "id": "poblano"}, "L13: the Poblano Plot")
-	g.buy_plot("poblano")
-	check(g.next_action() == {"do": "buy_plot", "id": "jalapeno"}, "L13: the Jalapeño Plot")
-	g.buy_plot("jalapeno")
+	check(g.next_action().do == "press", "L13: farm 2 next, cash short and nothing to sell: tap")
+	# Under the Tech Tree's $7,500: since v0.7 cash on hand counts in
+	# Operation Value (Galaxy Value).
+	g.cash = 1000.0
+	check(g.next_action() == {"do": "buy_plot", "id": "farm_02"}, "L13: farm 2 (v0.7: IPM's second planet)")
+	g.buy_plot("farm_02")
+	check(g.next_action() == {"do": "buy_plot", "id": "farm_03"}, "L13: farm 3")
+	g.buy_plot("farm_03")
 	check(g.next_action().is_empty(), "L14: the Tech Tree not open yet: nothing to ring, the goal bar shows")
 	g.account.best_ov = T.TAB_THRESHOLDS.tech
 	check(g.next_action() == {"do": "tab", "id": "tech"}, "L13: once it opens: open the Tech Tree")
 	g.stock.table_mild = 100
-	g.research_node("jalapeno_blueprint")
+	g.research_node("calloused_thumbs")
 	check(g.next_action().is_empty(), "L14: after the first research the sequence is done")
 
 

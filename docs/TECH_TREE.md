@@ -67,7 +67,7 @@ The pacing criteria are in [ECONOMY.md](ECONOMY.md#criteria-v03) (N3–N6). Rule
 | N8 | Factory Overclock III | N7 | 30 Classic Louisiana | 0.15 s a press | 1:25 | −1, −5 |
 | N9 | Automated Piston (capstone) | N5, N8 | 50 Classic Louisiana | Presses the button once a second, always, with every button perk | 1:40 | 0, −5 |
 
-A press from Double-Tap, Ergonomic Grip or the Piston counts as a press for everything: peppers, Heat and Overclock. The Golden Seed Extractor waits for Golden Seeds (v0.7).
+A press from Double-Tap, Ergonomic Grip or the Piston counts as a press for everything: peppers, Heat and Overclock. The Golden Seed Extractor waits for Golden Seeds (v0.8).
 
 ### Heat (G10, D011)
 
@@ -134,7 +134,7 @@ Standard Operating Procedures and Night Shift Protocols came later: Night Shift 
 | B2 | Franchise Auditors (West–South) | W3, S3 | 20 Classic Louisiana | Stock counts 20% more in Operation Value; sales are unchanged | 1:15 | −2, 2 |
 
 - **Byproduct Recycling (D013):** the "lowest-level plot" is the owned plot with the fewest levels across its three upgrades (ties go in data order). The free level goes on whichever of its upgrades is cheapest.
-- Executive Perks (North–West, the Head Chef slot) waits for the Shift Roster (v0.7).
+- Executive Perks (North–West, the Head Chef slot) waits for the Shift Roster (v0.8).
 
 On screen:
 - The Heat Meter is a thin bar under the button, with the bonus (`HEAT +36%`) to its left, opposite Sell Batch.

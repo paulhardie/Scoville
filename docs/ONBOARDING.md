@@ -32,7 +32,7 @@ Assumed where the brief is open (the owner can overrule):
 ## Stage 3 (v0.3)
 
 - **At £400 Operation Value**, a bottom navigation bar slides up with five tabs: **Farms** and **Processing** open, and **Tech Tree**, **Shift Roster** and **HQ Facilities** shown as `[ ? ]`. The vats and lines move from Farms to Processing.
-- Each locked tab opens at its Operation Value ([ECONOMY.md](ECONOMY.md#tab-thresholds-g5-d005)): Tech Tree at £750, Shift Roster at £10,000 (provisional, and not before v0.7 builds it), HQ at £1,000,000. Tapping a locked tab shows its threshold.
+- Each locked tab opens at its Operation Value ([ECONOMY.md](ECONOMY.md#tab-thresholds-g5-d005)): Tech Tree at £750, Shift Roster at £10,000 (provisional, and not before v0.8 builds it), HQ at £1,000,000. Tapping a locked tab shows its threshold.
 - Opened tabs stay open "for the account" (brief §2), so a Prestige (v0.6) doesn't lock them again. The account-wide record lives beside the run in the save.
 - Operation Value appears under Cash in the status bar from Stage 3.
 

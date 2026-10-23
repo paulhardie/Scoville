@@ -68,7 +68,7 @@ All PASS: `tests/prestige_tests.gd` (Q1–Q8, 50 checks) and `tests/ui_tests.gd`
 - **G16:** Night Watchman's Desk stops at Level 8 (+8 hours), the brief's stated maximum.
 - **G19:** level steps after Level 1 as in the table, and Seed Capital beyond the brief's four amounts (×5 a level, cap 10).
 - Selling needs a second tap; there's no undo.
-- Victoria Sterling's lower threshold (£800,000) waits for the Shift Roster (v0.7).
+- Victoria Sterling's lower threshold (£800,000) waits for the Shift Roster (v0.8).
 
 ## Part 2: Standard Operating Procedures and Tier 6
 

@@ -39,6 +39,8 @@ for r in rows(wt("Planets").split("== Mining Rate")[0]):
         planets[-1]["ores"].append([r[0], r[1]])
     elif len(r) >= 4 and r[0].isdigit():  # 77-79, names only
         planets.append({"n": int(r[0]), "name": r[1], "price": r[2] or None, "telescope": r[3], "ores": [], "distance": None})
+for p in planets:
+    p["ores"] = [o for o in p["ores"] if o[0]]
 snap["planets"] = [p for p in planets if p["n"] <= 79]
 # Telescopes and projects
 proj = []
@@ -59,7 +61,13 @@ for p in ["Engineering", "Forge", "Aeronautical", "Astronomy", "Packaging", "Wor
             lv.append({"level": int(r[0]), "cost": r[1], "boost": r[-1]})
     levels[p.replace("_", " ")] = lv
 snap["room_levels"] = levels
-snap["credits"] = [[r[0], r[1]] for r in rows(wt("Credit"))[:10] if len(r) == 2]
+snap["credits"] = [[r[0], r[1]] for r in rows(wt("Credit"))[:10] if len(r) == 2 and r[1].isdigit()]
+snap["credits_past_table"] = "each decade 10x more: the next triangular number x10 (the wiki's words)"
+# Planet upgrades: the wiki's formulas (as text) and its level table.
+up = wt("Planetary_Upgrades")
+snap["upgrades"] = {"formulas": [clean(l.lstrip("* ").replace("'''", "")) for l in up.splitlines() if l.startswith("* '")],
+                    "levels": [{"level": int(r[0]), "mining": r[1], "ship_speed": r[2], "cargo": r[3], "price_share": r[4]}
+                               for r in rows(up) if len(r) >= 5 and r[0].isdigit()]}
 json.dump(snap, open(sys.argv[2], "w"), indent=1, ensure_ascii=False)
 print({k: len(v) for k, v in snap.items() if isinstance(v, (list, dict))})
 for k in levels: print(k, len(levels[k]), levels[k][-1])

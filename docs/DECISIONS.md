@@ -156,6 +156,8 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 ## D023: The pepper ladder
 
+**Superseded in part:** D053 (v0.7) replaces this ladder with 28 rungs, one per Idle Planet Miner ore.
+
 **Status:** Accepted by the owner (with D029).
 
 **Decision:** The game's crops become a ladder of 13 real peppers ordered by Scoville, Bell Pepper (0) to Pepper X (2.69M), then 6 fictional ones up to 16 billion ([INGREDIENTS.md](INGREDIENTS.md)). The brief's six peppers keep their D004 values as anchors; each new real pepper sits on the geometric line between its neighbours; past the Carolina Reaper each rung is ×2.15, Idle Planet Miner's ore step. How the new peppers are used in recipes is G17.
@@ -194,6 +196,8 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 ## D029: Each new pepper gets an in-between sauce (G17)
 
+**Superseded in part:** D051 (v0.7) replaces one sauce per pepper with Idle Planet Miner's recipe graph.
+
 **Decision:** Every pepper the ladder adds through Tier 5 (Poblano, Serrano, Tabasco, Scotch Bonnet, Red Savina) gets a single-pepper mash and one sauce priced between the brief's sauces, so ten sauces climb about ×2.2 a rung ([FULL_RUN.md](FULL_RUN.md#the-sauce-ladder-g17-as-assumed-d029)). The new sauces take 0–3 Pickled Brine and some take lower-tier mash or bottles. **Accepted by the owner, with D023.**
 
 **Why:** It's the recommendation the owner was given for G17 (Idle Planet Miner's ore → bar). Pricing each new sauce between its neighbours makes every pepper the best line until the next one, rather than a sideways copy, and smooths the climb into Idle Planet Miner's ×2-ish steps.
@@ -224,11 +228,15 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 ## D034: v0.6b part 2, Standard Operating Procedures and Tier 6 (G17)
 
+**Superseded in part:** D051 and SKELETON.md (v0.7) replace Tier 6's recipes and its after-sale gate; SOP still waits for a sale.
+
 **Decision:** Standard Operating Procedures is a West Wing node that opens after the first sale; once researched, any node the player could research whose cost is worth under 1% of an hour of the bottles running lines make researches itself, free, except fork sides. Tier 6 (also after the first sale) adds Moruga Scorpion → Scorpion Sting £14,920, Carolina Reaper → Widowmaker Reserve £40,000 (D006's recipe) and Pepper X → Event Horizon £100,000, each with a single-pepper mash, priced by D004 ([PRESTIGE.md](PRESTIGE.md#part-2-standard-operating-procedures-and-tier-6)). **Assumed to build W12; the owner can change any of it.**
 
 **Why:** The brief gives SOP's rule ("less than 1% of current production throughput") but not what throughput is measured in; bottles a second is what the player sees grow, and an hour makes the early nodes (a few Table Mild) fall below it as soon as a second run has a few lines going, while late nodes stay manual. D029's pattern (each new pepper gets its own mash and sauce) is the accepted way to use a pepper; following it for Tier 6 keeps Widowmaker's D006 recipe and value and puts one sauce either side of it.
 
 ## D035: Idle Planet Miner's values, in dollars, and its $10M sale
+
+**Superseded in part:** D053 (v0.7) moves each pepper to its new rung's ore value; the sale and credit table stay.
 
 **Decision (the owner's):** every pepper maps to an Idle Planet Miner ore in order and copies its sell price, in US dollars (Bell = Copper $1 … Pepper X = Osmium $7,800); the four ingredients take the ore of the pepper nearest them before (assumed). D004's multiples stay, so bottles follow (Table Mild $50, Phantom $330,250). The first sale is Idle Planet Miner's: $10M for 10 credits, then its credit table. **The run keeps v0.6a's pace (the owner chose the agent's recommendation):** the $10M sale comes at about 2:00–2:15, and pushing on to Phantom pays more credits. The Tier 6 sauce Event Horizon is renamed Extinction Event. Save v8 converts money ×10. ([ECONOMY.md](ECONOMY.md#v06c-idle-planet-miners-values-in-dollars-d035), [INGREDIENTS.md](INGREDIENTS.md))
 
@@ -266,6 +274,8 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 ## D041: Idle Planet Miner's early flow
 
+**Superseded in part:** D050 (v0.7) replaces these plots and upgrade gains with Idle Planet Miner's farms and formulas; the 5% × 1.3 price curve stays.
+
 **Decision (the owner's, on the agent's recommendation):** the Poblano and Jalapeño Plots are on sale from the start, each growing 2 crops every 2.4 s and priced to pay back from raw sales in 8–10 minutes ($800, $1,900); blueprints gate crops from White Vinegar on, and E1 and E12 become cultivation nodes (a speed boost) with the same ids and places. Every crop sells raw from its plot. Every plot upgrade costs 5% of the plot's price for its first level and ×1.3 a level after, with smaller gains a level. The Blank Button start, the early vat and line, and 5× bottles stay. Save v9 converts plot levels ([ECONOMY.md](ECONOMY.md#v06d-idle-planet-miners-early-flow-d041)).
 
 **Why:** the owner wants the early game to flow like Idle Planet Miner's. Measured before this: after the first line at 1:36 nothing new was on sale until the Tech Tree opened, and the Poblano Plot came at 14:13, twelve and a half minutes of buying only upgrades. Idle Planet Miner fills that time with planets bought one after another and ore sold raw. Prices follow equal payback rather than a strict ×2, because our plots yield differently (a Jalapeño Plot makes six times what a Bell Plot does in dollars a second); a strict ×2 would pay back in under a minute and swamp the factory. The brief's E1 (Crop Blueprint: Jalapeño) is changed.
@@ -274,11 +284,15 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 ## D042: The pepper ladder by real heat, generic names only, and Pineapple
 
+**Superseded in part:** D053 (v0.7) keeps these names and adds 15 rungs around them.
+
 **Decision (the owner's, on the agent's recommendation; the two parody names are the owner's):** the peppers are tiered by PepperScale's heat ranges, one pepper a heat band, with generic variety names: Thai Chili for Tabasco, Caribbean Red Habanero for Habanero, Chocolate Habanero for Red Savina (its sauce Savina Gold becomes Cocoa Loco). Tier 6 ends in two fictional peppers that wink at the record holders: **Alabama Grim** for the Carolina Reaper and **Pepper Y** for Pepper X. Pineapple (from a Pineapple Grove) replaces Cane Sugar, making Charred Pineapple Glaze. Every rung keeps its ore value, so pacing is unchanged. Save v10 renames the ids. ([INGREDIENTS.md](INGREDIENTS.md#the-ladder-since-d042))
 
 **Why:** Tabasco duplicated Cayenne's heat and Habanero duplicated Scotch Bonnet's; Moruga and Reaper overlap. TABASCO (McIlhenny, enforced), RED SAVINA HABANERO and PepperX are registered marks, and "Smokin' Ed's Carolina Reaper" is registered with plain "Carolina Reaper" contested. Real names players know are the trade-off; the agent's searches used secondary sources, not the official register, so it isn't legal advice. Pepper Y and Alabama Grim are parodies by design: they nod at the marks without using them. Pineapple: Scotch Bonnet with pineapple or mango is a real Caribbean pairing, and it fits Island Heat and Sweet Heat better than cane sugar. The Trinidad 7 Pot the proposal added is dropped: the two parody peppers fill Tier 6. Fermentation as a mechanic is a later version (W27).
 
 ## D043: Cargo replaces Crop Quality; Bumper Crop in the Tech Tree
+
+**Superseded in part:** D050 (v0.7) replaces Cargo as a rate with trucks making round trips; Bumper Crop stays.
 
 **Decision (the owner's, on the agent's recommendation):** a plot's third cash upgrade is Cargo, Idle Planet Miner's: harvests wait in the plot's field and a truck carries them to stock at a cargo rate, twice the plot's base growth at level 0 and raised by every Tech and HQ boost that raises the harvest. The double-crop chance moves to three Tech Tree nodes, Bumper Crop I–III (10% each, 30% in all). Save v11 turns Crop Quality levels into Cargo levels. This changes the brief's plot knobs (§2, "Crop Quality Chance"). ([FACTORY.md](FACTORY.md#v06e-cargo-and-bumper-crop-in-the-tech-tree-d043))
 
@@ -343,6 +357,6 @@ Early criteria (FACTORY.md E1–E6) set gaps ("never longer than … without som
 
 ## D053: 28 peppers by Scoville, fictional past Pepper Y
 
-**Decision (the owner's):** one pepper for each of IPM's 28 ores, ordered by heat on PepperScale's list, generic names only (D042). Real peppers run Bell Pepper to Pepper Y (21 rungs, adding Pimento, Cascabel, Hungarian Wax, Chile de Árbol, Pequin, Fatalii, Trinidad 7 Pot and Naga Morich); the fictional seven past it are D023's six and Heat Death. Every pepper we grow keeps its id; values move to their new rung's ore (Jalapeño becomes Aluminium's $17). ([SKELETON.md](SKELETON.md#the-pepper-ladder-d053))
+**Decision (the owner's):** one pepper for each of IPM's 28 ores, ordered by heat on PepperScale's list, generic names only (D042). Real peppers and D042's two parodies run Bell Pepper to Pepper Y (21 rungs, adding Pimento, Cascabel, Hungarian Wax, Chile de Árbol, Pequin, Fatalii, Trinidad 7 Pot and Naga Morich); the fictional seven past it are D023's six and Heat Death. Every pepper we grow keeps its id; values move to their new rung's ore (Jalapeño becomes Aluminium's $17). ([SKELETON.md](SKELETON.md#the-pepper-ladder-d053))
 
 **Why:** the owner asked for more peppers tiered by Scoville and a deep endgame of made-up ones. The ladder of 13 (D042) left 15 ores with no pepper. Trinidad 7 Pot, which D042 dropped as overlapping, comes back because there are now rungs to fill. Apollo (3,000,000 SHU) is left out so Pepper Y stays the last real-world rung.

@@ -11,7 +11,7 @@ Status: **design (PR 1 of 3).** PR 2 builds the copy as it stands and measures i
 | Idle Planet Miner | Ours |
 | --- | --- |
 | 28 ores, $1 to $78B | 28 peppers by Scoville, each worth its ore's value |
-| 76 planets with ore shares, prices and distances (77–79 are names only) | 79 farms, each growing a mix of peppers in IPM's shares (D050); 77–79 assumed |
+| 76 planets with ore shares and prices, 70 with distances (77–79 are names only) | 79 farms, each growing a mix of peppers in IPM's shares (D050); 77–79 assumed |
 | Planet upgrades: mining rate, ship speed, cargo | Farm upgrades: Harvest Rate, Truck Speed, Truck Cargo, on IPM's formulas and price curve |
 | Telescopes 1–23, three planets each | Land Surveys 1–25, three farms each (24–25 assumed) |
 | 29 bars and alloys, 1,000 ore a bar | 29 mashes, 1,000 crops a mash, same recipe graph and values (D051) |
@@ -149,14 +149,14 @@ A farm grows its crops in the shares below at its Harvest Rate, and its truck ca
 | 78 | Heat Death Farm | $16.3No (assumed) | Heat Death 70, Event Horizon 30 | 150 (assumed) | Land Survey 25 | Hyperion |
 | 79 | Heat Death Farm II | $48.9No (assumed) | Heat Death 100 | 152 (assumed) | Land Survey 25 | Astrea |
 
-**Farm upgrades**, IPM's exactly (the wiki's Planets and Planetary Upgrades pages), for a farm at level L:
+**Farm upgrades**, IPM's exactly (the wiki's Planetary Upgrades page, kept in the snapshot as `upgrades` with its level table), for a farm at level L:
 
 - Harvest Rate = 0.25 + 0.1(L−1) + 0.017(L−1)² crops a second, split by the farm's shares.
 - Truck Speed = 1 + 0.2(L−1) + (L−1)²/75.
 - Truck Cargo = 5 + 2(L−1) + 0.1(L−1)², rounded half to even after boosts.
-- Each upgrade's next level costs the farm's price ÷ 20 × 1.3^(L−1), as now (D041).
+- Each upgrade's next level costs the farm's price ÷ 20 × 1.3^(L−1), as now (D041). The Bell Plot's use Balor's $100, not its tutorial $50 (D052).
 
-**Trucks (assumed, G21).** The wiki gives no trip formula. Assumed: a round trip takes 2 × distance ÷ Truck Speed seconds and carries up to Truck Cargo crops, the most valuable first unless Crop Priority says otherwise; what isn't carried waits at the farm. At level 1, farm 1's truck carries 5 crops every 20 s, exactly the 0.25 a second it grows, and farm 2's (distance 12) falls a little behind, which is the backlog IPM's guides describe.
+**Trucks (assumed, G21).** The wiki gives no trip formula. Assumed: a round trip takes 2 × distance ÷ Truck Speed seconds and carries up to Truck Cargo crops, the most valuable first unless Crop Priority says otherwise; what isn't carried waits at the farm. At level 1, IPM's Balor (distance 10) carries 5 every 20 s, exactly the 0.25 a second it mines (our Bell Plot, at four times the harvest and cargo, carries 20 every 20 s, its 1 a second), and farm 2's truck (distance 12) falls a little behind, which is the backlog IPM's guides describe.
 
 **Harvests** come once a second, with fractions carried, so Bumper Crop still has a harvest to double.
 
@@ -270,7 +270,7 @@ The four top sauces' recipes are quoted on the wiki with a 10% suit discount; th
 
 ### The kitchen (D052)
 
-The tutorial stays as it is: the Blank Button picks Bell Peppers, the Bell Plot grows one a second, **Sweet Pepper Mash** (10 Bell Peppers, $20, 8 s) and **Table Mild** (1 Sweet Pepper Mash, $50, 8 s) are free recipes, the Starter Crate bottles 50, and the first vat ($150) and line ($100) are the kitchen's. Kitchen recipes run only in the kitchen vat and line, so they stay a small, steady income (at most 1.25 Bell Peppers a second into Table Mild) that the factory overtakes; the kitchen vat and line can run any other recipe too, as IPM's free first smelter and crafter. The Bell Plot is IPM's Balor at four times the rate: its price is the tutorial's $50, its Harvest Rate, Truck Speed and Truck Cargo are IPM's × 4, and its upgrades cost $100 ÷ 20 × 1.3^(L−1), Balor's.
+The tutorial stays as it is: the Blank Button picks Bell Peppers, the Bell Plot grows one a second, **Sweet Pepper Mash** (10 Bell Peppers, $20, 8 s) and **Table Mild** (1 Sweet Pepper Mash, $50, 8 s) are free recipes, the Starter Crate bottles 50, and the first vat ($150) and line ($100) are the kitchen's. Kitchen recipes run only in the kitchen vat and line, so they stay a small, steady income (at most 1.25 Bell Peppers a second into Table Mild) that the factory overtakes; the kitchen vat and line can run any other recipe too, as IPM's free first smelter and crafter. The Bell Plot is IPM's Balor at four times the rate: its price is the tutorial's $50, its Harvest Rate and Truck Cargo are IPM's × 4 (Truck Speed is IPM's, so the truck keeps up as Balor's does), and its upgrades cost $100 ÷ 20 × 1.3^(L−1), Balor's.
 
 ## Vats and lines
 
@@ -358,7 +358,7 @@ Bought with cash once the Processing tab is open, no cap but the ten. Slot Expan
 
 **Changed in the tree:**
 - **Gone:** the Culinary Blueprints (recipes are bought with cash, as IPM's are), the Crop Blueprints (Land Surveys), Jalapeño and Poblano Cultivation, Hydroponic Cayenne, and Slot Expansion I–IV.
-- **Kept, re-costed:** every node of ours listed above under "Ours that stays". Their costs aren't IPM's to copy, so PR 2 sets them before measuring, each in the sauce the copied run makes about when the node's old gate came (the old tree's times), counts unchanged (G23).
+- **Kept, re-costed:** every node of ours listed above under "Ours that stays". Their costs aren't IPM's to copy, so PR 2 sets them before measuring by one rule (G23): each cost item keeps its dollar worth (count × its value before v0.7), paid in the item of the same kind (mash or sauce) whose new value is nearest on a log scale, the count rounded to the nearest whole one, at least 1. A rule on values rather than on when the copied run makes things, which isn't known until it's measured.
 - **After the sale:** only Standard Operating Procedures still waits for the first sale (brief). Tier 6's gate (D034) goes: IPM gates nothing behind a sale.
 
 ## HQ (prestige)
@@ -386,7 +386,7 @@ Rooms are offered two at a time in a fixed order, IPM's, not a random draft (thi
 | 15 | Ad Agency | Marketing | Market Ticker spikes (new) | x1.30 | +.10 | 60 | 1351 |
 
 - **Hydroponics Bay goes:** it raised plot yield, and Yield per Cycle goes with IPM's upgrades.
-- **Night Watchman's Desk** adds IPM's 30 minutes a level to 44 levels (+22 hours) on top of our 4-hour cap; offline speed is ours (OFFLINE.md).
+- **Night Watchman's Desk** adds IPM's 30 minutes a level to 44 levels (+22 hours) on top of our 4-hour cap; offline speed is ours (OFFLINE.md). The wiki's "24 hours" at the top is its 2-hour default plus those 22. This replaces G16's Level 8.
 - **Ergonomics Lab and Seed Capital Office** keep their effects and caps; their level costs follow Engineering's table (assumed).
 
 ## Numbers on screen
@@ -400,14 +400,14 @@ Measured in PR 2 on the copy as it stands. A FAIL is reported and gets a backlog
 | Id | Criterion |
 | --- | --- |
 | I1 | **Copied as given.** Every farm's price, shares and distance; every crop's value; every mash's and sauce's inputs, seconds, unlock price and value; every survey's and adopted node's cost and effect; vat and line prices; every room's effect, offer place, opening price and level costs; and the credit table equal the snapshot through this doc's mapping, apart from the rows marked assumed here (`tests/`, reading `docs/ipm_snapshot.json`). |
-| I2 | **Farm formulas.** For levels 1–60, Harvest Rate, Truck Speed and Truck Cargo match IPM's formulas to 3 decimals, and each level's price is the farm's price ÷ 20 × 1.3^(L−1). |
+| I2 | **Farm formulas.** For levels 1–60, Harvest Rate, Truck Speed and Truck Cargo match IPM's formulas to 3 decimals, and each level's price is the farm's price ÷ 20 × 1.3^(L−1) (the Bell Plot: $100 ÷ 20, and its Harvest Rate and Cargo × 4). |
 | I3 | **Trucks.** Over 10 minutes, a farm delivers min(what it grows, Truck Cargo × Truck Speed ÷ (2 × distance)) crops a second within 1%, the most valuable crop first (or the one Crop Priority picks); the rest waits at the farm. |
 | I4 | **The kitchen is untouched.** O2–O7, O9–O10, E1–E5, F1–F6, K1–K9 and L10–L13 pass as they stand. |
 | I5 | **Farms open in order.** Farms 1–4 are on sale from the start; every other farm only once its survey is researched; ingredient stations with theirs. |
 | I6 | **The first sale on time.** The pacing player reaches $10M Operation Value between 2:00 and 2:30 (U1's last band, D035). |
 | I7 | **No dead air.** From the first line to the sale, the pacing player never goes more than 6:30 without buying a farm, vat, line or recipe, or researching (A4's bar). |
 | I8 | **The button still matters.** Tapping adds at least 25% at 15:00, 10% at 30:00 and 30% (with Heat) at 1:30 (F8, N8 and M5's bars). |
-| I9 | **The second run is quicker, not trivial.** Run 2 reaches the sale in 60–75% of run 1's time (Y1's 85% ceiling, with the floor W24 asked for). |
+| I9 | **The second run is quicker, not trivial.** Run 2 reaches the sale in 60–75% of run 1's time. This tightens Y1's 85% ceiling to 75% and sets W24's floor at 60%, both before measuring, said here. |
 | I10 | **The deep end is reachable.** In a long simulation (a tool, not CI), the pacing player, selling whenever the sale pays at least 10× its last credits, buys farm 79 and makes every sauce at least once within 50 runs. The 50 is a GUESS. |
 | I11 | **No lost progress.** A v11 save loads as v12: cash, cash earned and best Operation Value are at least what they were; every owned plot and slot comes back as cash at what was spent on it (price and upgrades); items that still exist keep their counts and removed ones come back as cash at their old values; credits are kept and every room level is refunded in the credits it cost; an unreadable save is still kept as `save.json.bad`. |
 | I12 | **Big numbers read.** Every money and count shown reads three figures and a suffix up to 10³⁶, never `inf` or an exponent, at each boundary. |
@@ -419,8 +419,10 @@ Measured in PR 2 on the copy as it stands. A FAIL is reported and gets a backlog
 These measure the curve or rules the skeleton replaces. Retiring them now, before any result, is said here so no bar moves unseen.
 
 - **Replaced by I1–I3, I5:** A1, A2, A8 (the starting plots and their curve); C1–C3 (plot upgrades and cargo as a rate); R3 (blueprints), R9 (Slot Expansion), R10 and R11 (now IPM's values), R18 (Hydroponic Bell Peppers is IPM's Advanced Mining); S3 (the cap is ten); S5 (Operation Value is Galaxy Value); S7 and S8 (Tier 3's recipes, Crop Quality); V1–V3 (D004's markups and the old ladder); Q4 and Q5 (the draft and room levels are IPM's); Q10 and Q11 (Tier 6's gate and values).
-- **Replaced by I6–I9:** A4, F7, M1–M4, M6, M7, N1–N7, U1–U7, Y1–Y4, T4 and C7 (checkpoints and shares on the old curve). PR 3 sets new checkpoints from the measured copy.
-- **Kept as they stand:** everything else, including A3, A5, A7, C4–C6, E1–E6 (E6 is still W30), F1–F6, F8, H1–H3, J1–J2, K1–K9, L1–L15, M5, N8, O1–O10 as D044 left them, P1–P2, PX1–PX8, Q1–Q3, Q6–Q9, Q12–Q14, R1–R2, R4–R8, R12–R17, S1–S2, S4, S6, S9–S10, T1–T3, U8–U9, V4–V7 and X1–X8. Where one names an item or price that's gone (P2's "1:40 state", U8's $10M), it is read with the new items, the bar unchanged.
+- **Replaced by I6–I9:** A4, F7, J3, M1–M4, M6, M7, N1–N7, U1–U7, Y1, Y3, Y4, T4 and C7 (checkpoints and shares on the old curve). PR 3 sets new checkpoints from the measured copy.
+- **Replaced by I14:** A6, A9, C8 and T5 (each "every earlier criterion still passes").
+- **Rewritten:** Q10 keeps its Standard Operating Procedures clause (SOP opens only after a sale) and drops Tier 6's gate.
+- **Kept as they stand:** everything else, including A3, A5, A7 (the casual player's second farm by 3:30: the early feel, W28, not the curve; farm 2 is $200), C4–C6, E1–E6 (E6 is still W30), F1–F6, F8, H1–H3, J1–J2, K1–K9, L1–L15, M5, N8, O1–O10 as D044 left them, P1–P2, PX1–PX8, Q1–Q3, Q6–Q9, Q12–Q14, Y2 (SOP's node count in run 2), R1–R2, R4–R8, R12–R17, S1–S2, S4, S6, S9–S10, T1–T3, U8–U9, V4–V7 and X1–X8. Where one names an item or price that's gone (P2's "1:40 state", U8's $10M), it is read with the new items, the bar unchanged.
 
 ## Assumed
 
@@ -432,10 +434,10 @@ Each is the smallest reasonable answer; the owner can change any of it.
 - **Land Surveys 24–25**: the next two sauces on IPM's list and +1 count, +6 mash a survey, as 22 and 23 go (G22).
 - **The four top sauces' values**: $500Dc each, the wiki's guess (G22). **Heat Death Mash's time**: 100:00.
 - **Trucks**: the trip formula above (G21).
-- **The kitchen** (D052): the Bell Plot at $50 and four times Balor; kitchen recipes only in the kitchen vat and line; the kitchen vat and line at $150 and $100 rather than IPM's free.
+- **The kitchen** (D052): the Bell Plot at $50 with four times Balor's harvest and cargo; kitchen recipes only in the kitchen vat and line; the kitchen vat and line at $150 and $100 rather than IPM's free.
 - **Crafters 7–10** are the wiki's prices doubled: the wiki quotes them after Preferred Vendor's 50%.
 - **Ingredients**: stations opening with Surveys 1, 3, 4 and 6; priced like the survey's cheapest farm; mash values by IPM's bar markup; two sauces each, at about 10% of the inputs.
 - **Superior Mining, Thrusters and Cargo Handling** multiply by ×1.25 (the wiki doubts this and says it may be ×1.2 added).
-- **Our nodes' costs** set in PR 2 by the rule above (G23).
+- **Our nodes' costs**: the value rule above (G23).
 - **Operation Value as Galaxy Value**, rooms in IPM's fixed order, Hydroponics Bay gone, Night Watchman on IPM's levels, Ergonomics Lab and Seed Capital on Engineering's level costs.
 - **Suffixes** ours to Dc, not IPM's letters.

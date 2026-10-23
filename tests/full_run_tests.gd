@@ -42,7 +42,8 @@ func run() -> void:
 
 func test_booster_concentrate_bulk() -> void:
 	var g: Game = Helpers.with(["pantry_vinegar_bulk"])
-	var base: float = Game.new().ipm_curve(T.HARVEST_RATE, 0)
+	# The Cask's own harvest at Level 0, its survey's rate tweak (T3) included.
+	var base: float = Game.new().ipm_curve(T.HARVEST_RATE, 0) * g.data.plots.vinegar.harvest_mult
 	check(close(g.crop_rate("vinegar", "vinegar"), base * 2.0 * 2.0), "V4: the Booster doubles the Cask's harvest, and Bulk doubles it again (%.2f a second)" % g.crop_rate("vinegar", "vinegar"))
 	check(g.recipe_inputs("pickled_brine").vinegar == 600, "V4: Concentrate: Pickled Brine takes 600 Vinegar, 40%% less (got %d)" % g.recipe_inputs("pickled_brine").vinegar)
 	var z: Game = Helpers.with(["pantry_vinegar_concentrate", "zero_waste_1"])

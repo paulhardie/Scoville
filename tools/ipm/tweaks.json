@@ -1,5 +1,5 @@
 {
-	"_source": "v0.7 PR 3's tweaks to the copy (docs/SKELETON.md Z2): tools/ipm/build_data.py applies them to what the mapping gives, and tests/skeleton_tests.gd checks data/ is the mapping with exactly these applied. Each row says what it answers. Everything not named here is Idle Planet Miner's number.",
+	"_source": "v0.7 PR 3's tweaks to the copy (docs/SKELETON.md Z2): tools/ipm/build_data.py applies them to what the mapping gives, and tests/skeleton_tests.gd checks data/ is the mapping with exactly these applied. Each row says what it answers. Everything not named here is Idle Planet Miner's number. T5 (Standard Operating Procedures' bar) is a rule, in src/core/tuning.gd, not data; SKELETON.md lists it with these.",
 	"tweaks": [
 		{
 			"id": "T1",
@@ -14,8 +14,8 @@
 			"id": "T2",
 			"op": "survey_cost_scale",
 			"factor": 0.5,
-			"until_survey": 2,
-			"what": "Land Survey 1 costs IPM's Telescope 1 × 0.5, every later survey its telescope × 0.25 (at least 1 of each item).",
+			"until_survey": 1,
+			"what": "Every Land Survey costs its IPM telescope × 0.5 (at least 1 of each item).",
 			"answers": "I6, I7 (W37, W38): Land Survey 3 alone asked for 50,000 Pimento"
 		},
 		{
@@ -33,6 +33,40 @@
 			"line": 100.0,
 			"what": "The kitchen's vat and line run only the kitchen's recipes, and IPM's free first smelter and crafter come after them as Vat 2 and Line 2, at the kitchen's $150 and $100 (a price can't be 0). Every later slot is IPM's, one place on.",
 			"answers": "I8, I7, Y2 (W39, W38, W41): the player handed the kitchen's line to the survey's sauces, so no Table Mild came for the button's nodes"
+		},
+		{
+			"id": "T6",
+			"op": "node_effect",
+			"node": "calloused_thumbs",
+			"effects": [
+				{
+					"tap_yield": 8
+				}
+			],
+			"what": "Calloused Thumbs: a press picks 8 more Bell Peppers (was 2).",
+			"answers": "I8 (W39): the copy's factory is far bigger at 15:00 than v0.6's, so the button added 8% against F8's 25%"
+		},
+		{
+			"id": "T7",
+			"op": "node_cost_scale",
+			"nodes": [
+				"double_tap",
+				"ergonomic_grip",
+				"heat_meter"
+			],
+			"factor": 0.5,
+			"what": "Double-Tap, Ergonomic Grip and Heat Meter cost half their Table Mild (rounded up).",
+			"answers": "I8 (W39): the kitchen's Table Mild didn't reach Heat Meter before 1:30 (M5's check)"
+		},
+		{
+			"id": "T8",
+			"op": "node_cost",
+			"node": "night_shift_1",
+			"cost": {
+				"table_mild": 128
+			},
+			"what": "Night Shift Protocols I costs 128 Table Mild, the kitchen's bottle (was 6 Sweet Pepper Relish).",
+			"answers": "P2 (W43): offline only beat two hours of tapping with Night Shift, and the player never made the Relish for it before 1:40"
 		}
 	]
 }

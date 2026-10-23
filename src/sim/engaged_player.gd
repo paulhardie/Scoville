@@ -47,6 +47,9 @@ const KEEP_CYCLES := 2
 const ROOM_ORDER := ["seed_vault", "fermentation_cellar", "land_office", "high_speed_cannery", "test_kitchen", "motor_pool",
 	"crate_yard", "boardroom", "cooperage", "glassworks", "tasting_room", "seed_capital", "ergonomics_lab", "night_watchman", "ad_agency"]
 
+## The North Wing nodes it takes first, in order (GUESS: to the Heat Meter).
+const BUTTON_BASICS := 4
+
 ## Whether it buys and researches (off when measuring a minute as things stand).
 var buys := true
 
@@ -99,7 +102,7 @@ func decide(g) -> void:
 		goal = next_research(g)
 	var need: Dictionary = g.tech_cost(goal) if goal != "" and g.research_reachable(goal) else {}
 	if buys:
-		_research_spare(g, now, goal, need)
+		_research_spare(g, now, goal, need, _kitchen_node(g))
 		_use_crossbreeds(g)
 	var wanted := _wanted(g, need)
 	if g.fx.stockpile:
@@ -107,7 +110,7 @@ func decide(g) -> void:
 	var plan := _plan_slots(g, wanted)
 	_assign(g, plan, wanted)
 	# The kitchen's nodes are paid in its bottles (D052): it keeps them for
-	# the cheapest it can reach, as the player before v0.7 did.
+	# the one it's after (_kitchen_node).
 	var keep := need.duplicate()
 	var kitchen := _kitchen_node(g)
 	if kitchen != "":
@@ -139,8 +142,9 @@ func next_research(g) -> String:
 	return best if best != "" else (survey if g.data.tech.has(survey) and not g.is_researched(survey) else "")
 
 
-## The cheapest node it can reach that is paid only in the kitchen's mash and
-## bottles, or "".
+## The node it can reach that is paid only in the kitchen's mash and bottles,
+## or "": the button's basics (N1–N4, in order) first, since it taps;
+## otherwise the cheapest.
 func _kitchen_node(g) -> String:
 	var best := ""
 	for node in g.data.tech_order:
@@ -150,20 +154,41 @@ func _kitchen_node(g) -> String:
 		var kitchen_only := not cost.is_empty()
 		for item in cost:
 			kitchen_only = kitchen_only and g.data.recipes.has(item) and g.data.recipes[item].get("kitchen", false)
-		if kitchen_only and (best == "" or g.tech_cost_value(node) < g.tech_cost_value(best)):
+		if not kitchen_only:
+			continue
+		var north: bool = g.data.tech[node].wing == "north" and _label_n(g, node) <= BUTTON_BASICS
+		var best_north: bool = best != "" and g.data.tech[best].wing == "north" and _label_n(g, best) <= BUTTON_BASICS
+		if best == "" or north and not best_north:
 			best = node
+		elif north == best_north:
+			var before: bool = _label_n(g, node) < _label_n(g, best) if north else g.tech_cost_value(node) < g.tech_cost_value(best)
+			if before:
+				best = node
 	return best
 
 
-## Other nodes it can afford without touching what the goal needs.
-func _research_spare(g, now: float, goal: String, need: Dictionary) -> void:
+## A node's number on the web (N4 → 4).
+static func _label_n(g, node: String) -> int:
+	return int(g.data.tech[node].label.substr(1)) if node != "" else 0
+
+
+## Other nodes it can afford without touching what the goal or the kitchen
+## node needs (the kitchen node itself, once its cost is in stock).
+func _research_spare(g, now: float, goal: String, need: Dictionary, kitchen: String) -> void:
+	# Saved for: the goal's cost and the kitchen node's.
+	var held := need.duplicate()
+	if kitchen != "":
+		var kc: Dictionary = g.tech_cost(kitchen)
+		for item in kc:
+			held[item] = held.get(item, 0) + kc[item]
 	for node in g.data.tech_order:
 		if node == goal or not g.can_research(node):
 			continue
 		var cost: Dictionary = g.tech_cost(node)
 		var clash := false
 		for item in cost:
-			if need.has(item) and g.stock[item] - cost[item] < need[item]:
+			var hold: int = held.get(item, 0) - (cost[item] if node == kitchen else 0)
+			if g.stock[item] - cost[item] < hold:
 				clash = true
 		if not clash and g.research_node(node):
 			_note(now, "research " + node)

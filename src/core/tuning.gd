@@ -172,7 +172,7 @@ const ROOMS_OFFERED := 2
 
 ## Standard Operating Procedures (brief §4, D034): a node researches itself
 ## when its cost is worth under SOP_SHARE of the run's Operation Value, looked
-## at every SOP_EVERY_SECONDS (GUESS). PR 3's T6: it was 1% of an hour's
+## at every SOP_EVERY_SECONDS (GUESS). PR 3's T5: it was 1% of an hour's
 ## bottles, which on the copy was under every node's cost (Y2, W41).
 const SOP_SHARE := 0.05
 const SOP_EVERY_SECONDS := 1.0

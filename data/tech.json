@@ -27,7 +27,7 @@
 			},
 			"effects": [
 				{
-					"tap_yield": 2
+					"tap_yield": 8
 				}
 			],
 			"pos": [
@@ -65,7 +65,7 @@
 				"calloused_thumbs"
 			],
 			"cost": {
-				"table_mild": 128
+				"table_mild": 64
 			},
 			"effects": [
 				{
@@ -107,7 +107,7 @@
 				"double_tap"
 			],
 			"cost": {
-				"table_mild": 212
+				"table_mild": 106
 			},
 			"effects": [
 				{
@@ -128,7 +128,7 @@
 				"ergonomic_grip"
 			],
 			"cost": {
-				"table_mild": 255
+				"table_mild": 128
 			},
 			"effects": [
 				{
@@ -318,7 +318,7 @@
 				"delivery_van"
 			],
 			"cost": {
-				"sweet_pepper_relish": 6
+				"table_mild": 128
 			},
 			"effects": [
 				{
@@ -537,8 +537,8 @@
 				"survey_1"
 			],
 			"cost": {
-				"ancho_mash": 3,
-				"cascabel": 125
+				"ancho_mash": 5,
+				"cascabel": 250
 			},
 			"effects": [
 				{
@@ -559,8 +559,8 @@
 				"survey_2"
 			],
 			"cost": {
-				"pimento_spread": 3,
-				"cascabel_mash": 4
+				"pimento_spread": 5,
+				"cascabel_mash": 8
 			},
 			"effects": [
 				{
@@ -687,8 +687,8 @@
 				"survey_3"
 			],
 			"cost": {
-				"smoky_ancho": 1,
-				"verde_mash": 5
+				"smoky_ancho": 3,
+				"verde_mash": 10
 			},
 			"effects": [
 				{
@@ -837,8 +837,8 @@
 				"survey_4"
 			],
 			"cost": {
-				"bistro_verde": 1,
-				"serrano_mash": 3
+				"bistro_verde": 2,
+				"serrano_mash": 5
 			},
 			"effects": [
 				{
@@ -881,8 +881,8 @@
 				"survey_5"
 			],
 			"cost": {
-				"serrano_fire": 1,
-				"sofrito_base": 6
+				"serrano_fire": 2,
+				"sofrito_base": 13
 			},
 			"effects": [
 				{
@@ -1009,8 +1009,8 @@
 				"survey_6"
 			],
 			"cost": {
-				"sunshine_sauce": 1,
-				"cayenne_mash": 5
+				"sunshine_sauce": 2,
+				"cayenne_mash": 10
 			},
 			"effects": [
 				{
@@ -1031,8 +1031,8 @@
 				"survey_7"
 			],
 			"cost": {
-				"pineapple_picante": 1,
-				"pequin_mash": 3
+				"pineapple_picante": 2,
+				"pequin_mash": 5
 			},
 			"effects": [
 				{
@@ -1053,8 +1053,8 @@
 				"survey_8"
 			],
 			"cost": {
-				"mole_poblano": 1,
-				"thai_chili_mash": 3
+				"mole_poblano": 2,
+				"thai_chili_mash": 5
 			},
 			"effects": [
 				{
@@ -1075,8 +1075,8 @@
 				"survey_9"
 			],
 			"cost": {
-				"classic_louisiana": 1,
-				"bonnet_mash": 3
+				"classic_louisiana": 2,
+				"bonnet_mash": 5
 			},
 			"effects": [
 				{
@@ -1097,8 +1097,8 @@
 				"survey_10"
 			],
 			"cost": {
-				"phantom": 1,
-				"fatalii_mash": 3
+				"phantom": 2,
+				"fatalii_mash": 5
 			},
 			"effects": [
 				{
@@ -1119,8 +1119,8 @@
 				"survey_11"
 			],
 			"cost": {
-				"cajun_red": 1,
-				"caribbean_red_mash": 3
+				"cajun_red": 2,
+				"caribbean_red_mash": 5
 			},
 			"effects": [
 				{
@@ -1141,8 +1141,8 @@
 				"survey_12"
 			],
 			"cost": {
-				"pitmaster_bbq": 1,
-				"chocolate_mash": 3
+				"pitmaster_bbq": 2,
+				"chocolate_mash": 5
 			},
 			"effects": [
 				{
@@ -1163,8 +1163,8 @@
 				"survey_13"
 			],
 			"cost": {
-				"island_heat": 1,
-				"ghost_mash": 3
+				"island_heat": 2,
+				"ghost_mash": 5
 			},
 			"effects": [
 				{
@@ -1185,8 +1185,8 @@
 				"survey_14"
 			],
 			"cost": {
-				"ranchero": 1,
-				"seven_pot_mash": 3
+				"ranchero": 3,
+				"seven_pot_mash": 5
 			},
 			"effects": [
 				{
@@ -1207,8 +1207,8 @@
 				"survey_15"
 			],
 			"cost": {
-				"fatalii_fire": 1,
-				"naga_mash": 3
+				"fatalii_fire": 2,
+				"naga_mash": 5
 			},
 			"effects": [
 				{
@@ -1229,8 +1229,8 @@
 				"survey_16"
 			],
 			"cost": {
-				"sweet_heat": 1,
-				"moruga_mash": 3
+				"sweet_heat": 2,
+				"moruga_mash": 5
 			},
 			"effects": [
 				{
@@ -1251,8 +1251,8 @@
 				"survey_17"
 			],
 			"cost": {
-				"jalapeno_ranch": 1,
-				"grim_mash": 3
+				"jalapeno_ranch": 2,
+				"grim_mash": 5
 			},
 			"effects": [
 				{
@@ -1273,8 +1273,8 @@
 				"survey_18"
 			],
 			"cost": {
-				"volcano_sauce": 1,
-				"pepper_y_mash": 3
+				"volcano_sauce": 2,
+				"pepper_y_mash": 6
 			},
 			"effects": [
 				{
@@ -1295,8 +1295,8 @@
 				"survey_19"
 			],
 			"cost": {
-				"cocoa_loco": 1,
-				"lava_lantern_mash": 4
+				"cocoa_loco": 3,
+				"lava_lantern_mash": 8
 			},
 			"effects": [
 				{
@@ -1317,8 +1317,8 @@
 				"survey_20"
 			],
 			"cost": {
-				"black_hole": 1,
-				"solar_flare_mash": 5
+				"black_hole": 3,
+				"solar_flare_mash": 10
 			},
 			"effects": [
 				{
@@ -1339,8 +1339,8 @@
 				"survey_21"
 			],
 			"cost": {
-				"seven_pot_stew": 2,
-				"crystal_extract": 6
+				"seven_pot_stew": 3,
+				"crystal_extract": 12
 			},
 			"effects": [
 				{
@@ -1361,8 +1361,8 @@
 				"survey_22"
 			],
 			"cost": {
-				"naga_sunrise": 2,
-				"brimstone_mash": 8
+				"naga_sunrise": 3,
+				"brimstone_mash": 15
 			},
 			"effects": [
 				{
@@ -1383,8 +1383,8 @@
 				"survey_23"
 			],
 			"cost": {
-				"ghost_town": 2,
-				"supernova_mash": 9
+				"ghost_town": 4,
+				"supernova_mash": 18
 			},
 			"effects": [
 				{
@@ -1405,8 +1405,8 @@
 				"survey_24"
 			],
 			"cost": {
-				"scorpion_sting": 2,
-				"event_horizon_mash": 11
+				"scorpion_sting": 4,
+				"event_horizon_mash": 21
 			},
 			"effects": [
 				{

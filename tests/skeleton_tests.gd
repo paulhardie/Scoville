@@ -123,6 +123,23 @@ static func tweaked_survey(cost: Dictionary, n: int) -> Dictionary:
 	return out
 
 
+## A JSON cost as whole numbers.
+static func counts_of(cost: Dictionary) -> Dictionary:
+	var out := {}
+	for item in cost:
+		out[item] = roundi(cost[item])
+	return out
+
+
+## Slot prices after T4: the inserted price at its place.
+static func tweaked_slots(prices: Array, station: String) -> Array:
+	var out := prices.duplicate()
+	var t := tweak("slot_insert")
+	if not t.is_empty():
+		out.insert(int(t.index), float(t[station]))
+	return out
+
+
 ## Whole numbers, so JSON's floats compare with the loader's ints (Arrays
 ## compare strictly by type).
 static func ints(a: Array) -> Array:
@@ -203,10 +220,25 @@ func test_copied() -> void:
 			bad.append("room " + r.name)
 	for station in ["vat", "line"]:
 		var prices: Array = g.data.slots[station].prices
-		var want: Array = m.vats if station == "vat" else m.lines
+		var want: Array = tweaked_slots(m.vats if station == "vat" else m.lines, station)
+		check(prices.size() == want.size(), "Z2: %d %s prices, want %d" % [prices.size(), station, want.size()])
 		for i in want.size():
 			if i >= prices.size() or not near(prices[i], want[i]):
 				bad.append("%s %d" % [station, i + 1])
+	# Our own nodes' tweaks (T6–T8) are what the data holds.
+	for t in read_json(TWEAKS).tweaks:
+		match t.op:
+			"node_effect":
+				if JSON.stringify(g.data.tech[t.node].effects) != JSON.stringify(t.effects):
+					bad.append("tweak %s" % t.id)
+			"node_cost":
+				if g.data.tech[t.node].cost != counts_of(t.cost):
+					bad.append("tweak %s" % t.id)
+			"node_cost_scale":
+				for id in t.nodes:
+					for item in g.data.tech[id].cost:
+						if g.data.tech[id].cost[item] <= 0:
+							bad.append("tweak %s" % t.id)
 	check(bad.is_empty(), "Z2: these differ from the mapping with its tweaks: %s" % str(bad))
 	check(m.farms.size() == 79 and m.peppers.size() == 28 and m.rooms.size() == 15, "I1: 79 farms, 28 peppers and 15 rooms mapped (%d, %d, %d)" % [m.farms.size(), m.peppers.size(), m.rooms.size()])
 
@@ -245,14 +277,16 @@ func test_snapshot() -> void:
 		ours.sort()
 		if not f.price_assumed and shares != ours:
 			bad.append("farm %d shares" % f.n)
-	# The first vat and line are the kitchen's (D052); crafters 7–10 are doubled
-	# (SKELETON.md, assumed).
+	# The first vat and line are the kitchen's (D052) and IPM's free first
+	# smelter and crafter come next (T4), so IPM's n-th is our (n + shift)-th;
+	# crafters 7–10 are doubled (SKELETON.md, assumed).
+	var shift: int = 1 if not tweak("slot_insert").is_empty() else 0
 	for i in range(1, snap.smelters.size()):
-		if not near(g.data.slots.vat.prices[i], num(snap.smelters[i])):
-			bad.append("vat %d" % (i + 1))
+		if not near(g.data.slots.vat.prices[i + shift], num(snap.smelters[i])):
+			bad.append("vat %d" % (i + 1 + shift))
 	for i in range(1, 6):
-		if not near(g.data.slots.line.prices[i], num(snap.crafters[i])):
-			bad.append("line %d" % (i + 1))
+		if not near(g.data.slots.line.prices[i + shift], num(snap.crafters[i])):
+			bad.append("line %d" % (i + 1 + shift))
 	var credits := []
 	for row in snap.credits:
 		credits.append(int(num(row[1])))

@@ -148,12 +148,12 @@ func test_slot_upgrades() -> void:
 
 func test_slot_caps() -> void:
 	var g := factory(1e40)
-	for i in 10:
+	for i in 11:
 		check(g.buy_slot("vat"), "buys vat slot %d" % (i + 1))
-	check(g.slot_cap("vat") == 10 and not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: ten vats, no eleventh (IPM's ten smelters)")
-	for i in 10:
+	check(g.slot_cap("vat") == 11 and not g.slot_offered("vat") and not g.buy_slot("vat"), "S3: the kitchen's vat and IPM's ten smelters, no twelfth (T4)")
+	for i in 11:
 		check(g.buy_slot("line"), "buys line slot %d" % (i + 1))
-	check(not g.buy_slot("line"), "S3: no eleventh line")
+	check(not g.buy_slot("line"), "S3: no twelfth line")
 	check(g.lines[1].crate == 0, "only the first line has a Starter Crate")
 	check(g.vats[1].recipe == "" and g.lines[1].recipe == "", "slots after the kitchen's start switched off")
 	var spent := 0.0
@@ -181,7 +181,8 @@ func test_recipes_are_bought() -> void:
 
 
 func test_kitchen_recipes_only_in_the_kitchen() -> void:
-	# D052: Sweet Pepper Mash and Table Mild run only in the first vat and line.
+	# D052: Sweet Pepper Mash and Table Mild run only in the first vat and line,
+	# which run nothing else (PR 3's T4).
 	var g := factory()
 	g.buy_slot("vat")
 	g.buy_slot("vat")
@@ -189,22 +190,26 @@ func test_kitchen_recipes_only_in_the_kitchen() -> void:
 	g.buy_slot("line")
 	check(g.recipes_for("vat", 0).has("sweet_mash") and not g.recipes_for("vat", 1).has("sweet_mash"), "Sweet Pepper Mash only in vat 1")
 	check(not g.assign("vat", 1, "sweet_mash") and not g.assign("line", 1, "table_mild"), "and Table Mild only in line 1")
-	check(g.assign("vat", 0, "bell_puree"), "the kitchen vat can run any recipe")
+	check(not g.assign("vat", 0, "bell_puree") and g.recipes_for("vat", 0) == ["sweet_mash"] and g.recipes_for("line", 0) == ["table_mild"], "T4: the kitchen's vat and line run only the kitchen's recipes")
+	check(g.assign("vat", 1, "bell_puree"), "T4: IPM's free smelter, Vat 2, runs the rest")
 
 
 func test_ipm_chain_runs() -> void:
 	# S1: Bell Pepper Purée takes 1,000 Bell Peppers and makes one in 20 s;
 	# Sweet Pepper Relish takes 5 of them (IPM's Copper Bar and Copper Wire).
 	var g := factory()
-	g.buy_slot("vat")
-	g.buy_slot("line")
+	for i in 2:
+		g.buy_slot("vat")
+		g.buy_slot("line")
 	g.lines[0].crate = 0
+	g.assign("vat", 0, "")
+	g.assign("line", 0, "")
 	g.stock.bell = 1000
-	check(g.assign("vat", 0, "bell_puree") and g.stock.bell == 0, "S1: the vat takes exactly 1,000 Bell Peppers")
+	check(g.assign("vat", 1, "bell_puree") and g.stock.bell == 0, "S1: the vat takes exactly 1,000 Bell Peppers")
 	g.advance(seconds(20.0))
 	check(g.stock.bell_puree == 1, "S1: one Purée after 20 s")
 	g.stock.bell_puree = 5
-	check(g.assign("line", 0, "sweet_pepper_relish") and g.stock.bell_puree == 0, "S1: Relish takes 5 Purée")
+	check(g.assign("line", 1, "sweet_pepper_relish") and g.stock.bell_puree == 0, "S1: Relish takes 5 Purée")
 	g.advance(seconds(60.0))
 	check(g.stock.sweet_pepper_relish == 1 and close(g.value("sweet_pepper_relish"), 10000.0), "S1: a $10,000 Relish after 60 s")
 
@@ -323,7 +328,7 @@ func test_bad_saves_are_refused() -> void:
 	check(g.load_state(s) != "", "an unknown crop in a field is refused")
 	s = g.to_state()
 	s.run.vats = []
-	for i in 11:
+	for i in g.slot_cap("vat") + 1:
 		s.run.vats.append({})
 	check(g.load_state(s) != "", "more slots than the cap are refused")
 	check(JSON.stringify(g.to_state()) == before, "a refused save changes nothing")
@@ -462,7 +467,7 @@ func test_v3_save_migrates() -> void:
 	check(problem == "", "S9: a v3 save loads: " + problem)
 	check_no_loss(g, 3100.0 * T.SAVE_V8_MONEY, 3300.0 * T.SAVE_V8_MONEY, {"jalapeno": 30, "vinegar": 12, "verde_mash": 1}, "v3")
 	check(g.autosell.table_mild == 50, "S9: sliders carry over")
-	check(g.has_van() and g.tap_yield() == 3, "S9: research that still exists carries over, with its effects")
+	check(g.has_van() and g.tap_yield() == 1 + g.data.tech.calloused_thumbs.effects[0].tap_yield, "S9: research that still exists carries over, with its effects (Calloused Thumbs)")
 	check(not g.research.has("jalapeno_blueprint") and not g.research.has("verde_blueprint"), "I11 v3: removed blueprints are gone")
 	# The two removed blueprints cost 3 + 10 Table Mild in v11; they come back.
 	check(g.stock.table_mild >= 3 + 3 + 10, "I11 v3: their items come back (%d Table Mild)" % g.stock.table_mild)

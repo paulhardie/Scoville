@@ -384,6 +384,14 @@ for t in TWEAKS:
                 m = t["factor"] ** r["survey"]
                 r["harvest_mult"] = r.get("harvest_mult", 1.0) * m
                 r["cargo_mult"] = r.get("cargo_mult", 1.0) * m
+    elif t["op"] == "node_effect":
+        next(n for n in out if n["id"] == t["node"])["effects"] = t["effects"]
+    elif t["op"] == "node_cost":
+        next(n for n in out if n["id"] == t["node"])["cost"] = t["cost"]
+    elif t["op"] == "node_cost_scale":
+        for n in out:
+            if n["id"] in t["nodes"]:
+                n["cost"] = {i: math.ceil(c * t["factor"]) for i, c in n["cost"].items()}
     elif t["op"] == "slot_insert":
         for station in ("vat", "line"):
             slots[station]["prices"].insert(t["index"], t[station])

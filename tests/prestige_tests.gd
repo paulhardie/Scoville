@@ -162,7 +162,7 @@ func test_room_effects() -> void:
 	check(glass.recipe_inputs("pickled_brine").vinegar == 1000, "Q6: Glassworks leaves vats alone")
 	var lab := worth(0.0, {"ergonomics_lab": 1})
 	research(lab, "calloused_thumbs")
-	check(lab.tap_yield() == 4, "Q6: Ergonomics Lab Lv1 with Calloused Thumbs: 3 × 1.25 rounds to 4 (got %d)" % lab.tap_yield())
+	check(lab.tap_yield() == 11, "Q6: Ergonomics Lab Lv1 with Calloused Thumbs: 9 × 1.25 rounds to 11 (got %d)" % lab.tap_yield())
 	var amounts := []
 	for lv in range(1, 6):
 		amounts.append(worth(0.0, {"seed_capital": lv}).start_cash())
@@ -302,6 +302,10 @@ func test_sop() -> void:
 			var parents_due := true
 			for need in g.data.tech[id].needs:
 				parents_due = parents_due and (g.is_researched(need) or due.has(need))
+			# IPM's "any of": one of them researched or due.
+			var any: Array = g.data.tech[id].needs_any
+			if not any.is_empty():
+				parents_due = parents_due and any.any(func(n): return g.is_researched(n) or due.has(n))
 			if parents_due:
 				later.append(id)
 	var forks := ["pantry_vinegar_bulk", "pantry_vinegar_reserve"]

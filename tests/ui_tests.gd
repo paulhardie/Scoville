@@ -112,7 +112,7 @@ func run() -> void:
 	await process_frame
 	var vat_card: Control = screen.find_child("Card_vat_0", true, false)
 	check((screen.find_child("Page_processing", true, false) as Control).visible and vat_card.is_visible_in_tree(), "Processing shows the vat")
-	check((screen.find_child("Recipe_vat_0", true, false) as OptionButton).item_count == 3, "its picker offers Off, Sweet Pepper Mash and Bell Purée (free, IPM's Copper Bar)")
+	check((screen.find_child("Recipe_vat_0", true, false) as OptionButton).item_count == 2, "the kitchen vat's picker offers Off and Sweet Pepper Mash (T4)")
 	(screen.find_child("Tab_tech", true, false) as Button).pressed.emit()
 	await process_frame
 	check(not (screen.find_child("Page_tech", true, false) as Control).visible, "O9: a locked tab doesn't open")

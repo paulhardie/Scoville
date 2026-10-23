@@ -1050,7 +1050,7 @@ func scarcest_cost(node: String) -> Array:
 
 
 ## What a node may cost and still research itself under Standard Operating
-## Procedures: SOP_SHARE of the run's Operation Value (PR 3's T6).
+## Procedures: SOP_SHARE of the run's Operation Value (PR 3's T5).
 func sop_bar() -> float:
 	return T.SOP_SHARE * operation_value()
 
